@@ -23,7 +23,7 @@ public class ScentlessPotion {
         // Create custom potion contents with wind charged effect instead of any base potion
         StatusEffectInstance windChargedEffect = new StatusEffectInstance(
             StatusEffects.WIND_CHARGED,
-            isLong ? 9600 : 3600,  // 8 minutes or 3 minutes
+            isLong ? 19200 : 9600,  // 8 minutes or 3 minutes
             0,                     // Amplifier
             false,                 // Ambient
             true,                  // ShowParticles
@@ -41,12 +41,18 @@ public class ScentlessPotion {
 
         // Set potion Lore with different colors for each line
         LoreComponent lore = new LoreComponent(List.of(
-            Text.literal(isLong ? "Scentlessness (8:00)" : "Scentlessness (3:00)")
-                    .formatted(Formatting.RESET).formatted(Formatting.BLUE),
+            Text.literal(isLong ? "Scentlessness (16:00)" : "Scentlessness (8:00)")
+                    .formatted(Formatting.RESET).formatted(Formatting.BLUE).styled(style -> {
+                        return style.withItalic(false);
+                    }),
             Text.literal("Inhibits being caught by")
-                    .formatted(Formatting.RESET).formatted(Formatting.GRAY),
+                    .formatted(Formatting.RESET).formatted(Formatting.GRAY).styled(style -> {
+                        return style.withItalic(false);
+                    }),
             Text.literal("the Warden's sniff attack.")
-                    .formatted(Formatting.RESET).formatted(Formatting.GRAY)
+                    .formatted(Formatting.RESET).formatted(Formatting.GRAY).styled(style -> {
+                        return style.withItalic(false);
+                    })
         ));
 
         // Create tooltip display component to hide potion contents
@@ -65,7 +71,9 @@ public class ScentlessPotion {
 
         // Set custom name
         potionStack.set(DataComponentTypes.CUSTOM_NAME,
-            Text.literal(isLong ? "Long Potion of Scentlessness" : "Potion of Scentlessness").formatted(Formatting.RESET).formatted(Formatting.WHITE));
+            Text.literal(isLong ? "Long Potion of Scentlessness" : "Potion of Scentlessness").formatted(Formatting.RESET).formatted(Formatting.WHITE).styled(style -> {
+                return style.withItalic(false);
+            }));
 
         return potionStack;
     }
