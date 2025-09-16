@@ -1,68 +1,89 @@
 package net.noahsarch.deeperdark.potion;
 
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.LoreComponent;
 import net.minecraft.component.type.PotionContentsComponent;
+import net.minecraft.component.type.TooltipDisplayComponent;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.potion.Potions;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.potion.Potion;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
+
+import java.util.List;
+import java.util.Optional;
 
 public class ScentlessPotion {
-    // Base potion types for the brewing system - these can be changed to any vanilla potion
-    private static final RegistryEntry<Potion> BASE_SCENTLESS_POTION = Potions.WATER_BREATHING;
-    private static final RegistryEntry<Potion> BASE_SCENTLESS_LONG_POTION = Potions.LONG_WATER_BREATHING;
 
-    // Public constants for brewing recipes and detection - these use methods for flexibility
-    public static final RegistryEntry<Potion> SCENTLESS = getScentlessPotion();
-    public static final RegistryEntry<Potion> SCENTLESS_LONG = getScentlessLongPotion();
-
-    // Methods to get the registry entries - you can modify these to change the base potions
-    private static RegistryEntry<Potion> getScentlessPotion() {
-        // You can add custom logic here if needed
-        return BASE_SCENTLESS_POTION;
-    }
-
-    private static RegistryEntry<Potion> getScentlessLongPotion() {
-        // You can add custom logic here if needed
-        return BASE_SCENTLESS_LONG_POTION;
-    }
-
-    // Method to create a fully customized scentless potion ItemStack
+    // Method to create a completely custom scentless potion with custom effects
     public static ItemStack createScentlessPotion(boolean isLong) {
         ItemStack potionStack = new ItemStack(Items.POTION);
 
-        // Set the potion using data components (modern way)
-        // Use the constants which call the methods
-        PotionContentsComponent potionContents = new PotionContentsComponent(isLong ? SCENTLESS_LONG : SCENTLESS);
-        potionStack.set(DataComponentTypes.POTION_CONTENTS, potionContents);
+        // Create custom potion contents with wind charged effect instead of any base potion
+        StatusEffectInstance windChargedEffect = new StatusEffectInstance(
+            StatusEffects.WIND_CHARGED,
+            isLong ? 9600 : 3600,  // 8 minutes or 3 minutes
+            0,                     // Amplifier
+            false,                 // Ambient
+            true,                  // ShowParticles
+            false                   // ShowIcon
+        );
 
-        // Add custom name to distinguish it from regular water breathing potions
-        potionStack.set(DataComponentTypes.CUSTOM_NAME, Text.translatable(isLong ? "item.deeperdark.scentless_potion_long" : "item.deeperdark.scentless_potion"));
+        // Create potion contents with no base potion, just our custom effect
+        // Using the correct constructor: (potion, customColor, customEffects, customName)
+        PotionContentsComponent customPotionContents = new PotionContentsComponent(
+            Optional.empty(),                     // No base potion
+            Optional.of(0x529EC9),               // Custom purple color
+            List.of(windChargedEffect),          // Our custom effect list
+            Optional.empty()                     // No custom name in component (we'll use display name)
+        );
+
+        // Set potion Lore with different colors for each line
+        LoreComponent lore = new LoreComponent(List.of(
+            Text.literal(isLong ? "Scentlessness (8:00)" : "Scentlessness (3:00)")
+                    .formatted(Formatting.RESET).formatted(Formatting.BLUE),
+            Text.literal("Inhibits being caught by")
+                    .formatted(Formatting.RESET).formatted(Formatting.GRAY),
+            Text.literal("the Warden's sniff attack.")
+                    .formatted(Formatting.RESET).formatted(Formatting.GRAY)
+        ));
+
+        // Create tooltip display component to hide potion contents
+        TooltipDisplayComponent tooltip = new TooltipDisplayComponent(false,
+            new java.util.LinkedHashSet<>(java.util.Set.of(DataComponentTypes.POTION_CONTENTS))
+        );
+
+        // Set the custom potion contents
+        potionStack.set(DataComponentTypes.POTION_CONTENTS, customPotionContents);
+
+        // Set lore
+        potionStack.set(DataComponentTypes.LORE, lore);
+
+        // Set tooltip display to hide potion contents
+        potionStack.set(DataComponentTypes.TOOLTIP_DISPLAY, tooltip);
+
+        // Set custom name
+        potionStack.set(DataComponentTypes.CUSTOM_NAME,
+            Text.literal(isLong ? "Long Potion of Scentlessness" : "Potion of Scentlessness").formatted(Formatting.RESET).formatted(Formatting.WHITE));
 
         return potionStack;
     }
 
-    // Alternative method to create scentless potion with custom properties
-    public static ItemStack createCustomScentlessPotion(boolean isLong, String customName) {
-        ItemStack potionStack = createScentlessPotion(isLong);
-
-        if (customName != null && !customName.isEmpty()) {
-            potionStack.set(DataComponentTypes.CUSTOM_NAME, Text.literal(customName));
-        }
-
-        return potionStack;
-    }
-
-    // Helper method to check if a potion is our "scentless" potion
+    // Helper method to check if a potion is our custom scentless potion
     public static boolean isScentlessPotion(ItemStack stack) {
-        PotionContentsComponent potionContents = stack.getOrDefault(DataComponentTypes.POTION_CONTENTS, PotionContentsComponent.DEFAULT);
-
-        if (potionContents.potion().isPresent()) {
-            RegistryEntry<Potion> potion = potionContents.potion().get();
-            return potion == SCENTLESS || potion == SCENTLESS_LONG;
+        if (!(stack.getItem() instanceof net.minecraft.item.PotionItem)) {
+            return false;
         }
+
+        // Check if it has our custom name
+        Text customName = stack.get(DataComponentTypes.CUSTOM_NAME);
+        if (customName != null) {
+            String nameString = customName.getString();
+            return nameString.equals("Potion of Scentlessness") ||
+                   nameString.equals("Long Potion of Scentlessness");
+        }
+
         return false;
     }
 }

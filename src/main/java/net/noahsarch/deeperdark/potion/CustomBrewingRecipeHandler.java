@@ -2,26 +2,38 @@ package net.noahsarch.deeperdark.potion;
 
 import net.fabricmc.fabric.api.registry.FabricBrewingRecipeRegistryBuilder;
 import net.minecraft.item.Items;
+import net.minecraft.potion.Potions;
 import net.minecraft.recipe.Ingredient;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
 
 public class CustomBrewingRecipeHandler {
     public static void register() {
+        // Register specific recipes for creating scentless potions
         FabricBrewingRecipeRegistryBuilder.BUILD.register(builder -> {
-            // Register brewing recipe: Mundane Potion + Echo Shard = Scentless Potion
+            // Register specific recipes for each base potion type to avoid conflicts
+            System.out.println("DEBUG - Registering brewing recipes");
+
+            // Water + Echo Shard = Scentless
             builder.registerPotionRecipe(
-                    Registries.POTION.getEntry(Identifier.of("minecraft:mundane")).orElseThrow(),
-                    Ingredient.ofItems(Items.ECHO_SHARD),
-                    ScentlessPotion.SCENTLESS  // Use the constant from ScentlessPotion
+                    Potions.WATER,                          // Water bottle base
+                    Ingredient.ofItems(Items.ECHO_SHARD),   // Echo shard ingredient
+                    Potions.WATER                           // Output will be replaced by mixin
             );
 
-            // Register brewing recipe: Scentless Potion + Redstone = Long Scentless Potion
+            // Mundane + Echo Shard = Scentless
             builder.registerPotionRecipe(
-                    ScentlessPotion.SCENTLESS,  // Use the constant from ScentlessPotion
-                    Ingredient.ofItems(Items.REDSTONE),
-                    ScentlessPotion.SCENTLESS_LONG  // Use the constant from ScentlessPotion
+                    Potions.MUNDANE,                        // Mundane potion base
+                    Ingredient.ofItems(Items.ECHO_SHARD),   // Echo shard ingredient
+                    Potions.MUNDANE                         // Output will be replaced by mixin
             );
+
+            // Awkward + Echo Shard = Scentless
+            builder.registerPotionRecipe(
+                    Potions.AWKWARD,                        // Awkward potion base
+                    Ingredient.ofItems(Items.ECHO_SHARD),   // Echo shard ingredient
+                    Potions.AWKWARD                         // Output will be replaced by mixin
+            );
+
+            // The redstone extension is handled by the mixin directly, not registered here
         });
     }
 }

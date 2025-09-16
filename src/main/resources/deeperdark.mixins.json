@@ -4,6 +4,7 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "BiomeAccessMixin",
+    "BrewingStandMixin",
     "ExampleMixin",
     "MultiNoiseBiomeSourceMixin",
     "NetherPortalAccessor",
