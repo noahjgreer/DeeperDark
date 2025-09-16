@@ -1,0 +1,22 @@
+{
+  "required": true,
+  "package": "net.noahsarch.deeperdark.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "BiomeAccessMixin",
+    "ExampleMixin",
+    "InGameHudEffectIconMixin",
+    "MultiNoiseBiomeSourceMixin",
+    "NetherPortalAccessor",
+    "NetherPortalMixin",
+    "NoiseChunkGeneratorMixin",
+    "WardenEntityBrainMixin",
+    "WardenEntityMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}

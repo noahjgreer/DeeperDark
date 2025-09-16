@@ -1,0 +1,38 @@
+{
+	"schemaVersion": 1,
+	"id": "deeperdark",
+	"version": "${version}",
+	"name": "Deeperdark",
+	"description": "The deep dark is always below you.",
+	"authors": [
+		"FinniTheFox",
+        "Andrew Grant"
+	],
+	"contact": {
+		"homepage": "https://noahsarch.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/deeperdark/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"net.noahsarch.deeperdark.Deeperdark"
+		],
+		"fabric-datagen": [
+			"net.noahsarch.deeperdark.DeeperdarkDataGenerator"
+		]
+	},
+	"mixins": [
+		"deeperdark.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.17.2",
+		"minecraft": "~1.21.8",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
