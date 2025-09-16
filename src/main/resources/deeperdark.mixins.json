@@ -5,11 +5,11 @@
   "mixins": [
     "BiomeAccessMixin",
     "ExampleMixin",
-    "InGameHudEffectIconMixin",
     "MultiNoiseBiomeSourceMixin",
     "NetherPortalAccessor",
     "NetherPortalMixin",
     "NoiseChunkGeneratorMixin",
+    "PotionItemMixin",
     "WardenEntityBrainMixin",
     "WardenEntityMixin"
   ],

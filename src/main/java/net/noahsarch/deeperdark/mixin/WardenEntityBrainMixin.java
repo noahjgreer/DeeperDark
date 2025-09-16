@@ -3,6 +3,8 @@ package net.noahsarch.deeperdark.mixin;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.effect.StatusEffect;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.WardenEntity;
 import net.noahsarch.deeperdark.Deeperdark;
 import org.spongepowered.asm.mixin.Mixin;
@@ -28,7 +30,7 @@ public class WardenEntityBrainMixin {
 
         // Only ignore scentless entities when the warden is in the SNIFFING pose
         if (warden.isInPose(EntityPose.SNIFFING)) {
-            if (entity instanceof LivingEntity livingEntity && livingEntity.hasStatusEffect(Deeperdark.SCENTLESS_ENTRY)) {
+            if (entity instanceof LivingEntity livingEntity && livingEntity.hasStatusEffect(StatusEffects.WIND_CHARGED)) {
                 // The entity has Scentless effect and Warden is sniffing, so ignore it
                 cir.setReturnValue(false);
             }
