@@ -195,7 +195,31 @@
         "when_in_range": {
           "type": "minecraft:add",
           "argument1": "minecraft:overworld/caves/noodle",
-          "argument2": -0.1
+          "argument2": {
+            "type": "minecraft:add",
+            "argument1": -0.1,
+            "argument2": {
+              "type": "minecraft:mul",
+              "argument1": -0.22,
+              "argument2": {
+                "type": "minecraft:mul",
+                "argument1": {
+                  "type": "minecraft:y_clamped_gradient",
+                  "from_value": 0,
+                  "from_y": 48,
+                  "to_value": 1,
+                  "to_y": 72
+                },
+                "argument2": {
+                  "type": "minecraft:y_clamped_gradient",
+                  "from_value": 1,
+                  "from_y": 72,
+                  "to_value": 0,
+                  "to_y": 100
+                }
+              }
+            }
+          }
         },
         "when_out_of_range": "minecraft:overworld/caves/noodle"
       }
