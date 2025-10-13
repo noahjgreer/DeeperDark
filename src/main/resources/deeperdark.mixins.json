@@ -5,13 +5,16 @@
   "mixins": [
     "BiomeAccessMixin",
     "BrewingStandMixin",
+    "ConsumableComponentsMixin",
     "ExampleMixin",
     "MerchantEntityMixin",
+    "MobEntityAccessor",
     "MultiNoiseBiomeSourceMixin",
     "NetherPortalAccessor",
     "NetherPortalMixin",
     "NoiseChunkGeneratorMixin",
     "PotionItemMixin",
+    "ShulkerBoxBlockEntityMixin",
     "WardenEntityBrainMixin",
     "WardenEntityMixin"
   ],

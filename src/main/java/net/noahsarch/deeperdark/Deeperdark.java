@@ -1,5 +1,6 @@
 package net.noahsarch.deeperdark;
 
+import net.minecraft.block.ComposterBlock;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.registry.Registry;
 import net.noahsarch.deeperdark.potion.CustomBrewingRecipeHandler;
@@ -35,6 +36,10 @@ public class Deeperdark implements ModInitializer {
 
 		LOGGER.info("Hello Fabric world!");
         DeepDarkBiomeModifier.init();
+
+        // Register diamond as compostable (silly easter egg!)
+        // Since registerCompostableItem is private, we access the public map directly
+        ComposterBlock.ITEM_TO_LEVEL_INCREASE_CHANCE.put(Items.DIAMOND.asItem(), 1.0f);
 
         // Register the effects
 //        Registry.register(Registries.STATUS_EFFECT, Identifier.of("deeperdark:scentless"), SCENTLESS);
