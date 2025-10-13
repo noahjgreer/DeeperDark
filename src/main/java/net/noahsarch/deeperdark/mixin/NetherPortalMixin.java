@@ -43,8 +43,8 @@ public class NetherPortalMixin {
     @Inject(method = "createPortal", at = @At("HEAD"), cancellable = true)
     private void onlyLightBelowMinus64(WorldAccess world, CallbackInfo ci) {
         BlockPos lowerCorner = ((NetherPortalAccessor)(Object)this).getLowerCorner();
-        if (world.getDimension().bedWorks() && lowerCorner.getY() > -64) {
-            ci.cancel();
-        }
+//        if (world.getDimension().bedWorks() && lowerCorner.getY() > -64) {
+//            ci.cancel();
+//        }
     }
 }

@@ -6,6 +6,7 @@
     "BiomeAccessMixin",
     "BrewingStandMixin",
     "ExampleMixin",
+    "MerchantEntityMixin",
     "MultiNoiseBiomeSourceMixin",
     "NetherPortalAccessor",
     "NetherPortalMixin",
