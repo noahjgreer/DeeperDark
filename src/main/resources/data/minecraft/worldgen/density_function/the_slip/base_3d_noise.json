@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:mul",
+  "argument1": {
+    "type": "minecraft:noise",
+    "noise": "minecraft:soul_sand_layer",
+    "xz_scale": 1,
+    "y_scale": 1
+  },
+  "argument2": {
+    "type": "minecraft:old_blended_noise",
+    "smear_scale_multiplier": 4,
+    "xz_factor": 240,
+    "xz_scale": 0.125,
+    "y_factor": 80,
+    "y_scale": 0.25
+  }
+}

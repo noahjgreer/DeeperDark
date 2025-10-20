@@ -1,0 +1,5 @@
+{
+  "type": "minecraft:mul",
+  "argument1": 2,
+  "argument2": "minecraft:the_slip/base_3d_noise"
+}
