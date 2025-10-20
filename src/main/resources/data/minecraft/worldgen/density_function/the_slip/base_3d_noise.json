@@ -1,17 +1,30 @@
 {
   "type": "minecraft:mul",
   "argument1": {
-    "type": "minecraft:noise",
-    "noise": "minecraft:soul_sand_layer",
-    "xz_scale": 1,
-    "y_scale": 1
+    "type": "minecraft:add",
+    "argument1": {
+      "type": "minecraft:noise",
+      "noise": "minecraft:clay_bands_offset",
+      "xz_scale": 0.125,
+      "y_scale": 3
+    },
+    "argument2": {
+      "type": "minecraft:noise",
+      "noise": "minecraft:soul_sand_layer",
+      "xz_scale": 0.125,
+      "y_scale": 5
+    }
   },
   "argument2": {
-    "type": "minecraft:old_blended_noise",
-    "smear_scale_multiplier": 4,
-    "xz_factor": 240,
-    "xz_scale": 0.125,
-    "y_factor": 80,
-    "y_scale": 0.25
+    "type": "minecraft:add",
+    "argument1": 0.5,
+    "argument2": {
+      "type": "minecraft:old_blended_noise",
+      "xz_scale": 0.125,
+      "y_scale": 0.25,
+      "xz_factor": 240,
+      "y_factor": 1,
+      "smear_scale_multiplier": 4
+    }
   }
 }

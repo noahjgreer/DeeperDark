@@ -1,19 +1,11 @@
 package net.noahsarch.deeperdark;
 
 import net.minecraft.block.ComposterBlock;
-import net.minecraft.entity.effect.StatusEffect;
-import net.minecraft.registry.Registry;
+import net.noahsarch.deeperdark.event.PlayerTickHandler;
+import net.noahsarch.deeperdark.portal.SlipPortalHandler;
 import net.noahsarch.deeperdark.potion.CustomBrewingRecipeHandler;
-import net.noahsarch.deeperdark.potion.ScentlessPotion;
 import net.fabricmc.api.ModInitializer;
-
-import net.fabricmc.fabric.api.registry.FabricBrewingRecipeRegistryBuilder;
 import net.minecraft.item.Items;
-import net.minecraft.potion.Potions;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
-import net.minecraft.registry.entry.RegistryEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +40,12 @@ public class Deeperdark implements ModInitializer {
         // Register the potion itself somewhere else, as you already do
 //        ScentlessPotion.registerPotions();
 
+
+        // Register dimension freezing effect
         CustomBrewingRecipeHandler.register();
+
+        // Register Slip portal mechanic
+        SlipPortalHandler.register();
+
 	}
 }

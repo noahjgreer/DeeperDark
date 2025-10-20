@@ -18,7 +18,7 @@
   "natural": false,
   "piglin_safe": true,
   "respawn_anchor_works": true,
-  "ultrawarm": true,
+  "ultrawarm": false,
   "has_raids": true,
   "bed_works": false
 }
