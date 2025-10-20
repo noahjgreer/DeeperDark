@@ -1,0 +1,16 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 48,
+    "separation": 32,
+    "salt": 0,
+    "frequency_reduction_method": "default",
+    "frequency": 0.75
+  },
+  "structures": [
+    {
+      "structure": "minecraft:slip_shack",
+      "weight": 1
+    }
+  ]
+}

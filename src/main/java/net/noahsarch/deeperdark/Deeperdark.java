@@ -44,6 +44,8 @@ public class Deeperdark implements ModInitializer {
         // Register dimension freezing effect
         CustomBrewingRecipeHandler.register();
 
+        PlayerTickHandler.register();
+
         // Register Slip portal mechanic
         SlipPortalHandler.register();
 
