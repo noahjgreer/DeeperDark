@@ -16,6 +16,8 @@
     "NoiseChunkGeneratorMixin",
     "PotionItemMixin",
     "ShulkerBoxBlockEntityMixin",
+    "StructureBlockBlockEntityMixin",
+    "UpdateStructureBlockC2SPacketMixin",
     "WardenEntityBrainMixin",
     "WardenEntityMixin"
   ],
