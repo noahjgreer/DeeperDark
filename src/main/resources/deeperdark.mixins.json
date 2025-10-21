@@ -8,6 +8,7 @@
     "ConsumableComponentsMixin",
     "ExampleMixin",
     "FluidBlockMixin",
+    "IceBlockMixin",
     "MerchantEntityMixin",
     "MobEntityAccessor",
     "MultiNoiseBiomeSourceMixin",

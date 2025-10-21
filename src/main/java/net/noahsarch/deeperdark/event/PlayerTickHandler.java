@@ -8,6 +8,8 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.entity.EntityPose;
 
 public class PlayerTickHandler {
     private static final RegistryKey<World> THE_SLIP = RegistryKey.of(RegistryKeys.WORLD, Identifier.of("minecraft", "the_slip"));
@@ -17,32 +19,65 @@ public class PlayerTickHandler {
             for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
                 // Check if player is in The Slip dimension
                 if (player.getWorld().getRegistryKey().equals(THE_SLIP)) {
-                    // Check if player is wearing full leather armor
-                    if (isWearingFullLeatherArmor(player)) {
-                        // If wearing full leather armor, decrease frozen ticks (thaw out)
-                        int currentFrozen = player.getFrozenTicks();
-                        if (currentFrozen > 0) {
-                            player.setFrozenTicks(Math.max(0, currentFrozen - 2));
-                        }
-                    } else {
-                        // Increase frozen ticks to simulate being in powdered snow
-                        int currentFrozen = player.getFrozenTicks();
-                        int minFreezeDamage = player.getMinFreezeDamageTicks(); // This is 140 by default
+                    // Handle freezing mechanics
+                    handleFreezingMechanics(player);
 
-                        // Keep incrementing to allow damage. Cap at a reasonable max.
-                        if (currentFrozen < minFreezeDamage + 100) {
-                            player.setFrozenTicks(currentFrozen + 3);
-                        }
-
-                        // Manually trigger freeze damage when threshold is exceeded
-                        // Damage every 40 ticks (2 seconds) like vanilla freezing
-                        if (currentFrozen >= minFreezeDamage && player.age % 40 == 0) {
-                            player.serverDamage(player.getWorld().getDamageSources().freeze(), 1.0F);
-                        }
-                    }
+                    // Handle elytra freezing while flying
+                    handleElytraFreezing(player);
                 }
             }
         });
+    }
+
+    private static void handleFreezingMechanics(ServerPlayerEntity player) {
+        // Check if player is wearing full leather armor
+        if (isWearingFullLeatherArmor(player)) {
+            // If wearing full leather armor, decrease frozen ticks (thaw out)
+            int currentFrozen = player.getFrozenTicks();
+            if (currentFrozen > 0) {
+                player.setFrozenTicks(Math.max(0, currentFrozen - 2));
+            }
+        } else {
+            // Increase frozen ticks to simulate being in powdered snow
+            int currentFrozen = player.getFrozenTicks();
+            int minFreezeDamage = player.getMinFreezeDamageTicks(); // This is 140 by default
+
+            // Keep incrementing to allow damage. Cap at a reasonable max.
+            if (currentFrozen < minFreezeDamage + 100) {
+                player.setFrozenTicks(currentFrozen + 3);
+            }
+
+            // Manually trigger freeze damage when threshold is exceeded
+            // Damage every 40 ticks (2 seconds) like vanilla freezing
+            if (currentFrozen >= minFreezeDamage && player.age % 40 == 0) {
+                player.damage(player.getWorld(), player.getDamageSources().freeze(), 1.0F);
+            }
+        }
+    }
+
+    private static void handleElytraFreezing(ServerPlayerEntity player) {
+        // Check if player is actively flying with elytra (using EntityPose.GLIDING)
+        if (player.isInPose(EntityPose.GLIDING)) {
+            ItemStack chestplate = player.getEquippedStack(net.minecraft.entity.EquipmentSlot.CHEST);
+
+            // Verify they have an elytra equipped
+            if (chestplate.isOf(Items.ELYTRA)) {
+                // Check if the elytra is unbreakable (creative mode or special item)
+                if (chestplate.contains(DataComponentTypes.UNBREAKABLE)) {
+                    return; // Don't damage unbreakable elytras
+                }
+
+                // Damage the elytra rapidly (about 20 damage per second)
+                // At 432 max durability, this gives roughly 5 seconds of flight (100 ticks)
+                // We'll damage it every tick for maximum effect
+                // If the durability is at 2, damage it only by 1 to avoid breaking it immediately
+                if (chestplate.getDamage() >= chestplate.getMaxDamage() - 2) {
+                    chestplate.damage(1, player, net.minecraft.entity.EquipmentSlot.CHEST);
+                } else {
+                    chestplate.damage(2, player, net.minecraft.entity.EquipmentSlot.CHEST);
+                }
+            }
+        }
     }
 
     private static boolean isWearingFullLeatherArmor(ServerPlayerEntity player) {
