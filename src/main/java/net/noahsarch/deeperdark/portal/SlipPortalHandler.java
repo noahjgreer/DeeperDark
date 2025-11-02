@@ -1357,9 +1357,15 @@ public class SlipPortalHandler {
         BlockPos searchCenter = new BlockPos(sourcePos.getX(), 64, sourcePos.getZ());
 
         // Try to find existing portal with extended search radius to prevent adjacent portals
+        // Only check X and Z coordinates (ignore Y) to find portals at any height
         int extendedRadius = SEARCH_RADIUS * 2;
         for (BlockPos portalCenter : activeVerticalPortals.keySet()) {
-            if (portalCenter.isWithinDistance(searchCenter, extendedRadius)) {
+            int xDiff = Math.abs(portalCenter.getX() - searchCenter.getX());
+            int zDiff = Math.abs(portalCenter.getZ() - searchCenter.getZ());
+            double horizontalDistance = Math.sqrt(xDiff * xDiff + zDiff * zDiff);
+
+            if (horizontalDistance <= extendedRadius) {
+                // Found an existing portal within range, use it!
                 return portalCenter;
             }
         }
