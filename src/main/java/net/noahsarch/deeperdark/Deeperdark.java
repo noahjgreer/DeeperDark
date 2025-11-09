@@ -1,9 +1,13 @@
 package net.noahsarch.deeperdark;
 
 import net.minecraft.block.ComposterBlock;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.minecraft.util.Identifier;
 import net.noahsarch.deeperdark.event.PlayerTickHandler;
 import net.noahsarch.deeperdark.portal.SlipPortalHandler;
 import net.noahsarch.deeperdark.potion.CustomBrewingRecipeHandler;
+import net.noahsarch.deeperdark.worldgen.SlipChunkGenerator;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.item.Items;
 import org.slf4j.Logger;
@@ -23,6 +27,12 @@ public class Deeperdark implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		// This code runs as soon as Minecraft is in a mod-load-ready state.
+
+		// Register the Slip chunk generator
+		Registry.register(Registries.CHUNK_GENERATOR,
+				Identifier.of(MOD_ID, "slip_room_generator"),
+				SlipChunkGenerator.CODEC);
+
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
 

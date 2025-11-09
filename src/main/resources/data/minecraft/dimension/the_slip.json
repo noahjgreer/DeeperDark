@@ -1,11 +1,10 @@
 {
   "type": "minecraft:the_slip",
   "generator": {
-    "type": "minecraft:noise",
+    "type": "deeperdark:slip_room_generator",
     "biome_source": {
       "type": "minecraft:fixed",
       "biome": "minecraft:the_slip"
-    },
-    "settings": "minecraft:the_slip"
+    }
   }
 }
