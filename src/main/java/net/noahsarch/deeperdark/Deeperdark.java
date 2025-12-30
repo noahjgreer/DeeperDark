@@ -36,7 +36,7 @@ public class Deeperdark implements ModInitializer {
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
 
-		LOGGER.info("Hello Fabric world!");
+		LOGGER.info("[Deeper Dark] Mod initialized!");
         DeepDarkBiomeModifier.init();
 
         // Register diamond as compostable (silly easter egg!)

@@ -1,0 +1,63 @@
+# Deeper Dark
+## Features
+- World Generation
+  - Worlds now generate down to Y=-192
+  - Deepslate only begins at Y=-64
+  - Worlds beneath Y=-54 only generate Deep Dark biomes
+- Scentless Potion
+  - The Warden cannot detect players under the effects of this potion
+- The Nether
+  - Smaller Portals
+  - Ice now evaporates in the Nether
+- Villagers can now be lead using leashes and emeralds
+- Farmland won't be trampled if a player is wearing feather falling
+- Shulker Boxes can be placed inside of shulker boxes using hoppers
+- Structure blocks now have no size limit
+- Add Back Farlands
+
+### Recipes
+- Scentless Potion
+  - Awkward Potion + Echo Shard = Scentless Potion
+- Armor Stand 
+  - 6 Sticks + 1 Smooth Stone Slab = Armor Stand (With Arms)
+- Clay Block > 4 Clay Balls
+- Enchanted Golden Apple
+- Quartz Block > 4 Nether Quartz
+- String > Cobweb
+- Echo Shard
+- Nether Wart Block > 9 Nether Warts
+- Smelt: Rotten Flesh > Leather
+- Stonecutter: Deepslate > Cobbled Deepslate
+- Stonecutter: Red Sandstone > Red Sand
+- Stonecutter: Sandstone > Sand
+- Stonecutter: Stone > Cobblestone
+
+### Todo 
+- Something that buffs rabbit stew
+- Milk Squids
+- Boats have a speed attribute
+- All mobs can spawn with random status effects
+- Shulkerboxes in shulker boxes
+- Unbreaking 4 & 5
+- Grass set fire turns to coarse dirt
+- Baby skeletons
+- Brewing Stand XP Bottles
+- Enchanted Gapple explodes Zombie Villagers
+- Wool + Shears = String
+- Dead Bush = Shrub + Flint & Steel
+- Brew Rotten Flesh into Nausea Potion
+- Cure Witches
+- Shroomlight Crafting w/ Mushrooms + Glowstone
+- Uneaten Cake can be broken with silk touch
+- Unpath dirt paths
+- Snow Block to Snowballs
+- Mine budding amythest
+- All gold tools have implicit silk touch
+- Lose XP when keep inventory is on death
+- Boats travel up blocks
+- Boats keep horizontal velocity when falling
+- Overflow cap for the Slip
+- Make diamonds less common
+- Wings burn on nether roof
+
+-1704089800574401693
