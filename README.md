@@ -61,3 +61,4 @@
 - Wings burn on nether roof
 
 -1704089800574401693
+/execute in minecraft:overworld run tp @s -3607.35 244.00 -1511.47 496.65 52.80
