@@ -23,6 +23,11 @@
 - Boats travel up blocks
 - Boats keep horizontal velocity when falling
 - Boats have a speed attribute
+- Lose XP when keep inventory is on death
+- Brewing Stand XP Bottles
+- All gold tools have implicit silk touch
+- Cure Witches
+- Mine budding amythest
 
 ### Recipes
 - Scentless Potion
@@ -46,18 +51,15 @@
 - All mobs can spawn with random status effects
 - Shulkerboxes in shulker boxes
 - Grass set fire turns to coarse dirt
-- Brewing Stand XP Bottles
-- Wool + Shears = String
-- Dead Bush = Shrub + Flint & Steel
-- Brew Rotten Flesh into Nausea Potion
-- Cure Witches
-- Shroomlight Crafting w/ Mushrooms + Glowstone
-- Uneaten Cake can be broken with silk touch
+
+[//]: # (- Wool + Shears = String)
+[//]: # (- Dead Bush = Shrub + Flint & Steel)
+[//]: # (- Brew Rotten Flesh into Nausea Potion)
+[//]: # (- Shroomlight Crafting w/ Mushrooms + Glowstone)
+[//]: # (- Uneaten Cake can be broken with silk touch)
 - Unpath dirt paths
-- Snow Block to Snowballs
-- Mine budding amythest
-- All gold tools have implicit silk touch
-- Lose XP when keep inventory is on death
+
+[//]: # (- Snow Block to Snowballs)
 - Overflow cap for the Slip
 - Make diamonds less common
 
