@@ -32,6 +32,8 @@
 - Grass set fire turns to coarse dirt
 - All mobs can spawn with random status effects
 - Make diamonds less common
+- Larger villages
+- Less common strongholds
 
 ### Recipes
 - Scentless Potion
