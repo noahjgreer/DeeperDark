@@ -7,7 +7,7 @@ import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.mob.*;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.world.ServerWorld;
@@ -47,6 +47,16 @@ public class MobEntityMixin implements MobEntityExtension {
     private void onInitialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, EntityData entityData, CallbackInfoReturnable<EntityData> cir) {
         if (world.toServerWorld().isClient) return;
 
+        MobEntity self = (MobEntity) (Object) this;
+        boolean isAllowed = self instanceof SkeletonEntity ||
+                            self instanceof CreeperEntity ||
+                            self instanceof SpiderEntity ||
+                            self instanceof StrayEntity ||
+                            self instanceof EndermanEntity ||
+                            (self instanceof ZombieEntity && !(self instanceof ZombifiedPiglinEntity) && !(self instanceof ZombieVillagerEntity));
+
+        if (!isAllowed) return;
+
         float chance = 0.0f;
         Difficulty diff = world.getDifficulty();
         if (diff == Difficulty.EASY) {
@@ -72,9 +82,8 @@ public class MobEntityMixin implements MobEntityExtension {
             );
             this.deeperdark$storedEffect = effects.get(world.getRandom().nextInt(effects.size()));
 
-            MobEntity self = (MobEntity) (Object) this;
             StatusEffect effect = this.deeperdark$storedEffect.value();
-            if (effect != StatusEffects.LEVITATION.value() && effect != StatusEffects.WEAKNESS.value()) {
+            if (effect != StatusEffects.LEVITATION.value() && effect != StatusEffects.WEAKNESS.value() && effect != StatusEffects.POISON.value() && effect != StatusEffects.WITHER.value()) {
                 self.addStatusEffect(new StatusEffectInstance(this.deeperdark$storedEffect, -1, 0));
             }
         }
