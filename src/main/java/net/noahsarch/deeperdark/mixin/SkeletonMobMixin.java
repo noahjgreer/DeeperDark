@@ -26,7 +26,7 @@ public class SkeletonMobMixin implements BabySkeletonAccessor {
     private static final Identifier BABY_SPEED_MODIFIER_ID = Identifier.of("deeperdark", "baby_skeleton_speed");
     @Unique
     private static final EntityAttributeModifier BABY_SPEED_MODIFIER = new EntityAttributeModifier(
-        BABY_SPEED_MODIFIER_ID, 1.0, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE
+        BABY_SPEED_MODIFIER_ID, 0.75, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE
     );
 
     @Unique

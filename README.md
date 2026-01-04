@@ -29,6 +29,9 @@
 - Cure Witches
 - Mine budding amythest
 - Bundles can hold *anything* up to 256 items
+- Grass set fire turns to coarse dirt
+- All mobs can spawn with random status effects
+- Make diamonds less common
 
 ### Recipes
 - Scentless Potion
@@ -49,9 +52,7 @@
 
 ### Todo 
 - Something that buffs rabbit stew
-- All mobs can spawn with random status effects
 - Shulkerboxes in shulker boxes
-- Grass set fire turns to coarse dirt
 
 [//]: # (- Wool + Shears = String)
 [//]: # (- Dead Bush = Shrub + Flint & Steel)
@@ -62,7 +63,6 @@
 
 [//]: # (- Snow Block to Snowballs)
 - Overflow cap for the Slip
-- Make diamonds less common
 
 -1704089800574401693
 /execute in minecraft:overworld run tp @s -3607.35 244.00 -1511.47 496.65 52.80
