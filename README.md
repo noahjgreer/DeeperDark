@@ -14,6 +14,15 @@
 - Shulker Boxes can be placed inside of shulker boxes using hoppers
 - Structure blocks now have no size limit
 - Add Back Farlands
+- Wings burn on nether roof
+- Higher mountain peaks
+- Unbreaking 4 & 5
+- Enchanted Gapple explodes Zombie Villagers
+- Milk Squids
+- Baby skeletons
+- Boats travel up blocks
+- Boats keep horizontal velocity when falling
+- Boats have a speed attribute
 
 ### Recipes
 - Scentless Potion
@@ -34,15 +43,10 @@
 
 ### Todo 
 - Something that buffs rabbit stew
-- Milk Squids
-- Boats have a speed attribute
 - All mobs can spawn with random status effects
 - Shulkerboxes in shulker boxes
-- Unbreaking 4 & 5
 - Grass set fire turns to coarse dirt
-- Baby skeletons
 - Brewing Stand XP Bottles
-- Enchanted Gapple explodes Zombie Villagers
 - Wool + Shears = String
 - Dead Bush = Shrub + Flint & Steel
 - Brew Rotten Flesh into Nausea Potion
@@ -54,11 +58,8 @@
 - Mine budding amythest
 - All gold tools have implicit silk touch
 - Lose XP when keep inventory is on death
-- Boats travel up blocks
-- Boats keep horizontal velocity when falling
 - Overflow cap for the Slip
 - Make diamonds less common
-- Wings burn on nether roof
 
 -1704089800574401693
 /execute in minecraft:overworld run tp @s -3607.35 244.00 -1511.47 496.65 52.80

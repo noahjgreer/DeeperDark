@@ -10,6 +10,7 @@
     "ExampleMixin",
     "FarmlandBlockMixin",
     "FluidBlockMixin",
+    "GlassBottleItemMixin",
     "IceBlockMixin",
     "LivingEntityMixin",
     "MerchantEntityMixin",
@@ -20,11 +21,16 @@
     "NoiseChunkGeneratorMixin",
     "OctavePerlinNoiseSamplerMixin",
     "PotionItemMixin",
+    "ServerPlayerEntityMixin",
     "ShulkerBoxBlockEntityMixin",
+    "SkeletonMobMixin",
+    "SquidMobMixin",
     "StructureBlockBlockEntityMixin",
+    "AbstractBoatEntityMixin",
     "UpdateStructureBlockC2SPacketMixin",
     "WardenEntityBrainMixin",
-    "WardenEntityMixin"
+    "WardenEntityMixin",
+    "ZombieVillagerEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1

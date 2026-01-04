@@ -6,6 +6,8 @@ import net.minecraft.item.Items;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 import net.minecraft.component.DataComponentTypes;
@@ -23,7 +25,18 @@ public class PlayerTickHandler {
                     handleFreezingMechanics(player);
 
                     // Handle elytra freezing while flying
-                    handleElytraFreezing(player);
+                    handleElytraDamage(player);
+                } else if (player.getWorld().getRegistryKey().equals(World.NETHER)) {
+                    // Check if player is on the Nether roof (above Y=127)
+                    if (player.getY() > 127.0) {
+                        if (handleElytraDamage(player)) {
+                            // Play sizzling sound occasionally
+                            if (player.age % 10 == 0) {
+                                player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
+                                        SoundEvents.ENTITY_GENERIC_BURN, SoundCategory.PLAYERS, 0.5f, 1.0f);
+                            }
+                        }
+                    }
                 }
             }
         });
@@ -55,7 +68,7 @@ public class PlayerTickHandler {
         }
     }
 
-    private static void handleElytraFreezing(ServerPlayerEntity player) {
+    private static boolean handleElytraDamage(ServerPlayerEntity player) {
         // Check if player is actively flying with elytra (using EntityPose.GLIDING)
         if (player.isInPose(EntityPose.GLIDING)) {
             ItemStack chestplate = player.getEquippedStack(net.minecraft.entity.EquipmentSlot.CHEST);
@@ -64,7 +77,7 @@ public class PlayerTickHandler {
             if (chestplate.isOf(Items.ELYTRA)) {
                 // Check if the elytra is unbreakable (creative mode or special item)
                 if (chestplate.contains(DataComponentTypes.UNBREAKABLE)) {
-                    return; // Don't damage unbreakable elytras
+                    return false; // Don't damage unbreakable elytras
                 }
 
                 // Damage the elytra rapidly (about 20 damage per second)
@@ -76,8 +89,10 @@ public class PlayerTickHandler {
                 } else {
                     chestplate.damage(2, player, net.minecraft.entity.EquipmentSlot.CHEST);
                 }
+                return true;
             }
         }
+        return false;
     }
 
     private static boolean isWearingFullLeatherArmor(ServerPlayerEntity player) {

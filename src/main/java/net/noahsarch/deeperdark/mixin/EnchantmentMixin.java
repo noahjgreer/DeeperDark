@@ -10,9 +10,35 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Enchantment.class)
 public class EnchantmentMixin {
+
+    @Inject(method = "getMaxLevel", at = @At("HEAD"), cancellable = true)
+    private void deeperdark$modifyMaxLevel(CallbackInfoReturnable<Integer> cir) {
+        if (deeperdark$isUnbreakingEnchantment()) {
+            cir.setReturnValue(5);
+        }
+    }
+
+    @Inject(method = "getMinPower", at = @At("HEAD"), cancellable = true)
+    private void deeperdark$modifyMinPower(int level, CallbackInfoReturnable<Integer> cir) {
+        if (deeperdark$isUnbreakingEnchantment()) {
+            // Original: 5 + (level - 1) * 8
+            // New: 5 + (level - 1) * 6 to fit level 5 in 30 power
+            cir.setReturnValue(5 + (level - 1) * 6);
+        }
+    }
+
+    @Inject(method = "getMaxPower", at = @At("HEAD"), cancellable = true)
+    private void deeperdark$modifyMaxPower(int level, CallbackInfoReturnable<Integer> cir) {
+        if (deeperdark$isUnbreakingEnchantment()) {
+            // Original: super.getMinPower(level) + 50
+            // We use our new min power + 50
+            cir.setReturnValue(5 + (level - 1) * 6 + 50);
+        }
+    }
 
     /**
      * Inject into modifyBlockExperience to make Fortune multiply block XP drops
@@ -56,5 +82,11 @@ public class EnchantmentMixin {
         // The translation key for Fortune is "enchantment.minecraft.fortune"
         return description.toLowerCase().contains("fortune");
     }
-}
 
+    @Unique
+    private boolean deeperdark$isUnbreakingEnchantment() {
+        Enchantment self = (Enchantment) (Object) this;
+        String description = self.description().getString();
+        return description.toLowerCase().contains("unbreaking");
+    }
+}
