@@ -28,6 +28,7 @@
 - All gold tools have implicit silk touch
 - Cure Witches
 - Mine budding amythest
+- Bundles can hold *anything* up to 256 items
 
 ### Recipes
 - Scentless Potion
