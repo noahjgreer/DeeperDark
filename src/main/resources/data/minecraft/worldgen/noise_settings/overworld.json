@@ -70,12 +70,12 @@
                           "argument1": 0.078125,
                           "argument2": {
                             "type": "minecraft:range_choice",
-                            "input": "deeperdark:amplified_sloped_cheese",
+                            "input": { "type": "minecraft:interpolated", "argument": "deeperdark:amplified_sloped_cheese" },
                             "max_exclusive": 1.5625,
                             "min_inclusive": -1000000,
                             "when_in_range": {
                               "type": "minecraft:min",
-                              "argument1": "deeperdark:amplified_sloped_cheese",
+                              "argument1": { "type": "minecraft:interpolated", "argument": "deeperdark:amplified_sloped_cheese" },
                               "argument2": {
                                 "type": "minecraft:mul",
                                 "argument1": 5,
@@ -128,7 +128,7 @@
                                           "argument2": {
                                             "type": "minecraft:mul",
                                             "argument1": -0.64,
-                                            "argument2": "deeperdark:amplified_sloped_cheese"
+                                            "argument2": { "type": "minecraft:interpolated", "argument": "deeperdark:amplified_sloped_cheese" }
                                           }
                                         },
                                         "max": 0.5,

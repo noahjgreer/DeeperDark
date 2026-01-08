@@ -26,7 +26,6 @@
 - Lose XP when keep inventory is on death
 - Brewing Stand XP Bottles
 - All gold tools have implicit silk touch
-- Cure Witches
 - Mine budding amythest
 - Bundles can hold *anything* up to 256 items
 - Grass set fire turns to coarse dirt
@@ -55,16 +54,27 @@
 ### Todo 
 - Something that buffs rabbit stew
 - Shulkerboxes in shulker boxes
+- Witches become potion villagesr
+- Enchanting table giving only unbreaking 5
+- When trying to bottle xp, if not have max bookshelves, there is xp loss 
+- Eradicate bookshelf for chiseled bookshelf
+- XP pling sound when bottling xp3
+- Throwing water bottles at people extignuishes them
+- snowballs from snow block
+- Campfire sound when wings burn
+- Craftable debug stick
+- Cure Witches
+- Unpath dirt paths
+- Overflow cap for the Slip
+- Old Sponges
+- Explosions don't destroy dropped items
 
 [//]: # (- Wool + Shears = String)
 [//]: # (- Dead Bush = Shrub + Flint & Steel)
 [//]: # (- Brew Rotten Flesh into Nausea Potion)
 [//]: # (- Shroomlight Crafting w/ Mushrooms + Glowstone)
 [//]: # (- Uneaten Cake can be broken with silk touch)
-- Unpath dirt paths
-
 [//]: # (- Snow Block to Snowballs)
-- Overflow cap for the Slip
 
 -1704089800574401693
 /execute in minecraft:overworld run tp @s -3607.35 244.00 -1511.47 496.65 52.80

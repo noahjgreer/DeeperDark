@@ -7,6 +7,7 @@ import net.minecraft.util.Identifier;
 import net.noahsarch.deeperdark.event.PlayerTickHandler;
 import net.noahsarch.deeperdark.portal.SlipPortalHandler;
 import net.noahsarch.deeperdark.potion.CustomBrewingRecipeHandler;
+import net.noahsarch.deeperdark.villager.ModVillagers;
 import net.noahsarch.deeperdark.worldgen.SlipChunkGenerator;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.item.Items;
@@ -53,6 +54,8 @@ public class Deeperdark implements ModInitializer {
 
         // Register dimension freezing effect
         CustomBrewingRecipeHandler.register();
+
+        ModVillagers.registerVillagers();
 
         PlayerTickHandler.register();
 
