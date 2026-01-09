@@ -2,13 +2,10 @@
   "type": "minecraft:add",
   "argument1": {
     "type": "minecraft:add",
-    "argument1": {
-      "type": "minecraft:interpolated",
-      "argument": "minecraft:overworld/sloped_cheese"
-    },
+    "argument1": "minecraft:overworld/sloped_cheese",
     "argument2": {
       "type": "minecraft:mul",
-      "argument1": 8.0,
+      "argument1": 3.0,
       "argument2": {
         "type": "minecraft:mul",
         "argument1": {
@@ -17,10 +14,7 @@
           "argument2": {
             "type": "minecraft:add",
             "argument1": -0.2,
-            "argument2": {
-              "type": "minecraft:interpolated",
-              "argument": "minecraft:overworld/offset"
-            }
+            "argument2": "minecraft:overworld/offset"
           }
         },
         "argument2": {
@@ -28,14 +22,11 @@
           "argument1": 1.0,
           "argument2": {
             "type": "minecraft:mul",
-            "argument1": 4.0,
+            "argument1": 2.0,
             "argument2": {
               "type": "minecraft:max",
               "argument1": 0,
-              "argument2": {
-                "type": "minecraft:interpolated",
-                "argument": "minecraft:overworld/ridges"
-              }
+              "argument2": "minecraft:overworld/ridges"
             }
           }
         }
@@ -44,9 +35,9 @@
   },
   "argument2": {
     "type": "minecraft:y_clamped_gradient",
-    "from_y": 320,
+    "from_y": 256,
     "from_value": 0,
-    "to_y": 512,
-    "to_value": -5
+    "to_y": 576,
+    "to_value": -40
   }
 }

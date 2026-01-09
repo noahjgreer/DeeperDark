@@ -46,6 +46,7 @@
     "StrongholdGeneratorMixin",
     "StructureBlockBlockEntityMixin",
     "UpdateStructureBlockC2SPacketMixin",
+    "VanillaBiomeParametersMixin",
     "WardenEntityBrainMixin",
     "WardenEntityMixin",
     "ZombieVillagerEntityMixin"

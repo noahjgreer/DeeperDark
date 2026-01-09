@@ -68,6 +68,10 @@
 - Cure Witches
 - Unpath dirt paths
 - Overflow cap for the Slip
+- Leash players
+- /Ride players
+- Black Mesa Biome
+- Pale woodland mansions
 
 [//]: # (- Wool + Shears = String)
 [//]: # (- Dead Bush = Shrub + Flint & Steel)
