@@ -36,6 +36,7 @@
 - Old Sponges
 - Explosions don't destroy dropped items
 - Enchanting table giving only unbreaking 5
+- Black Mesa Biome
 - Campfire sound when wings burn
 
 ### Recipes
@@ -70,7 +71,6 @@
 - Overflow cap for the Slip
 - Leash players
 - /Ride players
-- Black Mesa Biome
 - Pale woodland mansions
 
 [//]: # (- Wool + Shears = String)

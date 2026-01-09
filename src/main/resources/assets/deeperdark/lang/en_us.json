@@ -3,5 +3,6 @@
   "item.minecraft.splash_potion.effect.effect.deeperdark.scentless": "Splash Potion of Scentlessness",
   "item.minecraft.lingering_potion.effect.effect.deeperdark.scentless": "Lingering Potion of Scentlessness",
   "effect.deeperdark.scentless": "Scentlessness",
-  "item.minecraft.tipped_arrow.effect.effect.deeperdark.scentless": "Arrow of Scentlessness"
+  "item.minecraft.tipped_arrow.effect.effect.deeperdark.scentless": "Arrow of Scentlessness",
+  "item.deeperdark.siphon": "Siphon"
 }

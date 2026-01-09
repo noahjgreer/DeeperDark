@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " B ",
+    " R ",
+    "OOO"
+  ],
+  "key": {
+    "B": "minecraft:experience_bottle",
+    "R": "minecraft:blaze_rod",
+    "O": [
+      "minecraft:crying_obsidian",
+      "minecraft:obsidian"
+    ]
+  },
+  "result": {
+    "id": "minecraft:sugar",
+    "components": {
+      "minecraft:item_model": "minecraft:siphon",
+      "minecraft:item_name": "Siphon",
+      "minecraft:rarity": "common"
+    },
+    "count": 1
+  }
+}

@@ -18,6 +18,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntityType;
 import net.noahsarch.deeperdark.block.entity.ActiveSpongeBlockEntity;
 import net.noahsarch.deeperdark.block.entity.ModBlockEntities;
+import net.noahsarch.deeperdark.event.SiphonEvents;
 
 public class Deeperdark implements ModInitializer {
 	public static final String MOD_ID = "deeperdark";
@@ -38,6 +39,8 @@ public class Deeperdark implements ModInitializer {
 		Registry.register(Registries.CHUNK_GENERATOR,
 				Identifier.of(MOD_ID, "slip_room_generator"),
 				SlipChunkGenerator.CODEC);
+
+		SiphonEvents.register();
 
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
