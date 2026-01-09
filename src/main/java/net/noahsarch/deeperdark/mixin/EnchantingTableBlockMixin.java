@@ -41,7 +41,7 @@ public class EnchantingTableBlockMixin {
                         player.addExperience(-10);
                     }
 
-                    world.playSound(null, pos, SoundEvents.ITEM_HONEY_BOTTLE_DRINK.value(), SoundCategory.BLOCKS, 0.5F, 1.0F);
+                    world.playSound(null, pos, SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.BLOCKS, 0.5F, 1.0F);
 
                     ItemStack bottle = ItemUsage.exchangeStack(stack, player, new ItemStack(Items.EXPERIENCE_BOTTLE));
                     player.setStackInHand(hand, bottle);

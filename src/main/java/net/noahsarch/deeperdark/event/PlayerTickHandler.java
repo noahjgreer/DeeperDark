@@ -31,9 +31,9 @@ public class PlayerTickHandler {
                     if (player.getY() > 127.0) {
                         if (handleElytraDamage(player)) {
                             // Play sizzling sound occasionally
-                            if (player.age % 10 == 0) {
+                            if (player.age % 2 == 0) {
                                 player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
-                                        SoundEvents.ENTITY_GENERIC_BURN, SoundCategory.PLAYERS, 0.5f, 1.0f);
+                                        SoundEvents.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.PLAYERS, 5f, 1.7f);
                             }
                         }
                     }

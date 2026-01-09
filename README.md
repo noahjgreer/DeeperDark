@@ -33,6 +33,10 @@
 - Make diamonds less common
 - Larger villages
 - Less common strongholds
+- Old Sponges
+- Explosions don't destroy dropped items
+- Enchanting table giving only unbreaking 5
+- Campfire sound when wings burn
 
 ### Recipes
 - Scentless Potion
@@ -49,25 +53,21 @@
 - Stonecutter: Deepslate > Cobbled Deepslate
 - Stonecutter: Red Sandstone > Red Sand
 - Stonecutter: Sandstone > Sand
+- snowballs from snow block
 - Stonecutter: Stone > Cobblestone
+- XP pling sound when bottling xp3
 
 ### Todo 
 - Something that buffs rabbit stew
 - Shulkerboxes in shulker boxes
 - Witches become potion villagesr
-- Enchanting table giving only unbreaking 5
 - When trying to bottle xp, if not have max bookshelves, there is xp loss 
 - Eradicate bookshelf for chiseled bookshelf
-- XP pling sound when bottling xp3
 - Throwing water bottles at people extignuishes them
-- snowballs from snow block
-- Campfire sound when wings burn
 - Craftable debug stick
 - Cure Witches
 - Unpath dirt paths
 - Overflow cap for the Slip
-- Old Sponges
-- Explosions don't destroy dropped items
 
 [//]: # (- Wool + Shears = String)
 [//]: # (- Dead Bush = Shrub + Flint & Steel)

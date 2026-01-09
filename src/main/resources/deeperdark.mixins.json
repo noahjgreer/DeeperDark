@@ -25,8 +25,10 @@
     "WetSpongeBlockMixin",
     "GlassBottleItemMixin",
     "IceBlockMixin",
+    "ItemEntityMixin",
     "JigsawStructureMixin",
     "LivingEntityMixin",
+    "MatchToolLootConditionMixin",
     "MerchantEntityMixin",
     "MobEntityAccessor",
     "MobEntityMixin",
@@ -46,7 +48,6 @@
     "UpdateStructureBlockC2SPacketMixin",
     "WardenEntityBrainMixin",
     "WardenEntityMixin",
-    "WitchInteractionMixin",
     "ZombieVillagerEntityMixin"
   ],
   "injectors": {

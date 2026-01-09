@@ -26,8 +26,8 @@ public class EnchantmentMixin {
     private void deeperdark$modifyMinPower(int level, CallbackInfoReturnable<Integer> cir) {
         if (deeperdark$isUnbreakingEnchantment()) {
             // Original: 5 + (level - 1) * 8
-            // New: 5 + (level - 1) * 6 to fit level 5 in 30 power
-            cir.setReturnValue(5 + (level - 1) * 6);
+            // New: 5 + (level - 1) * 9 to make higher tiers rarer
+            cir.setReturnValue(5 + (level - 1) * 9);
         }
     }
 
@@ -36,7 +36,7 @@ public class EnchantmentMixin {
         if (deeperdark$isUnbreakingEnchantment()) {
             // Original: super.getMinPower(level) + 50
             // We use our new min power + 50
-            cir.setReturnValue(5 + (level - 1) * 6 + 50);
+            cir.setReturnValue(5 + (level - 1) * 9 + 50);
         }
     }
 
