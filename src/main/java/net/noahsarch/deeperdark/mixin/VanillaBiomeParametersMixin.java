@@ -21,8 +21,13 @@ public class VanillaBiomeParametersMixin {
     @Inject(method = "getBadlandsBiome", at = @At("HEAD"), cancellable = true)
     private void deeperdark$replaceBadlandsWithBlackMesa(int humidity, MultiNoiseUtil.ParameterRange weirdness, CallbackInfoReturnable<RegistryKey<Biome>> cir) {
         if (humidity == 2) {
-            cir.setReturnValue(BLACK_MESA);
+            // Make black_mesa much rarer: deterministic selection based on the weirdness range.
+            // This keeps worldgen deterministic while reducing the overall size of black_mesa regions.
+            long seed = weirdness.min() * 31L + weirdness.max() * 13L + humidity;
+            long pick = Math.abs(seed % 5L); // ~1 in 5 chance
+            if (pick == 0L) {
+                cir.setReturnValue(BLACK_MESA);
+            }
         }
     }
 }
-
