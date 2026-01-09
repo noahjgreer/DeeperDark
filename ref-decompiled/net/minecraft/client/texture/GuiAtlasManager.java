@@ -1,0 +1,34 @@
+package net.minecraft.client.texture;
+
+import java.util.Set;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.resource.metadata.AnimationResourceMetadata;
+import net.minecraft.client.resource.metadata.GuiResourceMetadata;
+import net.minecraft.client.texture.atlas.Atlases;
+import net.minecraft.util.Identifier;
+
+@Environment(EnvType.CLIENT)
+public class GuiAtlasManager extends SpriteAtlasHolder {
+   private static final Set METADATA_SERIALIZERS;
+
+   public GuiAtlasManager(TextureManager manager) {
+      super(manager, Identifier.ofVanilla("textures/atlas/gui.png"), Atlases.GUI, METADATA_SERIALIZERS);
+   }
+
+   public Sprite getSprite(Identifier objectId) {
+      return super.getSprite(objectId);
+   }
+
+   public Scaling getScaling(Sprite sprite) {
+      return this.getGuiMetadata(sprite).scaling();
+   }
+
+   private GuiResourceMetadata getGuiMetadata(Sprite sprite) {
+      return (GuiResourceMetadata)sprite.getContents().getMetadata().decode(GuiResourceMetadata.SERIALIZER).orElse(GuiResourceMetadata.DEFAULT);
+   }
+
+   static {
+      METADATA_SERIALIZERS = Set.of(AnimationResourceMetadata.SERIALIZER, GuiResourceMetadata.SERIALIZER);
+   }
+}

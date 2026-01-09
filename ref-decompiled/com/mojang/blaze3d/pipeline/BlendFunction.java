@@ -1,0 +1,58 @@
+package com.mojang.blaze3d.pipeline;
+
+import com.mojang.blaze3d.platform.DestFactor;
+import com.mojang.blaze3d.platform.SourceFactor;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.util.annotation.DeobfuscateClass;
+
+@Environment(EnvType.CLIENT)
+@DeobfuscateClass
+public record BlendFunction(SourceFactor sourceColor, DestFactor destColor, SourceFactor sourceAlpha, DestFactor destAlpha) {
+   public static final BlendFunction LIGHTNING;
+   public static final BlendFunction GLINT;
+   public static final BlendFunction OVERLAY;
+   public static final BlendFunction TRANSLUCENT;
+   public static final BlendFunction TRANSLUCENT_PREMULTIPLIED_ALPHA;
+   public static final BlendFunction ADDITIVE;
+   public static final BlendFunction ENTITY_OUTLINE_BLIT;
+   public static final BlendFunction INVERT;
+
+   public BlendFunction(SourceFactor source, DestFactor dest) {
+      this(source, dest, source, dest);
+   }
+
+   public BlendFunction(SourceFactor sourceFactor, DestFactor destFactor, SourceFactor sourceFactor2, DestFactor destFactor2) {
+      this.sourceColor = sourceFactor;
+      this.destColor = destFactor;
+      this.sourceAlpha = sourceFactor2;
+      this.destAlpha = destFactor2;
+   }
+
+   public SourceFactor sourceColor() {
+      return this.sourceColor;
+   }
+
+   public DestFactor destColor() {
+      return this.destColor;
+   }
+
+   public SourceFactor sourceAlpha() {
+      return this.sourceAlpha;
+   }
+
+   public DestFactor destAlpha() {
+      return this.destAlpha;
+   }
+
+   static {
+      LIGHTNING = new BlendFunction(SourceFactor.SRC_ALPHA, DestFactor.ONE);
+      GLINT = new BlendFunction(SourceFactor.SRC_COLOR, DestFactor.ONE, SourceFactor.ZERO, DestFactor.ONE);
+      OVERLAY = new BlendFunction(SourceFactor.SRC_ALPHA, DestFactor.ONE, SourceFactor.ONE, DestFactor.ZERO);
+      TRANSLUCENT = new BlendFunction(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.ONE, DestFactor.ONE_MINUS_SRC_ALPHA);
+      TRANSLUCENT_PREMULTIPLIED_ALPHA = new BlendFunction(SourceFactor.ONE, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.ONE, DestFactor.ONE_MINUS_SRC_ALPHA);
+      ADDITIVE = new BlendFunction(SourceFactor.ONE, DestFactor.ONE);
+      ENTITY_OUTLINE_BLIT = new BlendFunction(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.ZERO, DestFactor.ONE);
+      INVERT = new BlendFunction(SourceFactor.ONE_MINUS_DST_COLOR, DestFactor.ONE_MINUS_SRC_COLOR, SourceFactor.ONE, DestFactor.ZERO);
+   }
+}

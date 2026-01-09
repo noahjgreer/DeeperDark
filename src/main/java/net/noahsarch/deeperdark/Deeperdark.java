@@ -7,12 +7,17 @@ import net.minecraft.util.Identifier;
 import net.noahsarch.deeperdark.event.PlayerTickHandler;
 import net.noahsarch.deeperdark.portal.SlipPortalHandler;
 import net.noahsarch.deeperdark.potion.CustomBrewingRecipeHandler;
-import net.noahsarch.deeperdark.villager.ModVillagers;
+//import net.noahsarch.deeperdark.villager.ModVillagers;
 import net.noahsarch.deeperdark.worldgen.SlipChunkGenerator;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.item.Items;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.entity.BlockEntityType;
+import net.noahsarch.deeperdark.block.entity.ActiveSpongeBlockEntity;
+import net.noahsarch.deeperdark.block.entity.ModBlockEntities;
 
 public class Deeperdark implements ModInitializer {
 	public static final String MOD_ID = "deeperdark";
@@ -38,6 +43,13 @@ public class Deeperdark implements ModInitializer {
 		// Proceed with mild caution.
 
 		LOGGER.info("[Deeper Dark] Mod initialized!");
+
+		ModBlockEntities.ACTIVE_SPONGE = Registry.register(
+				Registries.BLOCK_ENTITY_TYPE,
+				Identifier.of(MOD_ID, "active_sponge"),
+				FabricBlockEntityTypeBuilder.create(ActiveSpongeBlockEntity::new, Blocks.WET_SPONGE).build()
+		);
+
         DeepDarkBiomeModifier.init();
 
         // Register diamond as compostable (silly easter egg!)
@@ -55,7 +67,7 @@ public class Deeperdark implements ModInitializer {
         // Register dimension freezing effect
         CustomBrewingRecipeHandler.register();
 
-        ModVillagers.registerVillagers();
+//        ModVillagers.registerVillagers();
 
         PlayerTickHandler.register();
 

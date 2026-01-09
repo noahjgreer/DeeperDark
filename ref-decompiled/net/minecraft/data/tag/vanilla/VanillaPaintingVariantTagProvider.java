@@ -1,0 +1,19 @@
+package net.minecraft.data.tag.vanilla;
+
+import java.util.concurrent.CompletableFuture;
+import net.minecraft.data.DataOutput;
+import net.minecraft.data.tag.SimpleTagProvider;
+import net.minecraft.entity.decoration.painting.PaintingVariants;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.registry.tag.PaintingVariantTags;
+
+public class VanillaPaintingVariantTagProvider extends SimpleTagProvider {
+   public VanillaPaintingVariantTagProvider(DataOutput output, CompletableFuture registriesFuture) {
+      super(output, RegistryKeys.PAINTING_VARIANT, registriesFuture);
+   }
+
+   protected void configure(RegistryWrapper.WrapperLookup registries) {
+      this.builder(PaintingVariantTags.PLACEABLE).add((Object[])(PaintingVariants.KEBAB, PaintingVariants.AZTEC, PaintingVariants.ALBAN, PaintingVariants.AZTEC2, PaintingVariants.BOMB, PaintingVariants.PLANT, PaintingVariants.WASTELAND, PaintingVariants.POOL, PaintingVariants.COURBET, PaintingVariants.SEA, PaintingVariants.SUNSET, PaintingVariants.CREEBET, PaintingVariants.WANDERER, PaintingVariants.GRAHAM, PaintingVariants.MATCH, PaintingVariants.BUST, PaintingVariants.STAGE, PaintingVariants.VOID, PaintingVariants.SKULL_AND_ROSES, PaintingVariants.WITHER, PaintingVariants.FIGHTERS, PaintingVariants.POINTER, PaintingVariants.PIGSCENE, PaintingVariants.BURNING_SKULL, PaintingVariants.SKELETON, PaintingVariants.DONKEY_KONG, PaintingVariants.BAROQUE, PaintingVariants.HUMBLE, PaintingVariants.MEDITATIVE, PaintingVariants.PRAIRIE_RIDE, PaintingVariants.UNPACKED, PaintingVariants.BACKYARD, PaintingVariants.BOUQUET, PaintingVariants.CAVEBIRD, PaintingVariants.CHANGING, PaintingVariants.COTAN, PaintingVariants.ENDBOSS, PaintingVariants.FERN, PaintingVariants.FINDING, PaintingVariants.LOWMIST, PaintingVariants.ORB, PaintingVariants.OWLEMONS, PaintingVariants.PASSAGE, PaintingVariants.POND, PaintingVariants.SUNFLOWERS, PaintingVariants.TIDES, PaintingVariants.DENNIS));
+   }
+}

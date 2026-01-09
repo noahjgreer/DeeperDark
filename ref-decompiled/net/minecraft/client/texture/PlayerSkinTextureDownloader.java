@@ -1,0 +1,186 @@
+package net.minecraft.client.texture;
+
+import com.mojang.logging.LogUtils;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.OpenOption;
+import java.nio.file.Path;
+import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.Util;
+import net.minecraft.util.math.ColorHelper;
+import net.minecraft.util.path.PathUtil;
+import org.slf4j.Logger;
+
+@Environment(EnvType.CLIENT)
+public class PlayerSkinTextureDownloader {
+   private static final Logger LOGGER = LogUtils.getLogger();
+   private static final int SKIN_WIDTH = 64;
+   private static final int SKIN_HEIGHT = 64;
+   private static final int OLD_SKIN_HEIGHT = 32;
+
+   public static CompletableFuture downloadAndRegisterTexture(Identifier textureId, Path path, String uri, boolean remap) {
+      return CompletableFuture.supplyAsync(() -> {
+         NativeImage nativeImage;
+         try {
+            nativeImage = download(path, uri);
+         } catch (IOException var5) {
+            throw new UncheckedIOException(var5);
+         }
+
+         return remap ? remapTexture(nativeImage, uri) : nativeImage;
+      }, Util.getDownloadWorkerExecutor().named("downloadTexture")).thenCompose((image) -> {
+         return registerTexture(textureId, image);
+      });
+   }
+
+   private static NativeImage download(Path path, String uri) throws IOException {
+      if (Files.isRegularFile(path, new LinkOption[0])) {
+         LOGGER.debug("Loading HTTP texture from local cache ({})", path);
+         InputStream inputStream = Files.newInputStream(path);
+
+         NativeImage var17;
+         try {
+            var17 = NativeImage.read(inputStream);
+         } catch (Throwable var14) {
+            if (inputStream != null) {
+               try {
+                  inputStream.close();
+               } catch (Throwable var12) {
+                  var14.addSuppressed(var12);
+               }
+            }
+
+            throw var14;
+         }
+
+         if (inputStream != null) {
+            inputStream.close();
+         }
+
+         return var17;
+      } else {
+         HttpURLConnection httpURLConnection = null;
+         LOGGER.debug("Downloading HTTP texture from {} to {}", uri, path);
+         URI uRI = URI.create(uri);
+
+         NativeImage var6;
+         try {
+            httpURLConnection = (HttpURLConnection)uRI.toURL().openConnection(MinecraftClient.getInstance().getNetworkProxy());
+            httpURLConnection.setDoInput(true);
+            httpURLConnection.setDoOutput(false);
+            httpURLConnection.connect();
+            int i = httpURLConnection.getResponseCode();
+            if (i / 100 != 2) {
+               String var10002 = String.valueOf(uRI);
+               throw new IOException("Failed to open " + var10002 + ", HTTP error code: " + i);
+            }
+
+            byte[] bs = httpURLConnection.getInputStream().readAllBytes();
+
+            try {
+               PathUtil.createDirectories(path.getParent());
+               Files.write(path, bs, new OpenOption[0]);
+            } catch (IOException var13) {
+               LOGGER.warn("Failed to cache texture {} in {}", uri, path);
+            }
+
+            var6 = NativeImage.read(bs);
+         } finally {
+            if (httpURLConnection != null) {
+               httpURLConnection.disconnect();
+            }
+
+         }
+
+         return var6;
+      }
+   }
+
+   private static CompletableFuture registerTexture(Identifier textureId, NativeImage image) {
+      MinecraftClient minecraftClient = MinecraftClient.getInstance();
+      return CompletableFuture.supplyAsync(() -> {
+         Objects.requireNonNull(textureId);
+         NativeImageBackedTexture nativeImageBackedTexture = new NativeImageBackedTexture(textureId::toString, image);
+         minecraftClient.getTextureManager().registerTexture(textureId, (AbstractTexture)nativeImageBackedTexture);
+         return textureId;
+      }, minecraftClient);
+   }
+
+   private static NativeImage remapTexture(NativeImage image, String uri) {
+      int i = image.getHeight();
+      int j = image.getWidth();
+      if (j == 64 && (i == 32 || i == 64)) {
+         boolean bl = i == 32;
+         if (bl) {
+            NativeImage nativeImage = new NativeImage(64, 64, true);
+            nativeImage.copyFrom(image);
+            image.close();
+            image = nativeImage;
+            nativeImage.fillRect(0, 32, 64, 32, 0);
+            nativeImage.copyRect(4, 16, 16, 32, 4, 4, true, false);
+            nativeImage.copyRect(8, 16, 16, 32, 4, 4, true, false);
+            nativeImage.copyRect(0, 20, 24, 32, 4, 12, true, false);
+            nativeImage.copyRect(4, 20, 16, 32, 4, 12, true, false);
+            nativeImage.copyRect(8, 20, 8, 32, 4, 12, true, false);
+            nativeImage.copyRect(12, 20, 16, 32, 4, 12, true, false);
+            nativeImage.copyRect(44, 16, -8, 32, 4, 4, true, false);
+            nativeImage.copyRect(48, 16, -8, 32, 4, 4, true, false);
+            nativeImage.copyRect(40, 20, 0, 32, 4, 12, true, false);
+            nativeImage.copyRect(44, 20, -8, 32, 4, 12, true, false);
+            nativeImage.copyRect(48, 20, -16, 32, 4, 12, true, false);
+            nativeImage.copyRect(52, 20, -8, 32, 4, 12, true, false);
+         }
+
+         stripAlpha(image, 0, 0, 32, 16);
+         if (bl) {
+            stripColor(image, 32, 0, 64, 32);
+         }
+
+         stripAlpha(image, 0, 16, 64, 32);
+         stripAlpha(image, 16, 48, 48, 64);
+         return image;
+      } else {
+         image.close();
+         throw new IllegalStateException("Discarding incorrectly sized (" + j + "x" + i + ") skin texture from " + uri);
+      }
+   }
+
+   private static void stripColor(NativeImage image, int x1, int y1, int x2, int y2) {
+      int i;
+      int j;
+      for(i = x1; i < x2; ++i) {
+         for(j = y1; j < y2; ++j) {
+            int k = image.getColorArgb(i, j);
+            if (ColorHelper.getAlpha(k) < 128) {
+               return;
+            }
+         }
+      }
+
+      for(i = x1; i < x2; ++i) {
+         for(j = y1; j < y2; ++j) {
+            image.setColorArgb(i, j, image.getColorArgb(i, j) & 16777215);
+         }
+      }
+
+   }
+
+   private static void stripAlpha(NativeImage image, int x1, int y1, int x2, int y2) {
+      for(int i = x1; i < x2; ++i) {
+         for(int j = y1; j < y2; ++j) {
+            image.setColorArgb(i, j, ColorHelper.fullAlpha(image.getColorArgb(i, j)));
+         }
+      }
+
+   }
+}

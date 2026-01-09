@@ -1,0 +1,36 @@
+package net.minecraft.client.render.item.tint;
+
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.dynamic.Codecs;
+import net.minecraft.util.math.ColorHelper;
+import org.jetbrains.annotations.Nullable;
+
+@Environment(EnvType.CLIENT)
+public record ConstantTintSource(int value) implements TintSource {
+   public static final MapCodec CODEC = RecordCodecBuilder.mapCodec((instance) -> {
+      return instance.group(Codecs.RGB.fieldOf("value").forGetter(ConstantTintSource::value)).apply(instance, ConstantTintSource::new);
+   });
+
+   public ConstantTintSource(int value) {
+      value = ColorHelper.fullAlpha(value);
+      this.value = value;
+   }
+
+   public int getTint(ItemStack stack, @Nullable ClientWorld world, @Nullable LivingEntity user) {
+      return this.value;
+   }
+
+   public MapCodec getCodec() {
+      return CODEC;
+   }
+
+   public int value() {
+      return this.value;
+   }
+}

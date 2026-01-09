@@ -1,0 +1,41 @@
+package net.minecraft.network.packet.s2c.play;
+
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.Packet;
+import net.minecraft.network.packet.PacketType;
+import net.minecraft.network.packet.PlayPackets;
+import net.minecraft.world.tick.TickManager;
+
+public record TickStepS2CPacket(int tickSteps) implements Packet {
+   public static final PacketCodec CODEC = Packet.createCodec(TickStepS2CPacket::write, TickStepS2CPacket::new);
+
+   private TickStepS2CPacket(PacketByteBuf buf) {
+      this(buf.readVarInt());
+   }
+
+   public TickStepS2CPacket(int i) {
+      this.tickSteps = i;
+   }
+
+   public static TickStepS2CPacket create(TickManager tickManager) {
+      return new TickStepS2CPacket(tickManager.getStepTicks());
+   }
+
+   private void write(PacketByteBuf buf) {
+      buf.writeVarInt(this.tickSteps);
+   }
+
+   public PacketType getPacketType() {
+      return PlayPackets.TICKING_STEP;
+   }
+
+   public void apply(ClientPlayPacketListener clientPlayPacketListener) {
+      clientPlayPacketListener.onTickStep(this);
+   }
+
+   public int tickSteps() {
+      return this.tickSteps;
+   }
+}

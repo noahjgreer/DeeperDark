@@ -1,0 +1,54 @@
+package net.minecraft.world.gen.feature;
+
+import com.mojang.serialization.Codec;
+import java.util.Iterator;
+import net.minecraft.block.BlockState;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.random.Random;
+import net.minecraft.world.StructureWorldAccess;
+import net.minecraft.world.gen.feature.util.FeatureContext;
+
+public class ForestRockFeature extends Feature {
+   public ForestRockFeature(Codec codec) {
+      super(codec);
+   }
+
+   public boolean generate(FeatureContext context) {
+      BlockPos blockPos = context.getOrigin();
+      StructureWorldAccess structureWorldAccess = context.getWorld();
+      Random random = context.getRandom();
+
+      SingleStateFeatureConfig singleStateFeatureConfig;
+      for(singleStateFeatureConfig = (SingleStateFeatureConfig)context.getConfig(); blockPos.getY() > structureWorldAccess.getBottomY() + 3; blockPos = blockPos.down()) {
+         if (!structureWorldAccess.isAir(blockPos.down())) {
+            BlockState blockState = structureWorldAccess.getBlockState(blockPos.down());
+            if (isSoil(blockState) || isStone(blockState)) {
+               break;
+            }
+         }
+      }
+
+      if (blockPos.getY() <= structureWorldAccess.getBottomY() + 3) {
+         return false;
+      } else {
+         for(int i = 0; i < 3; ++i) {
+            int j = random.nextInt(2);
+            int k = random.nextInt(2);
+            int l = random.nextInt(2);
+            float f = (float)(j + k + l) * 0.333F + 0.5F;
+            Iterator var11 = BlockPos.iterate(blockPos.add(-j, -k, -l), blockPos.add(j, k, l)).iterator();
+
+            while(var11.hasNext()) {
+               BlockPos blockPos2 = (BlockPos)var11.next();
+               if (blockPos2.getSquaredDistance(blockPos) <= (double)(f * f)) {
+                  structureWorldAccess.setBlockState(blockPos2, singleStateFeatureConfig.state, 3);
+               }
+            }
+
+            blockPos = blockPos.add(-1 + random.nextInt(2), -random.nextInt(2), -1 + random.nextInt(2));
+         }
+
+         return true;
+      }
+   }
+}

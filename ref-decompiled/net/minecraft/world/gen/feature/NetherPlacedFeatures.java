@@ -1,0 +1,81 @@
+package net.minecraft.world.gen.feature;
+
+import java.util.List;
+import net.minecraft.registry.Registerable;
+import net.minecraft.registry.RegistryEntryLookup;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.util.math.intprovider.BiasedToBottomIntProvider;
+import net.minecraft.util.math.intprovider.UniformIntProvider;
+import net.minecraft.world.gen.placementmodifier.BiomePlacementModifier;
+import net.minecraft.world.gen.placementmodifier.CountMultilayerPlacementModifier;
+import net.minecraft.world.gen.placementmodifier.CountPlacementModifier;
+import net.minecraft.world.gen.placementmodifier.PlacementModifier;
+import net.minecraft.world.gen.placementmodifier.SquarePlacementModifier;
+
+public class NetherPlacedFeatures {
+   public static final RegistryKey DELTA = PlacedFeatures.of("delta");
+   public static final RegistryKey SMALL_BASALT_COLUMNS = PlacedFeatures.of("small_basalt_columns");
+   public static final RegistryKey LARGE_BASALT_COLUMNS = PlacedFeatures.of("large_basalt_columns");
+   public static final RegistryKey BASALT_BLOBS = PlacedFeatures.of("basalt_blobs");
+   public static final RegistryKey BLACKSTONE_BLOBS = PlacedFeatures.of("blackstone_blobs");
+   public static final RegistryKey GLOWSTONE_EXTRA = PlacedFeatures.of("glowstone_extra");
+   public static final RegistryKey GLOWSTONE = PlacedFeatures.of("glowstone");
+   public static final RegistryKey CRIMSON_FOREST_VEGETATION = PlacedFeatures.of("crimson_forest_vegetation");
+   public static final RegistryKey WARPED_FOREST_VEGETATION = PlacedFeatures.of("warped_forest_vegetation");
+   public static final RegistryKey NETHER_SPROUTS = PlacedFeatures.of("nether_sprouts");
+   public static final RegistryKey TWISTING_VINES = PlacedFeatures.of("twisting_vines");
+   public static final RegistryKey WEEPING_VINES = PlacedFeatures.of("weeping_vines");
+   public static final RegistryKey PATCH_CRIMSON_ROOTS = PlacedFeatures.of("patch_crimson_roots");
+   public static final RegistryKey BASALT_PILLAR = PlacedFeatures.of("basalt_pillar");
+   public static final RegistryKey SPRING_DELTA = PlacedFeatures.of("spring_delta");
+   public static final RegistryKey SPRING_CLOSED = PlacedFeatures.of("spring_closed");
+   public static final RegistryKey SPRING_CLOSED_DOUBLE = PlacedFeatures.of("spring_closed_double");
+   public static final RegistryKey SPRING_OPEN = PlacedFeatures.of("spring_open");
+   public static final RegistryKey PATCH_SOUL_FIRE = PlacedFeatures.of("patch_soul_fire");
+   public static final RegistryKey PATCH_FIRE = PlacedFeatures.of("patch_fire");
+
+   public static void bootstrap(Registerable featureRegisterable) {
+      RegistryEntryLookup registryEntryLookup = featureRegisterable.getRegistryLookup(RegistryKeys.CONFIGURED_FEATURE);
+      RegistryEntry registryEntry = registryEntryLookup.getOrThrow(NetherConfiguredFeatures.DELTA);
+      RegistryEntry registryEntry2 = registryEntryLookup.getOrThrow(NetherConfiguredFeatures.SMALL_BASALT_COLUMNS);
+      RegistryEntry registryEntry3 = registryEntryLookup.getOrThrow(NetherConfiguredFeatures.SMALL_BASALT_COLUMNS_TEMP);
+      RegistryEntry registryEntry4 = registryEntryLookup.getOrThrow(NetherConfiguredFeatures.BASALT_BLOBS);
+      RegistryEntry registryEntry5 = registryEntryLookup.getOrThrow(NetherConfiguredFeatures.BLACKSTONE_BLOBS);
+      RegistryEntry registryEntry6 = registryEntryLookup.getOrThrow(NetherConfiguredFeatures.GLOWSTONE_EXTRA);
+      RegistryEntry registryEntry7 = registryEntryLookup.getOrThrow(NetherConfiguredFeatures.CRIMSON_FOREST_VEGETATION);
+      RegistryEntry registryEntry8 = registryEntryLookup.getOrThrow(NetherConfiguredFeatures.WARPED_FOREST_VEGETATION);
+      RegistryEntry registryEntry9 = registryEntryLookup.getOrThrow(NetherConfiguredFeatures.NETHER_SPROUTS);
+      RegistryEntry registryEntry10 = registryEntryLookup.getOrThrow(NetherConfiguredFeatures.TWISTING_VINES);
+      RegistryEntry registryEntry11 = registryEntryLookup.getOrThrow(NetherConfiguredFeatures.WEEPING_VINES);
+      RegistryEntry registryEntry12 = registryEntryLookup.getOrThrow(NetherConfiguredFeatures.PATCH_CRIMSON_ROOTS);
+      RegistryEntry registryEntry13 = registryEntryLookup.getOrThrow(NetherConfiguredFeatures.BASALT_PILLAR);
+      RegistryEntry registryEntry14 = registryEntryLookup.getOrThrow(NetherConfiguredFeatures.SPRING_LAVA_NETHER);
+      RegistryEntry registryEntry15 = registryEntryLookup.getOrThrow(NetherConfiguredFeatures.SPRING_NETHER_CLOSED);
+      RegistryEntry registryEntry16 = registryEntryLookup.getOrThrow(NetherConfiguredFeatures.SPRING_NETHER_OPEN);
+      RegistryEntry registryEntry17 = registryEntryLookup.getOrThrow(NetherConfiguredFeatures.PATCH_SOUL_FIRE);
+      RegistryEntry registryEntry18 = registryEntryLookup.getOrThrow(NetherConfiguredFeatures.PATCH_FIRE);
+      PlacedFeatures.register(featureRegisterable, DELTA, registryEntry, (PlacementModifier[])(CountMultilayerPlacementModifier.of(40), BiomePlacementModifier.of()));
+      PlacedFeatures.register(featureRegisterable, SMALL_BASALT_COLUMNS, registryEntry2, (PlacementModifier[])(CountMultilayerPlacementModifier.of(4), BiomePlacementModifier.of()));
+      PlacedFeatures.register(featureRegisterable, LARGE_BASALT_COLUMNS, registryEntry3, (PlacementModifier[])(CountMultilayerPlacementModifier.of(2), BiomePlacementModifier.of()));
+      PlacedFeatures.register(featureRegisterable, BASALT_BLOBS, registryEntry4, (PlacementModifier[])(CountPlacementModifier.of(75), SquarePlacementModifier.of(), PlacedFeatures.BOTTOM_TO_TOP_RANGE, BiomePlacementModifier.of()));
+      PlacedFeatures.register(featureRegisterable, BLACKSTONE_BLOBS, registryEntry5, (PlacementModifier[])(CountPlacementModifier.of(25), SquarePlacementModifier.of(), PlacedFeatures.BOTTOM_TO_TOP_RANGE, BiomePlacementModifier.of()));
+      PlacedFeatures.register(featureRegisterable, GLOWSTONE_EXTRA, registryEntry6, (PlacementModifier[])(CountPlacementModifier.of(BiasedToBottomIntProvider.create(0, 9)), SquarePlacementModifier.of(), PlacedFeatures.FOUR_ABOVE_AND_BELOW_RANGE, BiomePlacementModifier.of()));
+      PlacedFeatures.register(featureRegisterable, GLOWSTONE, registryEntry6, (PlacementModifier[])(CountPlacementModifier.of(10), SquarePlacementModifier.of(), PlacedFeatures.BOTTOM_TO_TOP_RANGE, BiomePlacementModifier.of()));
+      PlacedFeatures.register(featureRegisterable, CRIMSON_FOREST_VEGETATION, registryEntry7, (PlacementModifier[])(CountMultilayerPlacementModifier.of(6), BiomePlacementModifier.of()));
+      PlacedFeatures.register(featureRegisterable, WARPED_FOREST_VEGETATION, registryEntry8, (PlacementModifier[])(CountMultilayerPlacementModifier.of(5), BiomePlacementModifier.of()));
+      PlacedFeatures.register(featureRegisterable, NETHER_SPROUTS, registryEntry9, (PlacementModifier[])(CountMultilayerPlacementModifier.of(4), BiomePlacementModifier.of()));
+      PlacedFeatures.register(featureRegisterable, TWISTING_VINES, registryEntry10, (PlacementModifier[])(CountPlacementModifier.of(10), SquarePlacementModifier.of(), PlacedFeatures.BOTTOM_TO_TOP_RANGE, BiomePlacementModifier.of()));
+      PlacedFeatures.register(featureRegisterable, WEEPING_VINES, registryEntry11, (PlacementModifier[])(CountPlacementModifier.of(10), SquarePlacementModifier.of(), PlacedFeatures.BOTTOM_TO_TOP_RANGE, BiomePlacementModifier.of()));
+      PlacedFeatures.register(featureRegisterable, PATCH_CRIMSON_ROOTS, registryEntry12, (PlacementModifier[])(PlacedFeatures.BOTTOM_TO_TOP_RANGE, BiomePlacementModifier.of()));
+      PlacedFeatures.register(featureRegisterable, BASALT_PILLAR, registryEntry13, (PlacementModifier[])(CountPlacementModifier.of(10), SquarePlacementModifier.of(), PlacedFeatures.BOTTOM_TO_TOP_RANGE, BiomePlacementModifier.of()));
+      PlacedFeatures.register(featureRegisterable, SPRING_DELTA, registryEntry14, (PlacementModifier[])(CountPlacementModifier.of(16), SquarePlacementModifier.of(), PlacedFeatures.FOUR_ABOVE_AND_BELOW_RANGE, BiomePlacementModifier.of()));
+      PlacedFeatures.register(featureRegisterable, SPRING_CLOSED, registryEntry15, (PlacementModifier[])(CountPlacementModifier.of(16), SquarePlacementModifier.of(), PlacedFeatures.TEN_ABOVE_AND_BELOW_RANGE, BiomePlacementModifier.of()));
+      PlacedFeatures.register(featureRegisterable, SPRING_CLOSED_DOUBLE, registryEntry15, (PlacementModifier[])(CountPlacementModifier.of(32), SquarePlacementModifier.of(), PlacedFeatures.TEN_ABOVE_AND_BELOW_RANGE, BiomePlacementModifier.of()));
+      PlacedFeatures.register(featureRegisterable, SPRING_OPEN, registryEntry16, (PlacementModifier[])(CountPlacementModifier.of(8), SquarePlacementModifier.of(), PlacedFeatures.FOUR_ABOVE_AND_BELOW_RANGE, BiomePlacementModifier.of()));
+      List list = List.of(CountPlacementModifier.of(UniformIntProvider.create(0, 5)), SquarePlacementModifier.of(), PlacedFeatures.FOUR_ABOVE_AND_BELOW_RANGE, BiomePlacementModifier.of());
+      PlacedFeatures.register(featureRegisterable, PATCH_SOUL_FIRE, registryEntry17, (List)list);
+      PlacedFeatures.register(featureRegisterable, PATCH_FIRE, registryEntry18, (List)list);
+   }
+}

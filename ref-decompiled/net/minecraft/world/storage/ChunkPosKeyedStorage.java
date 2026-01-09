@@ -1,0 +1,54 @@
+package net.minecraft.world.storage;
+
+import com.mojang.datafixers.DataFixer;
+import com.mojang.serialization.Dynamic;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.concurrent.CompletableFuture;
+import net.minecraft.datafixer.DataFixTypes;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtHelper;
+import net.minecraft.util.math.ChunkPos;
+import org.jetbrains.annotations.Nullable;
+
+public class ChunkPosKeyedStorage implements AutoCloseable {
+   private final StorageIoWorker worker;
+   private final DataFixer dataFixer;
+   private final DataFixTypes dataFixTypes;
+
+   public ChunkPosKeyedStorage(StorageKey storageKey, Path directory, DataFixer dataFixer, boolean dsync, DataFixTypes dataFixTypes) {
+      this.dataFixer = dataFixer;
+      this.dataFixTypes = dataFixTypes;
+      this.worker = new StorageIoWorker(storageKey, directory, dsync);
+   }
+
+   public CompletableFuture read(ChunkPos pos) {
+      return this.worker.readChunkData(pos);
+   }
+
+   public CompletableFuture set(ChunkPos pos, @Nullable NbtCompound nbt) {
+      return this.worker.setResult(pos, nbt);
+   }
+
+   public NbtCompound update(NbtCompound nbt, int oldVersion) {
+      int i = NbtHelper.getDataVersion(nbt, oldVersion);
+      NbtCompound nbtCompound = this.dataFixTypes.update(this.dataFixer, nbt, i);
+      return NbtHelper.putDataVersion(nbtCompound);
+   }
+
+   public Dynamic update(Dynamic nbt, int oldVersion) {
+      return this.dataFixTypes.update(this.dataFixer, nbt, oldVersion);
+   }
+
+   public CompletableFuture completeAll(boolean sync) {
+      return this.worker.completeAll(sync);
+   }
+
+   public void close() throws IOException {
+      this.worker.close();
+   }
+
+   public StorageKey getStorageKey() {
+      return this.worker.getStorageKey();
+   }
+}

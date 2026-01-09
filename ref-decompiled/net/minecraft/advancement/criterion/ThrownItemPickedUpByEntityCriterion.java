@@ -1,0 +1,73 @@
+package net.minecraft.advancement.criterion;
+
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import java.util.Optional;
+import net.minecraft.advancement.AdvancementCriterion;
+import net.minecraft.entity.Entity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.loot.context.LootContext;
+import net.minecraft.predicate.entity.EntityPredicate;
+import net.minecraft.predicate.entity.LootContextPredicate;
+import net.minecraft.predicate.entity.LootContextPredicateValidator;
+import net.minecraft.predicate.item.ItemPredicate;
+import net.minecraft.server.network.ServerPlayerEntity;
+import org.jetbrains.annotations.Nullable;
+
+public class ThrownItemPickedUpByEntityCriterion extends AbstractCriterion {
+   public Codec getConditionsCodec() {
+      return ThrownItemPickedUpByEntityCriterion.Conditions.CODEC;
+   }
+
+   public void trigger(ServerPlayerEntity player, ItemStack stack, @Nullable Entity entity) {
+      LootContext lootContext = EntityPredicate.createAdvancementEntityLootContext(player, entity);
+      this.trigger(player, (conditions) -> {
+         return conditions.test(player, stack, lootContext);
+      });
+   }
+
+   public static record Conditions(Optional player, Optional item, Optional entity) implements AbstractCriterion.Conditions {
+      public static final Codec CODEC = RecordCodecBuilder.create((instance) -> {
+         return instance.group(EntityPredicate.LOOT_CONTEXT_PREDICATE_CODEC.optionalFieldOf("player").forGetter(Conditions::player), ItemPredicate.CODEC.optionalFieldOf("item").forGetter(Conditions::item), EntityPredicate.LOOT_CONTEXT_PREDICATE_CODEC.optionalFieldOf("entity").forGetter(Conditions::entity)).apply(instance, Conditions::new);
+      });
+
+      public Conditions(Optional playerPredicate, Optional item, Optional entity) {
+         this.player = playerPredicate;
+         this.item = item;
+         this.entity = entity;
+      }
+
+      public static AdvancementCriterion createThrownItemPickedUpByEntity(LootContextPredicate player, Optional item, Optional entity) {
+         return Criteria.THROWN_ITEM_PICKED_UP_BY_ENTITY.create(new Conditions(Optional.of(player), item, entity));
+      }
+
+      public static AdvancementCriterion createThrownItemPickedUpByPlayer(Optional playerPredicate, Optional item, Optional entity) {
+         return Criteria.THROWN_ITEM_PICKED_UP_BY_PLAYER.create(new Conditions(playerPredicate, item, entity));
+      }
+
+      public boolean test(ServerPlayerEntity player, ItemStack stack, LootContext entity) {
+         if (this.item.isPresent() && !((ItemPredicate)this.item.get()).test(stack)) {
+            return false;
+         } else {
+            return !this.entity.isPresent() || ((LootContextPredicate)this.entity.get()).test(entity);
+         }
+      }
+
+      public void validate(LootContextPredicateValidator validator) {
+         AbstractCriterion.Conditions.super.validate(validator);
+         validator.validateEntityPredicate(this.entity, "entity");
+      }
+
+      public Optional player() {
+         return this.player;
+      }
+
+      public Optional item() {
+         return this.item;
+      }
+
+      public Optional entity() {
+         return this.entity;
+      }
+   }
+}

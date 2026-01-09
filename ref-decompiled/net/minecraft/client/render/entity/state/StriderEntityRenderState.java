@@ -1,0 +1,16 @@
+package net.minecraft.client.render.entity.state;
+
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.item.ItemStack;
+
+@Environment(EnvType.CLIENT)
+public class StriderEntityRenderState extends LivingEntityRenderState {
+   public ItemStack saddleStack;
+   public boolean cold;
+   public boolean hasPassengers;
+
+   public StriderEntityRenderState() {
+      this.saddleStack = ItemStack.EMPTY;
+   }
+}

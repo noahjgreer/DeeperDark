@@ -1,0 +1,65 @@
+package net.minecraft.datafixer.fix;
+
+import com.mojang.datafixers.DSL;
+import com.mojang.datafixers.DataFix;
+import com.mojang.datafixers.OpticFinder;
+import com.mojang.datafixers.TypeRewriteRule;
+import com.mojang.datafixers.Typed;
+import com.mojang.datafixers.schemas.Schema;
+import com.mojang.datafixers.types.Type;
+import com.mojang.datafixers.types.templates.List;
+import java.util.Optional;
+import java.util.Set;
+import net.minecraft.datafixer.TypeReferences;
+import net.minecraft.datafixer.schema.IdentifierNormalizingSchema;
+import net.minecraft.util.Util;
+
+public class ItemRemoveBlockEntityTagFix extends DataFix {
+   private final Set itemIds;
+
+   public ItemRemoveBlockEntityTagFix(Schema outputSchema, Set itemIds) {
+      super(outputSchema, true);
+      this.itemIds = itemIds;
+   }
+
+   public TypeRewriteRule makeRule() {
+      Type type = this.getInputSchema().getType(TypeReferences.ITEM_STACK);
+      OpticFinder opticFinder = type.findField("tag");
+      OpticFinder opticFinder2 = opticFinder.type().findField("BlockEntityTag");
+      Type type2 = this.getInputSchema().getType(TypeReferences.ENTITY);
+      OpticFinder opticFinder3 = DSL.namedChoice("minecraft:falling_block", this.getInputSchema().getChoiceType(TypeReferences.ENTITY, "minecraft:falling_block"));
+      OpticFinder opticFinder4 = opticFinder3.type().findField("TileEntityData");
+      Type type3 = this.getInputSchema().getType(TypeReferences.STRUCTURE);
+      OpticFinder opticFinder5 = type3.findField("blocks");
+      OpticFinder opticFinder6 = DSL.typeFinder(((List.ListType)opticFinder5.type()).getElement());
+      OpticFinder opticFinder7 = opticFinder6.type().findField("nbt");
+      OpticFinder opticFinder8 = DSL.fieldFinder("id", IdentifierNormalizingSchema.getIdentifierType());
+      return TypeRewriteRule.seq(this.fixTypeEverywhereTyped("ItemRemoveBlockEntityTagFix", type, (typed) -> {
+         return typed.updateTyped(opticFinder, (typedx) -> {
+            return this.method_71758(typedx, opticFinder2, opticFinder8, "BlockEntityTag");
+         });
+      }), new TypeRewriteRule[]{this.fixTypeEverywhereTyped("FallingBlockEntityRemoveBlockEntityTagFix", type2, (typed) -> {
+         return typed.updateTyped(opticFinder3, (typedx) -> {
+            return this.method_71758(typedx, opticFinder4, opticFinder8, "TileEntityData");
+         });
+      }), this.fixTypeEverywhereTyped("StructureRemoveBlockEntityTagFix", type3, (typed) -> {
+         return typed.updateTyped(opticFinder5, (typedx) -> {
+            return typedx.updateTyped(opticFinder6, (typed) -> {
+               return this.method_71758(typed, opticFinder7, opticFinder8, "nbt");
+            });
+         });
+      }), this.convertUnchecked("ItemRemoveBlockEntityTagFix - update block entity type", this.getInputSchema().getType(TypeReferences.BLOCK_ENTITY), this.getOutputSchema().getType(TypeReferences.BLOCK_ENTITY))});
+   }
+
+   private Typed method_71758(Typed typed, OpticFinder opticFinder, OpticFinder opticFinder2, String string) {
+      Optional optional = typed.getOptionalTyped(opticFinder);
+      if (optional.isEmpty()) {
+         return typed;
+      } else {
+         String string2 = (String)((Typed)optional.get()).getOptional(opticFinder2).orElse("");
+         return !this.itemIds.contains(string2) ? typed : Util.apply(typed, typed.getType(), (dynamic) -> {
+            return dynamic.remove(string);
+         });
+      }
+   }
+}

@@ -1,0 +1,37 @@
+package net.minecraft.block.entity;
+
+import java.util.function.Consumer;
+import net.minecraft.component.type.NbtComponent;
+import net.minecraft.entity.EntityType;
+import net.minecraft.screen.ScreenTexts;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
+import net.minecraft.util.math.random.Random;
+import org.jetbrains.annotations.Nullable;
+
+public interface Spawner {
+   void setEntityType(EntityType type, Random random);
+
+   static void appendSpawnDataToTooltip(NbtComponent nbtComponent, Consumer textConsumer, String spawnDataKey) {
+      Text text = getSpawnedEntityText(nbtComponent, spawnDataKey);
+      if (text != null) {
+         textConsumer.accept(text);
+      } else {
+         textConsumer.accept(ScreenTexts.EMPTY);
+         textConsumer.accept(Text.translatable("block.minecraft.spawner.desc1").formatted(Formatting.GRAY));
+         textConsumer.accept(ScreenTexts.space().append((Text)Text.translatable("block.minecraft.spawner.desc2").formatted(Formatting.BLUE)));
+      }
+
+   }
+
+   @Nullable
+   static Text getSpawnedEntityText(NbtComponent nbtComponent, String spawnDataKey) {
+      return (Text)nbtComponent.getNbt().getCompound(spawnDataKey).flatMap((spawnDataNbt) -> {
+         return spawnDataNbt.getCompound("entity");
+      }).flatMap((entityNbt) -> {
+         return entityNbt.get("id", EntityType.CODEC);
+      }).map((entityType) -> {
+         return Text.translatable(entityType.getTranslationKey()).formatted(Formatting.GRAY);
+      }).orElse((Object)null);
+   }
+}
