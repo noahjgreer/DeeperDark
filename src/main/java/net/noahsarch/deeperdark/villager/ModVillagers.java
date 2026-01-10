@@ -1,7 +1,7 @@
 package net.noahsarch.deeperdark.villager;
 
 import com.google.common.collect.ImmutableSet;
-import net.fabricmc.fabric.api.object.builder.v1.villager.VillagerProfessionBuilder;
+import net.fabricmc.fabric.api.object.builder.v1.VillagerProfessionBuilder;
 import net.fabricmc.fabric.api.object.builder.v1.trade.TradeOfferHelper;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.Items;

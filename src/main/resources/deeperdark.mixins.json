@@ -50,6 +50,8 @@
     "VanillaBiomeParametersMixin",
     "WardenEntityBrainMixin",
     "WardenEntityMixin",
+    "WitchEntityMixin",
+    "WitchMobMixin",
     "ZombieVillagerEntityMixin",
     "SimpleStructurePieceAccessor",
     "StructurePiecesCollectorAccessor",
