@@ -38,6 +38,8 @@
 - Enchanting table giving only unbreaking 5
 - Black Mesa Biome
 - Campfire sound when wings burn
+- Leash players
+- Pale woodland mansions
 
 ### Recipes
 - Scentless Potion
@@ -69,9 +71,7 @@
 - Cure Witches
 - Unpath dirt paths
 - Overflow cap for the Slip
-- Leash players
 - /Ride players
-- Pale woodland mansions
 
 [//]: # (- Wool + Shears = String)
 [//]: # (- Dead Bush = Shrub + Flint & Steel)

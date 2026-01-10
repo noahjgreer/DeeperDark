@@ -38,6 +38,7 @@
     "NoiseChunkGeneratorMixin",
     "OctavePerlinNoiseSamplerMixin",
     "PotionItemMixin",
+    "PlayerEntityMixin",
     "ServerPlayerEntityMixin",
     "ShearsItemMixin",
     "ShulkerBoxBlockEntityMixin",
@@ -49,7 +50,10 @@
     "VanillaBiomeParametersMixin",
     "WardenEntityBrainMixin",
     "WardenEntityMixin",
-    "ZombieVillagerEntityMixin"
+    "ZombieVillagerEntityMixin",
+    "SimpleStructurePieceAccessor",
+    "StructurePiecesCollectorAccessor",
+    "WoodlandMansionStructureMixin"
   ],
   "injectors": {
     "defaultRequire": 1

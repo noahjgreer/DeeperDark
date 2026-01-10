@@ -16,12 +16,15 @@ import org.slf4j.LoggerFactory;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.structure.processor.StructureProcessorType;
 import net.noahsarch.deeperdark.block.entity.ActiveSpongeBlockEntity;
 import net.noahsarch.deeperdark.block.entity.ModBlockEntities;
 import net.noahsarch.deeperdark.event.SiphonEvents;
+import net.noahsarch.deeperdark.worldgen.PaleMansionProcessor;
 
 public class Deeperdark implements ModInitializer {
 	public static final String MOD_ID = "deeperdark";
+	public static StructureProcessorType<PaleMansionProcessor> PALE_MANSION_PROCESSOR;
 
 	// This logger is used to write text to the console and the log file.
 	// It is considered best practice to use your mod id as the logger's name.
@@ -39,6 +42,8 @@ public class Deeperdark implements ModInitializer {
 		Registry.register(Registries.CHUNK_GENERATOR,
 				Identifier.of(MOD_ID, "slip_room_generator"),
 				SlipChunkGenerator.CODEC);
+
+		PALE_MANSION_PROCESSOR = Registry.register(Registries.STRUCTURE_PROCESSOR, Identifier.of(MOD_ID, "pale_mansion_processor"), () -> PaleMansionProcessor.CODEC);
 
 		SiphonEvents.register();
 
