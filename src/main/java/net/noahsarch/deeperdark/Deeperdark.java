@@ -7,7 +7,7 @@ import net.minecraft.util.Identifier;
 import net.noahsarch.deeperdark.event.PlayerTickHandler;
 import net.noahsarch.deeperdark.portal.SlipPortalHandler;
 import net.noahsarch.deeperdark.potion.CustomBrewingRecipeHandler;
-//import net.noahsarch.deeperdark.villager.ModVillagers;
+import net.noahsarch.deeperdark.villager.ModVillagers;
 import net.noahsarch.deeperdark.worldgen.SlipChunkGenerator;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.item.Items;
@@ -46,6 +46,8 @@ public class Deeperdark implements ModInitializer {
 		PALE_MANSION_PROCESSOR = Registry.register(Registries.STRUCTURE_PROCESSOR, Identifier.of(MOD_ID, "pale_mansion_processor"), () -> PaleMansionProcessor.CODEC);
 
 		SiphonEvents.register();
+
+        ModVillagers.registerVillagers();
 
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.

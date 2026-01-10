@@ -40,6 +40,8 @@
 - Campfire sound when wings burn
 - Leash players
 - Pale woodland mansions
+- Cure Witches
+- Splash water bottles extinguish players
 
 ### Recipes
 - Scentless Potion
@@ -63,12 +65,9 @@
 ### Todo 
 - Something that buffs rabbit stew
 - Shulkerboxes in shulker boxes
-- Witches become potion villagesr
 - When trying to bottle xp, if not have max bookshelves, there is xp loss 
 - Eradicate bookshelf for chiseled bookshelf
-- Throwing water bottles at people extignuishes them
 - Craftable debug stick
-- Cure Witches
 - Unpath dirt paths
 - Overflow cap for the Slip
 - /Ride players
