@@ -1,9 +1,6 @@
 package net.noahsarch.deeperdark.mixin;
 
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.data.DataTracker;
-import net.minecraft.entity.data.TrackedData;
-import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.mob.WitchEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -22,13 +19,14 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.UUID;
-import net.noahsarch.deeperdark.villager.ModVillagers;
 import net.minecraft.entity.conversion.EntityConversionContext;
 import net.noahsarch.deeperdark.duck.WitchConversionAccessor;
 import net.minecraft.registry.Registries;
 
 import net.minecraft.village.VillagerProfession;
 import net.noahsarch.deeperdark.duck.PotionMasterDuck;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 
 @Mixin(WitchEntity.class)
 public abstract class WitchEntityMixin extends RaiderEntity implements WitchConversionAccessor {
@@ -38,15 +36,39 @@ public abstract class WitchEntityMixin extends RaiderEntity implements WitchConv
     }
 
     @Unique
-    private static final TrackedData<Boolean> CONVERTING = DataTracker.registerData(WitchEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    private boolean converting;
     @Unique
     private int conversionTimer;
     @Unique
     private UUID converter;
 
-    @Inject(method = "initDataTracker", at = @At("TAIL"))
-    protected void initDataTracker(DataTracker.Builder builder, CallbackInfo ci) {
-        builder.add(CONVERTING, false);
+    @Override
+    public void writeCustomData(WriteView view) {
+        super.writeCustomData(view);
+        if (this.converting) {
+            view.putInt("ConversionTime", this.conversionTimer);
+            if (this.converter != null) {
+                view.putString("ConversionPlayer", this.converter.toString());
+            }
+        }
+    }
+
+    @Override
+    public void readCustomData(ReadView view) {
+        super.readCustomData(view);
+        int time = view.getInt("ConversionTime", -1);
+        if (time > -1) {
+            this.converting = true;
+            this.conversionTimer = time;
+            String uuidString = view.getString("ConversionPlayer", "");
+            if (!uuidString.isEmpty()) {
+                try {
+                    this.converter = UUID.fromString(uuidString);
+                } catch (IllegalArgumentException e) {
+                    // Ignore invalid UUID
+                }
+            }
+        }
     }
 
     @Inject(method = "tickMovement", at = @At("TAIL"))
@@ -70,14 +92,14 @@ public abstract class WitchEntityMixin extends RaiderEntity implements WitchConv
 
     @Unique
     public boolean deeperdark$isConverting() {
-        return this.dataTracker.get(CONVERTING);
+        return this.converting;
     }
 
     @Unique
     public void deeperdark$setConverting(@Nullable UUID uuid, int delay) {
         this.converter = uuid;
         this.conversionTimer = delay;
-        this.dataTracker.set(CONVERTING, true);
+        this.converting = true;
         this.removeStatusEffect(StatusEffects.WEAKNESS);
         this.addStatusEffect(new StatusEffectInstance(StatusEffects.STRENGTH, delay, Math.min(this.getWorld().getDifficulty().getId() - 1, 0)));
         this.getWorld().sendEntityStatus(this, (byte) 16);
@@ -117,10 +139,8 @@ public abstract class WitchEntityMixin extends RaiderEntity implements WitchConv
 
             villager.setExperience(1);
              if (this.converter != null) {
-                PlayerEntity playerEntity = world.getPlayerByUuid(this.converter);
-                if (playerEntity instanceof ServerPlayerEntity) {
-                    // Custom criteria could be triggered here
-                }
+                // PlayerEntity playerEntity = world.getPlayerByUuid(this.converter);
+                // Custom criteria could be triggered here
             }
         });
     }
