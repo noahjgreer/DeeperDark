@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import net.minecraft.structure.processor.StructureProcessorType;
 import net.noahsarch.deeperdark.event.SiphonEvents;
+import net.noahsarch.deeperdark.event.WorldBorderHandler;
 import net.noahsarch.deeperdark.worldgen.PaleMansionProcessor;
 
 public class Deeperdark implements ModInitializer {
@@ -33,6 +34,9 @@ public class Deeperdark implements ModInitializer {
 	public void onInitialize() {
 		// This code runs as soon as Minecraft is in a mod-load-ready state.
 
+		// Initialize Config
+		DeeperDarkConfig.load();
+
 		// Register the Slip chunk generator
 		Registry.register(Registries.CHUNK_GENERATOR,
 				Identifier.of(MOD_ID, "slip_room_generator"),
@@ -41,6 +45,8 @@ public class Deeperdark implements ModInitializer {
 		PALE_MANSION_PROCESSOR = Registry.register(Registries.STRUCTURE_PROCESSOR, Identifier.of(MOD_ID, "pale_mansion_processor"), () -> PaleMansionProcessor.CODEC);
 
 		SiphonEvents.register();
+
+		WorldBorderHandler.register();
 
         ModVillagers.registerVillagers();
 
