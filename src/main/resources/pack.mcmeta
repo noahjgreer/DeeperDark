@@ -1,0 +1,10 @@
+{
+    "pack": {
+        "description": "Server Specific Resources",
+        "pack_format": 63,
+        "supported_formats": [
+            63,
+            81
+        ]
+    }
+}

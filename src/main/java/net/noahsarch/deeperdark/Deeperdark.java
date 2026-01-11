@@ -13,12 +13,7 @@ import net.fabricmc.api.ModInitializer;
 import net.minecraft.item.Items;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.structure.processor.StructureProcessorType;
-import net.noahsarch.deeperdark.block.entity.ActiveSpongeBlockEntity;
-import net.noahsarch.deeperdark.block.entity.ModBlockEntities;
 import net.noahsarch.deeperdark.event.SiphonEvents;
 import net.noahsarch.deeperdark.worldgen.PaleMansionProcessor;
 
@@ -54,11 +49,6 @@ public class Deeperdark implements ModInitializer {
 
 		LOGGER.info("[Deeper Dark] Mod initialized!");
 
-		ModBlockEntities.ACTIVE_SPONGE = Registry.register(
-				Registries.BLOCK_ENTITY_TYPE,
-				Identifier.of(MOD_ID, "active_sponge"),
-				FabricBlockEntityTypeBuilder.create(ActiveSpongeBlockEntity::new, Blocks.WET_SPONGE).build()
-		);
 
         DeepDarkBiomeModifier.init();
 

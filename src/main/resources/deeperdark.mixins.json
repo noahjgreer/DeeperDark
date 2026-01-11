@@ -21,8 +21,6 @@
     "FireBlockMixin",
     "FluidBlockMixin",
     "FlowableFluidMixin",
-    "SpongeBlockMixin",
-    "WetSpongeBlockMixin",
     "GlassBottleItemMixin",
     "IceBlockMixin",
     "ItemEntityMixin",
