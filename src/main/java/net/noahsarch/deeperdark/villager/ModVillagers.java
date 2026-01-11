@@ -120,7 +120,17 @@ public class ModVillagers {
 
             potionStack.set(DataComponentTypes.POTION_CONTENTS, contents);
 
-            String translationKey = this.item == Items.SPLASH_POTION ? "item.deeperdark.mystery_splash_potion" : "item.deeperdark.mystery_potion";
+            String baseKey = this.item == Items.SPLASH_POTION ? "item.deeperdark.mystery_splash_potion" : "item.deeperdark.mystery_potion";
+            String[] suffixes = {
+                "", // Perplexing
+                ".uninteresting", ".bland", ".clear", ".milky", ".diffuse", ".artless", ".thin", ".flat", ".bulky", ".bungling", ".buttered",
+                ".smooth", ".suave", ".debonair", ".elegant", ".fancy", ".charming", ".dashing", ".refined", ".cordial", ".sparkling",
+                ".potent", ".foul", ".odorless", ".rank", ".harsh", ".acrid", ".gross", ".stinky"
+            };
+
+            String suffix = suffixes[random.nextInt(suffixes.length)];
+            String translationKey = baseKey + suffix;
+
             potionStack.set(DataComponentTypes.CUSTOM_NAME, Text.translatable(translationKey).styled(style -> style.withItalic(false)));
 
             return new TradeOffer(
