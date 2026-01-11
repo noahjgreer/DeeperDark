@@ -53,6 +53,7 @@
     "WitchEntityMixin",
     "WitchMobMixin",
     "PotionMasterMixin",
+    "PotionMasterNameMixin",
     "VillagerEntityAccessor",
     "ZombieVillagerEntityMixin",
     "SimpleStructurePieceAccessor",
