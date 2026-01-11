@@ -23,7 +23,8 @@
 		]
 	},
 	"mixins": [
-		"deeperdark.mixins.json"
+		"deeperdark.mixins.json",
+        "deeperdark.client.mixins.json"
 	],
 	"depends": {
 		"fabricloader": ">=0.17.2",

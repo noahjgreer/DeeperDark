@@ -5,11 +5,13 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.state.property.Property;
+import net.minecraft.block.PillarBlock;
 import net.minecraft.structure.StructurePlacementData;
 import net.minecraft.structure.StructureTemplate;
 import net.minecraft.structure.processor.StructureProcessor;
 import net.minecraft.structure.processor.StructureProcessorType;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,12 +38,22 @@ public class PaleMansionProcessor extends StructureProcessor {
         REPLACEMENTS.put(Blocks.STRIPPED_DARK_OAK_LOG, Blocks.STRIPPED_PALE_OAK_LOG);
         REPLACEMENTS.put(Blocks.STRIPPED_DARK_OAK_WOOD, Blocks.STRIPPED_PALE_OAK_WOOD);
         REPLACEMENTS.put(Blocks.DARK_OAK_WOOD, Blocks.PALE_OAK_WOOD);
+        REPLACEMENTS.put(Blocks.COBBLESTONE, Blocks.COBBLED_DEEPSLATE);
+        REPLACEMENTS.put(Blocks.COBBLESTONE_SLAB, Blocks.COBBLED_DEEPSLATE_SLAB);
+        REPLACEMENTS.put(Blocks.COBBLESTONE_STAIRS, Blocks.COBBLED_DEEPSLATE_STAIRS);
+        REPLACEMENTS.put(Blocks.COBBLESTONE_WALL, Blocks.COBBLED_DEEPSLATE_WALL);
+        REPLACEMENTS.put(Blocks.MOSSY_COBBLESTONE, Blocks.COBBLED_DEEPSLATE); // Simplification, or use another variant if preferred
     }
 
     @Nullable
     @Override
     public StructureTemplate.StructureBlockInfo process(WorldView world, BlockPos pos, BlockPos pivot, StructureTemplate.StructureBlockInfo originalBlockInfo, StructureTemplate.StructureBlockInfo currentBlockInfo, StructurePlacementData data) {
         BlockState currentState = currentBlockInfo.state();
+
+        if (currentState.isOf(Blocks.BIRCH_PLANKS)) {
+             return new StructureTemplate.StructureBlockInfo(currentBlockInfo.pos(), Blocks.STRIPPED_PALE_OAK_LOG.getDefaultState().with(PillarBlock.AXIS, Direction.Axis.X), currentBlockInfo.nbt());
+        }
+
         Block newBlock = REPLACEMENTS.get(currentState.getBlock());
         if (newBlock != null) {
             BlockState newState = newBlock.getDefaultState();

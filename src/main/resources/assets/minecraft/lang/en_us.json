@@ -1,0 +1,16 @@
+{
+  "item.minecraft.potion.effect.effect.deeperdark.scentless": "Potion of Scentlessness",
+  "item.minecraft.splash_potion.effect.effect.deeperdark.scentless": "Splash Potion of Scentlessness",
+  "item.minecraft.lingering_potion.effect.effect.deeperdark.scentless": "Lingering Potion of Scentlessness",
+  "item.minecraft.tipped_arrow.effect.effect.deeperdark.scentless": "Arrow of Scentlessness",
+  "effect.deeperdark.scentless": "Scentlessness",
+  "item.deeperdark.siphon": "Siphon",
+  "entity.deeperdark.villager.potion_master": "Potion Master",
+  "potion.deeperdark.scentless.name": "Potion of Scentlessness",
+  "potion.deeperdark.long_scentless.name": "Long Potion of Scentlessness",
+  "item.deeperdark.mystery_potion": "Perplexing Potion",
+  "effect.deeperdark.scentless.duration": "Scentlessness (%s)",
+  "effect.deeperdark.scentless.desc.1": "Inhibits being caught by",
+  "effect.deeperdark.scentless.desc.2": "the Warden's sniff attack."
+}
+

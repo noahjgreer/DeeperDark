@@ -11,14 +11,12 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.raid.RaiderEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.world.World;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.village.VillagerType;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -107,7 +105,8 @@ public abstract class WitchEntityMixin extends RaiderEntity implements WitchConv
     private void deeperdark$finishConversion(ServerWorld world) {
         this.convertTo(EntityType.VILLAGER, EntityConversionContext.create(this, false, false), (villager) -> {
             villager.initialize(world, world.getLocalDifficulty(villager.getBlockPos()), SpawnReason.CONVERSION, null);
-            villager.setVillagerData(villager.getVillagerData().withProfession(Registries.VILLAGER_PROFESSION.getEntry(ModVillagers.POTION_MASTER)).withType(VillagerType.SWAMP));
+            villager.setVillagerData(villager.getVillagerData().withProfession(Registries.VILLAGER_PROFESSION.getOrThrow(ModVillagers.POTION_MASTER_KEY)).withType(Registries.VILLAGER_TYPE.getOrThrow(VillagerType.SWAMP)));
+            villager.setExperience(1);
              if (this.converter != null) {
                 PlayerEntity playerEntity = world.getPlayerByUuid(this.converter);
                 if (playerEntity instanceof ServerPlayerEntity) {

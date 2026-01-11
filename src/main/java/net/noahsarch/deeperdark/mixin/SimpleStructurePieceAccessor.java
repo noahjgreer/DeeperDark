@@ -8,6 +8,6 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin(SimpleStructurePiece.class)
 public interface SimpleStructurePieceAccessor {
     @Accessor("placementData")
-    StructurePlacementData getPlacementData();
+    StructurePlacementData deeperdark$getPlacementData();
 }
 

@@ -4,7 +4,6 @@ import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.structure.SimpleStructurePiece;
 import net.minecraft.structure.StructurePiece;
 import net.minecraft.structure.StructurePiecesCollector;
-import net.minecraft.structure.StructurePlacementData;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
@@ -25,18 +24,28 @@ public class WoodlandMansionStructureMixin {
 
     @Inject(method = "addPieces", at = @At("TAIL"))
     private void deeperdark$replaceWithPaleOak(StructurePiecesCollector collector, Structure.Context context, BlockPos pos, BlockRotation rotation, CallbackInfo ci) {
-        RegistryEntry<Biome> biomeEntry = context.chunkGenerator().getBiomeSource().getBiome(
-                BiomeCoords.fromBlock(pos.getX()),
-                BiomeCoords.fromBlock(pos.getY()),
-                BiomeCoords.fromBlock(pos.getZ()),
-                context.noiseConfig().getMultiNoiseSampler()
-        );
+        List<StructurePiece> pieces = ((StructurePiecesCollectorAccessor) collector).getPieces();
+        boolean isPaleMansion = false;
 
-        if (biomeEntry.matchesKey(BiomeKeys.PALE_GARDEN)) {
-            List<StructurePiece> pieces = ((StructurePiecesCollectorAccessor) collector).getPieces();
+        for (StructurePiece piece : pieces) {
+            BlockPos center = piece.getBoundingBox().getCenter();
+            RegistryEntry<Biome> biomeEntry = context.chunkGenerator().getBiomeSource().getBiome(
+                    BiomeCoords.fromBlock(center.getX()),
+                    BiomeCoords.fromBlock(center.getY()),
+                    BiomeCoords.fromBlock(center.getZ()),
+                    context.noiseConfig().getMultiNoiseSampler()
+            );
+            if (biomeEntry.matchesKey(BiomeKeys.PALE_GARDEN)) {
+                isPaleMansion = true;
+                break;
+            }
+        }
+
+        if (isPaleMansion) {
             for (StructurePiece piece : pieces) {
                 if (piece instanceof SimpleStructurePiece simplePiece) {
-                    ((SimpleStructurePieceAccessor) simplePiece).getPlacementData().addProcessor(PaleMansionProcessor.INSTANCE);
+                    ((SimpleStructurePieceAccessor) simplePiece).deeperdark$getPlacementData().addProcessor(PaleMansionProcessor.INSTANCE);
+
                 }
             }
         }

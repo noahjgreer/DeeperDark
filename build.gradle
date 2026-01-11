@@ -32,7 +32,7 @@ dependencies {
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-	
+
 }
 
 processResources {
@@ -58,8 +58,10 @@ java {
 }
 
 jar {
+	inputs.property "archivesName", project.base.archivesName
+
 	from("LICENSE") {
-		rename { "${it}_${project.base.archivesName.get()}" }
+		rename { "${it}_${inputs.properties.archivesName}"}
 	}
 }
 
@@ -80,4 +82,3 @@ publishing {
 		// retrieving dependencies.
 	}
 }
-

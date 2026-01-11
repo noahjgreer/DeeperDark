@@ -9,6 +9,7 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.util.Formatting;
 
 import java.util.List;
@@ -20,7 +21,7 @@ public class ScentlessPotion {
     public static ItemStack createScentlessPotion(boolean isLong) {
         ItemStack potionStack = new ItemStack(Items.POTION);
 
-        // Create custom potion contents with wind charged effect instead of any base potion
+        // ...existing code...
         StatusEffectInstance windChargedEffect = new StatusEffectInstance(
             StatusEffects.WIND_CHARGED,
             isLong ? 19200 : 9600,  // 8 minutes or 3 minutes
@@ -30,8 +31,7 @@ public class ScentlessPotion {
             false                   // ShowIcon
         );
 
-        // Create potion contents with no base potion, just our custom effect
-        // Using the correct constructor: (potion, customColor, customEffects, customName)
+        // ...existing code...
         PotionContentsComponent customPotionContents = new PotionContentsComponent(
             Optional.empty(),                     // No base potion
             Optional.of(0x529EC9),               // Custom purple color
@@ -41,15 +41,15 @@ public class ScentlessPotion {
 
         // Set potion Lore with different colors for each line
         LoreComponent lore = new LoreComponent(List.of(
-            Text.literal(isLong ? "Scentlessness (16:00)" : "Scentlessness (8:00)")
+            Text.translatable("effect.deeperdark.scentless.duration", isLong ? "16:00" : "8:00")
                     .formatted(Formatting.RESET).formatted(Formatting.BLUE).styled(style -> {
                         return style.withItalic(false);
                     }),
-            Text.literal("Inhibits being caught by")
+            Text.translatable("effect.deeperdark.scentless.desc.1")
                     .formatted(Formatting.RESET).formatted(Formatting.GRAY).styled(style -> {
                         return style.withItalic(false);
                     }),
-            Text.literal("the Warden's sniff attack.")
+            Text.translatable("effect.deeperdark.scentless.desc.2")
                     .formatted(Formatting.RESET).formatted(Formatting.GRAY).styled(style -> {
                         return style.withItalic(false);
                     })
@@ -71,7 +71,7 @@ public class ScentlessPotion {
 
         // Set custom name
         potionStack.set(DataComponentTypes.CUSTOM_NAME,
-            Text.literal(isLong ? "Long Potion of Scentlessness" : "Potion of Scentlessness").formatted(Formatting.RESET).formatted(Formatting.WHITE).styled(style -> {
+            Text.translatable(isLong ? "potion.deeperdark.long_scentless.name" : "potion.deeperdark.scentless.name").formatted(Formatting.RESET).formatted(Formatting.WHITE).styled(style -> {
                 return style.withItalic(false);
             }));
 
@@ -86,10 +86,10 @@ public class ScentlessPotion {
 
         // Check if it has our custom name
         Text customName = stack.get(DataComponentTypes.CUSTOM_NAME);
-        if (customName != null) {
-            String nameString = customName.getString();
-            return nameString.equals("Potion of Scentlessness") ||
-                   nameString.equals("Long Potion of Scentlessness");
+        if (customName != null && customName.getContent() instanceof TranslatableTextContent translatable) {
+            String key = translatable.getKey();
+            return key.equals("potion.deeperdark.scentless.name") ||
+                   key.equals("potion.deeperdark.long_scentless.name");
         }
 
         return false;
