@@ -27,6 +27,10 @@ import net.minecraft.village.VillagerProfession;
 import net.noahsarch.deeperdark.duck.PotionMasterDuck;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 
 @Mixin(WitchEntity.class)
 public abstract class WitchEntityMixin extends RaiderEntity implements WitchConversionAccessor {
@@ -81,15 +85,6 @@ public abstract class WitchEntityMixin extends RaiderEntity implements WitchConv
         }
     }
 
-    @Inject(method = "handleStatus", at = @At("HEAD"))
-    public void handleStatus(byte status, CallbackInfo ci) {
-        if (status == 16) {
-            if (!this.isSilent()) {
-                this.getWorld().playSoundClient(this.getX(), this.getEyeY(), this.getZ(), SoundEvents.ENTITY_ZOMBIE_VILLAGER_CURE, this.getSoundCategory(), 1.0F + this.random.nextFloat(), this.random.nextFloat() * 0.7F + 0.3F, false);
-            }
-        }
-    }
-
     @Unique
     public boolean deeperdark$isConverting() {
         return this.converting;
@@ -102,7 +97,7 @@ public abstract class WitchEntityMixin extends RaiderEntity implements WitchConv
         this.converting = true;
         this.removeStatusEffect(StatusEffects.WEAKNESS);
         this.addStatusEffect(new StatusEffectInstance(StatusEffects.STRENGTH, delay, Math.min(this.getWorld().getDifficulty().getId() - 1, 0)));
-        this.getWorld().sendEntityStatus(this, (byte) 16);
+        this.getWorld().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.ENTITY_ZOMBIE_VILLAGER_CURE, this.getSoundCategory(), 1.0F + this.random.nextFloat(), this.random.nextFloat() * 0.7F + 0.3F);
     }
 
     @Unique
@@ -126,6 +121,23 @@ public abstract class WitchEntityMixin extends RaiderEntity implements WitchConv
         this.converter = uuid;
     }
 
+    @Override
+    public ActionResult interactMob(PlayerEntity player, Hand hand) {
+        ItemStack itemStack = player.getStackInHand(hand);
+        if (itemStack.isOf(Items.GOLDEN_APPLE)) {
+            if (this.hasStatusEffect(StatusEffects.WEAKNESS)) {
+                if (!player.getAbilities().creativeMode) {
+                    itemStack.decrement(1);
+                }
+                if (!this.getWorld().isClient) {
+                    this.deeperdark$setConverting(player.getUuid(), this.random.nextInt(2401) + 3600);
+                }
+                return ActionResult.SUCCESS;
+            }
+        }
+        return super.interactMob(player, hand);
+    }
+
     @Unique
     private void deeperdark$finishConversion(ServerWorld world) {
         this.convertTo(EntityType.VILLAGER, EntityConversionContext.create(this, false, false), (villager) -> {
@@ -145,4 +157,3 @@ public abstract class WitchEntityMixin extends RaiderEntity implements WitchConv
         });
     }
 }
-

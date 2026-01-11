@@ -49,7 +49,6 @@
     "WardenEntityBrainMixin",
     "WardenEntityMixin",
     "WitchEntityMixin",
-    "WitchMobMixin",
     "PotionMasterMixin",
     "PotionMasterNameMixin",
     "VillagerEntityAccessor",
