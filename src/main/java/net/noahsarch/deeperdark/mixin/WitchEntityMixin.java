@@ -27,6 +27,9 @@ import net.minecraft.entity.conversion.EntityConversionContext;
 import net.noahsarch.deeperdark.duck.WitchConversionAccessor;
 import net.minecraft.registry.Registries;
 
+import net.minecraft.village.VillagerProfession;
+import net.noahsarch.deeperdark.duck.PotionMasterDuck;
+
 @Mixin(WitchEntity.class)
 public abstract class WitchEntityMixin extends RaiderEntity implements WitchConversionAccessor {
 
@@ -105,7 +108,13 @@ public abstract class WitchEntityMixin extends RaiderEntity implements WitchConv
     private void deeperdark$finishConversion(ServerWorld world) {
         this.convertTo(EntityType.VILLAGER, EntityConversionContext.create(this, false, false), (villager) -> {
             villager.initialize(world, world.getLocalDifficulty(villager.getBlockPos()), SpawnReason.CONVERSION, null);
-            villager.setVillagerData(villager.getVillagerData().withProfession(Registries.VILLAGER_PROFESSION.getOrThrow(ModVillagers.POTION_MASTER_KEY)).withType(Registries.VILLAGER_TYPE.getOrThrow(VillagerType.SWAMP)));
+            // Use NONE profession but mark as Potion Master
+            villager.setVillagerData(villager.getVillagerData().withProfession(Registries.VILLAGER_PROFESSION.getOrThrow(VillagerProfession.NONE)).withType(Registries.VILLAGER_TYPE.getOrThrow(VillagerType.SWAMP)));
+
+            if (villager instanceof PotionMasterDuck potionMaster) {
+                potionMaster.deeperdark$setPotionMaster(true);
+            }
+
             villager.setExperience(1);
              if (this.converter != null) {
                 PlayerEntity playerEntity = world.getPlayerByUuid(this.converter);

@@ -136,7 +136,7 @@ public class SiphonEvents {
                      Identifier modelId = stack.get(DataComponentTypes.ITEM_MODEL);
                      if (modelId != null && modelId.equals(SIPHON_MODEL_ID)) {
                          // Drops
-                         if (!world.isClient && !player.isCreative()) {
+                         if (!world.isClient && !player.isCreative() && player.canHarvest(state)) {
                              net.minecraft.block.Block.dropStack(world, pos, stack);
                          }
                          // Clean up entity

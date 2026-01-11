@@ -52,6 +52,8 @@
     "WardenEntityMixin",
     "WitchEntityMixin",
     "WitchMobMixin",
+    "PotionMasterMixin",
+    "VillagerEntityAccessor",
     "ZombieVillagerEntityMixin",
     "SimpleStructurePieceAccessor",
     "StructurePiecesCollectorAccessor",

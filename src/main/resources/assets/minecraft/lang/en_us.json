@@ -9,6 +9,7 @@
   "potion.deeperdark.scentless.name": "Potion of Scentlessness",
   "potion.deeperdark.long_scentless.name": "Long Potion of Scentlessness",
   "item.deeperdark.mystery_potion": "Perplexing Potion",
+  "item.deeperdark.mystery_splash_potion": "Perplexing Splash Potion",
   "effect.deeperdark.scentless.duration": "Scentlessness (%s)",
   "effect.deeperdark.scentless.desc.1": "Inhibits being caught by",
   "effect.deeperdark.scentless.desc.2": "the Warden's sniff attack."
