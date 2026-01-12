@@ -4,8 +4,13 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.Leashable;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -13,6 +18,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(PlayerEntity.class)
 public abstract class PlayerEntityMixin extends LivingEntity implements Leashable {
@@ -44,5 +50,24 @@ public abstract class PlayerEntityMixin extends LivingEntity implements Leashabl
     private void readLeashData(ReadView nbt, CallbackInfo ci) {
         this.readLeashData(nbt);
     }
-}
 
+    @Inject(method = "tick", at = @At("TAIL"))
+    private void tickLeash(CallbackInfo ci) {
+        if (!this.getWorld().isClient) {
+            Leashable.tickLeash((ServerWorld) this.getWorld(), (LivingEntity & Leashable) (Object) this);
+        }
+    }
+
+    @Override
+    public ActionResult interact(PlayerEntity player, Hand hand) {
+        ItemStack itemStack = player.getStackInHand(hand);
+        if (itemStack.isOf(Items.LEAD) && this.canBeLeashedTo(player)) {
+            if (!this.isLeashed()) {
+                this.attachLeash(player, true);
+                itemStack.decrement(1);
+                return ActionResult.SUCCESS;
+            }
+        }
+        return super.interact(player, hand);
+    }
+}
