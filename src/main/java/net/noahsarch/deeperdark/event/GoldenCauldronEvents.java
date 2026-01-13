@@ -19,6 +19,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import net.noahsarch.deeperdark.util.CustomBlockManager;
 
+
 public class GoldenCauldronEvents {
     // Defines the golden cauldron model id (data component)
     public static final Identifier GOLDEN_CAULDRON_ITEM_MODEL_ID = Identifier.of("minecraft", "golden_cauldron_item");
@@ -50,6 +51,93 @@ public class GoldenCauldronEvents {
                     }
                 });
             }
+        });
+
+        // Intercept cauldron interactions to preserve golden cauldrons
+        UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
+            BlockPos pos = hitResult.getBlockPos();
+            BlockState state = world.getBlockState(pos);
+
+            // Check if this is a golden cauldron (has our custom display entity)
+            if (state.getBlock() == Blocks.CAULDRON || state.getBlock() == Blocks.WATER_CAULDRON ||
+                state.getBlock() == Blocks.LAVA_CAULDRON || state.getBlock() == Blocks.POWDER_SNOW_CAULDRON) {
+
+                if (!world.isClient() && world instanceof net.minecraft.server.world.ServerWorld) {
+                    // Check if there's a golden cauldron display entity here
+                    Box box = new Box(pos);
+                    var displays = world.getEntitiesByClass(
+                        net.minecraft.entity.decoration.DisplayEntity.ItemDisplayEntity.class, box, entity -> {
+                            ItemStack stack = entity.getItemStack();
+                            Identifier modelId = stack.get(DataComponentTypes.ITEM_MODEL);
+                            return modelId != null && modelId.equals(GOLDEN_CAULDRON_BLOCK_MODEL_ID);
+                        });
+
+                    if (displays.size() > 0) {
+                        // This is a golden cauldron - handle interaction ourselves
+                        ItemStack heldStack = player.getStackInHand(hand);
+
+                        // Allow bucket interactions but keep it as a regular cauldron
+                        if (heldStack.isOf(net.minecraft.item.Items.WATER_BUCKET) ||
+                            heldStack.isOf(net.minecraft.item.Items.LAVA_BUCKET) ||
+                            heldStack.isOf(net.minecraft.item.Items.POWDER_SNOW_BUCKET)) {
+
+                            // Just make sure the base block stays as CAULDRON
+                            // The vanilla behavior will try to change it, so we prevent that
+                            // by returning SUCCESS early, then manually placing water/lava
+
+                            if (heldStack.isOf(net.minecraft.item.Items.WATER_BUCKET)) {
+                                if (state.getBlock() != Blocks.WATER_CAULDRON) {
+                                    world.setBlockState(pos, Blocks.WATER_CAULDRON.getDefaultState()
+                                        .with(net.minecraft.block.LeveledCauldronBlock.LEVEL, 3));
+                                    world.playSound(null, pos, net.minecraft.sound.SoundEvents.ITEM_BUCKET_EMPTY,
+                                        net.minecraft.sound.SoundCategory.BLOCKS, 1.0f, 1.0f);
+
+                                    if (!player.isCreative()) {
+                                        player.setStackInHand(hand, new ItemStack(net.minecraft.item.Items.BUCKET));
+                                    }
+                                    return ActionResult.SUCCESS;
+                                }
+                            } else if (heldStack.isOf(net.minecraft.item.Items.LAVA_BUCKET)) {
+                                if (state.getBlock() != Blocks.LAVA_CAULDRON) {
+                                    world.setBlockState(pos, Blocks.LAVA_CAULDRON.getDefaultState());
+                                    world.playSound(null, pos, net.minecraft.sound.SoundEvents.ITEM_BUCKET_EMPTY_LAVA,
+                                        net.minecraft.sound.SoundCategory.BLOCKS, 1.0f, 1.0f);
+
+                                    if (!player.isCreative()) {
+                                        player.setStackInHand(hand, new ItemStack(net.minecraft.item.Items.BUCKET));
+                                    }
+                                    return ActionResult.SUCCESS;
+                                }
+                            }
+                        }
+                        // For bucket emptying (taking water out), we need to track the level
+                        else if (heldStack.isOf(net.minecraft.item.Items.BUCKET)) {
+                            if (state.getBlock() == Blocks.WATER_CAULDRON &&
+                                state.get(net.minecraft.block.LeveledCauldronBlock.LEVEL) == 3) {
+                                world.setBlockState(pos, Blocks.CAULDRON.getDefaultState());
+                                world.playSound(null, pos, net.minecraft.sound.SoundEvents.ITEM_BUCKET_FILL,
+                                    net.minecraft.sound.SoundCategory.BLOCKS, 1.0f, 1.0f);
+
+                                if (!player.isCreative()) {
+                                    player.setStackInHand(hand, new ItemStack(net.minecraft.item.Items.WATER_BUCKET));
+                                }
+                                return ActionResult.SUCCESS;
+                            } else if (state.getBlock() == Blocks.LAVA_CAULDRON) {
+                                world.setBlockState(pos, Blocks.CAULDRON.getDefaultState());
+                                world.playSound(null, pos, net.minecraft.sound.SoundEvents.ITEM_BUCKET_FILL_LAVA,
+                                    net.minecraft.sound.SoundCategory.BLOCKS, 1.0f, 1.0f);
+
+                                if (!player.isCreative()) {
+                                    player.setStackInHand(hand, new ItemStack(net.minecraft.item.Items.LAVA_BUCKET));
+                                }
+                                return ActionResult.SUCCESS;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return ActionResult.PASS;
         });
 
         // Placement Logic
@@ -101,7 +189,8 @@ public class GoldenCauldronEvents {
 
         // Break Logic
         PlayerBlockBreakEvents.BEFORE.register((world, player, pos, state, blockEntity) -> {
-            if (state.getBlock() == Blocks.CAULDRON) {
+            if (state.getBlock() == Blocks.CAULDRON || state.getBlock() == Blocks.WATER_CAULDRON ||
+                state.getBlock() == Blocks.LAVA_CAULDRON || state.getBlock() == Blocks.POWDER_SNOW_CAULDRON) {
                 // Custom break logic with golden particles
                 Runnable particleFX = () -> {
                     if (world instanceof net.minecraft.server.world.ServerWorld serverWorld) {
@@ -116,13 +205,11 @@ public class GoldenCauldronEvents {
                 };
 
                 // Check for block model ID since that's what's in the world
-                if (CustomBlockManager.onBreak(world, pos, state, player, GOLDEN_CAULDRON_BLOCK_MODEL_ID, BlockSoundGroup.METAL, particleFX, stack -> {
+                return !CustomBlockManager.onBreak(world, pos, state, player, GOLDEN_CAULDRON_BLOCK_MODEL_ID, BlockSoundGroup.METAL, particleFX, stack -> {
                     ItemStack drop = stack.copy();
                     drop.set(DataComponentTypes.ITEM_MODEL, GOLDEN_CAULDRON_ITEM_MODEL_ID);
                     return drop;
-                })) {
-                    return false;
-                }
+                });
             }
             return true;
         });

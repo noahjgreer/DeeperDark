@@ -125,19 +125,19 @@ public class CustomBlockManager {
              Identifier modelId = stack.get(DataComponentTypes.ITEM_MODEL);
 
              if (modelId != null && modelId.equals(targetModelId)) {
-                 // Drops
-                 if (!world.isClient() && !player.isCreative() && player.canHarvest(state)) {
-                     ItemStack dropStack = stack;
-                     if (dropTransformer != null) {
-                         dropStack = dropTransformer.apply(stack);
-                     }
-                     net.minecraft.block.Block.dropStack(world, pos, dropStack);
-                 }
-
-                 // Clean up entity
-                 display.discard();
-
                  if (!world.isClient()) {
+                     // Set air FIRST to prevent vanilla break sound/particles
+                     world.setBlockState(pos, net.minecraft.block.Blocks.AIR.getDefaultState(), 2);
+
+                     // Drops
+                     if (!player.isCreative() && player.canHarvest(state)) {
+                         ItemStack dropStack = stack;
+                         if (dropTransformer != null) {
+                             dropStack = dropTransformer.apply(stack);
+                         }
+                         net.minecraft.block.Block.dropStack(world, pos, dropStack);
+                     }
+
                      // Custom logic (like particles)
                      if (customAction != null) {
                          customAction.run();
@@ -145,11 +145,14 @@ public class CustomBlockManager {
 
                      // Play break sound
                      if (breakSound != null) {
-                        world.playSound(null, pos, breakSound.getBreakSound(), SoundCategory.BLOCKS, 1f, 1f);
+                        world.playSound(null, pos, breakSound.getBreakSound(), SoundCategory.BLOCKS,
+                            breakSound.getVolume(), breakSound.getPitch());
                      }
-                     // Set air to prevent vanilla drop logic
-                     world.setBlockState(pos, net.minecraft.block.Blocks.AIR.getDefaultState());
                  }
+
+                 // Clean up entity
+                 display.discard();
+
                  return true;
              }
         }

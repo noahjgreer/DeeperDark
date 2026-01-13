@@ -66,6 +66,18 @@ public class Deeperdark implements ModInitializer {
 			}
 		});
 
+		// Save custom block data when world loads (to trigger initial load)
+		net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents.LOAD.register((server, world) ->
+			net.noahsarch.deeperdark.util.CustomBlockTracker.get(world)
+		);
+
+		// Save custom block data when server stops
+		net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
+			for (net.minecraft.server.world.ServerWorld world : server.getWorlds()) {
+				net.noahsarch.deeperdark.util.CustomBlockTracker.get(world).save();
+			}
+		});
+
 		WorldBorderHandler.register();
 
         // Register custom commands
