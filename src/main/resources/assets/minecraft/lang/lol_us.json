@@ -70,6 +70,7 @@
   "item.deeperdark.mystery_splash_potion.stinky": "Stinky! SPLOSH Poshun",
   "effect.deeperdark.scentless.duration": "Scentlessness (%s)",
   "effect.deeperdark.scentless.desc.1": "Inhibits being caught by",
-  "effect.deeperdark.scentless.desc.2": "the Warden's sniff attack."
+  "effect.deeperdark.scentless.desc.2": "the Warden's sniff attack.",
+  "item.minecraft.golden_cauldron": "shiny water holder"
 }
 

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "fabric:type": "deeperdark:component_ingredient",
+      "stack": {
+        "id": "minecraft:sugar",
+        "components": {
+          "minecraft:item_model": "gunpowder_block"
+        }
+      }
+    }
+  ],
+  "result": {
+    "count": 9,
+    "id": "minecraft:gunpowder"
+  }
+}

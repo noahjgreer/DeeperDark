@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "#": "minecraft:gunpowder"
+  },
+  "pattern": [
+    "###",
+    "###",
+    "###"
+  ],
+  "result": {
+    "components": {
+      "minecraft:item_name": {
+        "translate": "item.deeperdark.gunpowder_block",
+        "fallback": "Block of Gunpowder"
+      },
+      "minecraft:item_model": "gunpowder_block"
+    },
+    "count": 1,
+    "id": "minecraft:sugar"
+  }
+}

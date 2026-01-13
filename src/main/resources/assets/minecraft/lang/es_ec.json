@@ -70,6 +70,7 @@
   "item.deeperdark.mystery_splash_potion.stinky": "Poción arrojadiza apestosa",
   "effect.deeperdark.scentless.duration": "Ausencia de olor (%s)",
   "effect.deeperdark.scentless.desc.1": "Inhibe ser detectado por",
-  "effect.deeperdark.scentless.desc.2": "el ataque olfativo del Warden."
+  "effect.deeperdark.scentless.desc.2": "el ataque olfativo del Warden.",
+  "item.minecraft.golden_cauldron": "Caldero dorado"
 }
 

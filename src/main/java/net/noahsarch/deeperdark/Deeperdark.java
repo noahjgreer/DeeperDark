@@ -15,6 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import net.minecraft.structure.processor.StructureProcessorType;
 import net.noahsarch.deeperdark.event.SiphonEvents;
+import net.noahsarch.deeperdark.event.GoldenCauldronEvents;
+import net.noahsarch.deeperdark.event.GunpowderBlockEvents;
 import net.noahsarch.deeperdark.event.WorldBorderHandler;
 import net.noahsarch.deeperdark.worldgen.PaleMansionProcessor;
 
@@ -45,8 +47,27 @@ public class Deeperdark implements ModInitializer {
 		PALE_MANSION_PROCESSOR = Registry.register(Registries.STRUCTURE_PROCESSOR, Identifier.of(MOD_ID, "pale_mansion_processor"), () -> PaleMansionProcessor.CODEC);
 
 		SiphonEvents.register();
+		GoldenCauldronEvents.register();
+		GunpowderBlockEvents.register();
+		net.noahsarch.deeperdark.event.LeatherBlockEvents.register();
+
+		// Register custom ingredient for crafting
+		net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredientSerializer.register(net.noahsarch.deeperdark.recipe.ComponentIngredient.Serializer.INSTANCE);
+
+		// Register tick handler for custom block tracker
+		net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_WORLD_TICK.register(world -> {
+			if (world instanceof net.minecraft.server.world.ServerWorld serverWorld) {
+				// Run every 20 ticks (1 second) to be gentle
+				if (serverWorld.getTime() % 20 == 0) {
+					net.noahsarch.deeperdark.util.CustomBlockTracker.get(serverWorld).tick(serverWorld);
+				}
+			}
+		});
 
 		WorldBorderHandler.register();
+
+        // Register custom commands
+        net.noahsarch.deeperdark.command.DeeperDarkCommands.register();
 
         ModVillagers.registerVillagers();
 

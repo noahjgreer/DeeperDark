@@ -70,6 +70,10 @@
   "item.deeperdark.mystery_splash_potion.stinky": "Stinky Splash Potion",
   "effect.deeperdark.scentless.duration": "Scentlessness (%s)",
   "effect.deeperdark.scentless.desc.1": "Inhibits being caught by",
-  "effect.deeperdark.scentless.desc.2": "the Warden's sniff attack."
+  "effect.deeperdark.scentless.desc.2": "the Warden's sniff attack.",
+  "item.deeperdark.gunpowder_block": "Block of Gunpowder",
+  "item.deeperdark.leather_block": "Block of Leather",
+  "item.deeperdark.golden_cauldron": "Golden Cauldron",
+  "container.stonecutter": "Circular Saw",
+  "block.minecraft.stonecutter": "Circular Saw"
 }
-

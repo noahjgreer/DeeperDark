@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "fabric:type": "deeperdark:component_ingredient",
+      "stack": {
+        "id": "minecraft:brown_wool",
+        "components": {
+          "minecraft:item_model": "leather_block"
+        }
+      }
+    }
+  ],
+  "result": {
+    "count": 9,
+    "id": "minecraft:leather"
+  }
+}
+
