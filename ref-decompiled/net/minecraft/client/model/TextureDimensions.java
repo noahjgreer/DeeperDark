@@ -1,15 +1,24 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.model.TextureDimensions
+ */
 package net.minecraft.client.model;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 public class TextureDimensions {
-   final int width;
-   final int height;
+    final int width;
+    final int height;
 
-   public TextureDimensions(int width, int height) {
-      this.width = width;
-      this.height = height;
-   }
+    public TextureDimensions(int width, int height) {
+        this.width = width;
+        this.height = height;
+    }
 }
+

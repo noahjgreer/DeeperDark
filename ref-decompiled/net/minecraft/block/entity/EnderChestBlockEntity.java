@@ -1,79 +1,80 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.block.BlockState
+ *  net.minecraft.block.entity.BlockEntity
+ *  net.minecraft.block.entity.BlockEntityType
+ *  net.minecraft.block.entity.ChestLidAnimator
+ *  net.minecraft.block.entity.EnderChestBlockEntity
+ *  net.minecraft.block.entity.LidOpenable
+ *  net.minecraft.block.entity.ViewerCountManager
+ *  net.minecraft.entity.ContainerUser
+ *  net.minecraft.entity.player.PlayerEntity
+ *  net.minecraft.inventory.Inventory
+ *  net.minecraft.util.math.BlockPos
+ *  net.minecraft.world.World
+ */
 package net.minecraft.block.entity;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.block.entity.ChestLidAnimator;
+import net.minecraft.block.entity.LidOpenable;
+import net.minecraft.block.entity.ViewerCountManager;
+import net.minecraft.entity.ContainerUser;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class EnderChestBlockEntity extends BlockEntity implements LidOpenable {
-   private final ChestLidAnimator lidAnimator = new ChestLidAnimator();
-   private final ViewerCountManager stateManager = new ViewerCountManager() {
-      protected void onContainerOpen(World world, BlockPos pos, BlockState state) {
-         world.playSound((Entity)null, (double)pos.getX() + 0.5, (double)pos.getY() + 0.5, (double)pos.getZ() + 0.5, (SoundEvent)SoundEvents.BLOCK_ENDER_CHEST_OPEN, SoundCategory.BLOCKS, 0.5F, world.random.nextFloat() * 0.1F + 0.9F);
-      }
+public class EnderChestBlockEntity
+extends BlockEntity
+implements LidOpenable {
+    private final ChestLidAnimator lidAnimator = new ChestLidAnimator();
+    private final ViewerCountManager stateManager = new /* Unavailable Anonymous Inner Class!! */;
 
-      protected void onContainerClose(World world, BlockPos pos, BlockState state) {
-         world.playSound((Entity)null, (double)pos.getX() + 0.5, (double)pos.getY() + 0.5, (double)pos.getZ() + 0.5, (SoundEvent)SoundEvents.BLOCK_ENDER_CHEST_CLOSE, SoundCategory.BLOCKS, 0.5F, world.random.nextFloat() * 0.1F + 0.9F);
-      }
+    public EnderChestBlockEntity(BlockPos pos, BlockState state) {
+        super(BlockEntityType.ENDER_CHEST, pos, state);
+    }
 
-      protected void onViewerCountUpdate(World world, BlockPos pos, BlockState state, int oldViewerCount, int newViewerCount) {
-         world.addSyncedBlockEvent(EnderChestBlockEntity.this.pos, Blocks.ENDER_CHEST, 1, newViewerCount);
-      }
+    public static void clientTick(World world, BlockPos pos, BlockState state, EnderChestBlockEntity blockEntity) {
+        blockEntity.lidAnimator.step();
+    }
 
-      protected boolean isPlayerViewing(PlayerEntity player) {
-         return player.getEnderChestInventory().isActiveBlockEntity(EnderChestBlockEntity.this);
-      }
-   };
+    public boolean onSyncedBlockEvent(int type, int data) {
+        if (type == 1) {
+            this.lidAnimator.setOpen(data > 0);
+            return true;
+        }
+        return super.onSyncedBlockEvent(type, data);
+    }
 
-   public EnderChestBlockEntity(BlockPos pos, BlockState state) {
-      super(BlockEntityType.ENDER_CHEST, pos, state);
-   }
+    public void onOpen(ContainerUser user) {
+        if (!this.removed && !user.asLivingEntity().isSpectator()) {
+            this.stateManager.openContainer(user.asLivingEntity(), this.getWorld(), this.getPos(), this.getCachedState(), user.getContainerInteractionRange());
+        }
+    }
 
-   public static void clientTick(World world, BlockPos pos, BlockState state, EnderChestBlockEntity blockEntity) {
-      blockEntity.lidAnimator.step();
-   }
+    public void onClose(ContainerUser user) {
+        if (!this.removed && !user.asLivingEntity().isSpectator()) {
+            this.stateManager.closeContainer(user.asLivingEntity(), this.getWorld(), this.getPos(), this.getCachedState());
+        }
+    }
 
-   public boolean onSyncedBlockEvent(int type, int data) {
-      if (type == 1) {
-         this.lidAnimator.setOpen(data > 0);
-         return true;
-      } else {
-         return super.onSyncedBlockEvent(type, data);
-      }
-   }
+    public boolean canPlayerUse(PlayerEntity player) {
+        return Inventory.canPlayerUse((BlockEntity)this, (PlayerEntity)player);
+    }
 
-   public void onOpen(PlayerEntity player) {
-      if (!this.removed && !player.isSpectator()) {
-         this.stateManager.openContainer(player, this.getWorld(), this.getPos(), this.getCachedState());
-      }
+    public void onScheduledTick() {
+        if (!this.removed) {
+            this.stateManager.updateViewerCount(this.getWorld(), this.getPos(), this.getCachedState());
+        }
+    }
 
-   }
-
-   public void onClose(PlayerEntity player) {
-      if (!this.removed && !player.isSpectator()) {
-         this.stateManager.closeContainer(player, this.getWorld(), this.getPos(), this.getCachedState());
-      }
-
-   }
-
-   public boolean canPlayerUse(PlayerEntity player) {
-      return Inventory.canPlayerUse(this, player);
-   }
-
-   public void onScheduledTick() {
-      if (!this.removed) {
-         this.stateManager.updateViewerCount(this.getWorld(), this.getPos(), this.getCachedState());
-      }
-
-   }
-
-   public float getAnimationProgress(float tickProgress) {
-      return this.lidAnimator.getProgress(tickProgress);
-   }
+    public float getAnimationProgress(float tickProgress) {
+        return this.lidAnimator.getProgress(tickProgress);
+    }
 }
+

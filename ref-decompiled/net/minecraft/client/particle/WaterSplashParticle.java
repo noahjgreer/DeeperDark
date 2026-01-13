@@ -1,41 +1,33 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.particle.RainSplashParticle
+ *  net.minecraft.client.particle.WaterSplashParticle
+ *  net.minecraft.client.texture.Sprite
+ *  net.minecraft.client.world.ClientWorld
+ */
 package net.minecraft.client.particle;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.particle.RainSplashParticle;
+import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.SimpleParticleType;
 
-@Environment(EnvType.CLIENT)
-public class WaterSplashParticle extends RainSplashParticle {
-   WaterSplashParticle(ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
-      super(clientWorld, d, e, f);
-      this.gravityStrength = 0.04F;
-      if (h == 0.0 && (g != 0.0 || i != 0.0)) {
-         this.velocityX = g;
-         this.velocityY = 0.1;
-         this.velocityZ = i;
-      }
-
-   }
-
-   @Environment(EnvType.CLIENT)
-   public static class SplashFactory implements ParticleFactory {
-      private final SpriteProvider spriteProvider;
-
-      public SplashFactory(SpriteProvider spriteProvider) {
-         this.spriteProvider = spriteProvider;
-      }
-
-      public Particle createParticle(SimpleParticleType simpleParticleType, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
-         WaterSplashParticle waterSplashParticle = new WaterSplashParticle(clientWorld, d, e, f, g, h, i);
-         waterSplashParticle.setSprite(this.spriteProvider);
-         return waterSplashParticle;
-      }
-
-      // $FF: synthetic method
-      public Particle createParticle(final ParticleEffect particleEffect, final ClientWorld clientWorld, final double d, final double e, final double f, final double g, final double h, final double i) {
-         return this.createParticle((SimpleParticleType)particleEffect, clientWorld, d, e, f, g, h, i);
-      }
-   }
+@Environment(value=EnvType.CLIENT)
+public class WaterSplashParticle
+extends RainSplashParticle {
+    WaterSplashParticle(ClientWorld clientWorld, double d, double e, double f, double g, double h, double i, Sprite sprite) {
+        super(clientWorld, d, e, f, sprite);
+        this.gravityStrength = 0.04f;
+        if (h == 0.0 && (g != 0.0 || i != 0.0)) {
+            this.velocityX = g;
+            this.velocityY = 0.1;
+            this.velocityZ = i;
+        }
+    }
 }
+

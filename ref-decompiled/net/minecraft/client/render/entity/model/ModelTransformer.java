@@ -1,3 +1,12 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.model.ModelData
+ *  net.minecraft.client.render.entity.model.ModelTransformer
+ */
 package net.minecraft.client.render.entity.model;
 
 import net.fabricmc.api.EnvType;
@@ -5,20 +14,15 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.model.ModelData;
 
 @FunctionalInterface
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 public interface ModelTransformer {
-   ModelTransformer NO_OP = (data) -> {
-      return data;
-   };
+    public static final ModelTransformer NO_OP = data -> data;
 
-   static ModelTransformer scaling(float scale) {
-      float f = 24.016F * (1.0F - scale);
-      return (data) -> {
-         return data.transform((transform) -> {
-            return transform.scaled(scale).moveOrigin(0.0F, f, 0.0F);
-         });
-      };
-   }
+    public static ModelTransformer scaling(float scale) {
+        float f = 24.016f * (1.0f - scale);
+        return data -> data.transform(transform -> transform.scaled(scale).moveOrigin(0.0f, f, 0.0f));
+    }
 
-   ModelData apply(ModelData modelData);
+    public ModelData apply(ModelData var1);
 }
+

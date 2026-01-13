@@ -1,3 +1,19 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.serialization.Codec
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.gui.hud.MessageIndicator
+ *  net.minecraft.client.network.message.MessageTrustStatus
+ *  net.minecraft.network.message.SignedMessage
+ *  net.minecraft.text.Style
+ *  net.minecraft.text.StyleSpriteSource
+ *  net.minecraft.text.Text
+ *  net.minecraft.util.StringIdentifiable
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.network.message;
 
 import com.mojang.serialization.Codec;
@@ -8,77 +24,94 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.network.message.SignedMessage;
 import net.minecraft.text.Style;
+import net.minecraft.text.StyleSpriteSource;
 import net.minecraft.text.Text;
 import net.minecraft.util.StringIdentifiable;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
-public enum MessageTrustStatus implements StringIdentifiable {
-   SECURE("secure"),
-   MODIFIED("modified"),
-   NOT_SECURE("not_secure");
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
+public final class MessageTrustStatus
+extends Enum<MessageTrustStatus>
+implements StringIdentifiable {
+    public static final /* enum */ MessageTrustStatus SECURE = new MessageTrustStatus("SECURE", 0, "secure");
+    public static final /* enum */ MessageTrustStatus MODIFIED = new MessageTrustStatus("MODIFIED", 1, "modified");
+    public static final /* enum */ MessageTrustStatus NOT_SECURE = new MessageTrustStatus("NOT_SECURE", 2, "not_secure");
+    public static final Codec<MessageTrustStatus> CODEC;
+    private final String id;
+    private static final /* synthetic */ MessageTrustStatus[] field_39784;
 
-   public static final Codec CODEC = StringIdentifiable.createCodec(MessageTrustStatus::values);
-   private final String id;
+    public static MessageTrustStatus[] values() {
+        return (MessageTrustStatus[])field_39784.clone();
+    }
 
-   private MessageTrustStatus(final String id) {
-      this.id = id;
-   }
+    public static MessageTrustStatus valueOf(String string) {
+        return Enum.valueOf(MessageTrustStatus.class, string);
+    }
 
-   public static MessageTrustStatus getStatus(SignedMessage message, Text decorated, Instant receptionTimestamp) {
-      if (message.hasSignature() && !message.isExpiredOnClient(receptionTimestamp)) {
-         return isModified(message, decorated) ? MODIFIED : SECURE;
-      } else {
-         return NOT_SECURE;
-      }
-   }
+    private MessageTrustStatus(String id) {
+        this.id = id;
+    }
 
-   private static boolean isModified(SignedMessage message, Text decorated) {
-      if (!decorated.getString().contains(message.getSignedContent())) {
-         return true;
-      } else {
-         Text text = message.unsignedContent();
-         return text == null ? false : isNotInDefaultFont(text);
-      }
-   }
+    public static MessageTrustStatus getStatus(SignedMessage message, Text decorated, Instant receptionTimestamp) {
+        if (!message.hasSignature() || message.isExpiredOnClient(receptionTimestamp)) {
+            return NOT_SECURE;
+        }
+        if (MessageTrustStatus.isModified((SignedMessage)message, (Text)decorated)) {
+            return MODIFIED;
+        }
+        return SECURE;
+    }
 
-   private static boolean isNotInDefaultFont(Text content) {
-      return (Boolean)content.visit((style, part) -> {
-         return isNotInDefaultFont(style) ? Optional.of(true) : Optional.empty();
-      }, Style.EMPTY).orElse(false);
-   }
+    private static boolean isModified(SignedMessage message, Text decorated) {
+        if (!decorated.getString().contains(message.getSignedContent())) {
+            return true;
+        }
+        Text text = message.unsignedContent();
+        if (text == null) {
+            return false;
+        }
+        return MessageTrustStatus.isNotInDefaultFont((Text)text);
+    }
 
-   private static boolean isNotInDefaultFont(Style style) {
-      return !style.getFont().equals(Style.DEFAULT_FONT_ID);
-   }
+    private static boolean isNotInDefaultFont(Text content) {
+        return content.visit((style, part) -> {
+            if (MessageTrustStatus.isNotInDefaultFont((Style)style)) {
+                return Optional.of(true);
+            }
+            return Optional.empty();
+        }, Style.EMPTY).orElse(false);
+    }
 
-   public boolean isInsecure() {
-      return this == NOT_SECURE;
-   }
+    private static boolean isNotInDefaultFont(Style style) {
+        return !style.getFont().equals((Object)StyleSpriteSource.DEFAULT);
+    }
 
-   @Nullable
-   public MessageIndicator createIndicator(SignedMessage message) {
-      MessageIndicator var10000;
-      switch (this.ordinal()) {
-         case 1:
-            var10000 = MessageIndicator.modified(message.getSignedContent());
-            break;
-         case 2:
-            var10000 = MessageIndicator.notSecure();
-            break;
-         default:
-            var10000 = null;
-      }
+    public boolean isInsecure() {
+        return this == NOT_SECURE;
+    }
 
-      return var10000;
-   }
+    public @Nullable MessageIndicator createIndicator(SignedMessage message) {
+        return switch (this.ordinal()) {
+            case 1 -> MessageIndicator.modified((String)message.getSignedContent());
+            case 2 -> MessageIndicator.notSecure();
+            default -> null;
+        };
+    }
 
-   public String asString() {
-      return this.id;
-   }
+    public String asString() {
+        return this.id;
+    }
 
-   // $FF: synthetic method
-   private static MessageTrustStatus[] method_44743() {
-      return new MessageTrustStatus[]{SECURE, MODIFIED, NOT_SECURE};
-   }
+    private static /* synthetic */ MessageTrustStatus[] method_44743() {
+        return new MessageTrustStatus[]{SECURE, MODIFIED, NOT_SECURE};
+    }
+
+    static {
+        field_39784 = MessageTrustStatus.method_44743();
+        CODEC = StringIdentifiable.createCodec(MessageTrustStatus::values);
+    }
 }
+

@@ -1,74 +1,61 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.google.common.collect.Maps
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.render.DrawStyle
+ *  net.minecraft.client.render.debug.GameTestDebugRenderer
+ *  net.minecraft.client.render.debug.GameTestDebugRenderer$Marker
+ *  net.minecraft.util.Util
+ *  net.minecraft.util.math.BlockPos
+ *  net.minecraft.util.math.Vec3d
+ *  net.minecraft.util.math.Vec3i
+ *  net.minecraft.world.debug.gizmo.GizmoDrawing
+ *  net.minecraft.world.debug.gizmo.TextGizmo$Style
+ */
 package net.minecraft.client.render.debug;
 
 import com.google.common.collect.Maps;
 import java.util.Map;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.render.DrawStyle;
+import net.minecraft.client.render.debug.GameTestDebugRenderer;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
+import net.minecraft.world.debug.gizmo.GizmoDrawing;
+import net.minecraft.world.debug.gizmo.TextGizmo;
 
-@Environment(EnvType.CLIENT)
-public class GameTestDebugRenderer implements DebugRenderer.Renderer {
-   private static final float MARKER_BOX_SIZE = 0.02F;
-   private final Map markers = Maps.newHashMap();
+@Environment(value=EnvType.CLIENT)
+public class GameTestDebugRenderer {
+    private static final int MARKER_LIFESPAN_MS = 10000;
+    private static final float MARKER_BOX_SIZE = 0.02f;
+    private final Map<BlockPos, Marker> markers = Maps.newHashMap();
 
-   public void addMarker(BlockPos pos, int color, String message, int duration) {
-      this.markers.put(pos, new Marker(color, message, Util.getMeasuringTimeMs() + (long)duration));
-   }
+    public void addMarker(BlockPos absolutePos, BlockPos relativePos) {
+        String string = relativePos.toShortString();
+        this.markers.put(absolutePos, new Marker(0x6000FF00, string, Util.getMeasuringTimeMs() + 10000L));
+    }
 
-   public void clear() {
-      this.markers.clear();
-   }
+    public void clear() {
+        this.markers.clear();
+    }
 
-   public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, double cameraX, double cameraY, double cameraZ) {
-      long l = Util.getMeasuringTimeMs();
-      this.markers.entrySet().removeIf((entry) -> {
-         return l > ((Marker)entry.getValue()).removalTime;
-      });
-      this.markers.forEach((pos, marker) -> {
-         this.renderMarker(matrices, vertexConsumers, pos, marker);
-      });
-   }
+    public void render() {
+        long l = Util.getMeasuringTimeMs();
+        this.markers.entrySet().removeIf(marker -> l > ((Marker)marker.getValue()).removalTime);
+        this.markers.forEach((pos, marker) -> this.render(pos, marker));
+    }
 
-   private void renderMarker(MatrixStack matrices, VertexConsumerProvider vertexConsumers, BlockPos pos, Marker marker) {
-      DebugRenderer.drawBox(matrices, vertexConsumers, pos, 0.02F, marker.getRed(), marker.getBlue(), marker.getGreen(), marker.getAlpha() * 0.75F);
-      if (!marker.message.isEmpty()) {
-         double d = (double)pos.getX() + 0.5;
-         double e = (double)pos.getY() + 1.2;
-         double f = (double)pos.getZ() + 0.5;
-         DebugRenderer.drawString(matrices, vertexConsumers, marker.message, d, e, f, -1, 0.01F, true, 0.0F, true);
-      }
-
-   }
-
-   @Environment(EnvType.CLIENT)
-   private static class Marker {
-      public int color;
-      public String message;
-      public long removalTime;
-
-      public Marker(int color, String message, long removalTime) {
-         this.color = color;
-         this.message = message;
-         this.removalTime = removalTime;
-      }
-
-      public float getRed() {
-         return (float)(this.color >> 16 & 255) / 255.0F;
-      }
-
-      public float getBlue() {
-         return (float)(this.color >> 8 & 255) / 255.0F;
-      }
-
-      public float getGreen() {
-         return (float)(this.color & 255) / 255.0F;
-      }
-
-      public float getAlpha() {
-         return (float)(this.color >> 24 & 255) / 255.0F;
-      }
-   }
+    private void render(BlockPos blockPos, Marker marker) {
+        GizmoDrawing.box((BlockPos)blockPos, (float)0.02f, (DrawStyle)DrawStyle.filled((int)marker.color()));
+        if (!marker.message.isEmpty()) {
+            GizmoDrawing.text((String)marker.message, (Vec3d)Vec3d.add((Vec3i)blockPos, (double)0.5, (double)1.2, (double)0.5), (TextGizmo.Style)TextGizmo.Style.left().scaled(0.16f)).ignoreOcclusion();
+        }
+    }
 }
+

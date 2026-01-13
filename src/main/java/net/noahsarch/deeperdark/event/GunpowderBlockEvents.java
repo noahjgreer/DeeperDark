@@ -46,7 +46,7 @@ public class GunpowderBlockEvents {
                  return ActionResult.PASS;
             }
 
-            if (!world.isClient) {
+            if (!world.isClient()) {
                 // Place Stone with Gunpowder Block Display
                 if (CustomBlockManager.place(world, placePos, stack, Blocks.STONE, null)) {
                     world.playSound(null, placePos, BlockSoundGroup.STONE.getPlaceSound(), SoundCategory.BLOCKS, 1f, 1f);

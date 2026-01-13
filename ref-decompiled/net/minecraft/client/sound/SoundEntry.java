@@ -1,33 +1,43 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.sound.Sound
+ *  net.minecraft.client.sound.SoundEntry
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.sound;
 
 import java.util.List;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.client.sound.Sound;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 public class SoundEntry {
-   private final List sounds;
-   private final boolean replace;
-   @Nullable
-   private final String subtitle;
+    private final List<Sound> sounds;
+    private final boolean replace;
+    private final @Nullable String subtitle;
 
-   public SoundEntry(List sounds, boolean replace, @Nullable String subtitle) {
-      this.sounds = sounds;
-      this.replace = replace;
-      this.subtitle = subtitle;
-   }
+    public SoundEntry(List<Sound> sounds, boolean replace, @Nullable String subtitle) {
+        this.sounds = sounds;
+        this.replace = replace;
+        this.subtitle = subtitle;
+    }
 
-   public List getSounds() {
-      return this.sounds;
-   }
+    public List<Sound> getSounds() {
+        return this.sounds;
+    }
 
-   public boolean canReplace() {
-      return this.replace;
-   }
+    public boolean canReplace() {
+        return this.replace;
+    }
 
-   @Nullable
-   public String getSubtitle() {
-      return this.subtitle;
-   }
+    public @Nullable String getSubtitle() {
+        return this.subtitle;
+    }
 }
+

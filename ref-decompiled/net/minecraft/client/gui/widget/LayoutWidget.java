@@ -1,25 +1,37 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.gui.widget.ClickableWidget
+ *  net.minecraft.client.gui.widget.LayoutWidget
+ *  net.minecraft.client.gui.widget.Widget
+ */
 package net.minecraft.client.gui.widget;
 
 import java.util.function.Consumer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.client.gui.widget.Widget;
 
-@Environment(EnvType.CLIENT)
-public interface LayoutWidget extends Widget {
-   void forEachElement(Consumer consumer);
+@Environment(value=EnvType.CLIENT)
+public interface LayoutWidget
+extends Widget {
+    public void forEachElement(Consumer<Widget> var1);
 
-   default void forEachChild(Consumer consumer) {
-      this.forEachElement((element) -> {
-         element.forEachChild(consumer);
-      });
-   }
+    default public void forEachChild(Consumer<ClickableWidget> consumer) {
+        this.forEachElement(element -> element.forEachChild(consumer));
+    }
 
-   default void refreshPositions() {
-      this.forEachElement((element) -> {
-         if (element instanceof LayoutWidget layoutWidget) {
-            layoutWidget.refreshPositions();
-         }
-
-      });
-   }
+    default public void refreshPositions() {
+        this.forEachElement(element -> {
+            if (element instanceof LayoutWidget) {
+                LayoutWidget layoutWidget = (LayoutWidget)element;
+                layoutWidget.refreshPositions();
+            }
+        });
+    }
 }
+

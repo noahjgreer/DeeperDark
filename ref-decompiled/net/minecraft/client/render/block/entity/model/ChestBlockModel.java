@@ -1,3 +1,19 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.model.Model
+ *  net.minecraft.client.model.ModelData
+ *  net.minecraft.client.model.ModelPart
+ *  net.minecraft.client.model.ModelPartBuilder
+ *  net.minecraft.client.model.ModelPartData
+ *  net.minecraft.client.model.ModelTransform
+ *  net.minecraft.client.model.TexturedModelData
+ *  net.minecraft.client.render.RenderLayers
+ *  net.minecraft.client.render.block.entity.model.ChestBlockModel
+ */
 package net.minecraft.client.render.block.entity.model;
 
 import net.fabricmc.api.EnvType;
@@ -9,51 +25,53 @@ import net.minecraft.client.model.ModelPartBuilder;
 import net.minecraft.client.model.ModelPartData;
 import net.minecraft.client.model.ModelTransform;
 import net.minecraft.client.model.TexturedModelData;
-import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.RenderLayers;
 
-@Environment(EnvType.CLIENT)
-public class ChestBlockModel extends Model {
-   private static final String BOTTOM = "bottom";
-   private static final String LID = "lid";
-   private static final String LOCK = "lock";
-   private final ModelPart lid;
-   private final ModelPart lock;
+@Environment(value=EnvType.CLIENT)
+public class ChestBlockModel
+extends Model<Float> {
+    private static final String BOTTOM = "bottom";
+    private static final String LID = "lid";
+    private static final String LOCK = "lock";
+    private final ModelPart lid;
+    private final ModelPart lock;
 
-   public ChestBlockModel(ModelPart root) {
-      super(root, RenderLayer::getEntitySolid);
-      this.lid = root.getChild("lid");
-      this.lock = root.getChild("lock");
-   }
+    public ChestBlockModel(ModelPart root) {
+        super(root, RenderLayers::entitySolid);
+        this.lid = root.getChild(LID);
+        this.lock = root.getChild(LOCK);
+    }
 
-   public static TexturedModelData getSingleTexturedModelData() {
-      ModelData modelData = new ModelData();
-      ModelPartData modelPartData = modelData.getRoot();
-      modelPartData.addChild("bottom", ModelPartBuilder.create().uv(0, 19).cuboid(1.0F, 0.0F, 1.0F, 14.0F, 10.0F, 14.0F), ModelTransform.NONE);
-      modelPartData.addChild("lid", ModelPartBuilder.create().uv(0, 0).cuboid(1.0F, 0.0F, 0.0F, 14.0F, 5.0F, 14.0F), ModelTransform.origin(0.0F, 9.0F, 1.0F));
-      modelPartData.addChild("lock", ModelPartBuilder.create().uv(0, 0).cuboid(7.0F, -2.0F, 14.0F, 2.0F, 4.0F, 1.0F), ModelTransform.origin(0.0F, 9.0F, 1.0F));
-      return TexturedModelData.of(modelData, 64, 64);
-   }
+    public static TexturedModelData getSingleTexturedModelData() {
+        ModelData modelData = new ModelData();
+        ModelPartData modelPartData = modelData.getRoot();
+        modelPartData.addChild(BOTTOM, ModelPartBuilder.create().uv(0, 19).cuboid(1.0f, 0.0f, 1.0f, 14.0f, 10.0f, 14.0f), ModelTransform.NONE);
+        modelPartData.addChild(LID, ModelPartBuilder.create().uv(0, 0).cuboid(1.0f, 0.0f, 0.0f, 14.0f, 5.0f, 14.0f), ModelTransform.origin((float)0.0f, (float)9.0f, (float)1.0f));
+        modelPartData.addChild(LOCK, ModelPartBuilder.create().uv(0, 0).cuboid(7.0f, -2.0f, 14.0f, 2.0f, 4.0f, 1.0f), ModelTransform.origin((float)0.0f, (float)9.0f, (float)1.0f));
+        return TexturedModelData.of((ModelData)modelData, (int)64, (int)64);
+    }
 
-   public static TexturedModelData getDoubleChestRightTexturedBlockData() {
-      ModelData modelData = new ModelData();
-      ModelPartData modelPartData = modelData.getRoot();
-      modelPartData.addChild("bottom", ModelPartBuilder.create().uv(0, 19).cuboid(1.0F, 0.0F, 1.0F, 15.0F, 10.0F, 14.0F), ModelTransform.NONE);
-      modelPartData.addChild("lid", ModelPartBuilder.create().uv(0, 0).cuboid(1.0F, 0.0F, 0.0F, 15.0F, 5.0F, 14.0F), ModelTransform.origin(0.0F, 9.0F, 1.0F));
-      modelPartData.addChild("lock", ModelPartBuilder.create().uv(0, 0).cuboid(15.0F, -2.0F, 14.0F, 1.0F, 4.0F, 1.0F), ModelTransform.origin(0.0F, 9.0F, 1.0F));
-      return TexturedModelData.of(modelData, 64, 64);
-   }
+    public static TexturedModelData getDoubleChestRightTexturedBlockData() {
+        ModelData modelData = new ModelData();
+        ModelPartData modelPartData = modelData.getRoot();
+        modelPartData.addChild(BOTTOM, ModelPartBuilder.create().uv(0, 19).cuboid(1.0f, 0.0f, 1.0f, 15.0f, 10.0f, 14.0f), ModelTransform.NONE);
+        modelPartData.addChild(LID, ModelPartBuilder.create().uv(0, 0).cuboid(1.0f, 0.0f, 0.0f, 15.0f, 5.0f, 14.0f), ModelTransform.origin((float)0.0f, (float)9.0f, (float)1.0f));
+        modelPartData.addChild(LOCK, ModelPartBuilder.create().uv(0, 0).cuboid(15.0f, -2.0f, 14.0f, 1.0f, 4.0f, 1.0f), ModelTransform.origin((float)0.0f, (float)9.0f, (float)1.0f));
+        return TexturedModelData.of((ModelData)modelData, (int)64, (int)64);
+    }
 
-   public static TexturedModelData getDoubleChestLeftTexturedBlockData() {
-      ModelData modelData = new ModelData();
-      ModelPartData modelPartData = modelData.getRoot();
-      modelPartData.addChild("bottom", ModelPartBuilder.create().uv(0, 19).cuboid(0.0F, 0.0F, 1.0F, 15.0F, 10.0F, 14.0F), ModelTransform.NONE);
-      modelPartData.addChild("lid", ModelPartBuilder.create().uv(0, 0).cuboid(0.0F, 0.0F, 0.0F, 15.0F, 5.0F, 14.0F), ModelTransform.origin(0.0F, 9.0F, 1.0F));
-      modelPartData.addChild("lock", ModelPartBuilder.create().uv(0, 0).cuboid(0.0F, -2.0F, 14.0F, 1.0F, 4.0F, 1.0F), ModelTransform.origin(0.0F, 9.0F, 1.0F));
-      return TexturedModelData.of(modelData, 64, 64);
-   }
+    public static TexturedModelData getDoubleChestLeftTexturedBlockData() {
+        ModelData modelData = new ModelData();
+        ModelPartData modelPartData = modelData.getRoot();
+        modelPartData.addChild(BOTTOM, ModelPartBuilder.create().uv(0, 19).cuboid(0.0f, 0.0f, 1.0f, 15.0f, 10.0f, 14.0f), ModelTransform.NONE);
+        modelPartData.addChild(LID, ModelPartBuilder.create().uv(0, 0).cuboid(0.0f, 0.0f, 0.0f, 15.0f, 5.0f, 14.0f), ModelTransform.origin((float)0.0f, (float)9.0f, (float)1.0f));
+        modelPartData.addChild(LOCK, ModelPartBuilder.create().uv(0, 0).cuboid(0.0f, -2.0f, 14.0f, 1.0f, 4.0f, 1.0f), ModelTransform.origin((float)0.0f, (float)9.0f, (float)1.0f));
+        return TexturedModelData.of((ModelData)modelData, (int)64, (int)64);
+    }
 
-   public void setLockAndLidPitch(float animationProgress) {
-      this.lid.pitch = -(animationProgress * 1.5707964F);
-      this.lock.pitch = this.lid.pitch;
-   }
+    public void setAngles(Float float_) {
+        super.setAngles((Object)float_);
+        this.lock.pitch = this.lid.pitch = -(float_.floatValue() * 1.5707964f);
+    }
 }
+

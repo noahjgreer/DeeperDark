@@ -1,9 +1,20 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.gui.hud.spectator.SpectatorMenu
+ *  net.minecraft.client.gui.hud.spectator.SpectatorMenuCloseCallback
+ */
 package net.minecraft.client.gui.hud.spectator;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.gui.hud.spectator.SpectatorMenu;
 
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 public interface SpectatorMenuCloseCallback {
-   void close(SpectatorMenu menu);
+    public void close(SpectatorMenu var1);
 }
+

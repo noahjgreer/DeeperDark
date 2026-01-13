@@ -1,40 +1,74 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.google.common.collect.Lists
+ *  com.google.common.hash.HashCode
+ *  com.mojang.logging.LogUtils
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.SharedConstants
+ *  net.minecraft.client.MinecraftClient
+ *  net.minecraft.client.RunArgs$Network
+ *  net.minecraft.client.resource.server.DownloadQueuer
+ *  net.minecraft.client.resource.server.PackStateChangeCallback
+ *  net.minecraft.client.resource.server.ReloadScheduler
+ *  net.minecraft.client.resource.server.ReloadScheduler$PackInfo
+ *  net.minecraft.client.resource.server.ReloadScheduler$ReloadContext
+ *  net.minecraft.client.resource.server.ServerResourcePackLoader
+ *  net.minecraft.client.resource.server.ServerResourcePackLoader$8
+ *  net.minecraft.client.resource.server.ServerResourcePackManager
+ *  net.minecraft.client.resource.server.ServerResourcePackManager$AcceptanceStatus
+ *  net.minecraft.client.session.Session
+ *  net.minecraft.network.ClientConnection
+ *  net.minecraft.resource.PackVersion
+ *  net.minecraft.resource.ResourcePackInfo
+ *  net.minecraft.resource.ResourcePackPosition
+ *  net.minecraft.resource.ResourcePackProfile
+ *  net.minecraft.resource.ResourcePackProfile$InsertionPosition
+ *  net.minecraft.resource.ResourcePackProfile$Metadata
+ *  net.minecraft.resource.ResourcePackProfile$PackFactory
+ *  net.minecraft.resource.ResourcePackProvider
+ *  net.minecraft.resource.ResourcePackSource
+ *  net.minecraft.resource.ResourceType
+ *  net.minecraft.resource.ZipResourcePack$ZipBackedFactory
+ *  net.minecraft.text.Text
+ *  net.minecraft.util.Downloader
+ *  net.minecraft.util.NetworkUtils$DownloadListener
+ *  org.jspecify.annotations.Nullable
+ *  org.slf4j.Logger
+ */
 package net.minecraft.client.resource.server;
 
 import com.google.common.collect.Lists;
 import com.google.common.hash.HashCode;
-import com.google.common.hash.HashFunction;
-import com.google.common.hash.Hashing;
 import com.mojang.logging.LogUtils;
-import com.mojang.util.UndashedUuid;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.Proxy;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.OptionalLong;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.GameVersion;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.RunArgs;
-import net.minecraft.client.realms.SizeUnit;
+import net.minecraft.client.resource.server.DownloadQueuer;
+import net.minecraft.client.resource.server.PackStateChangeCallback;
+import net.minecraft.client.resource.server.ReloadScheduler;
+import net.minecraft.client.resource.server.ServerResourcePackLoader;
+import net.minecraft.client.resource.server.ServerResourcePackManager;
 import net.minecraft.client.session.Session;
-import net.minecraft.client.toast.SystemToast;
 import net.minecraft.network.ClientConnection;
-import net.minecraft.network.packet.c2s.common.ResourcePackStatusC2SPacket;
+import net.minecraft.resource.PackVersion;
 import net.minecraft.resource.ResourcePackInfo;
 import net.minecraft.resource.ResourcePackPosition;
 import net.minecraft.resource.ResourcePackProfile;
@@ -45,399 +79,208 @@ import net.minecraft.resource.ZipResourcePack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Downloader;
 import net.minecraft.util.NetworkUtils;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 
-@Environment(EnvType.CLIENT)
-public class ServerResourcePackLoader implements AutoCloseable {
-   private static final Text SERVER_NAME_TEXT = Text.translatable("resourcePack.server.name");
-   private static final Pattern SHA1_PATTERN = Pattern.compile("^[a-fA-F0-9]{40}$");
-   static final Logger LOGGER = LogUtils.getLogger();
-   private static final ResourcePackProvider NOOP_PROVIDER = (profileAdder) -> {
-   };
-   private static final ResourcePackPosition POSITION;
-   private static final PackStateChangeCallback DEBUG_PACK_STATE_CHANGE_CALLBACK;
-   final MinecraftClient client;
-   private ResourcePackProvider packProvider;
-   @Nullable
-   private ReloadScheduler.ReloadContext reloadContext;
-   final ServerResourcePackManager manager;
-   private final Downloader downloader;
-   private ResourcePackSource packSource;
-   PackStateChangeCallback packStateChangeCallback;
-   private int packIndex;
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
+public class ServerResourcePackLoader
+implements AutoCloseable {
+    private static final Text SERVER_NAME_TEXT = Text.translatable((String)"resourcePack.server.name");
+    private static final Pattern SHA1_PATTERN = Pattern.compile("^[a-fA-F0-9]{40}$");
+    static final Logger LOGGER = LogUtils.getLogger();
+    private static final ResourcePackProvider NOOP_PROVIDER = profileAdder -> {};
+    private static final ResourcePackPosition POSITION = new ResourcePackPosition(true, ResourcePackProfile.InsertionPosition.TOP, true);
+    private static final PackStateChangeCallback DEBUG_PACK_STATE_CHANGE_CALLBACK = new /* Unavailable Anonymous Inner Class!! */;
+    final MinecraftClient client;
+    private ResourcePackProvider packProvider = NOOP_PROVIDER;
+    private // Could not load outer class - annotation placement on inner may be incorrect
+    @Nullable ReloadScheduler.ReloadContext reloadContext;
+    final ServerResourcePackManager manager;
+    private final Downloader downloader;
+    private ResourcePackSource packSource = ResourcePackSource.SERVER;
+    PackStateChangeCallback packStateChangeCallback = DEBUG_PACK_STATE_CHANGE_CALLBACK;
+    private int packIndex;
 
-   public ServerResourcePackLoader(MinecraftClient client, Path downloadsDirectory, RunArgs.Network runArgs) {
-      this.packProvider = NOOP_PROVIDER;
-      this.packSource = ResourcePackSource.SERVER;
-      this.packStateChangeCallback = DEBUG_PACK_STATE_CHANGE_CALLBACK;
-      this.client = client;
+    public ServerResourcePackLoader(MinecraftClient client, Path downloadsDirectory, RunArgs.Network runArgs) {
+        this.client = client;
+        try {
+            this.downloader = new Downloader(downloadsDirectory);
+        }
+        catch (IOException iOException) {
+            throw new UncheckedIOException("Failed to open download queue in directory " + String.valueOf(downloadsDirectory), iOException);
+        }
+        Executor executor = arg_0 -> ((MinecraftClient)client).send(arg_0);
+        this.manager = new ServerResourcePackManager(this.createDownloadQueuer(this.downloader, executor, runArgs.session, runArgs.netProxy), (PackStateChangeCallback)new /* Unavailable Anonymous Inner Class!! */, this.getReloadScheduler(), this.createPackChangeCallback(executor), ServerResourcePackManager.AcceptanceStatus.PENDING);
+    }
 
-      try {
-         this.downloader = new Downloader(downloadsDirectory);
-      } catch (IOException var5) {
-         throw new UncheckedIOException("Failed to open download queue in directory " + String.valueOf(downloadsDirectory), var5);
-      }
+    NetworkUtils.DownloadListener createListener(int entryCount) {
+        return new /* Unavailable Anonymous Inner Class!! */;
+    }
 
-      Objects.requireNonNull(client);
-      Executor executor = client::send;
-      this.manager = new ServerResourcePackManager(this.createDownloadQueuer(this.downloader, executor, runArgs.session, runArgs.netProxy), new PackStateChangeCallback() {
-         public void onStateChanged(UUID id, PackStateChangeCallback.State state) {
-            ServerResourcePackLoader.this.packStateChangeCallback.onStateChanged(id, state);
-         }
+    private DownloadQueuer createDownloadQueuer(Downloader downloader, Executor executor, Session session, Proxy proxy) {
+        return new /* Unavailable Anonymous Inner Class!! */;
+    }
 
-         public void onFinish(UUID id, PackStateChangeCallback.FinishState state) {
-            ServerResourcePackLoader.this.packStateChangeCallback.onFinish(id, state);
-         }
-      }, this.getReloadScheduler(), this.createPackChangeCallback(executor), ServerResourcePackManager.AcceptanceStatus.PENDING);
-   }
+    private Runnable createPackChangeCallback(Executor executor) {
+        return new /* Unavailable Anonymous Inner Class!! */;
+    }
 
-   NetworkUtils.DownloadListener createListener(final int entryCount) {
-      return new NetworkUtils.DownloadListener() {
-         private final SystemToast.Type toastType = new SystemToast.Type();
-         private Text toastTitle = Text.empty();
-         @Nullable
-         private Text toastDescription = null;
-         private int current;
-         private int failureCount;
-         private OptionalLong contentLength = OptionalLong.empty();
+    private ReloadScheduler getReloadScheduler() {
+        return arg_0 -> this.reload(arg_0);
+    }
 
-         private void showToast() {
-            ServerResourcePackLoader.this.client.execute(() -> {
-               SystemToast.show(ServerResourcePackLoader.this.client.getToastManager(), this.toastType, this.toastTitle, this.toastDescription);
-            });
-         }
-
-         private void showProgress(long writtenBytes) {
-            if (this.contentLength.isPresent()) {
-               this.toastDescription = Text.translatable("download.pack.progress.percent", writtenBytes * 100L / this.contentLength.getAsLong());
-            } else {
-               this.toastDescription = Text.translatable("download.pack.progress.bytes", SizeUnit.getUserFriendlyString(writtenBytes));
+    private @Nullable List<ResourcePackProfile> toProfiles(List<ReloadScheduler.PackInfo> packs) {
+        ArrayList<ResourcePackProfile> list = new ArrayList<ResourcePackProfile>(packs.size());
+        for (ReloadScheduler.PackInfo packInfo : Lists.reverse(packs)) {
+            PackVersion packVersion;
+            ZipResourcePack.ZipBackedFactory packFactory;
+            String string = String.format(Locale.ROOT, "server/%08X/%s", this.packIndex++, packInfo.id());
+            Path path = packInfo.path();
+            ResourcePackInfo resourcePackInfo = new ResourcePackInfo(string, SERVER_NAME_TEXT, this.packSource, Optional.empty());
+            ResourcePackProfile.Metadata metadata = ResourcePackProfile.loadMetadata((ResourcePackInfo)resourcePackInfo, (ResourcePackProfile.PackFactory)(packFactory = new ZipResourcePack.ZipBackedFactory(path)), (PackVersion)(packVersion = SharedConstants.getGameVersion().packVersion(ResourceType.CLIENT_RESOURCES)), (ResourceType)ResourceType.CLIENT_RESOURCES);
+            if (metadata == null) {
+                LOGGER.warn("Invalid pack metadata in {}, ignoring all", (Object)path);
+                return null;
             }
+            list.add(new ResourcePackProfile(resourcePackInfo, (ResourcePackProfile.PackFactory)packFactory, metadata, POSITION));
+        }
+        return list;
+    }
 
-            this.showToast();
-         }
+    public ResourcePackProvider getPassthroughPackProvider() {
+        return packAdder -> this.packProvider.register(packAdder);
+    }
 
-         public void onStart() {
-            ++this.current;
-            this.toastTitle = Text.translatable("download.pack.title", this.current, entryCount);
-            this.showToast();
-            ServerResourcePackLoader.LOGGER.debug("Starting pack {}/{} download", this.current, entryCount);
-         }
+    private static ResourcePackProvider getPackProvider(List<ResourcePackProfile> serverPacks) {
+        if (serverPacks.isEmpty()) {
+            return NOOP_PROVIDER;
+        }
+        return serverPacks::forEach;
+    }
 
-         public void onContentLength(OptionalLong contentLength) {
-            ServerResourcePackLoader.LOGGER.debug("File size = {} bytes", contentLength);
-            this.contentLength = contentLength;
-            this.showProgress(0L);
-         }
-
-         public void onProgress(long writtenBytes) {
-            ServerResourcePackLoader.LOGGER.debug("Progress for pack {}: {} bytes", this.current, writtenBytes);
-            this.showProgress(writtenBytes);
-         }
-
-         public void onFinish(boolean success) {
-            if (!success) {
-               ServerResourcePackLoader.LOGGER.info("Pack {} failed to download", this.current);
-               ++this.failureCount;
-            } else {
-               ServerResourcePackLoader.LOGGER.debug("Download ended for pack {}", this.current);
+    private void reload(ReloadScheduler.ReloadContext context) {
+        this.reloadContext = context;
+        List list = context.getPacks();
+        List list2 = this.toProfiles(list);
+        if (list2 == null) {
+            context.onFailure(false);
+            List list3 = context.getPacks();
+            list2 = this.toProfiles(list3);
+            if (list2 == null) {
+                LOGGER.warn("Double failure in loading server packs");
+                list2 = List.of();
             }
+        }
+        this.packProvider = ServerResourcePackLoader.getPackProvider((List)list2);
+        this.client.reloadResources();
+    }
 
-            if (this.current == entryCount) {
-               if (this.failureCount > 0) {
-                  this.toastTitle = Text.translatable("download.pack.failed", this.failureCount, entryCount);
-                  this.toastDescription = null;
-                  this.showToast();
-               } else {
-                  SystemToast.hide(ServerResourcePackLoader.this.client.getToastManager(), this.toastType);
-               }
+    public void onReloadFailure() {
+        if (this.reloadContext != null) {
+            this.reloadContext.onFailure(false);
+            List list = this.toProfiles(this.reloadContext.getPacks());
+            if (list == null) {
+                LOGGER.warn("Double failure in loading server packs");
+                list = List.of();
             }
+            this.packProvider = ServerResourcePackLoader.getPackProvider((List)list);
+        }
+    }
 
-         }
-      };
-   }
+    public void onForcedReloadFailure() {
+        if (this.reloadContext != null) {
+            this.reloadContext.onFailure(true);
+            this.reloadContext = null;
+            this.packProvider = NOOP_PROVIDER;
+        }
+    }
 
-   private DownloadQueuer createDownloadQueuer(final Downloader downloader, final Executor executor, final Session session, final Proxy proxy) {
-      return new DownloadQueuer() {
-         private static final int MAX_BYTES = 262144000;
-         private static final HashFunction SHA1 = Hashing.sha1();
+    public void onReloadSuccess() {
+        if (this.reloadContext != null) {
+            this.reloadContext.onSuccess();
+            this.reloadContext = null;
+        }
+    }
 
-         private Map getHeaders() {
-            GameVersion gameVersion = SharedConstants.getGameVersion();
-            return Map.of("X-Minecraft-Username", session.getUsername(), "X-Minecraft-UUID", UndashedUuid.toString(session.getUuidOrNull()), "X-Minecraft-Version", gameVersion.name(), "X-Minecraft-Version-ID", gameVersion.id(), "X-Minecraft-Pack-Format", String.valueOf(gameVersion.packVersion(ResourceType.CLIENT_RESOURCES)), "User-Agent", "Minecraft Java/" + gameVersion.name());
-         }
+    private static @Nullable HashCode toHashCode(@Nullable String hash) {
+        if (hash != null && SHA1_PATTERN.matcher(hash).matches()) {
+            return HashCode.fromString((String)hash.toLowerCase(Locale.ROOT));
+        }
+        return null;
+    }
 
-         public void enqueue(Map entries, Consumer callback) {
-            downloader.downloadAsync(new Downloader.Config(SHA1, 262144000, this.getHeaders(), proxy, ServerResourcePackLoader.this.createListener(entries.size())), entries).thenAcceptAsync(callback, executor);
-         }
-      };
-   }
+    public void addResourcePack(UUID id, URL url, @Nullable String hash) {
+        HashCode hashCode = ServerResourcePackLoader.toHashCode((String)hash);
+        this.manager.addResourcePack(id, url, hashCode);
+    }
 
-   private Runnable createPackChangeCallback(final Executor executor) {
-      return new Runnable() {
-         private boolean currentlyRunning;
-         private boolean shouldKeepRunning;
+    public void addResourcePack(UUID id, Path path) {
+        this.manager.addResourcePack(id, path);
+    }
 
-         public void run() {
-            this.shouldKeepRunning = true;
-            if (!this.currentlyRunning) {
-               this.currentlyRunning = true;
-               executor.execute(this::runOnExecutor);
+    public void remove(UUID id) {
+        this.manager.remove(id);
+    }
+
+    public void removeAll() {
+        this.manager.removeAll();
+    }
+
+    private static PackStateChangeCallback getStateChangeCallback(ClientConnection connection) {
+        return new /* Unavailable Anonymous Inner Class!! */;
+    }
+
+    public void init(ClientConnection connection, ServerResourcePackManager.AcceptanceStatus acceptanceStatus) {
+        this.packSource = ResourcePackSource.SERVER;
+        this.packStateChangeCallback = ServerResourcePackLoader.getStateChangeCallback((ClientConnection)connection);
+        switch (8.field_47620[acceptanceStatus.ordinal()]) {
+            case 1: {
+                this.manager.acceptAll();
+                break;
             }
-
-         }
-
-         private void runOnExecutor() {
-            while(this.shouldKeepRunning) {
-               this.shouldKeepRunning = false;
-               ServerResourcePackLoader.this.manager.update();
+            case 2: {
+                this.manager.declineAll();
+                break;
             }
-
-            this.currentlyRunning = false;
-         }
-      };
-   }
-
-   private ReloadScheduler getReloadScheduler() {
-      return this::reload;
-   }
-
-   @Nullable
-   private List toProfiles(List packs) {
-      List list = new ArrayList(packs.size());
-      Iterator var3 = Lists.reverse(packs).iterator();
-
-      while(var3.hasNext()) {
-         ReloadScheduler.PackInfo packInfo = (ReloadScheduler.PackInfo)var3.next();
-         String string = String.format(Locale.ROOT, "server/%08X/%s", this.packIndex++, packInfo.id());
-         Path path = packInfo.path();
-         ResourcePackInfo resourcePackInfo = new ResourcePackInfo(string, SERVER_NAME_TEXT, this.packSource, Optional.empty());
-         ResourcePackProfile.PackFactory packFactory = new ZipResourcePack.ZipBackedFactory(path);
-         int i = SharedConstants.getGameVersion().packVersion(ResourceType.CLIENT_RESOURCES);
-         ResourcePackProfile.Metadata metadata = ResourcePackProfile.loadMetadata(resourcePackInfo, packFactory, i);
-         if (metadata == null) {
-            LOGGER.warn("Invalid pack metadata in {}, ignoring all", path);
-            return null;
-         }
-
-         list.add(new ResourcePackProfile(resourcePackInfo, packFactory, metadata, POSITION));
-      }
-
-      return list;
-   }
-
-   public ResourcePackProvider getPassthroughPackProvider() {
-      return (packAdder) -> {
-         this.packProvider.register(packAdder);
-      };
-   }
-
-   private static ResourcePackProvider getPackProvider(List serverPacks) {
-      if (serverPacks.isEmpty()) {
-         return NOOP_PROVIDER;
-      } else {
-         Objects.requireNonNull(serverPacks);
-         return serverPacks::forEach;
-      }
-   }
-
-   private void reload(ReloadScheduler.ReloadContext context) {
-      this.reloadContext = context;
-      List list = context.getPacks();
-      List list2 = this.toProfiles(list);
-      if (list2 == null) {
-         context.onFailure(false);
-         List list3 = context.getPacks();
-         list2 = this.toProfiles(list3);
-         if (list2 == null) {
-            LOGGER.warn("Double failure in loading server packs");
-            list2 = List.of();
-         }
-      }
-
-      this.packProvider = getPackProvider(list2);
-      this.client.reloadResources();
-   }
-
-   public void onReloadFailure() {
-      if (this.reloadContext != null) {
-         this.reloadContext.onFailure(false);
-         List list = this.toProfiles(this.reloadContext.getPacks());
-         if (list == null) {
-            LOGGER.warn("Double failure in loading server packs");
-            list = List.of();
-         }
-
-         this.packProvider = getPackProvider(list);
-      }
-
-   }
-
-   public void onForcedReloadFailure() {
-      if (this.reloadContext != null) {
-         this.reloadContext.onFailure(true);
-         this.reloadContext = null;
-         this.packProvider = NOOP_PROVIDER;
-      }
-
-   }
-
-   public void onReloadSuccess() {
-      if (this.reloadContext != null) {
-         this.reloadContext.onSuccess();
-         this.reloadContext = null;
-      }
-
-   }
-
-   @Nullable
-   private static HashCode toHashCode(@Nullable String hash) {
-      return hash != null && SHA1_PATTERN.matcher(hash).matches() ? HashCode.fromString(hash.toLowerCase(Locale.ROOT)) : null;
-   }
-
-   public void addResourcePack(UUID id, URL url, @Nullable String hash) {
-      HashCode hashCode = toHashCode(hash);
-      this.manager.addResourcePack(id, url, hashCode);
-   }
-
-   public void addResourcePack(UUID id, Path path) {
-      this.manager.addResourcePack(id, path);
-   }
-
-   public void remove(UUID id) {
-      this.manager.remove(id);
-   }
-
-   public void removeAll() {
-      this.manager.removeAll();
-   }
-
-   private static PackStateChangeCallback getStateChangeCallback(final ClientConnection connection) {
-      return new PackStateChangeCallback() {
-         public void onStateChanged(UUID id, PackStateChangeCallback.State state) {
-            ServerResourcePackLoader.LOGGER.debug("Pack {} changed status to {}", id, state);
-            ResourcePackStatusC2SPacket.Status var10000;
-            switch (state) {
-               case ACCEPTED:
-                  var10000 = ResourcePackStatusC2SPacket.Status.ACCEPTED;
-                  break;
-               case DOWNLOADED:
-                  var10000 = ResourcePackStatusC2SPacket.Status.DOWNLOADED;
-                  break;
-               default:
-                  throw new MatchException((String)null, (Throwable)null);
+            case 3: {
+                this.manager.resetAcceptanceStatus();
             }
+        }
+    }
 
-            ResourcePackStatusC2SPacket.Status status = var10000;
-            connection.send(new ResourcePackStatusC2SPacket(id, status));
-         }
+    public void initWorldPack() {
+        this.packSource = ResourcePackSource.WORLD;
+        this.packStateChangeCallback = DEBUG_PACK_STATE_CHANGE_CALLBACK;
+        this.manager.acceptAll();
+    }
 
-         public void onFinish(UUID id, PackStateChangeCallback.FinishState state) {
-            ServerResourcePackLoader.LOGGER.debug("Pack {} changed status to {}", id, state);
-            ResourcePackStatusC2SPacket.Status var10000;
-            switch (state) {
-               case APPLIED:
-                  var10000 = ResourcePackStatusC2SPacket.Status.SUCCESSFULLY_LOADED;
-                  break;
-               case DOWNLOAD_FAILED:
-                  var10000 = ResourcePackStatusC2SPacket.Status.FAILED_DOWNLOAD;
-                  break;
-               case DECLINED:
-                  var10000 = ResourcePackStatusC2SPacket.Status.DECLINED;
-                  break;
-               case DISCARDED:
-                  var10000 = ResourcePackStatusC2SPacket.Status.DISCARDED;
-                  break;
-               case ACTIVATION_FAILED:
-                  var10000 = ResourcePackStatusC2SPacket.Status.FAILED_RELOAD;
-                  break;
-               default:
-                  throw new MatchException((String)null, (Throwable)null);
-            }
+    public void acceptAll() {
+        this.manager.acceptAll();
+    }
 
-            ResourcePackStatusC2SPacket.Status status = var10000;
-            connection.send(new ResourcePackStatusC2SPacket(id, status));
-         }
-      };
-   }
+    public void declineAll() {
+        this.manager.declineAll();
+    }
 
-   public void init(ClientConnection connection, ServerResourcePackManager.AcceptanceStatus acceptanceStatus) {
-      this.packSource = ResourcePackSource.SERVER;
-      this.packStateChangeCallback = getStateChangeCallback(connection);
-      switch (acceptanceStatus) {
-         case ALLOWED:
-            this.manager.acceptAll();
-            break;
-         case DECLINED:
-            this.manager.declineAll();
-            break;
-         case PENDING:
-            this.manager.resetAcceptanceStatus();
-      }
+    public CompletableFuture<Void> getPackLoadFuture(UUID id) {
+        CompletableFuture<Void> completableFuture = new CompletableFuture<Void>();
+        PackStateChangeCallback packStateChangeCallback = this.packStateChangeCallback;
+        this.packStateChangeCallback = new /* Unavailable Anonymous Inner Class!! */;
+        return completableFuture;
+    }
 
-   }
+    public void clear() {
+        this.manager.removeAll();
+        this.packStateChangeCallback = DEBUG_PACK_STATE_CHANGE_CALLBACK;
+        this.manager.resetAcceptanceStatus();
+    }
 
-   public void initWorldPack() {
-      this.packSource = ResourcePackSource.WORLD;
-      this.packStateChangeCallback = DEBUG_PACK_STATE_CHANGE_CALLBACK;
-      this.manager.acceptAll();
-   }
-
-   public void acceptAll() {
-      this.manager.acceptAll();
-   }
-
-   public void declineAll() {
-      this.manager.declineAll();
-   }
-
-   public CompletableFuture getPackLoadFuture(final UUID id) {
-      final CompletableFuture completableFuture = new CompletableFuture();
-      final PackStateChangeCallback packStateChangeCallback = this.packStateChangeCallback;
-      this.packStateChangeCallback = new PackStateChangeCallback() {
-         public void onStateChanged(UUID idx, PackStateChangeCallback.State state) {
-            packStateChangeCallback.onStateChanged(idx, state);
-         }
-
-         public void onFinish(UUID idx, PackStateChangeCallback.FinishState state) {
-            if (id.equals(idx)) {
-               ServerResourcePackLoader.this.packStateChangeCallback = packStateChangeCallback;
-               if (state == PackStateChangeCallback.FinishState.APPLIED) {
-                  completableFuture.complete((Object)null);
-               } else {
-                  CompletableFuture var10000 = completableFuture;
-                  String var10003 = String.valueOf(idx);
-                  var10000.completeExceptionally(new IllegalStateException("Failed to apply pack " + var10003 + ", reason: " + String.valueOf(state)));
-               }
-            }
-
-            packStateChangeCallback.onFinish(idx, state);
-         }
-      };
-      return completableFuture;
-   }
-
-   public void clear() {
-      this.manager.removeAll();
-      this.packStateChangeCallback = DEBUG_PACK_STATE_CHANGE_CALLBACK;
-      this.manager.resetAcceptanceStatus();
-   }
-
-   public void close() throws IOException {
-      this.downloader.close();
-   }
-
-   static {
-      POSITION = new ResourcePackPosition(true, ResourcePackProfile.InsertionPosition.TOP, true);
-      DEBUG_PACK_STATE_CHANGE_CALLBACK = new PackStateChangeCallback() {
-         public void onStateChanged(UUID id, PackStateChangeCallback.State state) {
-            ServerResourcePackLoader.LOGGER.debug("Downloaded pack {} changed state to {}", id, state);
-         }
-
-         public void onFinish(UUID id, PackStateChangeCallback.FinishState state) {
-            ServerResourcePackLoader.LOGGER.debug("Downloaded pack {} finished with state {}", id, state);
-         }
-      };
-   }
+    @Override
+    public void close() throws IOException {
+        this.downloader.close();
+    }
 }
+

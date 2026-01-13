@@ -44,7 +44,7 @@ public class RottenFleshBlockEvents {
                  return ActionResult.PASS;
             }
 
-            if (!world.isClient) {
+            if (!world.isClient()) {
                 // Place Nether Wart Block with Rotten Flesh Block Display
                 if (CustomBlockManager.place(world, placePos, stack, Blocks.NETHER_WART_BLOCK, null)) {
                     // Use NETHER_WART sound

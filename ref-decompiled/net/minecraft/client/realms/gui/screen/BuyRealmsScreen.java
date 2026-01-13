@@ -1,12 +1,38 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.gl.RenderPipelines
+ *  net.minecraft.client.gui.DrawContext
+ *  net.minecraft.client.gui.Element
+ *  net.minecraft.client.gui.screen.ButtonTextures
+ *  net.minecraft.client.gui.screen.ConfirmLinkScreen
+ *  net.minecraft.client.gui.screen.Screen
+ *  net.minecraft.client.gui.tooltip.Tooltip
+ *  net.minecraft.client.gui.widget.ButtonWidget
+ *  net.minecraft.client.gui.widget.ButtonWidget$PressAction
+ *  net.minecraft.client.gui.widget.ScrollableTextWidget
+ *  net.minecraft.client.gui.widget.TexturedButtonWidget
+ *  net.minecraft.client.realms.gui.screen.BuyRealmsScreen
+ *  net.minecraft.client.realms.gui.screen.RealmsScreen
+ *  net.minecraft.resource.ResourceManager
+ *  net.minecraft.text.Text
+ *  net.minecraft.util.Identifier
+ *  net.minecraft.util.Urls
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.realms.gui.screen;
 
 import java.net.URI;
-import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.ButtonTextures;
 import net.minecraft.client.gui.screen.ConfirmLinkScreen;
 import net.minecraft.client.gui.screen.Screen;
@@ -14,124 +40,118 @@ import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ScrollableTextWidget;
 import net.minecraft.client.gui.widget.TexturedButtonWidget;
+import net.minecraft.client.realms.gui.screen.RealmsScreen;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Urls;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
-public class BuyRealmsScreen extends RealmsScreen {
-   private static final Text POPUP_TEXT = Text.translatable("mco.selectServer.popup");
-   private static final Text CLOSE_TEXT = Text.translatable("mco.selectServer.close");
-   private static final Identifier POPUP_BACKGROUND_TEXTURE = Identifier.ofVanilla("popup/background");
-   private static final Identifier TRIAL_AVAILABLE_TEXTURE = Identifier.ofVanilla("icon/trial_available");
-   private static final ButtonTextures CROSS_BUTTON_TEXTURES = new ButtonTextures(Identifier.ofVanilla("widget/cross_button"), Identifier.ofVanilla("widget/cross_button_highlighted"));
-   private static final int field_45258 = 195;
-   private static final int field_45259 = 152;
-   private static final int field_45257 = 6;
-   private static final int field_45260 = 4;
-   private static final int field_45261 = 10;
-   private static final int field_45262 = 320;
-   private static final int field_45263 = 172;
-   private static final int field_45264 = 100;
-   private static final int field_45265 = 99;
-   private static final int field_45266 = 100;
-   private static List realmsImages = List.of();
-   private final Screen parent;
-   private final boolean trialAvailable;
-   @Nullable
-   private ButtonWidget trialButton;
-   private int realmsImageIndex;
-   private int realmsImageDisplayTime;
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
+public class BuyRealmsScreen
+extends RealmsScreen {
+    private static final Text POPUP_TEXT = Text.translatable((String)"mco.selectServer.popup");
+    private static final Text CLOSE_TEXT = Text.translatable((String)"mco.selectServer.close");
+    private static final Identifier POPUP_BACKGROUND_TEXTURE = Identifier.ofVanilla((String)"popup/background");
+    private static final Identifier TRIAL_AVAILABLE_TEXTURE = Identifier.ofVanilla((String)"icon/trial_available");
+    private static final ButtonTextures CROSS_BUTTON_TEXTURES = new ButtonTextures(Identifier.ofVanilla((String)"widget/cross_button"), Identifier.ofVanilla((String)"widget/cross_button_highlighted"));
+    private static final int field_45258 = 195;
+    private static final int field_45259 = 152;
+    private static final int field_45257 = 6;
+    private static final int field_45260 = 4;
+    private static final int field_45261 = 10;
+    private static final int field_45262 = 320;
+    private static final int field_45263 = 172;
+    private static final int field_45264 = 100;
+    private static final int field_45265 = 99;
+    private static final int field_45266 = 100;
+    private static List<Identifier> realmsImages = List.of();
+    private final Screen parent;
+    private final boolean trialAvailable;
+    private @Nullable ButtonWidget trialButton;
+    private int realmsImageIndex;
+    private int realmsImageDisplayTime;
 
-   public BuyRealmsScreen(Screen parent, boolean trialAvailable) {
-      super(POPUP_TEXT);
-      this.parent = parent;
-      this.trialAvailable = trialAvailable;
-   }
+    public BuyRealmsScreen(Screen parent, boolean trialAvailable) {
+        super(POPUP_TEXT);
+        this.parent = parent;
+        this.trialAvailable = trialAvailable;
+    }
 
-   public static void refreshImages(ResourceManager resourceManager) {
-      Collection collection = resourceManager.findResources("textures/gui/images", (id) -> {
-         return id.getPath().endsWith(".png");
-      }).keySet();
-      realmsImages = collection.stream().filter((id) -> {
-         return id.getNamespace().equals("realms");
-      }).toList();
-   }
+    public static void refreshImages(ResourceManager resourceManager) {
+        Set collection = resourceManager.findResources("textures/gui/images", id -> id.getPath().endsWith(".png")).keySet();
+        realmsImages = collection.stream().filter(id -> id.getNamespace().equals("realms")).toList();
+    }
 
-   protected void init() {
-      this.parent.resize(this.client, this.width, this.height);
-      if (this.trialAvailable) {
-         this.trialButton = (ButtonWidget)this.addDrawableChild(ButtonWidget.builder(Text.translatable("mco.selectServer.trial"), ConfirmLinkScreen.opening(this, (URI)Urls.JAVA_REALMS_TRIAL)).dimensions(this.getRight() - 10 - 99, this.getBottom() - 10 - 4 - 40, 99, 20).build());
-      }
+    protected void init() {
+        this.parent.resize(this.width, this.height);
+        if (this.trialAvailable) {
+            this.trialButton = (ButtonWidget)this.addDrawableChild((Element)ButtonWidget.builder((Text)Text.translatable((String)"mco.selectServer.trial"), (ButtonWidget.PressAction)ConfirmLinkScreen.opening((Screen)this, (URI)Urls.JAVA_REALMS_TRIAL)).dimensions(this.getRight() - 10 - 99, this.getBottom() - 10 - 4 - 40, 99, 20).build());
+        }
+        this.addDrawableChild((Element)ButtonWidget.builder((Text)Text.translatable((String)"mco.selectServer.buy"), (ButtonWidget.PressAction)ConfirmLinkScreen.opening((Screen)this, (URI)Urls.BUY_JAVA_REALMS)).dimensions(this.getRight() - 10 - 99, this.getBottom() - 10 - 20, 99, 20).build());
+        TexturedButtonWidget texturedButtonWidget = (TexturedButtonWidget)this.addDrawableChild((Element)new TexturedButtonWidget(this.getLeft() + 4, this.getTop() + 4, 14, 14, CROSS_BUTTON_TEXTURES, button -> this.close(), CLOSE_TEXT));
+        texturedButtonWidget.setTooltip(Tooltip.of((Text)CLOSE_TEXT));
+        int i = 142 - (this.trialAvailable ? 40 : 20);
+        ScrollableTextWidget scrollableTextWidget = new ScrollableTextWidget(this.getRight() - 10 - 100, this.getTop() + 10, 100, i, POPUP_TEXT, this.textRenderer);
+        if (scrollableTextWidget.textOverflows()) {
+            scrollableTextWidget.setWidth(94);
+        }
+        this.addDrawableChild((Element)scrollableTextWidget);
+    }
 
-      this.addDrawableChild(ButtonWidget.builder(Text.translatable("mco.selectServer.buy"), ConfirmLinkScreen.opening(this, (URI)Urls.BUY_JAVA_REALMS)).dimensions(this.getRight() - 10 - 99, this.getBottom() - 10 - 20, 99, 20).build());
-      TexturedButtonWidget texturedButtonWidget = (TexturedButtonWidget)this.addDrawableChild(new TexturedButtonWidget(this.getLeft() + 4, this.getTop() + 4, 14, 14, CROSS_BUTTON_TEXTURES, (button) -> {
-         this.close();
-      }, CLOSE_TEXT));
-      texturedButtonWidget.setTooltip(Tooltip.of(CLOSE_TEXT));
-      int i = 142 - (this.trialAvailable ? 40 : 20);
-      ScrollableTextWidget scrollableTextWidget = new ScrollableTextWidget(this.getRight() - 10 - 100, this.getTop() + 10, 100, i, POPUP_TEXT, this.textRenderer);
-      if (scrollableTextWidget.textOverflows()) {
-         scrollableTextWidget.setWidth(94);
-      }
+    public void tick() {
+        super.tick();
+        if (++this.realmsImageDisplayTime > 100) {
+            this.realmsImageDisplayTime = 0;
+            this.realmsImageIndex = (this.realmsImageIndex + 1) % realmsImages.size();
+        }
+    }
 
-      this.addDrawableChild(scrollableTextWidget);
-   }
+    public void render(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
+        super.render(context, mouseX, mouseY, deltaTicks);
+        if (this.trialButton != null) {
+            BuyRealmsScreen.drawTrialAvailableTexture((DrawContext)context, (ButtonWidget)this.trialButton);
+        }
+    }
 
-   public void tick() {
-      super.tick();
-      if (++this.realmsImageDisplayTime > 100) {
-         this.realmsImageDisplayTime = 0;
-         this.realmsImageIndex = (this.realmsImageIndex + 1) % realmsImages.size();
-      }
+    public static void drawTrialAvailableTexture(DrawContext context, ButtonWidget button) {
+        int i = 8;
+        context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, TRIAL_AVAILABLE_TEXTURE, button.getX() + button.getWidth() - 8 - 4, button.getY() + button.getHeight() / 2 - 4, 8, 8);
+    }
 
-   }
+    public void renderBackground(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
+        this.parent.renderBackground(context, -1, -1, deltaTicks);
+        context.createNewRootLayer();
+        this.parent.render(context, -1, -1, deltaTicks);
+        context.createNewRootLayer();
+        this.renderInGameBackground(context);
+        context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, POPUP_BACKGROUND_TEXTURE, this.getLeft(), this.getTop(), 320, 172);
+        if (!realmsImages.isEmpty()) {
+            context.drawTexture(RenderPipelines.GUI_TEXTURED, (Identifier)realmsImages.get(this.realmsImageIndex), this.getLeft() + 10, this.getTop() + 10, 0.0f, 0.0f, 195, 152, 195, 152);
+        }
+    }
 
-   public void render(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
-      super.render(context, mouseX, mouseY, deltaTicks);
-      if (this.trialButton != null) {
-         drawTrialAvailableTexture(context, this.trialButton);
-      }
+    private int getLeft() {
+        return (this.width - 320) / 2;
+    }
 
-   }
+    private int getTop() {
+        return (this.height - 172) / 2;
+    }
 
-   public static void drawTrialAvailableTexture(DrawContext context, ButtonWidget button) {
-      int i = true;
-      context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, TRIAL_AVAILABLE_TEXTURE, button.getX() + button.getWidth() - 8 - 4, button.getY() + button.getHeight() / 2 - 4, 8, 8);
-   }
+    private int getRight() {
+        return this.getLeft() + 320;
+    }
 
-   public void renderBackground(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
-      this.parent.renderBackground(context, -1, -1, deltaTicks);
-      context.createNewRootLayer();
-      this.parent.render(context, -1, -1, deltaTicks);
-      context.createNewRootLayer();
-      this.renderInGameBackground(context);
-      context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, POPUP_BACKGROUND_TEXTURE, this.getLeft(), this.getTop(), 320, 172);
-      if (!realmsImages.isEmpty()) {
-         context.drawTexture(RenderPipelines.GUI_TEXTURED, (Identifier)realmsImages.get(this.realmsImageIndex), this.getLeft() + 10, this.getTop() + 10, 0.0F, 0.0F, 195, 152, 195, 152);
-      }
+    private int getBottom() {
+        return this.getTop() + 172;
+    }
 
-   }
-
-   private int getLeft() {
-      return (this.width - 320) / 2;
-   }
-
-   private int getTop() {
-      return (this.height - 172) / 2;
-   }
-
-   private int getRight() {
-      return this.getLeft() + 320;
-   }
-
-   private int getBottom() {
-      return this.getTop() + 172;
-   }
-
-   public void close() {
-      this.client.setScreen(this.parent);
-   }
+    public void close() {
+        this.client.setScreen(this.parent);
+    }
 }
+

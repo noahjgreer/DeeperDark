@@ -1,3 +1,20 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.model.Model
+ *  net.minecraft.client.model.ModelData
+ *  net.minecraft.client.model.ModelPart
+ *  net.minecraft.client.model.ModelPartBuilder
+ *  net.minecraft.client.model.ModelPartData
+ *  net.minecraft.client.model.ModelTransform
+ *  net.minecraft.client.model.TexturedModelData
+ *  net.minecraft.client.render.RenderLayers
+ *  net.minecraft.client.render.block.entity.model.BannerFlagBlockModel
+ *  net.minecraft.util.math.MathHelper
+ */
 package net.minecraft.client.render.block.entity.model;
 
 import net.fabricmc.api.EnvType;
@@ -9,26 +26,29 @@ import net.minecraft.client.model.ModelPartBuilder;
 import net.minecraft.client.model.ModelPartData;
 import net.minecraft.client.model.ModelTransform;
 import net.minecraft.client.model.TexturedModelData;
-import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.RenderLayers;
 import net.minecraft.util.math.MathHelper;
 
-@Environment(EnvType.CLIENT)
-public class BannerFlagBlockModel extends Model {
-   private final ModelPart flag;
+@Environment(value=EnvType.CLIENT)
+public class BannerFlagBlockModel
+extends Model<Float> {
+    private final ModelPart flag;
 
-   public BannerFlagBlockModel(ModelPart root) {
-      super(root, RenderLayer::getEntitySolid);
-      this.flag = root.getChild("flag");
-   }
+    public BannerFlagBlockModel(ModelPart root) {
+        super(root, RenderLayers::entitySolid);
+        this.flag = root.getChild("flag");
+    }
 
-   public static TexturedModelData getTexturedModelData(boolean standing) {
-      ModelData modelData = new ModelData();
-      ModelPartData modelPartData = modelData.getRoot();
-      modelPartData.addChild("flag", ModelPartBuilder.create().uv(0, 0).cuboid(-10.0F, 0.0F, -2.0F, 20.0F, 40.0F, 1.0F), ModelTransform.origin(0.0F, standing ? -44.0F : -20.5F, standing ? 0.0F : 10.5F));
-      return TexturedModelData.of(modelData, 64, 64);
-   }
+    public static TexturedModelData getTexturedModelData(boolean standing) {
+        ModelData modelData = new ModelData();
+        ModelPartData modelPartData = modelData.getRoot();
+        modelPartData.addChild("flag", ModelPartBuilder.create().uv(0, 0).cuboid(-10.0f, 0.0f, -2.0f, 20.0f, 40.0f, 1.0f), ModelTransform.origin((float)0.0f, (float)(standing ? -44.0f : -20.5f), (float)(standing ? 0.0f : 10.5f)));
+        return TexturedModelData.of((ModelData)modelData, (int)64, (int)64);
+    }
 
-   public void sway(float rotation) {
-      this.flag.pitch = (-0.0125F + 0.01F * MathHelper.cos(6.2831855F * rotation)) * 3.1415927F;
-   }
+    public void setAngles(Float float_) {
+        super.setAngles((Object)float_);
+        this.flag.pitch = (-0.0125f + 0.01f * MathHelper.cos((double)((float)Math.PI * 2 * float_.floatValue()))) * (float)Math.PI;
+    }
 }
+

@@ -1,119 +1,90 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.google.common.collect.ImmutableMap
+ *  com.google.common.collect.ImmutableMap$Builder
+ *  com.google.common.collect.ImmutableSet
+ *  com.google.common.collect.ImmutableSet$Builder
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.gl.Defines
+ *  net.minecraft.client.gl.Defines$Builder
+ */
 package net.minecraft.client.gl;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.gl.Defines;
 
-@Environment(EnvType.CLIENT)
-public record Defines(Map values, Set flags) {
-   public static final Defines EMPTY = new Defines(Map.of(), Set.of());
-   public static final Codec CODEC = RecordCodecBuilder.create((instance) -> {
-      return instance.group(Codec.unboundedMap(Codec.STRING, Codec.STRING).optionalFieldOf("values", Map.of()).forGetter(Defines::values), Codec.STRING.listOf().xmap(Set::copyOf, List::copyOf).optionalFieldOf("flags", Set.of()).forGetter(Defines::flags)).apply(instance, Defines::new);
-   });
+@Environment(value=EnvType.CLIENT)
+public record Defines(Map<String, String> values, Set<String> flags) {
+    private final Map<String, String> values;
+    private final Set<String> flags;
+    public static final Defines EMPTY = new Defines(Map.of(), Set.of());
+    public static final Codec<Defines> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Codec.unboundedMap((Codec)Codec.STRING, (Codec)Codec.STRING).optionalFieldOf("values", Map.of()).forGetter(Defines::values), (App)Codec.STRING.listOf().xmap(Set::copyOf, List::copyOf).optionalFieldOf("flags", Set.of()).forGetter(Defines::flags)).apply((Applicative)instance, Defines::new));
 
-   public Defines(Map map, Set set) {
-      this.values = map;
-      this.flags = set;
-   }
+    public Defines(Map<String, String> values, Set<String> flags) {
+        this.values = values;
+        this.flags = flags;
+    }
 
-   public static Builder builder() {
-      return new Builder();
-   }
+    public static Builder builder() {
+        return new Builder();
+    }
 
-   public Defines withMerged(Defines other) {
-      if (this.isEmpty()) {
-         return other;
-      } else if (other.isEmpty()) {
-         return this;
-      } else {
-         ImmutableMap.Builder builder = ImmutableMap.builderWithExpectedSize(this.values.size() + other.values.size());
-         builder.putAll(this.values);
-         builder.putAll(other.values);
-         ImmutableSet.Builder builder2 = ImmutableSet.builderWithExpectedSize(this.flags.size() + other.flags.size());
-         builder2.addAll(this.flags);
-         builder2.addAll(other.flags);
-         return new Defines(builder.buildKeepingLast(), builder2.build());
-      }
-   }
-
-   public String toSource() {
-      StringBuilder stringBuilder = new StringBuilder();
-      Iterator var2 = this.values.entrySet().iterator();
-
-      while(var2.hasNext()) {
-         Map.Entry entry = (Map.Entry)var2.next();
-         String string = (String)entry.getKey();
-         String string2 = (String)entry.getValue();
-         stringBuilder.append("#define ").append(string).append(" ").append(string2).append('\n');
-      }
-
-      var2 = this.flags.iterator();
-
-      while(var2.hasNext()) {
-         String string3 = (String)var2.next();
-         stringBuilder.append("#define ").append(string3).append('\n');
-      }
-
-      return stringBuilder.toString();
-   }
-
-   public boolean isEmpty() {
-      return this.values.isEmpty() && this.flags.isEmpty();
-   }
-
-   public Map values() {
-      return this.values;
-   }
-
-   public Set flags() {
-      return this.flags;
-   }
-
-   @Environment(EnvType.CLIENT)
-   public static class Builder {
-      private final ImmutableMap.Builder values = ImmutableMap.builder();
-      private final ImmutableSet.Builder flags = ImmutableSet.builder();
-
-      Builder() {
-      }
-
-      public Builder define(String key, String value) {
-         if (value.isBlank()) {
-            throw new IllegalArgumentException("Cannot define empty string");
-         } else {
-            this.values.put(key, escapeLinebreak(value));
+    public Defines withMerged(Defines other) {
+        if (this.isEmpty()) {
+            return other;
+        }
+        if (other.isEmpty()) {
             return this;
-         }
-      }
+        }
+        ImmutableMap.Builder builder = ImmutableMap.builderWithExpectedSize((int)(this.values.size() + other.values.size()));
+        builder.putAll(this.values);
+        builder.putAll(other.values);
+        ImmutableSet.Builder builder2 = ImmutableSet.builderWithExpectedSize((int)(this.flags.size() + other.flags.size()));
+        builder2.addAll((Iterable)this.flags);
+        builder2.addAll((Iterable)other.flags);
+        return new Defines((Map)builder.buildKeepingLast(), (Set)builder2.build());
+    }
 
-      private static String escapeLinebreak(String string) {
-         return string.replaceAll("\n", "\\\\\n");
-      }
+    public String toSource() {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Map.Entry entry : this.values.entrySet()) {
+            String string = (String)entry.getKey();
+            String string2 = (String)entry.getValue();
+            stringBuilder.append("#define ").append(string).append(" ").append(string2).append('\n');
+        }
+        for (String string3 : this.flags) {
+            stringBuilder.append("#define ").append(string3).append('\n');
+        }
+        return stringBuilder.toString();
+    }
 
-      public Builder define(String key, float value) {
-         this.values.put(key, String.valueOf(value));
-         return this;
-      }
+    public boolean isEmpty() {
+        return this.values.isEmpty() && this.flags.isEmpty();
+    }
 
-      public Builder define(String name, int value) {
-         this.values.put(name, String.valueOf(value));
-         return this;
-      }
+    public Map<String, String> values() {
+        return this.values;
+    }
 
-      public Builder flag(String flag) {
-         this.flags.add(flag);
-         return this;
-      }
-
-      public Defines build() {
-         return new Defines(this.values.build(), this.flags.build());
-      }
-   }
+    public Set<String> flags() {
+        return this.flags;
+    }
 }
+

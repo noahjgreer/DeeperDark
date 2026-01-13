@@ -1,217 +1,221 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.google.common.base.Strings
+ *  com.google.common.collect.Lists
+ *  com.mojang.authlib.GameProfile
+ *  it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.MinecraftClient
+ *  net.minecraft.client.gui.DrawContext
+ *  net.minecraft.client.gui.screen.multiplayer.SocialInteractionsPlayerListEntry
+ *  net.minecraft.client.gui.screen.multiplayer.SocialInteractionsPlayerListWidget
+ *  net.minecraft.client.gui.screen.multiplayer.SocialInteractionsScreen
+ *  net.minecraft.client.gui.screen.multiplayer.SocialInteractionsScreen$Tab
+ *  net.minecraft.client.gui.widget.ElementListWidget
+ *  net.minecraft.client.gui.widget.EntryListWidget$Entry
+ *  net.minecraft.client.network.ClientPlayNetworkHandler
+ *  net.minecraft.client.network.PlayerListEntry
+ *  net.minecraft.client.session.report.log.ChatLog
+ *  net.minecraft.client.session.report.log.ChatLogEntry
+ *  net.minecraft.client.session.report.log.ReceivedMessage$ChatMessage
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.gui.screen.multiplayer;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.mojang.authlib.GameProfile;
-import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.multiplayer.SocialInteractionsPlayerListEntry;
+import net.minecraft.client.gui.screen.multiplayer.SocialInteractionsScreen;
 import net.minecraft.client.gui.widget.ElementListWidget;
+import net.minecraft.client.gui.widget.EntryListWidget;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.session.report.log.ChatLog;
 import net.minecraft.client.session.report.log.ChatLogEntry;
 import net.minecraft.client.session.report.log.ReceivedMessage;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
-public class SocialInteractionsPlayerListWidget extends ElementListWidget {
-   private final SocialInteractionsScreen parent;
-   private final List players = Lists.newArrayList();
-   @Nullable
-   private String currentSearch;
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
+public class SocialInteractionsPlayerListWidget
+extends ElementListWidget<SocialInteractionsPlayerListEntry> {
+    private final SocialInteractionsScreen parent;
+    private final List<SocialInteractionsPlayerListEntry> players = Lists.newArrayList();
+    private @Nullable String currentSearch;
 
-   public SocialInteractionsPlayerListWidget(SocialInteractionsScreen parent, MinecraftClient client, int width, int height, int y, int itemHeight) {
-      super(client, width, height, y, itemHeight);
-      this.parent = parent;
-   }
+    public SocialInteractionsPlayerListWidget(SocialInteractionsScreen parent, MinecraftClient client, int width, int height, int y, int itemHeight) {
+        super(client, width, height, y, itemHeight);
+        this.parent = parent;
+    }
 
-   protected void drawMenuListBackground(DrawContext context) {
-   }
+    protected void drawMenuListBackground(DrawContext context) {
+    }
 
-   protected void drawHeaderAndFooterSeparators(DrawContext context) {
-   }
+    protected void drawHeaderAndFooterSeparators(DrawContext context) {
+    }
 
-   protected void enableScissor(DrawContext context) {
-      context.enableScissor(this.getX(), this.getY() + 4, this.getRight(), this.getBottom());
-   }
+    protected void enableScissor(DrawContext context) {
+        context.enableScissor(this.getX(), this.getY() + 4, this.getRight(), this.getBottom());
+    }
 
-   public void update(Collection uuids, double scrollAmount, boolean includeOffline) {
-      Map map = new HashMap();
-      this.setPlayers(uuids, map);
-      this.markOfflineMembers(map, includeOffline);
-      this.refresh(map.values(), scrollAmount);
-   }
+    public void update(Collection<UUID> uuids, double scrollAmount, boolean includeOffline) {
+        HashMap map = new HashMap();
+        this.setPlayers(uuids, map);
+        if (includeOffline) {
+            this.collectOfflinePlayers(map);
+        }
+        this.markOfflineMembers(map, includeOffline);
+        this.refresh(map.values(), scrollAmount);
+    }
 
-   private void setPlayers(Collection playerUuids, Map entriesByUuids) {
-      ClientPlayNetworkHandler clientPlayNetworkHandler = this.client.player.networkHandler;
-      Iterator var4 = playerUuids.iterator();
+    private void setPlayers(Collection<UUID> playerUuids, Map<UUID, SocialInteractionsPlayerListEntry> entriesByUuids) {
+        ClientPlayNetworkHandler clientPlayNetworkHandler = this.client.player.networkHandler;
+        for (UUID uUID : playerUuids) {
+            PlayerListEntry playerListEntry = clientPlayNetworkHandler.getPlayerListEntry(uUID);
+            if (playerListEntry == null) continue;
+            SocialInteractionsPlayerListEntry socialInteractionsPlayerListEntry = this.createListEntry(uUID, playerListEntry);
+            entriesByUuids.put(uUID, socialInteractionsPlayerListEntry);
+        }
+    }
 
-      while(var4.hasNext()) {
-         UUID uUID = (UUID)var4.next();
-         PlayerListEntry playerListEntry = clientPlayNetworkHandler.getPlayerListEntry(uUID);
-         if (playerListEntry != null) {
-            boolean bl = playerListEntry.hasPublicKey();
-            MinecraftClient var10004 = this.client;
-            SocialInteractionsScreen var10005 = this.parent;
-            String var10007 = playerListEntry.getProfile().getName();
-            Objects.requireNonNull(playerListEntry);
-            entriesByUuids.put(uUID, new SocialInteractionsPlayerListEntry(var10004, var10005, uUID, var10007, playerListEntry::getSkinTextures, bl));
-         }
-      }
+    private void collectOfflinePlayers(Map<UUID, SocialInteractionsPlayerListEntry> entriesByUuids) {
+        Map map = this.client.player.networkHandler.getSeenPlayers();
+        for (Map.Entry entry : map.entrySet()) {
+            entriesByUuids.computeIfAbsent((UUID)entry.getKey(), uuid -> {
+                SocialInteractionsPlayerListEntry socialInteractionsPlayerListEntry = this.createListEntry(uuid, (PlayerListEntry)entry.getValue());
+                socialInteractionsPlayerListEntry.setOffline(true);
+                return socialInteractionsPlayerListEntry;
+            });
+        }
+    }
 
-   }
+    private SocialInteractionsPlayerListEntry createListEntry(UUID uuid, PlayerListEntry playerListEntry) {
+        return new SocialInteractionsPlayerListEntry(this.client, this.parent, uuid, playerListEntry.getProfile().name(), () -> ((PlayerListEntry)playerListEntry).getSkinTextures(), playerListEntry.hasPublicKey());
+    }
 
-   private void markOfflineMembers(Map entries, boolean includeOffline) {
-      Collection collection = collectReportableProfiles(this.client.getAbuseReportContext().getChatLog());
-      Iterator var4 = collection.iterator();
-
-      while(true) {
-         SocialInteractionsPlayerListEntry socialInteractionsPlayerListEntry;
-         do {
-            if (!var4.hasNext()) {
-               return;
-            }
-
-            GameProfile gameProfile = (GameProfile)var4.next();
+    private void markOfflineMembers(Map<UUID, SocialInteractionsPlayerListEntry> entries, boolean includeOffline) {
+        Map map = SocialInteractionsPlayerListWidget.collectReportableProfiles((ChatLog)this.client.getAbuseReportContext().getChatLog());
+        map.forEach((uuid2, profile) -> {
+            SocialInteractionsPlayerListEntry socialInteractionsPlayerListEntry;
             if (includeOffline) {
-               socialInteractionsPlayerListEntry = (SocialInteractionsPlayerListEntry)entries.computeIfAbsent(gameProfile.getId(), (uuid) -> {
-                  SocialInteractionsPlayerListEntry socialInteractionsPlayerListEntry = new SocialInteractionsPlayerListEntry(this.client, this.parent, gameProfile.getId(), gameProfile.getName(), this.client.getSkinProvider().getSkinTexturesSupplier(gameProfile), true);
-                  socialInteractionsPlayerListEntry.setOffline(true);
-                  return socialInteractionsPlayerListEntry;
-               });
-               break;
+                socialInteractionsPlayerListEntry = entries.computeIfAbsent((UUID)uuid2, uuid -> {
+                    SocialInteractionsPlayerListEntry socialInteractionsPlayerListEntry = new SocialInteractionsPlayerListEntry(this.client, this.parent, profile.id(), profile.name(), this.client.getSkinProvider().supplySkinTextures(profile, true), true);
+                    socialInteractionsPlayerListEntry.setOffline(true);
+                    return socialInteractionsPlayerListEntry;
+                });
+            } else {
+                socialInteractionsPlayerListEntry = (SocialInteractionsPlayerListEntry)entries.get(uuid2);
+                if (socialInteractionsPlayerListEntry == null) {
+                    return;
+                }
             }
+            socialInteractionsPlayerListEntry.setSentMessage(true);
+        });
+    }
 
-            socialInteractionsPlayerListEntry = (SocialInteractionsPlayerListEntry)entries.get(gameProfile.getId());
-         } while(socialInteractionsPlayerListEntry == null);
+    private static Map<UUID, GameProfile> collectReportableProfiles(ChatLog log) {
+        Object2ObjectLinkedOpenHashMap map = new Object2ObjectLinkedOpenHashMap();
+        for (int i = log.getMaxIndex(); i >= log.getMinIndex(); --i) {
+            ReceivedMessage.ChatMessage chatMessage;
+            ChatLogEntry chatLogEntry = log.get(i);
+            if (!(chatLogEntry instanceof ReceivedMessage.ChatMessage) || !(chatMessage = (ReceivedMessage.ChatMessage)chatLogEntry).message().hasSignature()) continue;
+            map.put(chatMessage.getSenderUuid(), chatMessage.profile());
+        }
+        return map;
+    }
 
-         socialInteractionsPlayerListEntry.setSentMessage(true);
-      }
-   }
-
-   private static Collection collectReportableProfiles(ChatLog log) {
-      Set set = new ObjectLinkedOpenHashSet();
-
-      for(int i = log.getMaxIndex(); i >= log.getMinIndex(); --i) {
-         ChatLogEntry chatLogEntry = log.get(i);
-         if (chatLogEntry instanceof ReceivedMessage.ChatMessage chatMessage) {
-            if (chatMessage.message().hasSignature()) {
-               set.add(chatMessage.profile());
+    private void sortPlayers() {
+        this.players.sort(Comparator.comparing(player -> {
+            if (this.client.uuidEquals(player.getUuid())) {
+                return 0;
             }
-         }
-      }
-
-      return set;
-   }
-
-   private void sortPlayers() {
-      this.players.sort(Comparator.comparing((player) -> {
-         if (this.client.uuidEquals(player.getUuid())) {
-            return 0;
-         } else if (this.client.getAbuseReportContext().draftPlayerUuidEquals(player.getUuid())) {
+            if (this.client.getAbuseReportContext().draftPlayerUuidEquals(player.getUuid())) {
+                return 1;
+            }
+            if (player.getUuid().version() == 2) {
+                return 4;
+            }
+            if (player.hasSentMessage()) {
+                return 2;
+            }
+            return 3;
+        }).thenComparing(player -> {
+            int i;
+            if (!player.getName().isBlank() && ((i = player.getName().codePointAt(0)) == 95 || i >= 97 && i <= 122 || i >= 65 && i <= 90 || i >= 48 && i <= 57)) {
+                return 0;
+            }
             return 1;
-         } else if (player.getUuid().version() == 2) {
-            return 4;
-         } else {
-            return player.hasSentMessage() ? 2 : 3;
-         }
-      }).thenComparing((player) -> {
-         if (!player.getName().isBlank()) {
-            int i = player.getName().codePointAt(0);
-            if (i == 95 || i >= 97 && i <= 122 || i >= 65 && i <= 90 || i >= 48 && i <= 57) {
-               return 0;
-            }
-         }
+        }).thenComparing(SocialInteractionsPlayerListEntry::getName, String::compareToIgnoreCase));
+    }
 
-         return 1;
-      }).thenComparing(SocialInteractionsPlayerListEntry::getName, String::compareToIgnoreCase));
-   }
+    private void refresh(Collection<SocialInteractionsPlayerListEntry> players, double scrollAmount) {
+        this.players.clear();
+        this.players.addAll(players);
+        this.sortPlayers();
+        this.filterPlayers();
+        this.replaceEntries((Collection)this.players);
+        this.setScrollY(scrollAmount);
+    }
 
-   private void refresh(Collection players, double scrollAmount) {
-      this.players.clear();
-      this.players.addAll(players);
-      this.sortPlayers();
-      this.filterPlayers();
-      this.replaceEntries(this.players);
-      this.setScrollY(scrollAmount);
-   }
+    private void filterPlayers() {
+        if (this.currentSearch != null) {
+            this.players.removeIf(player -> !player.getName().toLowerCase(Locale.ROOT).contains(this.currentSearch));
+            this.replaceEntries((Collection)this.players);
+        }
+    }
 
-   private void filterPlayers() {
-      if (this.currentSearch != null) {
-         this.players.removeIf((player) -> {
-            return !player.getName().toLowerCase(Locale.ROOT).contains(this.currentSearch);
-         });
-         this.replaceEntries(this.players);
-      }
+    public void setCurrentSearch(String currentSearch) {
+        this.currentSearch = currentSearch;
+    }
 
-   }
+    public boolean isEmpty() {
+        return this.players.isEmpty();
+    }
 
-   public void setCurrentSearch(String currentSearch) {
-      this.currentSearch = currentSearch;
-   }
-
-   public boolean isEmpty() {
-      return this.players.isEmpty();
-   }
-
-   public void setPlayerOnline(PlayerListEntry player, SocialInteractionsScreen.Tab tab) {
-      UUID uUID = player.getProfile().getId();
-      Iterator var4 = this.players.iterator();
-
-      SocialInteractionsPlayerListEntry socialInteractionsPlayerListEntry;
-      while(var4.hasNext()) {
-         socialInteractionsPlayerListEntry = (SocialInteractionsPlayerListEntry)var4.next();
-         if (socialInteractionsPlayerListEntry.getUuid().equals(uUID)) {
+    public void setPlayerOnline(PlayerListEntry player, SocialInteractionsScreen.Tab tab) {
+        UUID uUID = player.getProfile().id();
+        for (SocialInteractionsPlayerListEntry socialInteractionsPlayerListEntry : this.players) {
+            if (!socialInteractionsPlayerListEntry.getUuid().equals(uUID)) continue;
             socialInteractionsPlayerListEntry.setOffline(false);
             return;
-         }
-      }
+        }
+        if ((tab == SocialInteractionsScreen.Tab.ALL || this.client.getSocialInteractionsManager().isPlayerMuted(uUID)) && (Strings.isNullOrEmpty((String)this.currentSearch) || player.getProfile().name().toLowerCase(Locale.ROOT).contains(this.currentSearch))) {
+            SocialInteractionsPlayerListEntry socialInteractionsPlayerListEntry;
+            boolean bl = player.hasPublicKey();
+            socialInteractionsPlayerListEntry = new SocialInteractionsPlayerListEntry(this.client, this.parent, player.getProfile().id(), player.getProfile().name(), () -> ((PlayerListEntry)player).getSkinTextures(), bl);
+            this.addEntry((EntryListWidget.Entry)socialInteractionsPlayerListEntry);
+            this.players.add(socialInteractionsPlayerListEntry);
+        }
+    }
 
-      if ((tab == SocialInteractionsScreen.Tab.ALL || this.client.getSocialInteractionsManager().isPlayerMuted(uUID)) && (Strings.isNullOrEmpty(this.currentSearch) || player.getProfile().getName().toLowerCase(Locale.ROOT).contains(this.currentSearch))) {
-         boolean bl = player.hasPublicKey();
-         MinecraftClient var10002 = this.client;
-         SocialInteractionsScreen var10003 = this.parent;
-         UUID var10004 = player.getProfile().getId();
-         String var10005 = player.getProfile().getName();
-         Objects.requireNonNull(player);
-         socialInteractionsPlayerListEntry = new SocialInteractionsPlayerListEntry(var10002, var10003, var10004, var10005, player::getSkinTextures, bl);
-         this.addEntry(socialInteractionsPlayerListEntry);
-         this.players.add(socialInteractionsPlayerListEntry);
-      }
-
-   }
-
-   public void setPlayerOffline(UUID uuid) {
-      Iterator var2 = this.players.iterator();
-
-      SocialInteractionsPlayerListEntry socialInteractionsPlayerListEntry;
-      do {
-         if (!var2.hasNext()) {
+    public void setPlayerOffline(UUID uuid) {
+        for (SocialInteractionsPlayerListEntry socialInteractionsPlayerListEntry : this.players) {
+            if (!socialInteractionsPlayerListEntry.getUuid().equals(uuid)) continue;
+            socialInteractionsPlayerListEntry.setOffline(true);
             return;
-         }
+        }
+    }
 
-         socialInteractionsPlayerListEntry = (SocialInteractionsPlayerListEntry)var2.next();
-      } while(!socialInteractionsPlayerListEntry.getUuid().equals(uuid));
-
-      socialInteractionsPlayerListEntry.setOffline(true);
-   }
-
-   public void updateHasDraftReport() {
-      this.players.forEach((player) -> {
-         player.updateHasDraftReport(this.client.getAbuseReportContext());
-      });
-   }
+    public void updateHasDraftReport() {
+        this.players.forEach(player -> player.updateHasDraftReport(this.client.getAbuseReportContext()));
+    }
 }
+

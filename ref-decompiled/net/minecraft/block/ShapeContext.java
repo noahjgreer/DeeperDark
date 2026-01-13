@@ -1,7 +1,32 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.block.BlockState
+ *  net.minecraft.block.EntityShapeContext
+ *  net.minecraft.block.EntityShapeContext$Absent
+ *  net.minecraft.block.ExperimentalMinecartShapeContext
+ *  net.minecraft.block.ShapeContext
+ *  net.minecraft.entity.Entity
+ *  net.minecraft.entity.LivingEntity
+ *  net.minecraft.entity.player.PlayerEntity
+ *  net.minecraft.entity.vehicle.AbstractMinecartEntity
+ *  net.minecraft.fluid.FluidState
+ *  net.minecraft.item.Item
+ *  net.minecraft.item.ItemStack
+ *  net.minecraft.util.math.BlockPos
+ *  net.minecraft.util.shape.VoxelShape
+ *  net.minecraft.world.CollisionView
+ *  net.minecraft.world.World
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.block;
 
+import java.lang.runtime.SwitchBootstraps;
 import java.util.Objects;
-import java.util.function.Predicate;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.EntityShapeContext;
+import net.minecraft.block.ExperimentalMinecartShapeContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -12,78 +37,79 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.CollisionView;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.world.World;
+import org.jspecify.annotations.Nullable;
 
 public interface ShapeContext {
-   static ShapeContext absent() {
-      return EntityShapeContext.ABSENT;
-   }
+    public static ShapeContext absent() {
+        return EntityShapeContext.Absent.INSTANCE;
+    }
 
-   static ShapeContext of(Entity entity) {
-      Objects.requireNonNull(entity);
-      byte var2 = 0;
-      Object var10000;
-      switch (entity.typeSwitch<invokedynamic>(entity, var2)) {
-         case 0:
-            AbstractMinecartEntity abstractMinecartEntity = (AbstractMinecartEntity)entity;
-            var10000 = AbstractMinecartEntity.areMinecartImprovementsEnabled(abstractMinecartEntity.getWorld()) ? new ExperimentalMinecartShapeContext(abstractMinecartEntity, false) : new EntityShapeContext(entity, false, false);
-            break;
-         default:
-            var10000 = new EntityShapeContext(entity, false, false);
-      }
+    public static ShapeContext absentTreatingFluidAsCube() {
+        return EntityShapeContext.Absent.TREAT_FLUID_AS_CUBE;
+    }
 
-      return (ShapeContext)var10000;
-   }
+    public static ShapeContext of(Entity entity) {
+        Entity entity2 = entity;
+        Objects.requireNonNull(entity2);
+        Entity entity3 = entity2;
+        int n = 0;
+        return switch (SwitchBootstraps.typeSwitch("typeSwitch", new Object[]{AbstractMinecartEntity.class}, (Object)entity3, n)) {
+            case 0 -> {
+                AbstractMinecartEntity abstractMinecartEntity = (AbstractMinecartEntity)entity3;
+                if (AbstractMinecartEntity.areMinecartImprovementsEnabled((World)abstractMinecartEntity.getEntityWorld())) {
+                    yield new ExperimentalMinecartShapeContext(abstractMinecartEntity, false);
+                }
+                yield new EntityShapeContext(entity, false, false);
+            }
+            default -> new EntityShapeContext(entity, false, false);
+        };
+    }
 
-   static ShapeContext of(Entity entity, boolean collidesWithFluid) {
-      return new EntityShapeContext(entity, collidesWithFluid, false);
-   }
+    public static ShapeContext of(Entity entity, boolean shouldTreatFluidAsCube) {
+        return new EntityShapeContext(entity, shouldTreatFluidAsCube, false);
+    }
 
-   static ShapeContext ofPlacement(@Nullable PlayerEntity player) {
-      return new EntityShapeContext(player != null ? player.isDescending() : false, true, player != null ? player.getY() : -1.7976931348623157E308, player instanceof LivingEntity ? player.getMainHandStack() : ItemStack.EMPTY, player instanceof LivingEntity ? (state) -> {
-         return player.canWalkOnFluid(state);
-      } : (state) -> {
-         return false;
-      }, player);
-   }
+    public static ShapeContext ofPlacement(@Nullable PlayerEntity player) {
+        ItemStack itemStack;
+        boolean bl = player != null ? player.isDescending() : false;
+        double d = player != null ? player.getY() : -1.7976931348623157E308;
+        if (player instanceof LivingEntity) {
+            PlayerEntity livingEntity = player;
+            itemStack = livingEntity.getMainHandStack();
+        } else {
+            itemStack = ItemStack.EMPTY;
+        }
+        return new EntityShapeContext(bl, true, d, itemStack, false, (Entity)player);
+    }
 
-   static ShapeContext ofCollision(@Nullable Entity entity, double y) {
-      EntityShapeContext var10000 = new EntityShapeContext;
-      boolean var10002 = entity != null ? entity.isDescending() : false;
-      double var10004 = entity != null ? y : -1.7976931348623157E308;
-      ItemStack var10005;
-      if (entity instanceof LivingEntity livingEntity) {
-         var10005 = livingEntity.getMainHandStack();
-      } else {
-         var10005 = ItemStack.EMPTY;
-      }
+    public static ShapeContext ofCollision(@Nullable Entity entity, double y) {
+        ItemStack itemStack;
+        boolean bl = entity != null ? entity.isDescending() : false;
+        double d = entity != null ? y : -1.7976931348623157E308;
+        if (entity instanceof LivingEntity) {
+            LivingEntity livingEntity = (LivingEntity)entity;
+            itemStack = livingEntity.getMainHandStack();
+        } else {
+            itemStack = ItemStack.EMPTY;
+        }
+        return new EntityShapeContext(bl, true, d, itemStack, false, entity);
+    }
 
-      Predicate var10006;
-      if (entity instanceof LivingEntity livingEntity) {
-         var10006 = (state) -> {
-            return livingEntity.canWalkOnFluid(state);
-         };
-      } else {
-         var10006 = (state) -> {
-            return false;
-         };
-      }
+    public boolean isDescending();
 
-      var10000.<init>(var10002, true, var10004, var10005, var10006, entity);
-      return var10000;
-   }
+    public boolean isAbove(VoxelShape var1, BlockPos var2, boolean var3);
 
-   boolean isDescending();
+    public boolean isHolding(Item var1);
 
-   boolean isAbove(VoxelShape shape, BlockPos pos, boolean defaultValue);
+    public boolean shouldTreatFluidAsCube();
 
-   boolean isHolding(Item item);
+    public boolean canWalkOnFluid(FluidState var1, FluidState var2);
 
-   boolean canWalkOnFluid(FluidState stateAbove, FluidState state);
+    public VoxelShape getCollisionShape(BlockState var1, CollisionView var2, BlockPos var3);
 
-   VoxelShape getCollisionShape(BlockState state, CollisionView world, BlockPos pos);
-
-   default boolean isPlacement() {
-      return false;
-   }
+    default public boolean isPlacement() {
+        return false;
+    }
 }
+

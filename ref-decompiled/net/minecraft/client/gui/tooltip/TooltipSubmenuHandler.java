@@ -1,3 +1,14 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.gui.tooltip.TooltipSubmenuHandler
+ *  net.minecraft.item.ItemStack
+ *  net.minecraft.screen.slot.Slot
+ *  net.minecraft.screen.slot.SlotActionType
+ */
 package net.minecraft.client.gui.tooltip;
 
 import net.fabricmc.api.EnvType;
@@ -6,13 +17,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 public interface TooltipSubmenuHandler {
-   boolean isApplicableTo(Slot slot);
+    public boolean isApplicableTo(Slot var1);
 
-   boolean onScroll(double horizontal, double vertical, int slotId, ItemStack item);
+    public boolean onScroll(double var1, double var3, int var5, ItemStack var6);
 
-   void reset(Slot slot);
+    public void reset(Slot var1);
 
-   void onMouseClick(Slot slot, SlotActionType actionType);
+    public void onMouseClick(Slot var1, SlotActionType var2);
 }
+

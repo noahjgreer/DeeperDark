@@ -1,3 +1,14 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.MinecraftClient
+ *  net.minecraft.client.gl.Framebuffer
+ *  net.minecraft.client.render.BlockRenderLayer
+ *  net.minecraft.client.render.BlockRenderLayerGroup
+ */
 package net.minecraft.client.render;
 
 import java.util.Locale;
@@ -5,49 +16,58 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;
+import net.minecraft.client.render.BlockRenderLayer;
 
-@Environment(EnvType.CLIENT)
-public enum BlockRenderLayerGroup {
-   OPAQUE(new BlockRenderLayer[]{BlockRenderLayer.SOLID, BlockRenderLayer.CUTOUT_MIPPED, BlockRenderLayer.CUTOUT}),
-   TRANSLUCENT(new BlockRenderLayer[]{BlockRenderLayer.TRANSLUCENT}),
-   TRIPWIRE(new BlockRenderLayer[]{BlockRenderLayer.TRIPWIRE});
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
+public final class BlockRenderLayerGroup
+extends Enum<BlockRenderLayerGroup> {
+    public static final /* enum */ BlockRenderLayerGroup OPAQUE = new BlockRenderLayerGroup("OPAQUE", 0, new BlockRenderLayer[]{BlockRenderLayer.SOLID, BlockRenderLayer.CUTOUT});
+    public static final /* enum */ BlockRenderLayerGroup TRANSLUCENT = new BlockRenderLayerGroup("TRANSLUCENT", 1, new BlockRenderLayer[]{BlockRenderLayer.TRANSLUCENT});
+    public static final /* enum */ BlockRenderLayerGroup TRIPWIRE = new BlockRenderLayerGroup("TRIPWIRE", 2, new BlockRenderLayer[]{BlockRenderLayer.TRIPWIRE});
+    private final String name;
+    private final BlockRenderLayer[] layers;
+    private static final /* synthetic */ BlockRenderLayerGroup[] field_61027;
 
-   private final String name;
-   private final BlockRenderLayer[] layers;
+    public static BlockRenderLayerGroup[] values() {
+        return (BlockRenderLayerGroup[])field_61027.clone();
+    }
 
-   private BlockRenderLayerGroup(final BlockRenderLayer... layers) {
-      this.layers = layers;
-      this.name = this.toString().toLowerCase(Locale.ROOT);
-   }
+    public static BlockRenderLayerGroup valueOf(String string) {
+        return Enum.valueOf(BlockRenderLayerGroup.class, string);
+    }
 
-   public String getName() {
-      return this.name;
-   }
+    private BlockRenderLayerGroup(BlockRenderLayer ... layers) {
+        this.layers = layers;
+        this.name = this.toString().toLowerCase(Locale.ROOT);
+    }
 
-   public BlockRenderLayer[] getLayers() {
-      return this.layers;
-   }
+    public String getName() {
+        return this.name;
+    }
 
-   public Framebuffer getFramebuffer() {
-      MinecraftClient minecraftClient = MinecraftClient.getInstance();
-      Framebuffer var10000;
-      switch (this.ordinal()) {
-         case 1:
-            var10000 = minecraftClient.worldRenderer.getTranslucentFramebuffer();
-            break;
-         case 2:
-            var10000 = minecraftClient.worldRenderer.getWeatherFramebuffer();
-            break;
-         default:
-            var10000 = minecraftClient.getFramebuffer();
-      }
+    public BlockRenderLayer[] getLayers() {
+        return this.layers;
+    }
 
-      Framebuffer framebuffer = var10000;
-      return framebuffer != null ? framebuffer : minecraftClient.getFramebuffer();
-   }
+    public Framebuffer getFramebuffer() {
+        MinecraftClient minecraftClient = MinecraftClient.getInstance();
+        Framebuffer framebuffer = switch (this.ordinal()) {
+            case 2 -> minecraftClient.worldRenderer.getWeatherFramebuffer();
+            case 1 -> minecraftClient.worldRenderer.getTranslucentFramebuffer();
+            default -> minecraftClient.getFramebuffer();
+        };
+        return framebuffer != null ? framebuffer : minecraftClient.getFramebuffer();
+    }
 
-   // $FF: synthetic method
-   private static BlockRenderLayerGroup[] method_72169() {
-      return new BlockRenderLayerGroup[]{OPAQUE, TRANSLUCENT, TRIPWIRE};
-   }
+    private static /* synthetic */ BlockRenderLayerGroup[] method_72169() {
+        return new BlockRenderLayerGroup[]{OPAQUE, TRANSLUCENT, TRIPWIRE};
+    }
+
+    static {
+        field_61027 = BlockRenderLayerGroup.method_72169();
+    }
 }
+

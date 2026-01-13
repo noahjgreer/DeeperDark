@@ -1,3 +1,11 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.sound.AudioStream
+ */
 package net.minecraft.client.sound;
 
 import java.io.Closeable;
@@ -7,9 +15,11 @@ import javax.sound.sampled.AudioFormat;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
-@Environment(EnvType.CLIENT)
-public interface AudioStream extends Closeable {
-   AudioFormat getFormat();
+@Environment(value=EnvType.CLIENT)
+public interface AudioStream
+extends Closeable {
+    public AudioFormat getFormat();
 
-   ByteBuffer read(int size) throws IOException;
+    public ByteBuffer read(int var1) throws IOException;
 }
+

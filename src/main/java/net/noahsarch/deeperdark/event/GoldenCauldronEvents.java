@@ -78,7 +78,7 @@ public class GoldenCauldronEvents {
                  return ActionResult.PASS;
             }
 
-            if (!world.isClient) {
+            if (!world.isClient()) {
                 // Place Cauldron with Display
                 if (CustomBlockManager.place(world, placePos, stack, Blocks.CAULDRON, display -> {
                     // Override the item stack on the display entity to use the block model

@@ -1,37 +1,55 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
+ *  net.minecraft.block.entity.BannerPattern
+ *  net.minecraft.network.RegistryByteBuf
+ *  net.minecraft.network.codec.PacketCodec
+ *  net.minecraft.network.codec.PacketCodecs
+ *  net.minecraft.registry.RegistryKey
+ *  net.minecraft.registry.RegistryKeys
+ *  net.minecraft.registry.entry.RegistryElementCodec
+ *  net.minecraft.registry.entry.RegistryEntry
+ *  net.minecraft.util.Identifier
+ */
 package net.minecraft.block.entity;
 
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryElementCodec;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Identifier;
 
 public record BannerPattern(Identifier assetId, String translationKey) {
-   public static final Codec CODEC = RecordCodecBuilder.create((instance) -> {
-      return instance.group(Identifier.CODEC.fieldOf("asset_id").forGetter(BannerPattern::assetId), Codec.STRING.fieldOf("translation_key").forGetter(BannerPattern::translationKey)).apply(instance, BannerPattern::new);
-   });
-   public static final PacketCodec PACKET_CODEC;
-   public static final Codec ENTRY_CODEC;
-   public static final PacketCodec ENTRY_PACKET_CODEC;
+    private final Identifier assetId;
+    private final String translationKey;
+    public static final Codec<BannerPattern> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Identifier.CODEC.fieldOf("asset_id").forGetter(BannerPattern::assetId), (App)Codec.STRING.fieldOf("translation_key").forGetter(BannerPattern::translationKey)).apply((Applicative)instance, BannerPattern::new));
+    public static final PacketCodec<RegistryByteBuf, BannerPattern> PACKET_CODEC = PacketCodec.tuple((PacketCodec)Identifier.PACKET_CODEC, BannerPattern::assetId, (PacketCodec)PacketCodecs.STRING, BannerPattern::translationKey, BannerPattern::new);
+    public static final Codec<RegistryEntry<BannerPattern>> ENTRY_CODEC = RegistryElementCodec.of((RegistryKey)RegistryKeys.BANNER_PATTERN, (Codec)CODEC);
+    public static final PacketCodec<RegistryByteBuf, RegistryEntry<BannerPattern>> ENTRY_PACKET_CODEC = PacketCodecs.registryEntry((RegistryKey)RegistryKeys.BANNER_PATTERN, (PacketCodec)PACKET_CODEC);
 
-   public BannerPattern(Identifier identifier, String string) {
-      this.assetId = identifier;
-      this.translationKey = string;
-   }
+    public BannerPattern(Identifier assetId, String translationKey) {
+        this.assetId = assetId;
+        this.translationKey = translationKey;
+    }
 
-   public Identifier assetId() {
-      return this.assetId;
-   }
+    public Identifier assetId() {
+        return this.assetId;
+    }
 
-   public String translationKey() {
-      return this.translationKey;
-   }
-
-   static {
-      PACKET_CODEC = PacketCodec.tuple(Identifier.PACKET_CODEC, BannerPattern::assetId, PacketCodecs.STRING, BannerPattern::translationKey, BannerPattern::new);
-      ENTRY_CODEC = RegistryElementCodec.of(RegistryKeys.BANNER_PATTERN, CODEC);
-      ENTRY_PACKET_CODEC = PacketCodecs.registryEntry(RegistryKeys.BANNER_PATTERN, PACKET_CODEC);
-   }
+    public String translationKey() {
+        return this.translationKey;
+    }
 }
+

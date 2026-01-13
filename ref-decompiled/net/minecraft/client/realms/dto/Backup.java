@@ -1,60 +1,79 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.google.gson.JsonElement
+ *  com.google.gson.JsonObject
+ *  com.mojang.logging.LogUtils
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.realms.dto.Backup
+ *  net.minecraft.client.realms.dto.ValueObject
+ *  net.minecraft.client.realms.util.JsonUtils
+ *  org.jspecify.annotations.Nullable
+ *  org.slf4j.Logger
+ */
 package net.minecraft.client.realms.dto;
 
-import com.google.common.collect.Maps;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.logging.LogUtils;
-import java.util.Date;
-import java.util.Iterator;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.realms.dto.ValueObject;
 import net.minecraft.client.realms.util.JsonUtils;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 
-@Environment(EnvType.CLIENT)
-public class Backup extends ValueObject {
-   private static final Logger LOGGER = LogUtils.getLogger();
-   public String backupId;
-   public Date lastModifiedDate;
-   public long size;
-   private boolean uploadedVersion;
-   public Map metadata = Maps.newHashMap();
-   public Map changeList = Maps.newHashMap();
+@Environment(value=EnvType.CLIENT)
+public class Backup
+extends ValueObject {
+    private static final Logger LOGGER = LogUtils.getLogger();
+    public final String backupId;
+    public final Instant lastModifiedDate;
+    public final long size;
+    public boolean uploadedVersion;
+    public final Map<String, String> metadata;
+    public final Map<String, String> changeList = new HashMap();
 
-   public static Backup parse(JsonElement node) {
-      JsonObject jsonObject = node.getAsJsonObject();
-      Backup backup = new Backup();
+    private Backup(String backupId, Instant lastModifiedDate, long size, Map<String, String> metadata) {
+        this.backupId = backupId;
+        this.lastModifiedDate = lastModifiedDate;
+        this.size = size;
+        this.metadata = metadata;
+    }
 
-      try {
-         backup.backupId = JsonUtils.getNullableStringOr("backupId", jsonObject, "");
-         backup.lastModifiedDate = JsonUtils.getDateOr("lastModifiedDate", jsonObject);
-         backup.size = JsonUtils.getLongOr("size", jsonObject, 0L);
-         if (jsonObject.has("metadata")) {
-            JsonObject jsonObject2 = jsonObject.getAsJsonObject("metadata");
-            Set set = jsonObject2.entrySet();
-            Iterator var5 = set.iterator();
+    public ZonedDateTime getLastModifiedTime() {
+        return ZonedDateTime.ofInstant(this.lastModifiedDate, ZoneId.systemDefault());
+    }
 
-            while(var5.hasNext()) {
-               Map.Entry entry = (Map.Entry)var5.next();
-               if (!((JsonElement)entry.getValue()).isJsonNull()) {
-                  backup.metadata.put((String)entry.getKey(), ((JsonElement)entry.getValue()).getAsString());
-               }
+    public static @Nullable Backup parse(JsonElement node) {
+        JsonObject jsonObject = node.getAsJsonObject();
+        try {
+            String string = JsonUtils.getNullableStringOr((String)"backupId", (JsonObject)jsonObject, (String)"");
+            Instant instant = JsonUtils.getInstantOr((String)"lastModifiedDate", (JsonObject)jsonObject);
+            long l = JsonUtils.getLongOr((String)"size", (JsonObject)jsonObject, (long)0L);
+            HashMap<String, String> map = new HashMap<String, String>();
+            if (jsonObject.has("metadata")) {
+                JsonObject jsonObject2 = jsonObject.getAsJsonObject("metadata");
+                Set set = jsonObject2.entrySet();
+                for (Map.Entry entry : set) {
+                    if (((JsonElement)entry.getValue()).isJsonNull()) continue;
+                    map.put((String)entry.getKey(), ((JsonElement)entry.getValue()).getAsString());
+                }
             }
-         }
-      } catch (Exception var7) {
-         LOGGER.error("Could not parse Backup: {}", var7.getMessage());
-      }
-
-      return backup;
-   }
-
-   public boolean isUploadedVersion() {
-      return this.uploadedVersion;
-   }
-
-   public void setUploadedVersion(boolean uploadedVersion) {
-      this.uploadedVersion = uploadedVersion;
-   }
+            return new Backup(string, instant, l, map);
+        }
+        catch (Exception exception) {
+            LOGGER.error("Could not parse Backup", (Throwable)exception);
+            return null;
+        }
+    }
 }
+

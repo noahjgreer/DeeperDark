@@ -1,9 +1,20 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.gui.DrawContext
+ *  net.minecraft.client.gui.Drawable
+ */
 package net.minecraft.client.gui;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.gui.DrawContext;
 
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 public interface Drawable {
-   void render(DrawContext context, int mouseX, int mouseY, float deltaTicks);
+    public void render(DrawContext var1, int var2, int var3, float var4);
 }
+

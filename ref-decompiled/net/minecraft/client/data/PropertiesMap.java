@@ -1,3 +1,14 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.google.common.collect.ImmutableList
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.data.PropertiesMap
+ *  net.minecraft.state.property.Property$Value
+ *  net.minecraft.util.Util
+ */
 package net.minecraft.client.data;
 
 import com.google.common.collect.ImmutableList;
@@ -9,38 +20,39 @@ import net.fabricmc.api.Environment;
 import net.minecraft.state.property.Property;
 import net.minecraft.util.Util;
 
-@Environment(EnvType.CLIENT)
-public record PropertiesMap(List values) {
-   public static final PropertiesMap EMPTY = new PropertiesMap(List.of());
-   private static final Comparator COMPARATOR = Comparator.comparing((value) -> {
-      return value.property().getName();
-   });
+@Environment(value=EnvType.CLIENT)
+public record PropertiesMap(List<Property.Value<?>> values) {
+    private final List<Property.Value<?>> values;
+    public static final PropertiesMap EMPTY = new PropertiesMap(List.of());
+    private static final Comparator<Property.Value<?>> COMPARATOR = Comparator.comparing(value -> value.property().getName());
 
-   public PropertiesMap(List values) {
-      this.values = values;
-   }
+    public PropertiesMap(List<Property.Value<?>> values) {
+        this.values = values;
+    }
 
-   public PropertiesMap withValue(Property.Value value) {
-      return new PropertiesMap(Util.withAppended(this.values, value));
-   }
+    public PropertiesMap withValue(Property.Value<?> value) {
+        return new PropertiesMap(Util.withAppended((List)this.values, value));
+    }
 
-   public PropertiesMap copyOf(PropertiesMap propertiesMap) {
-      return new PropertiesMap(ImmutableList.builder().addAll(this.values).addAll(propertiesMap.values).build());
-   }
+    public PropertiesMap copyOf(PropertiesMap propertiesMap) {
+        return new PropertiesMap((List)ImmutableList.builder().addAll((Iterable)this.values).addAll((Iterable)propertiesMap.values).build());
+    }
 
-   public static PropertiesMap withValues(Property.Value... values) {
-      return new PropertiesMap(List.of(values));
-   }
+    public static PropertiesMap withValues(Property.Value<?> ... values) {
+        return new PropertiesMap(List.of(values));
+    }
 
-   public String asString() {
-      return (String)this.values.stream().sorted(COMPARATOR).map(Property.Value::toString).collect(Collectors.joining(","));
-   }
+    public String asString() {
+        return this.values.stream().sorted(COMPARATOR).map(Property.Value::toString).collect(Collectors.joining(","));
+    }
 
-   public String toString() {
-      return this.asString();
-   }
+    @Override
+    public String toString() {
+        return this.asString();
+    }
 
-   public List values() {
-      return this.values;
-   }
+    public List<Property.Value<?>> values() {
+        return this.values;
+    }
 }
+

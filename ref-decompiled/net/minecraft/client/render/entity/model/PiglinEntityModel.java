@@ -1,85 +1,98 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.model.ModelPart
+ *  net.minecraft.client.render.entity.model.ArmPosing
+ *  net.minecraft.client.render.entity.model.PiglinBaseEntityModel
+ *  net.minecraft.client.render.entity.model.PiglinEntityModel
+ *  net.minecraft.client.render.entity.state.BipedEntityRenderState
+ *  net.minecraft.client.render.entity.state.PiglinEntityRenderState
+ *  net.minecraft.entity.mob.PiglinActivity
+ *  net.minecraft.util.Arm
+ *  net.minecraft.util.math.MathHelper
+ */
 package net.minecraft.client.render.entity.model;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.model.ModelPart;
+import net.minecraft.client.render.entity.model.ArmPosing;
+import net.minecraft.client.render.entity.model.PiglinBaseEntityModel;
 import net.minecraft.client.render.entity.state.BipedEntityRenderState;
 import net.minecraft.client.render.entity.state.PiglinEntityRenderState;
 import net.minecraft.entity.mob.PiglinActivity;
 import net.minecraft.util.Arm;
 import net.minecraft.util.math.MathHelper;
 
-@Environment(EnvType.CLIENT)
-public class PiglinEntityModel extends PiglinBaseEntityModel {
-   public PiglinEntityModel(ModelPart modelPart) {
-      super(modelPart);
-   }
+@Environment(value=EnvType.CLIENT)
+public class PiglinEntityModel
+extends PiglinBaseEntityModel<PiglinEntityRenderState> {
+    public PiglinEntityModel(ModelPart modelPart) {
+        super(modelPart);
+    }
 
-   public void setAngles(PiglinEntityRenderState piglinEntityRenderState) {
-      super.setAngles((BipedEntityRenderState)piglinEntityRenderState);
-      float f = 0.5235988F;
-      float g = piglinEntityRenderState.handSwingProgress;
-      PiglinActivity piglinActivity = piglinEntityRenderState.activity;
-      if (piglinActivity == PiglinActivity.DANCING) {
-         float h = piglinEntityRenderState.age / 60.0F;
-         this.rightEar.roll = 0.5235988F + 0.017453292F * MathHelper.sin(h * 30.0F) * 10.0F;
-         this.leftEar.roll = -0.5235988F - 0.017453292F * MathHelper.cos(h * 30.0F) * 10.0F;
-         ModelPart var10000 = this.head;
-         var10000.originX += MathHelper.sin(h * 10.0F);
-         var10000 = this.head;
-         var10000.originY += MathHelper.sin(h * 40.0F) + 0.4F;
-         this.rightArm.roll = 0.017453292F * (70.0F + MathHelper.cos(h * 40.0F) * 10.0F);
-         this.leftArm.roll = this.rightArm.roll * -1.0F;
-         var10000 = this.rightArm;
-         var10000.originY += MathHelper.sin(h * 40.0F) * 0.5F - 0.5F;
-         var10000 = this.leftArm;
-         var10000.originY += MathHelper.sin(h * 40.0F) * 0.5F + 0.5F;
-         var10000 = this.body;
-         var10000.originY += MathHelper.sin(h * 40.0F) * 0.35F;
-      } else if (piglinActivity == PiglinActivity.ATTACKING_WITH_MELEE_WEAPON && g == 0.0F) {
-         this.rotateMainArm(piglinEntityRenderState);
-      } else if (piglinActivity == PiglinActivity.CROSSBOW_HOLD) {
-         ArmPosing.hold(this.rightArm, this.leftArm, this.head, piglinEntityRenderState.mainArm == Arm.RIGHT);
-      } else if (piglinActivity == PiglinActivity.CROSSBOW_CHARGE) {
-         ArmPosing.charge(this.rightArm, this.leftArm, piglinEntityRenderState.piglinCrossbowPullTime, piglinEntityRenderState.itemUseTime, piglinEntityRenderState.mainArm == Arm.RIGHT);
-      } else if (piglinActivity == PiglinActivity.ADMIRING_ITEM) {
-         this.head.pitch = 0.5F;
-         this.head.yaw = 0.0F;
-         if (piglinEntityRenderState.mainArm == Arm.LEFT) {
-            this.rightArm.yaw = -0.5F;
-            this.rightArm.pitch = -0.9F;
-         } else {
-            this.leftArm.yaw = 0.5F;
-            this.leftArm.pitch = -0.9F;
-         }
-      }
+    public void setAngles(PiglinEntityRenderState piglinEntityRenderState) {
+        super.setAngles((BipedEntityRenderState)piglinEntityRenderState);
+        float f = 0.5235988f;
+        float g = piglinEntityRenderState.handSwingProgress;
+        PiglinActivity piglinActivity = piglinEntityRenderState.activity;
+        if (piglinActivity == PiglinActivity.DANCING) {
+            float h = piglinEntityRenderState.age / 60.0f;
+            this.rightEar.roll = 0.5235988f + (float)Math.PI / 180 * MathHelper.sin((double)(h * 30.0f)) * 10.0f;
+            this.leftEar.roll = -0.5235988f - (float)Math.PI / 180 * MathHelper.cos((double)(h * 30.0f)) * 10.0f;
+            this.head.originX += MathHelper.sin((double)(h * 10.0f));
+            this.head.originY += MathHelper.sin((double)(h * 40.0f)) + 0.4f;
+            this.rightArm.roll = (float)Math.PI / 180 * (70.0f + MathHelper.cos((double)(h * 40.0f)) * 10.0f);
+            this.leftArm.roll = this.rightArm.roll * -1.0f;
+            this.rightArm.originY += MathHelper.sin((double)(h * 40.0f)) * 0.5f - 0.5f;
+            this.leftArm.originY += MathHelper.sin((double)(h * 40.0f)) * 0.5f + 0.5f;
+            this.body.originY += MathHelper.sin((double)(h * 40.0f)) * 0.35f;
+        } else if (piglinActivity == PiglinActivity.ATTACKING_WITH_MELEE_WEAPON && g == 0.0f) {
+            this.rotateMainArm(piglinEntityRenderState);
+        } else if (piglinActivity == PiglinActivity.CROSSBOW_HOLD) {
+            ArmPosing.hold((ModelPart)this.rightArm, (ModelPart)this.leftArm, (ModelPart)this.head, (piglinEntityRenderState.mainArm == Arm.RIGHT ? 1 : 0) != 0);
+        } else if (piglinActivity == PiglinActivity.CROSSBOW_CHARGE) {
+            ArmPosing.charge((ModelPart)this.rightArm, (ModelPart)this.leftArm, (float)piglinEntityRenderState.piglinCrossbowPullTime, (float)piglinEntityRenderState.itemUseTime, (piglinEntityRenderState.mainArm == Arm.RIGHT ? 1 : 0) != 0);
+        } else if (piglinActivity == PiglinActivity.ADMIRING_ITEM) {
+            this.head.pitch = 0.5f;
+            this.head.yaw = 0.0f;
+            if (piglinEntityRenderState.mainArm == Arm.LEFT) {
+                this.rightArm.yaw = -0.5f;
+                this.rightArm.pitch = -0.9f;
+            } else {
+                this.leftArm.yaw = 0.5f;
+                this.leftArm.pitch = -0.9f;
+            }
+        }
+    }
 
-   }
+    protected void animateArms(PiglinEntityRenderState piglinEntityRenderState) {
+        float f = piglinEntityRenderState.handSwingProgress;
+        if (f > 0.0f && piglinEntityRenderState.activity == PiglinActivity.ATTACKING_WITH_MELEE_WEAPON) {
+            ArmPosing.meleeAttack((ModelPart)this.rightArm, (ModelPart)this.leftArm, (Arm)piglinEntityRenderState.mainArm, (float)f, (float)piglinEntityRenderState.age);
+            return;
+        }
+        super.animateArms((BipedEntityRenderState)piglinEntityRenderState);
+    }
 
-   protected void animateArms(PiglinEntityRenderState piglinEntityRenderState, float f) {
-      float g = piglinEntityRenderState.handSwingProgress;
-      if (g > 0.0F && piglinEntityRenderState.activity == PiglinActivity.ATTACKING_WITH_MELEE_WEAPON) {
-         ArmPosing.meleeAttack(this.rightArm, this.leftArm, piglinEntityRenderState.mainArm, g, piglinEntityRenderState.age);
-      } else {
-         super.animateArms(piglinEntityRenderState, f);
-      }
-   }
+    private void rotateMainArm(PiglinEntityRenderState state) {
+        if (state.mainArm == Arm.LEFT) {
+            this.leftArm.pitch = -1.8f;
+        } else {
+            this.rightArm.pitch = -1.8f;
+        }
+    }
 
-   private void rotateMainArm(PiglinEntityRenderState state) {
-      if (state.mainArm == Arm.LEFT) {
-         this.leftArm.pitch = -1.8F;
-      } else {
-         this.rightArm.pitch = -1.8F;
-      }
-
-   }
-
-   public void setVisible(boolean visible) {
-      super.setVisible(visible);
-      this.leftSleeve.visible = visible;
-      this.rightSleeve.visible = visible;
-      this.leftPants.visible = visible;
-      this.rightPants.visible = visible;
-      this.jacket.visible = visible;
-   }
+    public void setVisible(boolean visible) {
+        super.setVisible(visible);
+        this.leftSleeve.visible = visible;
+        this.rightSleeve.visible = visible;
+        this.leftPants.visible = visible;
+        this.rightPants.visible = visible;
+        this.jacket.visible = visible;
+    }
 }
+

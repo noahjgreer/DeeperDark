@@ -1,117 +1,134 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.MinecraftClient
+ *  net.minecraft.client.render.OverlayVertexConsumer
+ *  net.minecraft.client.render.RenderLayer
+ *  net.minecraft.client.render.RenderLayers
+ *  net.minecraft.client.render.TexturedRenderLayers
+ *  net.minecraft.client.render.VertexConsumer
+ *  net.minecraft.client.render.VertexConsumerProvider
+ *  net.minecraft.client.render.VertexConsumers
+ *  net.minecraft.client.render.item.ItemRenderState$Glint
+ *  net.minecraft.client.render.item.ItemRenderer
+ *  net.minecraft.client.render.model.BakedQuad
+ *  net.minecraft.client.util.math.MatrixStack
+ *  net.minecraft.client.util.math.MatrixStack$Entry
+ *  net.minecraft.item.ItemDisplayContext
+ *  net.minecraft.util.Identifier
+ *  net.minecraft.util.math.ColorHelper
+ *  net.minecraft.util.math.MatrixUtil
+ *  org.joml.Matrix4f
+ */
 package net.minecraft.client.render.item;
 
-import java.util.Iterator;
 import java.util.List;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.item.ItemModelManager;
 import net.minecraft.client.render.OverlayVertexConsumer;
 import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.RenderLayers;
 import net.minecraft.client.render.TexturedRenderLayers;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.VertexConsumers;
+import net.minecraft.client.render.item.ItemRenderState;
 import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemDisplayContext;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MatrixUtil;
-import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix4f;
 
-@Environment(EnvType.CLIENT)
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
 public class ItemRenderer {
-   public static final Identifier ENTITY_ENCHANTMENT_GLINT = Identifier.ofVanilla("textures/misc/enchanted_glint_armor.png");
-   public static final Identifier ITEM_ENCHANTMENT_GLINT = Identifier.ofVanilla("textures/misc/enchanted_glint_item.png");
-   public static final float field_60154 = 0.5F;
-   public static final float field_60155 = 0.75F;
-   public static final float field_60156 = 0.0078125F;
-   public static final int field_55295 = -1;
-   private final ItemModelManager itemModelManager;
-   private final ItemRenderState itemRenderState = new ItemRenderState();
+    public static final Identifier ENTITY_ENCHANTMENT_GLINT = Identifier.ofVanilla((String)"textures/misc/enchanted_glint_armor.png");
+    public static final Identifier ITEM_ENCHANTMENT_GLINT = Identifier.ofVanilla((String)"textures/misc/enchanted_glint_item.png");
+    public static final float field_60154 = 0.5f;
+    public static final float field_60155 = 0.75f;
+    public static final float field_60156 = 0.0078125f;
+    public static final int NO_TINT = -1;
 
-   public ItemRenderer(ItemModelManager itemModelManager) {
-      this.itemModelManager = itemModelManager;
-   }
+    public static void renderItem(ItemDisplayContext displayContext, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, int[] tints, List<BakedQuad> quads, RenderLayer layer, ItemRenderState.Glint glint) {
+        VertexConsumer vertexConsumer;
+        if (glint == ItemRenderState.Glint.SPECIAL) {
+            MatrixStack.Entry entry = matrices.peek().copy();
+            if (displayContext == ItemDisplayContext.GUI) {
+                MatrixUtil.scale((Matrix4f)entry.getPositionMatrix(), (float)0.5f);
+            } else if (displayContext.isFirstPerson()) {
+                MatrixUtil.scale((Matrix4f)entry.getPositionMatrix(), (float)0.75f);
+            }
+            vertexConsumer = ItemRenderer.getSpecialItemGlintConsumer((VertexConsumerProvider)vertexConsumers, (RenderLayer)layer, (MatrixStack.Entry)entry);
+        } else {
+            vertexConsumer = ItemRenderer.getItemGlintConsumer((VertexConsumerProvider)vertexConsumers, (RenderLayer)layer, (boolean)true, (glint != ItemRenderState.Glint.NONE ? 1 : 0) != 0);
+        }
+        ItemRenderer.renderBakedItemQuads((MatrixStack)matrices, (VertexConsumer)vertexConsumer, quads, (int[])tints, (int)light, (int)overlay);
+    }
 
-   public static void renderItem(ItemDisplayContext displayContext, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, int[] tints, List quads, RenderLayer layer, ItemRenderState.Glint glint) {
-      VertexConsumer vertexConsumer;
-      if (glint == ItemRenderState.Glint.SPECIAL) {
-         MatrixStack.Entry entry = matrices.peek().copy();
-         if (displayContext == ItemDisplayContext.GUI) {
-            MatrixUtil.scale(entry.getPositionMatrix(), 0.5F);
-         } else if (displayContext.isFirstPerson()) {
-            MatrixUtil.scale(entry.getPositionMatrix(), 0.75F);
-         }
+    private static VertexConsumer getSpecialItemGlintConsumer(VertexConsumerProvider consumers, RenderLayer layer, MatrixStack.Entry matrix) {
+        return VertexConsumers.union((VertexConsumer)new OverlayVertexConsumer(consumers.getBuffer(ItemRenderer.useTransparentGlint((RenderLayer)layer) ? RenderLayers.glintTranslucent() : RenderLayers.glint()), matrix, 0.0078125f), (VertexConsumer)consumers.getBuffer(layer));
+    }
 
-         vertexConsumer = getSpecialItemGlintConsumer(vertexConsumers, layer, entry);
-      } else {
-         vertexConsumer = getItemGlintConsumer(vertexConsumers, layer, true, glint != ItemRenderState.Glint.NONE);
-      }
+    public static VertexConsumer getItemGlintConsumer(VertexConsumerProvider vertexConsumers, RenderLayer layer, boolean solid, boolean glint) {
+        if (glint) {
+            if (ItemRenderer.useTransparentGlint((RenderLayer)layer)) {
+                return VertexConsumers.union((VertexConsumer)vertexConsumers.getBuffer(RenderLayers.glintTranslucent()), (VertexConsumer)vertexConsumers.getBuffer(layer));
+            }
+            return VertexConsumers.union((VertexConsumer)vertexConsumers.getBuffer(solid ? RenderLayers.glint() : RenderLayers.entityGlint()), (VertexConsumer)vertexConsumers.getBuffer(layer));
+        }
+        return vertexConsumers.getBuffer(layer);
+    }
 
-      renderBakedItemQuads(matrices, vertexConsumer, quads, tints, light, overlay);
-   }
+    public static List<RenderLayer> getGlintRenderLayers(RenderLayer renderLayer, boolean solid, boolean glint) {
+        if (glint) {
+            if (ItemRenderer.useTransparentGlint((RenderLayer)renderLayer)) {
+                return List.of(renderLayer, RenderLayers.glintTranslucent());
+            }
+            return List.of(renderLayer, solid ? RenderLayers.glint() : RenderLayers.entityGlint());
+        }
+        return List.of(renderLayer);
+    }
 
-   public static VertexConsumer getArmorGlintConsumer(VertexConsumerProvider provider, RenderLayer layer, boolean glint) {
-      return glint ? VertexConsumers.union(provider.getBuffer(RenderLayer.getArmorEntityGlint()), provider.getBuffer(layer)) : provider.getBuffer(layer);
-   }
+    private static boolean useTransparentGlint(RenderLayer renderLayer) {
+        return MinecraftClient.usesImprovedTransparency() && (renderLayer == TexturedRenderLayers.getItemTranslucentCull() || renderLayer == TexturedRenderLayers.getBlockTranslucentCull());
+    }
 
-   private static VertexConsumer getSpecialItemGlintConsumer(VertexConsumerProvider consumers, RenderLayer layer, MatrixStack.Entry matrix) {
-      return VertexConsumers.union(new OverlayVertexConsumer(consumers.getBuffer(useTranslucentGlint(layer) ? RenderLayer.getGlintTranslucent() : RenderLayer.getGlint()), matrix, 0.0078125F), consumers.getBuffer(layer));
-   }
+    private static int getTint(int[] tints, int index) {
+        if (index < 0 || index >= tints.length) {
+            return -1;
+        }
+        return tints[index];
+    }
 
-   public static VertexConsumer getItemGlintConsumer(VertexConsumerProvider vertexConsumers, RenderLayer layer, boolean solid, boolean glint) {
-      if (glint) {
-         return useTranslucentGlint(layer) ? VertexConsumers.union(vertexConsumers.getBuffer(RenderLayer.getGlintTranslucent()), vertexConsumers.getBuffer(layer)) : VertexConsumers.union(vertexConsumers.getBuffer(solid ? RenderLayer.getGlint() : RenderLayer.getEntityGlint()), vertexConsumers.getBuffer(layer));
-      } else {
-         return vertexConsumers.getBuffer(layer);
-      }
-   }
-
-   private static boolean useTranslucentGlint(RenderLayer renderLayer) {
-      return MinecraftClient.isFabulousGraphicsOrBetter() && renderLayer == TexturedRenderLayers.getItemEntityTranslucentCull();
-   }
-
-   private static int getTint(int[] tints, int index) {
-      return index >= 0 && index < tints.length ? tints[index] : -1;
-   }
-
-   private static void renderBakedItemQuads(MatrixStack matrices, VertexConsumer vertexConsumer, List quads, int[] tints, int light, int overlay) {
-      MatrixStack.Entry entry = matrices.peek();
-
-      BakedQuad bakedQuad;
-      float f;
-      float g;
-      float h;
-      float j;
-      for(Iterator var7 = quads.iterator(); var7.hasNext(); vertexConsumer.quad(entry, bakedQuad, g, h, j, f, light, overlay)) {
-         bakedQuad = (BakedQuad)var7.next();
-         if (bakedQuad.hasTint()) {
-            int i = getTint(tints, bakedQuad.tintIndex());
-            f = (float)ColorHelper.getAlpha(i) / 255.0F;
-            g = (float)ColorHelper.getRed(i) / 255.0F;
-            h = (float)ColorHelper.getGreen(i) / 255.0F;
-            j = (float)ColorHelper.getBlue(i) / 255.0F;
-         } else {
-            f = 1.0F;
-            g = 1.0F;
-            h = 1.0F;
-            j = 1.0F;
-         }
-      }
-
-   }
-
-   public void renderItem(ItemStack stack, ItemDisplayContext displayContext, int light, int overlay, MatrixStack matrices, VertexConsumerProvider vertexConsumers, @Nullable World world, int seed) {
-      this.renderItem((LivingEntity)null, stack, displayContext, matrices, vertexConsumers, world, light, overlay, seed);
-   }
-
-   public void renderItem(@Nullable LivingEntity entity, ItemStack stack, ItemDisplayContext displayContext, MatrixStack matrices, VertexConsumerProvider vertexConsumers, @Nullable World world, int light, int overlay, int seed) {
-      this.itemModelManager.clearAndUpdate(this.itemRenderState, stack, displayContext, world, entity, seed);
-      this.itemRenderState.render(matrices, vertexConsumers, light, overlay);
-   }
+    private static void renderBakedItemQuads(MatrixStack matrices, VertexConsumer vertexConsumer, List<BakedQuad> quads, int[] tints, int light, int overlay) {
+        MatrixStack.Entry entry = matrices.peek();
+        for (BakedQuad bakedQuad : quads) {
+            float j;
+            float h;
+            float g;
+            float f;
+            if (bakedQuad.hasTint()) {
+                int i = ItemRenderer.getTint((int[])tints, (int)bakedQuad.tintIndex());
+                f = (float)ColorHelper.getAlpha((int)i) / 255.0f;
+                g = (float)ColorHelper.getRed((int)i) / 255.0f;
+                h = (float)ColorHelper.getGreen((int)i) / 255.0f;
+                j = (float)ColorHelper.getBlue((int)i) / 255.0f;
+            } else {
+                f = 1.0f;
+                g = 1.0f;
+                h = 1.0f;
+                j = 1.0f;
+            }
+            vertexConsumer.quad(entry, bakedQuad, g, h, j, f, light, overlay);
+        }
+    }
 }
+

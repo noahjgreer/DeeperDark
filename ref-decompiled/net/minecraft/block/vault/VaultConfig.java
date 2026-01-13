@@ -1,72 +1,103 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.DataResult
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
+ *  net.minecraft.SharedConstants
+ *  net.minecraft.block.spawner.EntityDetector
+ *  net.minecraft.block.spawner.EntityDetector$Selector
+ *  net.minecraft.block.vault.VaultConfig
+ *  net.minecraft.item.ItemConvertible
+ *  net.minecraft.item.ItemStack
+ *  net.minecraft.item.Items
+ *  net.minecraft.loot.LootTable
+ *  net.minecraft.loot.LootTables
+ *  net.minecraft.registry.RegistryKey
+ */
 package net.minecraft.block.vault;
 
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.Optional;
+import net.minecraft.SharedConstants;
 import net.minecraft.block.spawner.EntityDetector;
+import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.loot.LootTable;
 import net.minecraft.loot.LootTables;
 import net.minecraft.registry.RegistryKey;
 
-public record VaultConfig(RegistryKey lootTable, double activationRange, double deactivationRange, ItemStack keyItem, Optional overrideLootTableToDisplay, EntityDetector playerDetector, EntityDetector.Selector entitySelector) {
-   static final String CONFIG_KEY = "config";
-   static VaultConfig DEFAULT = new VaultConfig();
-   static Codec codec = RecordCodecBuilder.create((instance) -> {
-      return instance.group(LootTable.TABLE_KEY.lenientOptionalFieldOf("loot_table", DEFAULT.lootTable()).forGetter(VaultConfig::lootTable), Codec.DOUBLE.lenientOptionalFieldOf("activation_range", DEFAULT.activationRange()).forGetter(VaultConfig::activationRange), Codec.DOUBLE.lenientOptionalFieldOf("deactivation_range", DEFAULT.deactivationRange()).forGetter(VaultConfig::deactivationRange), ItemStack.createOptionalCodec("key_item").forGetter(VaultConfig::keyItem), LootTable.TABLE_KEY.lenientOptionalFieldOf("override_loot_table_to_display").forGetter(VaultConfig::overrideLootTableToDisplay)).apply(instance, VaultConfig::new);
-   }).validate(VaultConfig::validate);
+public record VaultConfig(RegistryKey<LootTable> lootTable, double activationRange, double deactivationRange, ItemStack keyItem, Optional<RegistryKey<LootTable>> overrideLootTableToDisplay, EntityDetector playerDetector, EntityDetector.Selector entitySelector) {
+    private final RegistryKey<LootTable> lootTable;
+    private final double activationRange;
+    private final double deactivationRange;
+    private final ItemStack keyItem;
+    private final Optional<RegistryKey<LootTable>> overrideLootTableToDisplay;
+    private final EntityDetector playerDetector;
+    private final EntityDetector.Selector entitySelector;
+    static final String CONFIG_KEY = "config";
+    static VaultConfig DEFAULT = new VaultConfig();
+    static Codec<VaultConfig> codec = RecordCodecBuilder.create(instance -> instance.group((App)LootTable.TABLE_KEY.lenientOptionalFieldOf("loot_table", (Object)DEFAULT.lootTable()).forGetter(VaultConfig::lootTable), (App)Codec.DOUBLE.lenientOptionalFieldOf("activation_range", (Object)DEFAULT.activationRange()).forGetter(VaultConfig::activationRange), (App)Codec.DOUBLE.lenientOptionalFieldOf("deactivation_range", (Object)DEFAULT.deactivationRange()).forGetter(VaultConfig::deactivationRange), (App)ItemStack.createOptionalCodec((String)"key_item").forGetter(VaultConfig::keyItem), (App)LootTable.TABLE_KEY.lenientOptionalFieldOf("override_loot_table_to_display").forGetter(VaultConfig::overrideLootTableToDisplay)).apply((Applicative)instance, VaultConfig::new)).validate(VaultConfig::validate);
 
-   private VaultConfig() {
-      this(LootTables.TRIAL_CHAMBERS_REWARD_CHEST, 4.0, 4.5, new ItemStack(Items.TRIAL_KEY), Optional.empty(), EntityDetector.NON_SPECTATOR_PLAYERS, EntityDetector.Selector.IN_WORLD);
-   }
+    private VaultConfig() {
+        this(LootTables.TRIAL_CHAMBERS_REWARD_CHEST, 4.0, 4.5, new ItemStack((ItemConvertible)Items.TRIAL_KEY), Optional.empty(), EntityDetector.NON_SPECTATOR_PLAYERS, EntityDetector.Selector.IN_WORLD);
+    }
 
-   public VaultConfig(RegistryKey lootTable, double activationRange, double deactivationRange, ItemStack keyItem, Optional overrideLootTableToDisplay) {
-      this(lootTable, activationRange, deactivationRange, keyItem, overrideLootTableToDisplay, DEFAULT.playerDetector(), DEFAULT.entitySelector());
-   }
+    public VaultConfig(RegistryKey<LootTable> lootTable, double activationRange, double deactivationRange, ItemStack keyItem, Optional<RegistryKey<LootTable>> overrideLootTableToDisplay) {
+        this(lootTable, activationRange, deactivationRange, keyItem, overrideLootTableToDisplay, DEFAULT.playerDetector(), DEFAULT.entitySelector());
+    }
 
-   public VaultConfig(RegistryKey registryKey, double d, double e, ItemStack itemStack, Optional optional, EntityDetector entityDetector, EntityDetector.Selector selector) {
-      this.lootTable = registryKey;
-      this.activationRange = d;
-      this.deactivationRange = e;
-      this.keyItem = itemStack;
-      this.overrideLootTableToDisplay = optional;
-      this.playerDetector = entityDetector;
-      this.entitySelector = selector;
-   }
+    public VaultConfig(RegistryKey<LootTable> lootTable, double activationRange, double deactivationRange, ItemStack keyItem, Optional<RegistryKey<LootTable>> overrideLootTableToDisplay, EntityDetector playerDetector, EntityDetector.Selector entitySelector) {
+        this.lootTable = lootTable;
+        this.activationRange = activationRange;
+        this.deactivationRange = deactivationRange;
+        this.keyItem = keyItem;
+        this.overrideLootTableToDisplay = overrideLootTableToDisplay;
+        this.playerDetector = playerDetector;
+        this.entitySelector = entitySelector;
+    }
 
-   public EntityDetector playerDetector() {
-      return this.playerDetector;
-   }
+    public EntityDetector playerDetector() {
+        return SharedConstants.VAULT_DETECTS_SHEEP_AS_PLAYERS ? EntityDetector.SHEEP : this.playerDetector;
+    }
 
-   private DataResult validate() {
-      return this.activationRange > this.deactivationRange ? DataResult.error(() -> {
-         return "Activation range must (" + this.activationRange + ") be less or equal to deactivation range (" + this.deactivationRange + ")";
-      }) : DataResult.success(this);
-   }
+    private DataResult<VaultConfig> validate() {
+        if (this.activationRange > this.deactivationRange) {
+            return DataResult.error(() -> "Activation range must (" + this.activationRange + ") be less or equal to deactivation range (" + this.deactivationRange + ")");
+        }
+        return DataResult.success((Object)this);
+    }
 
-   public RegistryKey lootTable() {
-      return this.lootTable;
-   }
+    public RegistryKey<LootTable> lootTable() {
+        return this.lootTable;
+    }
 
-   public double activationRange() {
-      return this.activationRange;
-   }
+    public double activationRange() {
+        return this.activationRange;
+    }
 
-   public double deactivationRange() {
-      return this.deactivationRange;
-   }
+    public double deactivationRange() {
+        return this.deactivationRange;
+    }
 
-   public ItemStack keyItem() {
-      return this.keyItem;
-   }
+    public ItemStack keyItem() {
+        return this.keyItem;
+    }
 
-   public Optional overrideLootTableToDisplay() {
-      return this.overrideLootTableToDisplay;
-   }
+    public Optional<RegistryKey<LootTable>> overrideLootTableToDisplay() {
+        return this.overrideLootTableToDisplay;
+    }
 
-   public EntityDetector.Selector entitySelector() {
-      return this.entitySelector;
-   }
+    public EntityDetector.Selector entitySelector() {
+        return this.entitySelector;
+    }
 }
+

@@ -5,7 +5,6 @@ import net.minecraft.entity.mob.ZombieVillagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.storage.ReadView;
@@ -13,6 +12,7 @@ import net.minecraft.storage.WriteView;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.world.World;
+import net.noahsarch.deeperdark.duck.EntityAccessor;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -51,7 +51,8 @@ public abstract class ZombieVillagerEntityMixin {
                 if (!player.getAbilities().creativeMode) {
                     itemStack.decrement(1);
                 }
-                if (!self.getWorld().isClient) {
+                World world = ((EntityAccessor)self).deeperdark$getWorld();
+                if (!world.isClient()) {
                     // Start conversion with random delay (same as vanilla)
                     // Vanilla uses: this.random.nextInt(2401) + 3600
                     this.setConverting(player.getUuid(), self.getRandom().nextInt(2401) + 3600);

@@ -1,6 +1,46 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.MinecraftClient
+ *  net.minecraft.client.gui.Element
+ *  net.minecraft.client.gui.screen.ButtonTextures
+ *  net.minecraft.client.gui.screen.Screen
+ *  net.minecraft.client.gui.screen.dialog.DialogBodyHandlers
+ *  net.minecraft.client.gui.screen.dialog.DialogControls
+ *  net.minecraft.client.gui.screen.dialog.DialogNetworkAccess
+ *  net.minecraft.client.gui.screen.dialog.DialogScreen
+ *  net.minecraft.client.gui.screen.dialog.DialogScreen$1
+ *  net.minecraft.client.gui.screen.dialog.DialogScreen$WarningScreen
+ *  net.minecraft.client.gui.screen.dialog.WaitingForResponseScreen
+ *  net.minecraft.client.gui.tooltip.Tooltip
+ *  net.minecraft.client.gui.widget.ButtonWidget
+ *  net.minecraft.client.gui.widget.DirectionalLayoutWidget
+ *  net.minecraft.client.gui.widget.GridWidget
+ *  net.minecraft.client.gui.widget.LayoutWidget
+ *  net.minecraft.client.gui.widget.ScrollableLayoutWidget
+ *  net.minecraft.client.gui.widget.TextWidget
+ *  net.minecraft.client.gui.widget.TexturedButtonWidget
+ *  net.minecraft.client.gui.widget.ThreePartsLayoutWidget
+ *  net.minecraft.client.gui.widget.Widget
+ *  net.minecraft.dialog.AfterAction
+ *  net.minecraft.dialog.body.DialogBody
+ *  net.minecraft.dialog.type.Dialog
+ *  net.minecraft.dialog.type.DialogInput
+ *  net.minecraft.server.command.CommandManager
+ *  net.minecraft.text.ClickEvent
+ *  net.minecraft.text.ClickEvent$Custom
+ *  net.minecraft.text.ClickEvent$RunCommand
+ *  net.minecraft.text.ClickEvent$ShowDialog
+ *  net.minecraft.text.Text
+ *  net.minecraft.util.Identifier
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.gui.screen.dialog;
 
-import java.util.Iterator;
+import java.lang.runtime.SwitchBootstraps;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -8,14 +48,19 @@ import java.util.function.Supplier;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.ButtonTextures;
-import net.minecraft.client.gui.screen.ConfirmScreen;
-import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.dialog.DialogBodyHandlers;
+import net.minecraft.client.gui.screen.dialog.DialogControls;
+import net.minecraft.client.gui.screen.dialog.DialogNetworkAccess;
+import net.minecraft.client.gui.screen.dialog.DialogScreen;
+import net.minecraft.client.gui.screen.dialog.WaitingForResponseScreen;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.DirectionalLayoutWidget;
 import net.minecraft.client.gui.widget.GridWidget;
+import net.minecraft.client.gui.widget.LayoutWidget;
 import net.minecraft.client.gui.widget.ScrollableLayoutWidget;
 import net.minecraft.client.gui.widget.TextWidget;
 import net.minecraft.client.gui.widget.TexturedButtonWidget;
@@ -25,248 +70,204 @@ import net.minecraft.dialog.AfterAction;
 import net.minecraft.dialog.body.DialogBody;
 import net.minecraft.dialog.type.Dialog;
 import net.minecraft.dialog.type.DialogInput;
-import net.minecraft.screen.ScreenTexts;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import org.apache.commons.lang3.mutable.MutableObject;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
-public abstract class DialogScreen extends Screen {
-   public static final Text CUSTOM_SCREEN_REJECTED_DISCONNECT_TEXT = Text.translatable("menu.custom_screen_info.disconnect");
-   private static final int field_60758 = 20;
-   private static final ButtonTextures WARNING_BUTTON_TEXTURES = new ButtonTextures(Identifier.ofVanilla("dialog/warning_button"), Identifier.ofVanilla("dialog/warning_button_disabled"), Identifier.ofVanilla("dialog/warning_button_highlighted"));
-   private final Dialog dialog;
-   private final ThreePartsLayoutWidget layout = new ThreePartsLayoutWidget(this);
-   @Nullable
-   private final Screen parent;
-   @Nullable
-   private ScrollableLayoutWidget contents;
-   private ButtonWidget warningButton;
-   private final DialogNetworkAccess networkAccess;
-   private Supplier cancelAction;
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
+public abstract class DialogScreen<T extends Dialog>
+extends Screen {
+    public static final Text CUSTOM_SCREEN_REJECTED_DISCONNECT_TEXT = Text.translatable((String)"menu.custom_screen_info.disconnect");
+    private static final int field_60758 = 20;
+    private static final ButtonTextures WARNING_BUTTON_TEXTURES = new ButtonTextures(Identifier.ofVanilla((String)"dialog/warning_button"), Identifier.ofVanilla((String)"dialog/warning_button_disabled"), Identifier.ofVanilla((String)"dialog/warning_button_highlighted"));
+    private final T dialog;
+    private final ThreePartsLayoutWidget layout = new ThreePartsLayoutWidget((Screen)this);
+    private final @Nullable Screen parent;
+    private @Nullable ScrollableLayoutWidget contents;
+    private ButtonWidget warningButton;
+    private final DialogNetworkAccess networkAccess;
+    private Supplier<Optional<ClickEvent>> cancelAction = DialogControls.EMPTY_ACTION_CLICK_EVENT;
 
-   public DialogScreen(@Nullable Screen parent, Dialog dialog, DialogNetworkAccess networkAccess) {
-      super(dialog.common().title());
-      this.cancelAction = DialogControls.EMPTY_ACTION_CLICK_EVENT;
-      this.dialog = dialog;
-      this.parent = parent;
-      this.networkAccess = networkAccess;
-   }
+    public DialogScreen(@Nullable Screen parent, T dialog, DialogNetworkAccess networkAccess) {
+        super(dialog.common().title());
+        this.dialog = dialog;
+        this.parent = parent;
+        this.networkAccess = networkAccess;
+    }
 
-   protected final void init() {
-      super.init();
-      this.warningButton = this.createWarningButton();
-      this.warningButton.setNavigationOrder(-10);
-      DialogControls dialogControls = new DialogControls(this);
-      DirectionalLayoutWidget directionalLayoutWidget = DirectionalLayoutWidget.vertical().spacing(10);
-      directionalLayoutWidget.getMainPositioner().alignHorizontalCenter();
-      this.layout.addHeader(this.createHeader());
-      Iterator var3 = this.dialog.common().body().iterator();
-
-      while(var3.hasNext()) {
-         DialogBody dialogBody = (DialogBody)var3.next();
-         Widget widget = DialogBodyHandlers.createWidget(this, dialogBody);
-         if (widget != null) {
+    protected final void init() {
+        super.init();
+        this.warningButton = this.createWarningButton();
+        this.warningButton.setNavigationOrder(-10);
+        DialogControls dialogControls = new DialogControls(this);
+        DirectionalLayoutWidget directionalLayoutWidget = DirectionalLayoutWidget.vertical().spacing(10);
+        directionalLayoutWidget.getMainPositioner().alignHorizontalCenter();
+        this.layout.addHeader(this.createHeader());
+        for (DialogBody dialogBody : this.dialog.common().body()) {
+            Widget widget = DialogBodyHandlers.createWidget((DialogScreen)this, (DialogBody)dialogBody);
+            if (widget == null) continue;
             directionalLayoutWidget.add(widget);
-         }
-      }
-
-      var3 = this.dialog.common().inputs().iterator();
-
-      while(var3.hasNext()) {
-         DialogInput dialogInput = (DialogInput)var3.next();
-         Objects.requireNonNull(directionalLayoutWidget);
-         dialogControls.addInput(dialogInput, directionalLayoutWidget::add);
-      }
-
-      this.initBody(directionalLayoutWidget, dialogControls, this.dialog, this.networkAccess);
-      this.contents = new ScrollableLayoutWidget(this.client, directionalLayoutWidget, this.layout.getContentHeight());
-      this.layout.addBody(this.contents);
-      this.initHeaderAndFooter(this.layout, dialogControls, this.dialog, this.networkAccess);
-      this.cancelAction = dialogControls.createClickEvent(this.dialog.getCancelAction());
-      this.layout.forEachChild((child) -> {
-         if (child != this.warningButton) {
-            this.addDrawableChild(child);
-         }
-
-      });
-      this.addDrawableChild(this.warningButton);
-      this.refreshWidgetPositions();
-   }
-
-   protected void initBody(DirectionalLayoutWidget bodyLayout, DialogControls controls, Dialog dialog, DialogNetworkAccess networkAccess) {
-   }
-
-   protected void initHeaderAndFooter(ThreePartsLayoutWidget layout, DialogControls controls, Dialog dialog, DialogNetworkAccess networkAccess) {
-   }
-
-   protected void refreshWidgetPositions() {
-      this.contents.setHeight(this.layout.getContentHeight());
-      this.layout.refreshPositions();
-      this.resetWarningButtonPosition();
-   }
-
-   protected Widget createHeader() {
-      DirectionalLayoutWidget directionalLayoutWidget = DirectionalLayoutWidget.horizontal().spacing(10);
-      directionalLayoutWidget.getMainPositioner().alignHorizontalCenter().alignVerticalCenter();
-      directionalLayoutWidget.add(new TextWidget(this.title, this.textRenderer));
-      directionalLayoutWidget.add(this.warningButton);
-      return directionalLayoutWidget;
-   }
-
-   protected void resetWarningButtonPosition() {
-      int i = this.warningButton.getX();
-      int j = this.warningButton.getY();
-      if (i < 0 || j < 0 || i > this.width - 20 || j > this.height - 20) {
-         this.warningButton.setX(Math.max(0, this.width - 40));
-         this.warningButton.setY(Math.min(5, this.height));
-      }
-
-   }
-
-   private ButtonWidget createWarningButton() {
-      TexturedButtonWidget texturedButtonWidget = new TexturedButtonWidget(0, 0, 20, 20, WARNING_BUTTON_TEXTURES, (button) -> {
-         this.client.setScreen(DialogScreen.WarningScreen.create(this.client, this));
-      }, Text.translatable("menu.custom_screen_info.button_narration"));
-      texturedButtonWidget.setTooltip(Tooltip.of(Text.translatable("menu.custom_screen_info.tooltip")));
-      return texturedButtonWidget;
-   }
-
-   public boolean shouldPause() {
-      return this.dialog.common().pause();
-   }
-
-   public boolean shouldCloseOnEsc() {
-      return this.dialog.common().canCloseWithEscape();
-   }
-
-   public void close() {
-      this.runAction((Optional)this.cancelAction.get(), AfterAction.CLOSE);
-   }
-
-   public void runAction(Optional clickEvent) {
-      this.runAction(clickEvent, this.dialog.common().afterAction());
-   }
-
-   public void runAction(Optional clickEvent, AfterAction afterAction) {
-      Object var10000;
-      switch (afterAction) {
-         case NONE:
-            var10000 = this;
-            break;
-         case CLOSE:
-            var10000 = this.parent;
-            break;
-         case WAIT_FOR_RESPONSE:
-            var10000 = new WaitingForResponseScreen(this.parent);
-            break;
-         default:
-            throw new MatchException((String)null, (Throwable)null);
-      }
-
-      Screen screen = var10000;
-      if (clickEvent.isPresent()) {
-         this.handleClickEvent((ClickEvent)clickEvent.get(), (Screen)screen);
-      } else {
-         this.client.setScreen((Screen)screen);
-      }
-
-   }
-
-   private void handleClickEvent(ClickEvent clickEvent, @Nullable Screen afterActionScreen) {
-      Objects.requireNonNull(clickEvent);
-      byte var4 = 0;
-      switch (clickEvent.typeSwitch<invokedynamic>(clickEvent, var4)) {
-         case 0:
-            ClickEvent.RunCommand var5 = (ClickEvent.RunCommand)clickEvent;
-            ClickEvent.RunCommand var10000 = var5;
-
-            String var10;
-            try {
-               var10 = var10000.command();
-            } catch (Throwable var9) {
-               throw new MatchException(var9.toString(), var9);
+        }
+        for (DialogInput dialogInput : this.dialog.common().inputs()) {
+            dialogControls.addInput(dialogInput, arg_0 -> ((DirectionalLayoutWidget)directionalLayoutWidget).add(arg_0));
+        }
+        this.initBody(directionalLayoutWidget, dialogControls, this.dialog, this.networkAccess);
+        this.contents = new ScrollableLayoutWidget(this.client, (LayoutWidget)directionalLayoutWidget, this.layout.getContentHeight());
+        this.layout.addBody((Widget)this.contents);
+        this.initHeaderAndFooter(this.layout, dialogControls, this.dialog, this.networkAccess);
+        this.cancelAction = dialogControls.createClickEvent(this.dialog.getCancelAction());
+        this.layout.forEachChild(child -> {
+            if (child != this.warningButton) {
+                this.addDrawableChild((Element)child);
             }
+        });
+        this.addDrawableChild((Element)this.warningButton);
+        this.refreshWidgetPositions();
+    }
 
-            String var11 = var10;
-            this.networkAccess.runClickEventCommand(CommandManager.stripLeadingSlash(var11), afterActionScreen);
-            break;
-         case 1:
-            ClickEvent.ShowDialog showDialog = (ClickEvent.ShowDialog)clickEvent;
-            this.networkAccess.showDialog(showDialog.dialog(), afterActionScreen);
-            break;
-         case 2:
-            ClickEvent.Custom custom = (ClickEvent.Custom)clickEvent;
-            this.networkAccess.sendCustomClickActionPacket(custom.id(), custom.payload());
-            this.client.setScreen(afterActionScreen);
-            break;
-         default:
-            handleBasicClickEvent(clickEvent, this.client, afterActionScreen);
-      }
+    protected void initBody(DirectionalLayoutWidget bodyLayout, DialogControls controls, T dialog, DialogNetworkAccess networkAccess) {
+    }
 
-   }
+    protected void initHeaderAndFooter(ThreePartsLayoutWidget layout, DialogControls controls, T dialog, DialogNetworkAccess networkAccess) {
+    }
 
-   @Nullable
-   public Screen getParentScreen() {
-      return this.parent;
-   }
+    protected void refreshWidgetPositions() {
+        this.contents.setHeight(this.layout.getContentHeight());
+        this.layout.refreshPositions();
+        this.resetWarningButtonPosition();
+    }
 
-   protected static Widget createGridWidget(List widgets, int columns) {
-      GridWidget gridWidget = new GridWidget();
-      gridWidget.getMainPositioner().alignHorizontalCenter();
-      gridWidget.setColumnSpacing(2).setRowSpacing(2);
-      int i = widgets.size();
-      int j = i / columns;
-      int k = j * columns;
+    protected Widget createHeader() {
+        DirectionalLayoutWidget directionalLayoutWidget = DirectionalLayoutWidget.horizontal().spacing(10);
+        directionalLayoutWidget.getMainPositioner().alignHorizontalCenter().alignVerticalCenter();
+        directionalLayoutWidget.add((Widget)new TextWidget(this.title, this.textRenderer));
+        directionalLayoutWidget.add((Widget)this.warningButton);
+        return directionalLayoutWidget;
+    }
 
-      for(int l = 0; l < k; ++l) {
-         gridWidget.add((Widget)widgets.get(l), l / columns, l % columns);
-      }
+    protected void resetWarningButtonPosition() {
+        int i = this.warningButton.getX();
+        int j = this.warningButton.getY();
+        if (i < 0 || j < 0 || i > this.width - 20 || j > this.height - 20) {
+            this.warningButton.setX(Math.max(0, this.width - 40));
+            this.warningButton.setY(Math.min(5, this.height));
+        }
+    }
 
-      if (i != k) {
-         DirectionalLayoutWidget directionalLayoutWidget = DirectionalLayoutWidget.horizontal().spacing(2);
-         directionalLayoutWidget.getMainPositioner().alignHorizontalCenter();
+    private ButtonWidget createWarningButton() {
+        TexturedButtonWidget texturedButtonWidget = new TexturedButtonWidget(0, 0, 20, 20, WARNING_BUTTON_TEXTURES, button -> this.client.setScreen(WarningScreen.create((MinecraftClient)this.client, (DialogNetworkAccess)this.networkAccess, (Screen)this)), (Text)Text.translatable((String)"menu.custom_screen_info.button_narration"));
+        texturedButtonWidget.setTooltip(Tooltip.of((Text)Text.translatable((String)"menu.custom_screen_info.tooltip")));
+        return texturedButtonWidget;
+    }
 
-         for(int m = k; m < i; ++m) {
-            directionalLayoutWidget.add((Widget)widgets.get(m));
-         }
+    public boolean shouldPause() {
+        return this.dialog.common().pause();
+    }
 
-         gridWidget.add(directionalLayoutWidget, j, 0, 1, columns);
-      }
+    public boolean shouldCloseOnEsc() {
+        return this.dialog.common().canCloseWithEscape();
+    }
 
-      return gridWidget;
-   }
+    public void close() {
+        this.runAction((Optional)this.cancelAction.get(), AfterAction.CLOSE);
+    }
 
-   @Environment(EnvType.CLIENT)
-   public static class WarningScreen extends ConfirmScreen {
-      private final MutableObject dialogScreen;
+    public void runAction(Optional<ClickEvent> clickEvent) {
+        this.runAction(clickEvent, this.dialog.common().afterAction());
+    }
 
-      public static Screen create(MinecraftClient client, Screen screen) {
-         return new WarningScreen(client, new MutableObject(screen));
-      }
-
-      private WarningScreen(MinecraftClient client, MutableObject mutableObject) {
-         super((bl) -> {
-            if (bl) {
-               GameMenuScreen.disconnect(client, DialogScreen.CUSTOM_SCREEN_REJECTED_DISCONNECT_TEXT);
-            } else {
-               client.setScreen((Screen)mutableObject.getValue());
+    public void runAction(Optional<ClickEvent> clickEvent, AfterAction afterAction) {
+        DialogScreen screen;
+        switch (1.field_61009[afterAction.ordinal()]) {
+            default: {
+                throw new MatchException(null, null);
             }
+            case 1: {
+                DialogScreen dialogScreen = this;
+                break;
+            }
+            case 2: {
+                DialogScreen dialogScreen = this.parent;
+                break;
+            }
+            case 3: {
+                DialogScreen dialogScreen = screen = new WaitingForResponseScreen(this.parent);
+            }
+        }
+        if (clickEvent.isPresent()) {
+            this.handleClickEvent(clickEvent.get(), (Screen)screen);
+        } else {
+            this.client.setScreen((Screen)screen);
+        }
+    }
 
-         }, Text.translatable("menu.custom_screen_info.title"), Text.translatable("menu.custom_screen_info.contents"), ScreenTexts.returnToMenuOrDisconnect(client.isInSingleplayer()), ScreenTexts.BACK);
-         this.dialogScreen = mutableObject;
-      }
+    /*
+     * Enabled aggressive block sorting
+     * Enabled unnecessary exception pruning
+     * Enabled aggressive exception aggregation
+     */
+    private void handleClickEvent(ClickEvent clickEvent, @Nullable Screen afterActionScreen) {
+        ClickEvent clickEvent2 = clickEvent;
+        Objects.requireNonNull(clickEvent2);
+        ClickEvent clickEvent3 = clickEvent2;
+        int n = 0;
+        switch (SwitchBootstraps.typeSwitch("typeSwitch", new Object[]{ClickEvent.RunCommand.class, ClickEvent.ShowDialog.class, ClickEvent.Custom.class}, (Object)clickEvent3, n)) {
+            case 0: {
+                String string2;
+                ClickEvent.RunCommand runCommand = (ClickEvent.RunCommand)clickEvent3;
+                try {
+                    String string;
+                    string2 = string = runCommand.command();
+                }
+                catch (Throwable throwable) {
+                    throw new MatchException(throwable.toString(), throwable);
+                }
+                this.networkAccess.runClickEventCommand(CommandManager.stripLeadingSlash((String)string2), afterActionScreen);
+                return;
+            }
+            case 1: {
+                ClickEvent.ShowDialog showDialog = (ClickEvent.ShowDialog)clickEvent3;
+                this.networkAccess.showDialog(showDialog.dialog(), afterActionScreen);
+                return;
+            }
+            case 2: {
+                ClickEvent.Custom custom = (ClickEvent.Custom)clickEvent3;
+                this.networkAccess.sendCustomClickActionPacket(custom.id(), custom.payload());
+                this.client.setScreen(afterActionScreen);
+                return;
+            }
+        }
+        DialogScreen.handleBasicClickEvent((ClickEvent)clickEvent, (MinecraftClient)this.client, (Screen)afterActionScreen);
+    }
 
-      @Nullable
-      public Screen getDialogScreen() {
-         return (Screen)this.dialogScreen.getValue();
-      }
+    public @Nullable Screen getParentScreen() {
+        return this.parent;
+    }
 
-      public void setDialogScreen(@Nullable Screen screen) {
-         this.dialogScreen.setValue(screen);
-      }
-   }
+    protected static Widget createGridWidget(List<? extends Widget> widgets, int columns) {
+        GridWidget gridWidget = new GridWidget();
+        gridWidget.getMainPositioner().alignHorizontalCenter();
+        gridWidget.setColumnSpacing(2).setRowSpacing(2);
+        int i = widgets.size();
+        int j = i / columns;
+        int k = j * columns;
+        for (int l = 0; l < k; ++l) {
+            gridWidget.add(widgets.get(l), l / columns, l % columns);
+        }
+        if (i != k) {
+            DirectionalLayoutWidget directionalLayoutWidget = DirectionalLayoutWidget.horizontal().spacing(2);
+            directionalLayoutWidget.getMainPositioner().alignHorizontalCenter();
+            for (int m = k; m < i; ++m) {
+                directionalLayoutWidget.add(widgets.get(m));
+            }
+            gridWidget.add((Widget)directionalLayoutWidget, j, 0, 1, columns);
+        }
+        return gridWidget;
+    }
 }
+

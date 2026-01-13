@@ -1,63 +1,73 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.fabricmc.fabric.api.client.sound.v1.FabricSoundInstance
+ *  net.minecraft.client.sound.Sound
+ *  net.minecraft.client.sound.SoundInstance
+ *  net.minecraft.client.sound.SoundInstance$AttenuationType
+ *  net.minecraft.client.sound.SoundManager
+ *  net.minecraft.client.sound.WeightedSoundSet
+ *  net.minecraft.sound.SoundCategory
+ *  net.minecraft.util.Identifier
+ *  net.minecraft.util.math.random.Random
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.sound;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.sound.v1.FabricSoundInstance;
+import net.minecraft.client.sound.Sound;
+import net.minecraft.client.sound.SoundInstance;
+import net.minecraft.client.sound.SoundManager;
+import net.minecraft.client.sound.WeightedSoundSet;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.random.Random;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
-public interface SoundInstance extends FabricSoundInstance {
-   Identifier getId();
+@Environment(value=EnvType.CLIENT)
+public interface SoundInstance
+extends FabricSoundInstance {
+    public Identifier getId();
 
-   @Nullable
-   WeightedSoundSet getSoundSet(SoundManager soundManager);
+    public @Nullable WeightedSoundSet getSoundSet(SoundManager var1);
 
-   @Nullable
-   Sound getSound();
+    public @Nullable Sound getSound();
 
-   SoundCategory getCategory();
+    public SoundCategory getCategory();
 
-   boolean isRepeatable();
+    public boolean isRepeatable();
 
-   boolean isRelative();
+    public boolean isRelative();
 
-   int getRepeatDelay();
+    public int getRepeatDelay();
 
-   float getVolume();
+    public float getVolume();
 
-   float getPitch();
+    public float getPitch();
 
-   double getX();
+    public double getX();
 
-   double getY();
+    public double getY();
 
-   double getZ();
+    public double getZ();
 
-   AttenuationType getAttenuationType();
+    public AttenuationType getAttenuationType();
 
-   default boolean shouldAlwaysPlay() {
-      return false;
-   }
+    default public boolean shouldAlwaysPlay() {
+        return false;
+    }
 
-   default boolean canPlay() {
-      return true;
-   }
+    default public boolean canPlay() {
+        return true;
+    }
 
-   static Random createRandom() {
-      return Random.create();
-   }
-
-   @Environment(EnvType.CLIENT)
-   public static enum AttenuationType {
-      NONE,
-      LINEAR;
-
-      // $FF: synthetic method
-      private static AttenuationType[] method_36927() {
-         return new AttenuationType[]{NONE, LINEAR};
-      }
-   }
+    public static Random createRandom() {
+        return Random.create();
+    }
 }
+

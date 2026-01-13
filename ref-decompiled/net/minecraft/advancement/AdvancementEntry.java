@@ -1,54 +1,65 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.advancement.Advancement
+ *  net.minecraft.advancement.AdvancementEntry
+ *  net.minecraft.network.RegistryByteBuf
+ *  net.minecraft.network.codec.PacketCodec
+ *  net.minecraft.network.codec.PacketCodecs
+ *  net.minecraft.util.Identifier
+ */
 package net.minecraft.advancement;
 
+import java.util.List;
+import net.minecraft.advancement.Advancement;
+import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.util.Identifier;
 
 public record AdvancementEntry(Identifier id, Advancement value) {
-   public static final PacketCodec PACKET_CODEC;
-   public static final PacketCodec LIST_PACKET_CODEC;
+    private final Identifier id;
+    private final Advancement value;
+    public static final PacketCodec<RegistryByteBuf, AdvancementEntry> PACKET_CODEC = PacketCodec.tuple((PacketCodec)Identifier.PACKET_CODEC, AdvancementEntry::id, (PacketCodec)Advancement.PACKET_CODEC, AdvancementEntry::value, AdvancementEntry::new);
+    public static final PacketCodec<RegistryByteBuf, List<AdvancementEntry>> LIST_PACKET_CODEC = PACKET_CODEC.collect(PacketCodecs.toList());
 
-   public AdvancementEntry(Identifier identifier, Advancement advancement) {
-      this.id = identifier;
-      this.value = advancement;
-   }
+    public AdvancementEntry(Identifier id, Advancement value) {
+        this.id = id;
+        this.value = value;
+    }
 
-   public boolean equals(Object o) {
-      if (this == o) {
-         return true;
-      } else {
-         boolean var10000;
-         if (o instanceof AdvancementEntry) {
-            AdvancementEntry advancementEntry = (AdvancementEntry)o;
-            if (this.id.equals(advancementEntry.id)) {
-               var10000 = true;
-               return var10000;
-            }
-         }
+    /*
+     * Enabled force condition propagation
+     * Lifted jumps to return sites
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof AdvancementEntry)) return false;
+        AdvancementEntry advancementEntry = (AdvancementEntry)o;
+        if (!this.id.equals((Object)advancementEntry.id)) return false;
+        return true;
+    }
 
-         var10000 = false;
-         return var10000;
-      }
-   }
+    @Override
+    public int hashCode() {
+        return this.id.hashCode();
+    }
 
-   public int hashCode() {
-      return this.id.hashCode();
-   }
+    @Override
+    public String toString() {
+        return this.id.toString();
+    }
 
-   public String toString() {
-      return this.id.toString();
-   }
+    public Identifier id() {
+        return this.id;
+    }
 
-   public Identifier id() {
-      return this.id;
-   }
-
-   public Advancement value() {
-      return this.value;
-   }
-
-   static {
-      PACKET_CODEC = PacketCodec.tuple(Identifier.PACKET_CODEC, AdvancementEntry::id, Advancement.PACKET_CODEC, AdvancementEntry::value, AdvancementEntry::new);
-      LIST_PACKET_CODEC = PACKET_CODEC.collect(PacketCodecs.toList());
-   }
+    public Advancement value() {
+        return this.value;
+    }
 }
+

@@ -1,47 +1,65 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.gui.screen.ButtonTextures
+ *  net.minecraft.util.Identifier
+ */
 package net.minecraft.client.gui.screen;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.util.Identifier;
 
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 public record ButtonTextures(Identifier enabled, Identifier disabled, Identifier enabledFocused, Identifier disabledFocused) {
-   public ButtonTextures(Identifier unfocused, Identifier focused) {
-      this(unfocused, unfocused, focused, focused);
-   }
+    private final Identifier enabled;
+    private final Identifier disabled;
+    private final Identifier enabledFocused;
+    private final Identifier disabledFocused;
 
-   public ButtonTextures(Identifier enabled, Identifier disabled, Identifier focused) {
-      this(enabled, disabled, focused, disabled);
-   }
+    public ButtonTextures(Identifier texture) {
+        this(texture, texture, texture, texture);
+    }
 
-   public ButtonTextures(Identifier identifier, Identifier identifier2, Identifier identifier3, Identifier identifier4) {
-      this.enabled = identifier;
-      this.disabled = identifier2;
-      this.enabledFocused = identifier3;
-      this.disabledFocused = identifier4;
-   }
+    public ButtonTextures(Identifier unfocused, Identifier focused) {
+        this(unfocused, unfocused, focused, focused);
+    }
 
-   public Identifier get(boolean enabled, boolean focused) {
-      if (enabled) {
-         return focused ? this.enabledFocused : this.enabled;
-      } else {
-         return focused ? this.disabledFocused : this.disabled;
-      }
-   }
+    public ButtonTextures(Identifier enabled, Identifier disabled, Identifier focused) {
+        this(enabled, disabled, focused, disabled);
+    }
 
-   public Identifier enabled() {
-      return this.enabled;
-   }
+    public ButtonTextures(Identifier enabled, Identifier disabled, Identifier enabledFocused, Identifier disabledFocused) {
+        this.enabled = enabled;
+        this.disabled = disabled;
+        this.enabledFocused = enabledFocused;
+        this.disabledFocused = disabledFocused;
+    }
 
-   public Identifier disabled() {
-      return this.disabled;
-   }
+    public Identifier get(boolean enabled, boolean focused) {
+        if (enabled) {
+            return focused ? this.enabledFocused : this.enabled;
+        }
+        return focused ? this.disabledFocused : this.disabled;
+    }
 
-   public Identifier enabledFocused() {
-      return this.enabledFocused;
-   }
+    public Identifier enabled() {
+        return this.enabled;
+    }
 
-   public Identifier disabledFocused() {
-      return this.disabledFocused;
-   }
+    public Identifier disabled() {
+        return this.disabled;
+    }
+
+    public Identifier enabledFocused() {
+        return this.enabledFocused;
+    }
+
+    public Identifier disabledFocused() {
+        return this.disabledFocused;
+    }
 }
+

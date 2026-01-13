@@ -1,27 +1,48 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.render.command.OrderedRenderCommandQueue
+ *  net.minecraft.client.render.entity.AgeableMobEntityRenderer
+ *  net.minecraft.client.render.entity.EntityRendererFactory$Context
+ *  net.minecraft.client.render.entity.MobEntityRenderer
+ *  net.minecraft.client.render.entity.model.EntityModel
+ *  net.minecraft.client.render.entity.state.LivingEntityRenderState
+ *  net.minecraft.client.render.state.CameraRenderState
+ *  net.minecraft.client.util.math.MatrixStack
+ *  net.minecraft.entity.mob.MobEntity
+ */
 package net.minecraft.client.render.entity;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
+import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.render.entity.MobEntityRenderer;
 import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.render.entity.state.LivingEntityRenderState;
+import net.minecraft.client.render.state.CameraRenderState;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.mob.MobEntity;
 
-/** @deprecated */
 @Deprecated
-@Environment(EnvType.CLIENT)
-public abstract class AgeableMobEntityRenderer extends MobEntityRenderer {
-   private final EntityModel adultModel;
-   private final EntityModel babyModel;
+@Environment(value=EnvType.CLIENT)
+public abstract class AgeableMobEntityRenderer<T extends MobEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>>
+extends MobEntityRenderer<T, S, M> {
+    private final M adultModel;
+    private final M babyModel;
 
-   public AgeableMobEntityRenderer(EntityRendererFactory.Context context, EntityModel model, EntityModel babyModel, float shadowRadius) {
-      super(context, model, shadowRadius);
-      this.adultModel = model;
-      this.babyModel = babyModel;
-   }
+    public AgeableMobEntityRenderer(EntityRendererFactory.Context context, M model, M babyModel, float shadowRadius) {
+        super(context, model, shadowRadius);
+        this.adultModel = model;
+        this.babyModel = babyModel;
+    }
 
-   public void render(LivingEntityRenderState livingEntityRenderState, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i) {
-      this.model = livingEntityRenderState.baby ? this.babyModel : this.adultModel;
-      super.render(livingEntityRenderState, matrixStack, vertexConsumerProvider, i);
-   }
+    public void render(S livingEntityRenderState, MatrixStack matrixStack, OrderedRenderCommandQueue orderedRenderCommandQueue, CameraRenderState cameraRenderState) {
+        this.model = ((LivingEntityRenderState)livingEntityRenderState).baby ? this.babyModel : this.adultModel;
+        super.render(livingEntityRenderState, matrixStack, orderedRenderCommandQueue, cameraRenderState);
+    }
 }
+

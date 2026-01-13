@@ -1,14 +1,30 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.gui.screen.world.CreateWorldCallback
+ *  net.minecraft.client.gui.screen.world.CreateWorldScreen
+ *  net.minecraft.registry.CombinedDynamicRegistries
+ *  net.minecraft.registry.ServerDynamicRegistryType
+ *  net.minecraft.world.level.LevelProperties
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.gui.screen.world;
 
 import java.nio.file.Path;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.gui.screen.world.CreateWorldScreen;
 import net.minecraft.registry.CombinedDynamicRegistries;
+import net.minecraft.registry.ServerDynamicRegistryType;
 import net.minecraft.world.level.LevelProperties;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 @FunctionalInterface
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 public interface CreateWorldCallback {
-   boolean create(CreateWorldScreen screen, CombinedDynamicRegistries dynamicRegistries, LevelProperties levelProperties, @Nullable Path dataPackTempDir);
+    public boolean create(CreateWorldScreen var1, CombinedDynamicRegistries<ServerDynamicRegistryType> var2, LevelProperties var3, @Nullable Path var4);
 }
+

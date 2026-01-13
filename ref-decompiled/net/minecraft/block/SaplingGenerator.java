@@ -1,12 +1,38 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.serialization.Codec
+ *  it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap
+ *  net.minecraft.block.Block
+ *  net.minecraft.block.BlockState
+ *  net.minecraft.block.Blocks
+ *  net.minecraft.block.SaplingGenerator
+ *  net.minecraft.registry.RegistryKey
+ *  net.minecraft.registry.RegistryKeys
+ *  net.minecraft.registry.entry.RegistryEntry
+ *  net.minecraft.registry.tag.BlockTags
+ *  net.minecraft.server.world.ServerWorld
+ *  net.minecraft.util.math.BlockPos
+ *  net.minecraft.util.math.BlockPos$Mutable
+ *  net.minecraft.util.math.random.Random
+ *  net.minecraft.world.BlockView
+ *  net.minecraft.world.StructureWorldAccess
+ *  net.minecraft.world.WorldAccess
+ *  net.minecraft.world.gen.chunk.ChunkGenerator
+ *  net.minecraft.world.gen.feature.ConfiguredFeature
+ *  net.minecraft.world.gen.feature.TreeConfiguredFeatures
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.block;
 
 import com.mojang.serialization.Codec;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Function;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -15,160 +41,132 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.BlockView;
+import net.minecraft.world.StructureWorldAccess;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
 import net.minecraft.world.gen.feature.TreeConfiguredFeatures;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
+/*
+ * Exception performing whole class analysis ignored.
+ */
 public final class SaplingGenerator {
-   private static final Map GENERATORS = new Object2ObjectArrayMap();
-   public static final Codec CODEC;
-   public static final SaplingGenerator OAK;
-   public static final SaplingGenerator SPRUCE;
-   public static final SaplingGenerator MANGROVE;
-   public static final SaplingGenerator AZALEA;
-   public static final SaplingGenerator BIRCH;
-   public static final SaplingGenerator JUNGLE;
-   public static final SaplingGenerator ACACIA;
-   public static final SaplingGenerator CHERRY;
-   public static final SaplingGenerator DARK_OAK;
-   public static final SaplingGenerator PALE_OAK;
-   private final String id;
-   private final float rareChance;
-   private final Optional megaVariant;
-   private final Optional rareMegaVariant;
-   private final Optional regularVariant;
-   private final Optional rareRegularVariant;
-   private final Optional beesVariant;
-   private final Optional rareBeesVariant;
+    private static final Map<String, SaplingGenerator> GENERATORS = new Object2ObjectArrayMap();
+    public static final Codec<SaplingGenerator> CODEC = Codec.stringResolver(generator -> generator.id, GENERATORS::get);
+    public static final SaplingGenerator OAK = new SaplingGenerator("oak", 0.1f, Optional.empty(), Optional.empty(), Optional.of(TreeConfiguredFeatures.OAK), Optional.of(TreeConfiguredFeatures.FANCY_OAK), Optional.of(TreeConfiguredFeatures.OAK_BEES_005), Optional.of(TreeConfiguredFeatures.FANCY_OAK_BEES_005));
+    public static final SaplingGenerator SPRUCE = new SaplingGenerator("spruce", 0.5f, Optional.of(TreeConfiguredFeatures.MEGA_SPRUCE), Optional.of(TreeConfiguredFeatures.MEGA_PINE), Optional.of(TreeConfiguredFeatures.SPRUCE), Optional.empty(), Optional.empty(), Optional.empty());
+    public static final SaplingGenerator MANGROVE = new SaplingGenerator("mangrove", 0.85f, Optional.empty(), Optional.empty(), Optional.of(TreeConfiguredFeatures.MANGROVE), Optional.of(TreeConfiguredFeatures.TALL_MANGROVE), Optional.empty(), Optional.empty());
+    public static final SaplingGenerator AZALEA = new SaplingGenerator("azalea", Optional.empty(), Optional.of(TreeConfiguredFeatures.AZALEA_TREE), Optional.empty());
+    public static final SaplingGenerator BIRCH = new SaplingGenerator("birch", Optional.empty(), Optional.of(TreeConfiguredFeatures.BIRCH), Optional.of(TreeConfiguredFeatures.BIRCH_BEES_005));
+    public static final SaplingGenerator JUNGLE = new SaplingGenerator("jungle", Optional.of(TreeConfiguredFeatures.MEGA_JUNGLE_TREE), Optional.of(TreeConfiguredFeatures.JUNGLE_TREE_NO_VINE), Optional.empty());
+    public static final SaplingGenerator ACACIA = new SaplingGenerator("acacia", Optional.empty(), Optional.of(TreeConfiguredFeatures.ACACIA), Optional.empty());
+    public static final SaplingGenerator CHERRY = new SaplingGenerator("cherry", Optional.empty(), Optional.of(TreeConfiguredFeatures.CHERRY), Optional.of(TreeConfiguredFeatures.CHERRY_BEES_005));
+    public static final SaplingGenerator DARK_OAK = new SaplingGenerator("dark_oak", Optional.of(TreeConfiguredFeatures.DARK_OAK), Optional.empty(), Optional.empty());
+    public static final SaplingGenerator PALE_OAK = new SaplingGenerator("pale_oak", Optional.of(TreeConfiguredFeatures.PALE_OAK_BONEMEAL), Optional.empty(), Optional.empty());
+    private final String id;
+    private final float rareChance;
+    private final Optional<RegistryKey<ConfiguredFeature<?, ?>>> megaVariant;
+    private final Optional<RegistryKey<ConfiguredFeature<?, ?>>> rareMegaVariant;
+    private final Optional<RegistryKey<ConfiguredFeature<?, ?>>> regularVariant;
+    private final Optional<RegistryKey<ConfiguredFeature<?, ?>>> rareRegularVariant;
+    private final Optional<RegistryKey<ConfiguredFeature<?, ?>>> beesVariant;
+    private final Optional<RegistryKey<ConfiguredFeature<?, ?>>> rareBeesVariant;
 
-   public SaplingGenerator(String id, Optional megaVariant, Optional regularVariant, Optional beesVariant) {
-      this(id, 0.0F, megaVariant, Optional.empty(), regularVariant, Optional.empty(), beesVariant, Optional.empty());
-   }
+    public SaplingGenerator(String id, Optional<RegistryKey<ConfiguredFeature<?, ?>>> megaVariant, Optional<RegistryKey<ConfiguredFeature<?, ?>>> regularVariant, Optional<RegistryKey<ConfiguredFeature<?, ?>>> beesVariant) {
+        this(id, 0.0f, megaVariant, Optional.empty(), regularVariant, Optional.empty(), beesVariant, Optional.empty());
+    }
 
-   public SaplingGenerator(String id, float rareChance, Optional megaVariant, Optional rareMegaVariant, Optional regularVariant, Optional rareRegularVariant, Optional beesVariant, Optional rareBeesVariant) {
-      this.id = id;
-      this.rareChance = rareChance;
-      this.megaVariant = megaVariant;
-      this.rareMegaVariant = rareMegaVariant;
-      this.regularVariant = regularVariant;
-      this.rareRegularVariant = rareRegularVariant;
-      this.beesVariant = beesVariant;
-      this.rareBeesVariant = rareBeesVariant;
-      GENERATORS.put(id, this);
-   }
+    public SaplingGenerator(String id, float rareChance, Optional<RegistryKey<ConfiguredFeature<?, ?>>> megaVariant, Optional<RegistryKey<ConfiguredFeature<?, ?>>> rareMegaVariant, Optional<RegistryKey<ConfiguredFeature<?, ?>>> regularVariant, Optional<RegistryKey<ConfiguredFeature<?, ?>>> rareRegularVariant, Optional<RegistryKey<ConfiguredFeature<?, ?>>> beesVariant, Optional<RegistryKey<ConfiguredFeature<?, ?>>> rareBeesVariant) {
+        this.id = id;
+        this.rareChance = rareChance;
+        this.megaVariant = megaVariant;
+        this.rareMegaVariant = rareMegaVariant;
+        this.regularVariant = regularVariant;
+        this.rareRegularVariant = rareRegularVariant;
+        this.beesVariant = beesVariant;
+        this.rareBeesVariant = rareBeesVariant;
+        GENERATORS.put(id, this);
+    }
 
-   @Nullable
-   private RegistryKey getSmallTreeFeature(Random random, boolean flowersNearby) {
-      if (random.nextFloat() < this.rareChance) {
-         if (flowersNearby && this.rareBeesVariant.isPresent()) {
-            return (RegistryKey)this.rareBeesVariant.get();
-         }
+    private @Nullable RegistryKey<ConfiguredFeature<?, ?>> getSmallTreeFeature(Random random, boolean flowersNearby) {
+        if (random.nextFloat() < this.rareChance) {
+            if (flowersNearby && this.rareBeesVariant.isPresent()) {
+                return (RegistryKey)this.rareBeesVariant.get();
+            }
+            if (this.rareRegularVariant.isPresent()) {
+                return (RegistryKey)this.rareRegularVariant.get();
+            }
+        }
+        if (flowersNearby && this.beesVariant.isPresent()) {
+            return (RegistryKey)this.beesVariant.get();
+        }
+        return this.regularVariant.orElse(null);
+    }
 
-         if (this.rareRegularVariant.isPresent()) {
-            return (RegistryKey)this.rareRegularVariant.get();
-         }
-      }
+    private @Nullable RegistryKey<ConfiguredFeature<?, ?>> getMegaTreeFeature(Random random) {
+        if (this.rareMegaVariant.isPresent() && random.nextFloat() < this.rareChance) {
+            return (RegistryKey)this.rareMegaVariant.get();
+        }
+        return this.megaVariant.orElse(null);
+    }
 
-      return flowersNearby && this.beesVariant.isPresent() ? (RegistryKey)this.beesVariant.get() : (RegistryKey)this.regularVariant.orElse((Object)null);
-   }
-
-   @Nullable
-   private RegistryKey getMegaTreeFeature(Random random) {
-      return this.rareMegaVariant.isPresent() && random.nextFloat() < this.rareChance ? (RegistryKey)this.rareMegaVariant.get() : (RegistryKey)this.megaVariant.orElse((Object)null);
-   }
-
-   public boolean generate(ServerWorld world, ChunkGenerator chunkGenerator, BlockPos pos, BlockState state, Random random) {
-      RegistryKey registryKey = this.getMegaTreeFeature(random);
-      if (registryKey != null) {
-         RegistryEntry registryEntry = (RegistryEntry)world.getRegistryManager().getOrThrow(RegistryKeys.CONFIGURED_FEATURE).getOptional(registryKey).orElse((Object)null);
-         if (registryEntry != null) {
-            for(int i = 0; i >= -1; --i) {
-               for(int j = 0; j >= -1; --j) {
-                  if (canGenerateLargeTree(state, world, pos, i, j)) {
-                     ConfiguredFeature configuredFeature = (ConfiguredFeature)registryEntry.value();
-                     BlockState blockState = Blocks.AIR.getDefaultState();
-                     world.setBlockState(pos.add(i, 0, j), blockState, 260);
-                     world.setBlockState(pos.add(i + 1, 0, j), blockState, 260);
-                     world.setBlockState(pos.add(i, 0, j + 1), blockState, 260);
-                     world.setBlockState(pos.add(i + 1, 0, j + 1), blockState, 260);
-                     if (configuredFeature.generate(world, chunkGenerator, random, pos.add(i, 0, j))) {
+    public boolean generate(ServerWorld world, ChunkGenerator chunkGenerator, BlockPos pos, BlockState state, Random random) {
+        RegistryKey registryKey2;
+        RegistryEntry registryEntry;
+        RegistryKey registryKey = this.getMegaTreeFeature(random);
+        if (registryKey != null && (registryEntry = (RegistryEntry)world.getRegistryManager().getOrThrow(RegistryKeys.CONFIGURED_FEATURE).getOptional(registryKey).orElse(null)) != null) {
+            for (int i = 0; i >= -1; --i) {
+                for (int j = 0; j >= -1; --j) {
+                    if (!SaplingGenerator.canGenerateLargeTree((BlockState)state, (BlockView)world, (BlockPos)pos, (int)i, (int)j)) continue;
+                    ConfiguredFeature configuredFeature = (ConfiguredFeature)registryEntry.value();
+                    BlockState blockState = Blocks.AIR.getDefaultState();
+                    world.setBlockState(pos.add(i, 0, j), blockState, 260);
+                    world.setBlockState(pos.add(i + 1, 0, j), blockState, 260);
+                    world.setBlockState(pos.add(i, 0, j + 1), blockState, 260);
+                    world.setBlockState(pos.add(i + 1, 0, j + 1), blockState, 260);
+                    if (configuredFeature.generate((StructureWorldAccess)world, chunkGenerator, random, pos.add(i, 0, j))) {
                         return true;
-                     }
-
-                     world.setBlockState(pos.add(i, 0, j), state, 260);
-                     world.setBlockState(pos.add(i + 1, 0, j), state, 260);
-                     world.setBlockState(pos.add(i, 0, j + 1), state, 260);
-                     world.setBlockState(pos.add(i + 1, 0, j + 1), state, 260);
-                     return false;
-                  }
-               }
+                    }
+                    world.setBlockState(pos.add(i, 0, j), state, 260);
+                    world.setBlockState(pos.add(i + 1, 0, j), state, 260);
+                    world.setBlockState(pos.add(i, 0, j + 1), state, 260);
+                    world.setBlockState(pos.add(i + 1, 0, j + 1), state, 260);
+                    return false;
+                }
             }
-         }
-      }
-
-      RegistryKey registryKey2 = this.getSmallTreeFeature(random, this.areFlowersNearby(world, pos));
-      if (registryKey2 == null) {
-         return false;
-      } else {
-         RegistryEntry registryEntry2 = (RegistryEntry)world.getRegistryManager().getOrThrow(RegistryKeys.CONFIGURED_FEATURE).getOptional(registryKey2).orElse((Object)null);
-         if (registryEntry2 == null) {
+        }
+        if ((registryKey2 = this.getSmallTreeFeature(random, this.areFlowersNearby((WorldAccess)world, pos))) == null) {
             return false;
-         } else {
-            ConfiguredFeature configuredFeature2 = (ConfiguredFeature)registryEntry2.value();
-            BlockState blockState2 = world.getFluidState(pos).getBlockState();
-            world.setBlockState(pos, blockState2, 260);
-            if (configuredFeature2.generate(world, chunkGenerator, random, pos)) {
-               if (world.getBlockState(pos) == blockState2) {
-                  world.updateListeners(pos, state, blockState2, 2);
-               }
-
-               return true;
-            } else {
-               world.setBlockState(pos, state, 260);
-               return false;
+        }
+        RegistryEntry registryEntry2 = world.getRegistryManager().getOrThrow(RegistryKeys.CONFIGURED_FEATURE).getOptional(registryKey2).orElse(null);
+        if (registryEntry2 == null) {
+            return false;
+        }
+        ConfiguredFeature configuredFeature2 = (ConfiguredFeature)registryEntry2.value();
+        BlockState blockState2 = world.getFluidState(pos).getBlockState();
+        world.setBlockState(pos, blockState2, 260);
+        if (configuredFeature2.generate((StructureWorldAccess)world, chunkGenerator, random, pos)) {
+            if (world.getBlockState(pos) == blockState2) {
+                world.updateListeners(pos, state, blockState2, 2);
             }
-         }
-      }
-   }
+            return true;
+        }
+        world.setBlockState(pos, state, 260);
+        return false;
+    }
 
-   private static boolean canGenerateLargeTree(BlockState state, BlockView world, BlockPos pos, int x, int z) {
-      Block block = state.getBlock();
-      return world.getBlockState(pos.add(x, 0, z)).isOf(block) && world.getBlockState(pos.add(x + 1, 0, z)).isOf(block) && world.getBlockState(pos.add(x, 0, z + 1)).isOf(block) && world.getBlockState(pos.add(x + 1, 0, z + 1)).isOf(block);
-   }
+    private static boolean canGenerateLargeTree(BlockState state, BlockView world, BlockPos pos, int x, int z) {
+        Block block = state.getBlock();
+        return world.getBlockState(pos.add(x, 0, z)).isOf(block) && world.getBlockState(pos.add(x + 1, 0, z)).isOf(block) && world.getBlockState(pos.add(x, 0, z + 1)).isOf(block) && world.getBlockState(pos.add(x + 1, 0, z + 1)).isOf(block);
+    }
 
-   private boolean areFlowersNearby(WorldAccess world, BlockPos pos) {
-      Iterator var3 = BlockPos.Mutable.iterate(pos.down().north(2).west(2), pos.up().south(2).east(2)).iterator();
-
-      BlockPos blockPos;
-      do {
-         if (!var3.hasNext()) {
-            return false;
-         }
-
-         blockPos = (BlockPos)var3.next();
-      } while(!world.getBlockState(blockPos).isIn(BlockTags.FLOWERS));
-
-      return true;
-   }
-
-   static {
-      Function var10000 = (generator) -> {
-         return generator.id;
-      };
-      Map var10001 = GENERATORS;
-      Objects.requireNonNull(var10001);
-      CODEC = Codec.stringResolver(var10000, var10001::get);
-      OAK = new SaplingGenerator("oak", 0.1F, Optional.empty(), Optional.empty(), Optional.of(TreeConfiguredFeatures.OAK), Optional.of(TreeConfiguredFeatures.FANCY_OAK), Optional.of(TreeConfiguredFeatures.OAK_BEES_005), Optional.of(TreeConfiguredFeatures.FANCY_OAK_BEES_005));
-      SPRUCE = new SaplingGenerator("spruce", 0.5F, Optional.of(TreeConfiguredFeatures.MEGA_SPRUCE), Optional.of(TreeConfiguredFeatures.MEGA_PINE), Optional.of(TreeConfiguredFeatures.SPRUCE), Optional.empty(), Optional.empty(), Optional.empty());
-      MANGROVE = new SaplingGenerator("mangrove", 0.85F, Optional.empty(), Optional.empty(), Optional.of(TreeConfiguredFeatures.MANGROVE), Optional.of(TreeConfiguredFeatures.TALL_MANGROVE), Optional.empty(), Optional.empty());
-      AZALEA = new SaplingGenerator("azalea", Optional.empty(), Optional.of(TreeConfiguredFeatures.AZALEA_TREE), Optional.empty());
-      BIRCH = new SaplingGenerator("birch", Optional.empty(), Optional.of(TreeConfiguredFeatures.BIRCH), Optional.of(TreeConfiguredFeatures.BIRCH_BEES_005));
-      JUNGLE = new SaplingGenerator("jungle", Optional.of(TreeConfiguredFeatures.MEGA_JUNGLE_TREE), Optional.of(TreeConfiguredFeatures.JUNGLE_TREE_NO_VINE), Optional.empty());
-      ACACIA = new SaplingGenerator("acacia", Optional.empty(), Optional.of(TreeConfiguredFeatures.ACACIA), Optional.empty());
-      CHERRY = new SaplingGenerator("cherry", Optional.empty(), Optional.of(TreeConfiguredFeatures.CHERRY), Optional.of(TreeConfiguredFeatures.CHERRY_BEES_005));
-      DARK_OAK = new SaplingGenerator("dark_oak", Optional.of(TreeConfiguredFeatures.DARK_OAK), Optional.empty(), Optional.empty());
-      PALE_OAK = new SaplingGenerator("pale_oak", Optional.of(TreeConfiguredFeatures.PALE_OAK_BONEMEAL), Optional.empty(), Optional.empty());
-   }
+    private boolean areFlowersNearby(WorldAccess world, BlockPos pos) {
+        for (BlockPos blockPos : BlockPos.Mutable.iterate((BlockPos)pos.down().north(2).west(2), (BlockPos)pos.up().south(2).east(2))) {
+            if (!world.getBlockState(blockPos).isIn(BlockTags.FLOWERS)) continue;
+            return true;
+        }
+        return false;
+    }
 }
+

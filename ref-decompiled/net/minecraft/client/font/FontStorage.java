@@ -1,242 +1,188 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.google.common.collect.Sets
+ *  it.unimi.dsi.fastutil.ints.Int2ObjectMap
+ *  it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
+ *  it.unimi.dsi.fastutil.ints.IntArrayList
+ *  it.unimi.dsi.fastutil.ints.IntCollection
+ *  it.unimi.dsi.fastutil.ints.IntList
+ *  it.unimi.dsi.fastutil.ints.IntOpenHashSet
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.font.BakedGlyph
+ *  net.minecraft.client.font.BuiltinEmptyGlyph
+ *  net.minecraft.client.font.EffectGlyph
+ *  net.minecraft.client.font.Font
+ *  net.minecraft.client.font.Font$FontFilterPair
+ *  net.minecraft.client.font.FontFilterType
+ *  net.minecraft.client.font.FontStorage
+ *  net.minecraft.client.font.FontStorage$GlyphPair
+ *  net.minecraft.client.font.FontStorage$Glyphs
+ *  net.minecraft.client.font.FontStorage$LazyBakedGlyph
+ *  net.minecraft.client.font.Glyph
+ *  net.minecraft.client.font.Glyph$AbstractGlyphBaker
+ *  net.minecraft.client.font.GlyphBaker
+ *  net.minecraft.client.font.GlyphContainer
+ *  net.minecraft.client.font.GlyphMetrics
+ *  net.minecraft.client.font.GlyphProvider
+ *  net.minecraft.util.math.MathHelper
+ *  net.minecraft.util.math.random.Random
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.font;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.mojang.logging.LogUtils;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntCollection;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
-import it.unimi.dsi.fastutil.ints.IntSet;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.IntFunction;
-import java.util.stream.Stream;
+import java.util.function.Supplier;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.texture.AbstractTexture;
-import net.minecraft.client.texture.TextureManager;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.font.BakedGlyph;
+import net.minecraft.client.font.BuiltinEmptyGlyph;
+import net.minecraft.client.font.EffectGlyph;
+import net.minecraft.client.font.Font;
+import net.minecraft.client.font.FontFilterType;
+import net.minecraft.client.font.FontStorage;
+import net.minecraft.client.font.Glyph;
+import net.minecraft.client.font.GlyphBaker;
+import net.minecraft.client.font.GlyphContainer;
+import net.minecraft.client.font.GlyphMetrics;
+import net.minecraft.client.font.GlyphProvider;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.random.Random;
-import org.slf4j.Logger;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
-public class FontStorage implements AutoCloseable {
-   private static final Logger LOGGER = LogUtils.getLogger();
-   private static final Random RANDOM = Random.create();
-   private static final float MAX_ADVANCE = 32.0F;
-   private final TextureManager textureManager;
-   private final Identifier id;
-   private BakedGlyph blankBakedGlyph;
-   private BakedGlyph whiteRectangleBakedGlyph;
-   private List allFonts = List.of();
-   private List availableFonts = List.of();
-   private final GlyphContainer bakedGlyphCache = new GlyphContainer((i) -> {
-      return new BakedGlyph[i];
-   }, (rowCount) -> {
-      return new BakedGlyph[rowCount][];
-   });
-   private final GlyphContainer glyphCache = new GlyphContainer((i) -> {
-      return new GlyphPair[i];
-   }, (rowCount) -> {
-      return new GlyphPair[rowCount][];
-   });
-   private final Int2ObjectMap charactersByWidth = new Int2ObjectOpenHashMap();
-   private final List glyphAtlases = Lists.newArrayList();
-   private final IntFunction glyphFinder = this::findGlyph;
-   private final IntFunction glyphBaker = this::bake;
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
+public class FontStorage
+implements AutoCloseable {
+    private static final float MAX_ADVANCE = 32.0f;
+    private static final BakedGlyph MISSING_GLYPH = new /* Unavailable Anonymous Inner Class!! */;
+    final GlyphBaker glyphBaker;
+    final Glyph.AbstractGlyphBaker abstractBaker = new /* Unavailable Anonymous Inner Class!! */;
+    private List<Font.FontFilterPair> allFonts = List.of();
+    private List<Font> availableFonts = List.of();
+    private final Int2ObjectMap<IntList> charactersByWidth = new Int2ObjectOpenHashMap();
+    private final GlyphContainer<GlyphPair> bakedGlyphCache = new GlyphContainer(GlyphPair[]::new, rowCount -> new GlyphPair[rowCount][]);
+    private final IntFunction<GlyphPair> findGlyph = arg_0 -> this.findGlyph(arg_0);
+    BakedGlyph blankBakedGlyph = MISSING_GLYPH;
+    private final Supplier<BakedGlyph> blankGlyphSupplier = () -> this.blankBakedGlyph;
+    private final GlyphPair blankBakedGlyphPair = new GlyphPair(this.blankGlyphSupplier, this.blankGlyphSupplier);
+    private @Nullable EffectGlyph whiteRectangleBakedGlyph;
+    private final GlyphProvider anyGlyphs = new Glyphs(this, false);
+    private final GlyphProvider advanceValidatingGlyphs = new Glyphs(this, true);
 
-   public FontStorage(TextureManager textureManager, Identifier id) {
-      this.textureManager = textureManager;
-      this.id = id;
-   }
+    public FontStorage(GlyphBaker baker) {
+        this.glyphBaker = baker;
+    }
 
-   public void setFonts(List allFonts, Set activeFilters) {
-      this.allFonts = allFonts;
-      this.setActiveFilters(activeFilters);
-   }
+    public void setFonts(List<Font.FontFilterPair> allFonts, Set<FontFilterType> activeFilters) {
+        this.allFonts = allFonts;
+        this.setActiveFilters(activeFilters);
+    }
 
-   public void setActiveFilters(Set activeFilters) {
-      this.availableFonts = List.of();
-      this.clear();
-      this.availableFonts = this.applyFilters(this.allFonts, activeFilters);
-   }
+    public void setActiveFilters(Set<FontFilterType> activeFilters) {
+        this.availableFonts = List.of();
+        this.clear();
+        this.availableFonts = this.applyFilters(this.allFonts, activeFilters);
+    }
 
-   private void clear() {
-      this.glyphAtlases.clear();
-      this.bakedGlyphCache.clear();
-      this.glyphCache.clear();
-      this.charactersByWidth.clear();
-      this.blankBakedGlyph = BuiltinEmptyGlyph.MISSING.bake(this::bake);
-      this.whiteRectangleBakedGlyph = BuiltinEmptyGlyph.WHITE.bake(this::bake);
-   }
+    private void clear() {
+        this.glyphBaker.clear();
+        this.bakedGlyphCache.clear();
+        this.charactersByWidth.clear();
+        this.blankBakedGlyph = (BakedGlyph)Objects.requireNonNull(BuiltinEmptyGlyph.MISSING.bake(this.glyphBaker));
+        this.whiteRectangleBakedGlyph = BuiltinEmptyGlyph.WHITE.bake(this.glyphBaker);
+    }
 
-   private List applyFilters(List allFonts, Set activeFilters) {
-      IntSet intSet = new IntOpenHashSet();
-      List list = new ArrayList();
-      Iterator var5 = allFonts.iterator();
-
-      while(var5.hasNext()) {
-         Font.FontFilterPair fontFilterPair = (Font.FontFilterPair)var5.next();
-         if (fontFilterPair.filter().isAllowed(activeFilters)) {
+    private List<Font> applyFilters(List<Font.FontFilterPair> allFonts, Set<FontFilterType> activeFilters) {
+        IntOpenHashSet intSet = new IntOpenHashSet();
+        ArrayList<Font> list = new ArrayList<Font>();
+        for (Font.FontFilterPair fontFilterPair : allFonts) {
+            if (!fontFilterPair.filter().isAllowed(activeFilters)) continue;
             list.add(fontFilterPair.provider());
-            intSet.addAll(fontFilterPair.provider().getProvidedGlyphs());
-         }
-      }
+            intSet.addAll((IntCollection)fontFilterPair.provider().getProvidedGlyphs());
+        }
+        HashSet set = Sets.newHashSet();
+        intSet.forEach(codePoint -> {
+            for (Font font : list) {
+                Glyph glyph = font.getGlyph(codePoint);
+                if (glyph == null) continue;
+                set.add(font);
+                if (glyph.getMetrics() == BuiltinEmptyGlyph.MISSING) break;
+                ((IntList)this.charactersByWidth.computeIfAbsent(MathHelper.ceil((float)glyph.getMetrics().getAdvance(false)), i -> new IntArrayList())).add(codePoint);
+                break;
+            }
+        });
+        return list.stream().filter(set::contains).toList();
+    }
 
-      Set set = Sets.newHashSet();
-      intSet.forEach((codePoint) -> {
-         Iterator var4 = list.iterator();
+    @Override
+    public void close() {
+        this.glyphBaker.close();
+    }
 
-         while(var4.hasNext()) {
-            Font font = (Font)var4.next();
+    private static boolean isAdvanceInvalid(GlyphMetrics glyph) {
+        float f = glyph.getAdvance(false);
+        if (f < 0.0f || f > 32.0f) {
+            return true;
+        }
+        float g = glyph.getAdvance(true);
+        return g < 0.0f || g > 32.0f;
+    }
+
+    private GlyphPair findGlyph(int codePoint) {
+        LazyBakedGlyph lazyBakedGlyph = null;
+        for (Font font : this.availableFonts) {
             Glyph glyph = font.getGlyph(codePoint);
-            if (glyph != null) {
-               set.add(font);
-               if (glyph != BuiltinEmptyGlyph.MISSING) {
-                  ((IntList)this.charactersByWidth.computeIfAbsent(MathHelper.ceil(glyph.getAdvance(false)), (i) -> {
-                     return new IntArrayList();
-                  })).add(codePoint);
-               }
-               break;
+            if (glyph == null) continue;
+            if (lazyBakedGlyph == null) {
+                lazyBakedGlyph = new LazyBakedGlyph(this, glyph);
             }
-         }
-
-      });
-      Stream var10000 = list.stream();
-      Objects.requireNonNull(set);
-      return var10000.filter(set::contains).toList();
-   }
-
-   public void close() {
-      this.glyphAtlases.clear();
-   }
-
-   private static boolean isAdvanceInvalid(Glyph glyph) {
-      float f = glyph.getAdvance(false);
-      if (!(f < 0.0F) && !(f > 32.0F)) {
-         float g = glyph.getAdvance(true);
-         return g < 0.0F || g > 32.0F;
-      } else {
-         return true;
-      }
-   }
-
-   private GlyphPair findGlyph(int codePoint) {
-      Glyph glyph = null;
-      Iterator var3 = this.availableFonts.iterator();
-
-      while(var3.hasNext()) {
-         Font font = (Font)var3.next();
-         Glyph glyph2 = font.getGlyph(codePoint);
-         if (glyph2 != null) {
-            if (glyph == null) {
-               glyph = glyph2;
+            if (FontStorage.isAdvanceInvalid((GlyphMetrics)glyph.getMetrics())) continue;
+            if (lazyBakedGlyph.glyph == glyph) {
+                return new GlyphPair((Supplier)lazyBakedGlyph, (Supplier)lazyBakedGlyph);
             }
+            return new GlyphPair((Supplier)lazyBakedGlyph, (Supplier)new LazyBakedGlyph(this, glyph));
+        }
+        if (lazyBakedGlyph != null) {
+            return new GlyphPair(lazyBakedGlyph, this.blankGlyphSupplier);
+        }
+        return this.blankBakedGlyphPair;
+    }
 
-            if (!isAdvanceInvalid(glyph2)) {
-               return new GlyphPair(glyph, glyph2);
-            }
-         }
-      }
+    GlyphPair getBaked(int codePoint) {
+        return (GlyphPair)this.bakedGlyphCache.computeIfAbsent(codePoint, this.findGlyph);
+    }
 
-      if (glyph != null) {
-         return new GlyphPair(glyph, BuiltinEmptyGlyph.MISSING);
-      } else {
-         return FontStorage.GlyphPair.MISSING;
-      }
-   }
+    public BakedGlyph getObfuscatedBakedGlyph(Random random, int width) {
+        IntList intList = (IntList)this.charactersByWidth.get(width);
+        if (intList != null && !intList.isEmpty()) {
+            return (BakedGlyph)this.getBaked(intList.getInt(random.nextInt(intList.size()))).advanceValidating().get();
+        }
+        return this.blankBakedGlyph;
+    }
 
-   public Glyph getGlyph(int codePoint, boolean validateAdvance) {
-      return ((GlyphPair)this.glyphCache.computeIfAbsent(codePoint, this.glyphFinder)).getGlyph(validateAdvance);
-   }
+    public EffectGlyph getRectangleBakedGlyph() {
+        return Objects.requireNonNull(this.whiteRectangleBakedGlyph);
+    }
 
-   private BakedGlyph bake(int codePoint) {
-      Iterator var2 = this.availableFonts.iterator();
-
-      Glyph glyph;
-      do {
-         if (!var2.hasNext()) {
-            LOGGER.warn("Couldn't find glyph for character {} (\\u{})", Character.toString(codePoint), String.format("%04x", codePoint));
-            return this.blankBakedGlyph;
-         }
-
-         Font font = (Font)var2.next();
-         glyph = font.getGlyph(codePoint);
-      } while(glyph == null);
-
-      return glyph.bake(this::bake);
-   }
-
-   public BakedGlyph getBaked(int codePoint) {
-      return (BakedGlyph)this.bakedGlyphCache.computeIfAbsent(codePoint, this.glyphBaker);
-   }
-
-   private BakedGlyph bake(RenderableGlyph c) {
-      Iterator var2 = this.glyphAtlases.iterator();
-
-      BakedGlyph bakedGlyph;
-      do {
-         if (!var2.hasNext()) {
-            Identifier identifier = this.id.withSuffixedPath("/" + this.glyphAtlases.size());
-            boolean bl = c.hasColor();
-            TextRenderLayerSet textRenderLayerSet = bl ? TextRenderLayerSet.of(identifier) : TextRenderLayerSet.ofIntensity(identifier);
-            Objects.requireNonNull(identifier);
-            GlyphAtlasTexture glyphAtlasTexture2 = new GlyphAtlasTexture(identifier::toString, textRenderLayerSet, bl);
-            this.glyphAtlases.add(glyphAtlasTexture2);
-            this.textureManager.registerTexture(identifier, (AbstractTexture)glyphAtlasTexture2);
-            BakedGlyph bakedGlyph2 = glyphAtlasTexture2.bake(c);
-            return bakedGlyph2 == null ? this.blankBakedGlyph : bakedGlyph2;
-         }
-
-         GlyphAtlasTexture glyphAtlasTexture = (GlyphAtlasTexture)var2.next();
-         bakedGlyph = glyphAtlasTexture.bake(c);
-      } while(bakedGlyph == null);
-
-      return bakedGlyph;
-   }
-
-   public BakedGlyph getObfuscatedBakedGlyph(Glyph glyph) {
-      IntList intList = (IntList)this.charactersByWidth.get(MathHelper.ceil(glyph.getAdvance(false)));
-      return intList != null && !intList.isEmpty() ? this.getBaked(intList.getInt(RANDOM.nextInt(intList.size()))) : this.blankBakedGlyph;
-   }
-
-   public Identifier getId() {
-      return this.id;
-   }
-
-   public BakedGlyph getRectangleBakedGlyph() {
-      return this.whiteRectangleBakedGlyph;
-   }
-
-   @Environment(EnvType.CLIENT)
-   private static record GlyphPair(Glyph glyph, Glyph advanceValidatedGlyph) {
-      static final GlyphPair MISSING;
-
-      GlyphPair(Glyph glyph, Glyph glyph2) {
-         this.glyph = glyph;
-         this.advanceValidatedGlyph = glyph2;
-      }
-
-      Glyph getGlyph(boolean validateAdvance) {
-         return validateAdvance ? this.advanceValidatedGlyph : this.glyph;
-      }
-
-      public Glyph glyph() {
-         return this.glyph;
-      }
-
-      public Glyph advanceValidatedGlyph() {
-         return this.advanceValidatedGlyph;
-      }
-
-      static {
-         MISSING = new GlyphPair(BuiltinEmptyGlyph.MISSING, BuiltinEmptyGlyph.MISSING);
-      }
-   }
+    public GlyphProvider getGlyphs(boolean advanceValidating) {
+        return advanceValidating ? this.advanceValidatingGlyphs : this.anyGlyphs;
+    }
 }
+

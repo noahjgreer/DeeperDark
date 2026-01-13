@@ -1,14 +1,23 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.render.entity.state.EntityRenderState
+ *  net.minecraft.client.render.entity.state.FishingBobberEntityState
+ *  net.minecraft.util.math.Vec3d
+ */
 package net.minecraft.client.render.entity.state;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.render.entity.state.EntityRenderState;
 import net.minecraft.util.math.Vec3d;
 
-@Environment(EnvType.CLIENT)
-public class FishingBobberEntityState extends EntityRenderState {
-   public Vec3d pos;
-
-   public FishingBobberEntityState() {
-      this.pos = Vec3d.ZERO;
-   }
+@Environment(value=EnvType.CLIENT)
+public class FishingBobberEntityState
+extends EntityRenderState {
+    public Vec3d pos = Vec3d.ZERO;
 }
+

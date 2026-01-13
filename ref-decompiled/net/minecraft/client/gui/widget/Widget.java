@@ -1,32 +1,44 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.gui.ScreenRect
+ *  net.minecraft.client.gui.widget.ClickableWidget
+ *  net.minecraft.client.gui.widget.Widget
+ */
 package net.minecraft.client.gui.widget;
 
 import java.util.function.Consumer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.ScreenRect;
+import net.minecraft.client.gui.widget.ClickableWidget;
 
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 public interface Widget {
-   void setX(int x);
+    public void setX(int var1);
 
-   void setY(int y);
+    public void setY(int var1);
 
-   int getX();
+    public int getX();
 
-   int getY();
+    public int getY();
 
-   int getWidth();
+    public int getWidth();
 
-   int getHeight();
+    public int getHeight();
 
-   default ScreenRect getNavigationFocus() {
-      return new ScreenRect(this.getX(), this.getY(), this.getWidth(), this.getHeight());
-   }
+    default public ScreenRect getNavigationFocus() {
+        return new ScreenRect(this.getX(), this.getY(), this.getWidth(), this.getHeight());
+    }
 
-   default void setPosition(int x, int y) {
-      this.setX(x);
-      this.setY(y);
-   }
+    default public void setPosition(int x, int y) {
+        this.setX(x);
+        this.setY(y);
+    }
 
-   void forEachChild(Consumer consumer);
+    public void forEachChild(Consumer<ClickableWidget> var1);
 }
+

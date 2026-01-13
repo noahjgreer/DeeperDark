@@ -44,7 +44,7 @@ public class FlintBlockEvents {
                  return ActionResult.PASS;
             }
 
-            if (!world.isClient) {
+            if (!world.isClient()) {
                 // Place Cobbled Deepslate with Flint Block Display
                 if (CustomBlockManager.place(world, placePos, stack, Blocks.COBBLED_DEEPSLATE, null)) {
                     // Use DEEPSLATE sound

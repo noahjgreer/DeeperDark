@@ -1,3 +1,24 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.model.Dilation
+ *  net.minecraft.client.model.ModelData
+ *  net.minecraft.client.model.ModelPart
+ *  net.minecraft.client.model.ModelPartBuilder
+ *  net.minecraft.client.model.ModelPartData
+ *  net.minecraft.client.model.ModelTransform
+ *  net.minecraft.client.render.entity.model.EntityModel
+ *  net.minecraft.client.render.entity.model.ModelTransformer
+ *  net.minecraft.client.render.entity.model.ModelWithHat
+ *  net.minecraft.client.render.entity.model.ModelWithHead
+ *  net.minecraft.client.render.entity.model.VillagerResemblingModel
+ *  net.minecraft.client.render.entity.state.VillagerEntityRenderState
+ *  net.minecraft.client.util.math.MatrixStack
+ *  net.minecraft.util.math.MathHelper
+ */
 package net.minecraft.client.render.entity.model;
 
 import net.fabricmc.api.EnvType;
@@ -8,75 +29,81 @@ import net.minecraft.client.model.ModelPart;
 import net.minecraft.client.model.ModelPartBuilder;
 import net.minecraft.client.model.ModelPartData;
 import net.minecraft.client.model.ModelTransform;
+import net.minecraft.client.render.entity.model.EntityModel;
+import net.minecraft.client.render.entity.model.ModelTransformer;
+import net.minecraft.client.render.entity.model.ModelWithHat;
+import net.minecraft.client.render.entity.model.ModelWithHead;
 import net.minecraft.client.render.entity.state.VillagerEntityRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.MathHelper;
 
-@Environment(EnvType.CLIENT)
-public class VillagerResemblingModel extends EntityModel implements ModelWithHead, ModelWithHat {
-   public static final ModelTransformer BABY_TRANSFORMER = ModelTransformer.scaling(0.5F);
-   private final ModelPart head;
-   private final ModelPart hat;
-   private final ModelPart hatRim;
-   private final ModelPart rightLeg;
-   private final ModelPart leftLeg;
-   private final ModelPart arms;
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
+public class VillagerResemblingModel
+extends EntityModel<VillagerEntityRenderState>
+implements ModelWithHead,
+ModelWithHat<VillagerEntityRenderState> {
+    public static final ModelTransformer BABY_TRANSFORMER = ModelTransformer.scaling((float)0.5f);
+    private final ModelPart head;
+    private final ModelPart rightLeg;
+    private final ModelPart leftLeg;
+    private final ModelPart arms;
 
-   public VillagerResemblingModel(ModelPart modelPart) {
-      super(modelPart);
-      this.head = modelPart.getChild("head");
-      this.hat = this.head.getChild("hat");
-      this.hatRim = this.hat.getChild("hat_rim");
-      this.rightLeg = modelPart.getChild("right_leg");
-      this.leftLeg = modelPart.getChild("left_leg");
-      this.arms = modelPart.getChild("arms");
-   }
+    public VillagerResemblingModel(ModelPart modelPart) {
+        super(modelPart);
+        this.head = modelPart.getChild("head");
+        this.rightLeg = modelPart.getChild("right_leg");
+        this.leftLeg = modelPart.getChild("left_leg");
+        this.arms = modelPart.getChild("arms");
+    }
 
-   public static ModelData getModelData() {
-      ModelData modelData = new ModelData();
-      ModelPartData modelPartData = modelData.getRoot();
-      float f = 0.5F;
-      ModelPartData modelPartData2 = modelPartData.addChild("head", ModelPartBuilder.create().uv(0, 0).cuboid(-4.0F, -10.0F, -4.0F, 8.0F, 10.0F, 8.0F), ModelTransform.NONE);
-      ModelPartData modelPartData3 = modelPartData2.addChild("hat", ModelPartBuilder.create().uv(32, 0).cuboid(-4.0F, -10.0F, -4.0F, 8.0F, 10.0F, 8.0F, new Dilation(0.51F)), ModelTransform.NONE);
-      modelPartData3.addChild("hat_rim", ModelPartBuilder.create().uv(30, 47).cuboid(-8.0F, -8.0F, -6.0F, 16.0F, 16.0F, 1.0F), ModelTransform.rotation(-1.5707964F, 0.0F, 0.0F));
-      modelPartData2.addChild("nose", ModelPartBuilder.create().uv(24, 0).cuboid(-1.0F, -1.0F, -6.0F, 2.0F, 4.0F, 2.0F), ModelTransform.origin(0.0F, -2.0F, 0.0F));
-      ModelPartData modelPartData4 = modelPartData.addChild("body", ModelPartBuilder.create().uv(16, 20).cuboid(-4.0F, 0.0F, -3.0F, 8.0F, 12.0F, 6.0F), ModelTransform.NONE);
-      modelPartData4.addChild("jacket", ModelPartBuilder.create().uv(0, 38).cuboid(-4.0F, 0.0F, -3.0F, 8.0F, 20.0F, 6.0F, new Dilation(0.5F)), ModelTransform.NONE);
-      modelPartData.addChild("arms", ModelPartBuilder.create().uv(44, 22).cuboid(-8.0F, -2.0F, -2.0F, 4.0F, 8.0F, 4.0F).uv(44, 22).cuboid(4.0F, -2.0F, -2.0F, 4.0F, 8.0F, 4.0F, true).uv(40, 38).cuboid(-4.0F, 2.0F, -2.0F, 8.0F, 4.0F, 4.0F), ModelTransform.of(0.0F, 3.0F, -1.0F, -0.75F, 0.0F, 0.0F));
-      modelPartData.addChild("right_leg", ModelPartBuilder.create().uv(0, 22).cuboid(-2.0F, 0.0F, -2.0F, 4.0F, 12.0F, 4.0F), ModelTransform.origin(-2.0F, 12.0F, 0.0F));
-      modelPartData.addChild("left_leg", ModelPartBuilder.create().uv(0, 22).mirrored().cuboid(-2.0F, 0.0F, -2.0F, 4.0F, 12.0F, 4.0F), ModelTransform.origin(2.0F, 12.0F, 0.0F));
-      return modelData;
-   }
+    public static ModelData getModelData() {
+        ModelData modelData = new ModelData();
+        ModelPartData modelPartData = modelData.getRoot();
+        float f = 0.5f;
+        ModelPartData modelPartData2 = modelPartData.addChild("head", ModelPartBuilder.create().uv(0, 0).cuboid(-4.0f, -10.0f, -4.0f, 8.0f, 10.0f, 8.0f), ModelTransform.NONE);
+        ModelPartData modelPartData3 = modelPartData2.addChild("hat", ModelPartBuilder.create().uv(32, 0).cuboid(-4.0f, -10.0f, -4.0f, 8.0f, 10.0f, 8.0f, new Dilation(0.51f)), ModelTransform.NONE);
+        modelPartData3.addChild("hat_rim", ModelPartBuilder.create().uv(30, 47).cuboid(-8.0f, -8.0f, -6.0f, 16.0f, 16.0f, 1.0f), ModelTransform.rotation((float)-1.5707964f, (float)0.0f, (float)0.0f));
+        modelPartData2.addChild("nose", ModelPartBuilder.create().uv(24, 0).cuboid(-1.0f, -1.0f, -6.0f, 2.0f, 4.0f, 2.0f), ModelTransform.origin((float)0.0f, (float)-2.0f, (float)0.0f));
+        ModelPartData modelPartData4 = modelPartData.addChild("body", ModelPartBuilder.create().uv(16, 20).cuboid(-4.0f, 0.0f, -3.0f, 8.0f, 12.0f, 6.0f), ModelTransform.NONE);
+        modelPartData4.addChild("jacket", ModelPartBuilder.create().uv(0, 38).cuboid(-4.0f, 0.0f, -3.0f, 8.0f, 20.0f, 6.0f, new Dilation(0.5f)), ModelTransform.NONE);
+        modelPartData.addChild("arms", ModelPartBuilder.create().uv(44, 22).cuboid(-8.0f, -2.0f, -2.0f, 4.0f, 8.0f, 4.0f).uv(44, 22).cuboid(4.0f, -2.0f, -2.0f, 4.0f, 8.0f, 4.0f, true).uv(40, 38).cuboid(-4.0f, 2.0f, -2.0f, 8.0f, 4.0f, 4.0f), ModelTransform.of((float)0.0f, (float)3.0f, (float)-1.0f, (float)-0.75f, (float)0.0f, (float)0.0f));
+        modelPartData.addChild("right_leg", ModelPartBuilder.create().uv(0, 22).cuboid(-2.0f, 0.0f, -2.0f, 4.0f, 12.0f, 4.0f), ModelTransform.origin((float)-2.0f, (float)12.0f, (float)0.0f));
+        modelPartData.addChild("left_leg", ModelPartBuilder.create().uv(0, 22).mirrored().cuboid(-2.0f, 0.0f, -2.0f, 4.0f, 12.0f, 4.0f), ModelTransform.origin((float)2.0f, (float)12.0f, (float)0.0f));
+        return modelData;
+    }
 
-   public void setAngles(VillagerEntityRenderState villagerEntityRenderState) {
-      super.setAngles(villagerEntityRenderState);
-      this.head.yaw = villagerEntityRenderState.relativeHeadYaw * 0.017453292F;
-      this.head.pitch = villagerEntityRenderState.pitch * 0.017453292F;
-      if (villagerEntityRenderState.headRolling) {
-         this.head.roll = 0.3F * MathHelper.sin(0.45F * villagerEntityRenderState.age);
-         this.head.pitch = 0.4F;
-      } else {
-         this.head.roll = 0.0F;
-      }
+    public static ModelData getNoHatModelData() {
+        ModelData modelData = VillagerResemblingModel.getModelData();
+        modelData.getRoot().resetChildrenParts("head").resetChildrenParts();
+        return modelData;
+    }
 
-      this.rightLeg.pitch = MathHelper.cos(villagerEntityRenderState.limbSwingAnimationProgress * 0.6662F) * 1.4F * villagerEntityRenderState.limbSwingAmplitude * 0.5F;
-      this.leftLeg.pitch = MathHelper.cos(villagerEntityRenderState.limbSwingAnimationProgress * 0.6662F + 3.1415927F) * 1.4F * villagerEntityRenderState.limbSwingAmplitude * 0.5F;
-      this.rightLeg.yaw = 0.0F;
-      this.leftLeg.yaw = 0.0F;
-   }
+    public void setAngles(VillagerEntityRenderState villagerEntityRenderState) {
+        super.setAngles((Object)villagerEntityRenderState);
+        this.head.yaw = villagerEntityRenderState.relativeHeadYaw * ((float)Math.PI / 180);
+        this.head.pitch = villagerEntityRenderState.pitch * ((float)Math.PI / 180);
+        if (villagerEntityRenderState.headRolling) {
+            this.head.roll = 0.3f * MathHelper.sin((double)(0.45f * villagerEntityRenderState.age));
+            this.head.pitch = 0.4f;
+        } else {
+            this.head.roll = 0.0f;
+        }
+        this.rightLeg.pitch = MathHelper.cos((double)(villagerEntityRenderState.limbSwingAnimationProgress * 0.6662f)) * 1.4f * villagerEntityRenderState.limbSwingAmplitude * 0.5f;
+        this.leftLeg.pitch = MathHelper.cos((double)(villagerEntityRenderState.limbSwingAnimationProgress * 0.6662f + (float)Math.PI)) * 1.4f * villagerEntityRenderState.limbSwingAmplitude * 0.5f;
+        this.rightLeg.yaw = 0.0f;
+        this.leftLeg.yaw = 0.0f;
+    }
 
-   public ModelPart getHead() {
-      return this.head;
-   }
+    public ModelPart getHead() {
+        return this.head;
+    }
 
-   public void setHatVisible(boolean visible) {
-      this.head.visible = visible;
-      this.hat.visible = visible;
-      this.hatRim.visible = visible;
-   }
-
-   public void rotateArms(MatrixStack stack) {
-      this.root.applyTransform(stack);
-      this.arms.applyTransform(stack);
-   }
+    public void rotateArms(VillagerEntityRenderState villagerEntityRenderState, MatrixStack matrixStack) {
+        this.root.applyTransform(matrixStack);
+        this.arms.applyTransform(matrixStack);
+    }
 }
+

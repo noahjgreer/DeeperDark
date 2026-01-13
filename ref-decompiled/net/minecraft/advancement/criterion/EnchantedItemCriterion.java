@@ -1,59 +1,30 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.serialization.Codec
+ *  net.minecraft.advancement.criterion.AbstractCriterion
+ *  net.minecraft.advancement.criterion.EnchantedItemCriterion
+ *  net.minecraft.advancement.criterion.EnchantedItemCriterion$Conditions
+ *  net.minecraft.item.ItemStack
+ *  net.minecraft.server.network.ServerPlayerEntity
+ */
 package net.minecraft.advancement.criterion;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import java.util.Optional;
-import net.minecraft.advancement.AdvancementCriterion;
+import net.minecraft.advancement.criterion.AbstractCriterion;
+import net.minecraft.advancement.criterion.EnchantedItemCriterion;
 import net.minecraft.item.ItemStack;
-import net.minecraft.predicate.NumberRange;
-import net.minecraft.predicate.entity.EntityPredicate;
-import net.minecraft.predicate.item.ItemPredicate;
 import net.minecraft.server.network.ServerPlayerEntity;
 
-public class EnchantedItemCriterion extends AbstractCriterion {
-   public Codec getConditionsCodec() {
-      return EnchantedItemCriterion.Conditions.CODEC;
-   }
+public class EnchantedItemCriterion
+extends AbstractCriterion<Conditions> {
+    public Codec<Conditions> getConditionsCodec() {
+        return Conditions.CODEC;
+    }
 
-   public void trigger(ServerPlayerEntity player, ItemStack stack, int levels) {
-      this.trigger(player, (conditions) -> {
-         return conditions.matches(stack, levels);
-      });
-   }
-
-   public static record Conditions(Optional player, Optional item, NumberRange.IntRange levels) implements AbstractCriterion.Conditions {
-      public static final Codec CODEC = RecordCodecBuilder.create((instance) -> {
-         return instance.group(EntityPredicate.LOOT_CONTEXT_PREDICATE_CODEC.optionalFieldOf("player").forGetter(Conditions::player), ItemPredicate.CODEC.optionalFieldOf("item").forGetter(Conditions::item), NumberRange.IntRange.CODEC.optionalFieldOf("levels", NumberRange.IntRange.ANY).forGetter(Conditions::levels)).apply(instance, Conditions::new);
-      });
-
-      public Conditions(Optional playerPredicate, Optional item, NumberRange.IntRange levels) {
-         this.player = playerPredicate;
-         this.item = item;
-         this.levels = levels;
-      }
-
-      public static AdvancementCriterion any() {
-         return Criteria.ENCHANTED_ITEM.create(new Conditions(Optional.empty(), Optional.empty(), NumberRange.IntRange.ANY));
-      }
-
-      public boolean matches(ItemStack stack, int levels) {
-         if (this.item.isPresent() && !((ItemPredicate)this.item.get()).test(stack)) {
-            return false;
-         } else {
-            return this.levels.test(levels);
-         }
-      }
-
-      public Optional player() {
-         return this.player;
-      }
-
-      public Optional item() {
-         return this.item;
-      }
-
-      public NumberRange.IntRange levels() {
-         return this.levels;
-      }
-   }
+    public void trigger(ServerPlayerEntity player, ItemStack stack, int levels) {
+        this.trigger(player, conditions -> conditions.matches(stack, levels));
+    }
 }
+

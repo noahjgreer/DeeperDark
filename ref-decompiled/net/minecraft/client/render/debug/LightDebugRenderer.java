@@ -1,3 +1,26 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.MinecraftClient
+ *  net.minecraft.client.render.DrawStyle
+ *  net.minecraft.client.render.Frustum
+ *  net.minecraft.client.render.debug.DebugRenderer$Renderer
+ *  net.minecraft.client.render.debug.LightDebugRenderer
+ *  net.minecraft.client.render.debug.LightDebugRenderer$Data
+ *  net.minecraft.util.math.BlockPos
+ *  net.minecraft.util.math.ChunkSectionPos
+ *  net.minecraft.util.math.ColorHelper
+ *  net.minecraft.util.math.Direction
+ *  net.minecraft.util.math.Vec3d
+ *  net.minecraft.util.shape.VoxelSet
+ *  net.minecraft.world.LightType
+ *  net.minecraft.world.debug.DebugDataStore
+ *  net.minecraft.world.debug.gizmo.GizmoDrawing
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.render.debug;
 
 import java.time.Duration;
@@ -5,121 +28,90 @@ import java.time.Instant;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.VertexRendering;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.render.DrawStyle;
+import net.minecraft.client.render.Frustum;
+import net.minecraft.client.render.debug.DebugRenderer;
+import net.minecraft.client.render.debug.LightDebugRenderer;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkSectionPos;
+import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.BitSetVoxelSet;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelSet;
 import net.minecraft.world.LightType;
-import net.minecraft.world.chunk.light.LightStorage;
-import net.minecraft.world.chunk.light.LightingProvider;
-import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix4f;
-import org.joml.Vector4f;
+import net.minecraft.world.debug.DebugDataStore;
+import net.minecraft.world.debug.gizmo.GizmoDrawing;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
-public class LightDebugRenderer implements DebugRenderer.Renderer {
-   private static final Duration UPDATE_INTERVAL = Duration.ofMillis(500L);
-   private static final int RADIUS = 10;
-   private static final Vector4f READY_SHAPE_COLOR = new Vector4f(1.0F, 1.0F, 0.0F, 0.25F);
-   private static final Vector4f DEFAULT_SHAPE_COLOR = new Vector4f(0.25F, 0.125F, 0.0F, 0.125F);
-   private final MinecraftClient client;
-   private final LightType lightType;
-   private Instant lastUpdateTime = Instant.now();
-   @Nullable
-   private Data data;
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
+public class LightDebugRenderer
+implements DebugRenderer.Renderer {
+    private static final Duration UPDATE_INTERVAL = Duration.ofMillis(500L);
+    private static final int RADIUS = 10;
+    private static final int READY_SHAPE_COLOR = ColorHelper.fromFloats((float)0.25f, (float)1.0f, (float)1.0f, (float)0.0f);
+    private static final int DEFAULT_SHAPE_COLOR = ColorHelper.fromFloats((float)0.125f, (float)0.25f, (float)0.125f, (float)0.0f);
+    private final MinecraftClient client;
+    private final LightType lightType;
+    private Instant lastUpdateTime = Instant.now();
+    private // Could not load outer class - annotation placement on inner may be incorrect
+    @Nullable LightDebugRenderer.Data data;
 
-   public LightDebugRenderer(MinecraftClient client, LightType lightType) {
-      this.client = client;
-      this.lightType = lightType;
-   }
+    public LightDebugRenderer(MinecraftClient client, LightType lightType) {
+        this.client = client;
+        this.lightType = lightType;
+    }
 
-   public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, double cameraX, double cameraY, double cameraZ) {
-      Instant instant = Instant.now();
-      if (this.data == null || Duration.between(this.lastUpdateTime, instant).compareTo(UPDATE_INTERVAL) > 0) {
-         this.lastUpdateTime = instant;
-         this.data = new Data(this.client.world.getLightingProvider(), ChunkSectionPos.from(this.client.player.getBlockPos()), 10, this.lightType);
-      }
+    public void render(double cameraX, double cameraY, double cameraZ, DebugDataStore store, Frustum frustum, float tickProgress) {
+        Instant instant = Instant.now();
+        if (this.data == null || Duration.between(this.lastUpdateTime, instant).compareTo(UPDATE_INTERVAL) > 0) {
+            this.lastUpdateTime = instant;
+            this.data = new Data(this.client.world.getLightingProvider(), ChunkSectionPos.from((BlockPos)this.client.player.getBlockPos()), 10, this.lightType);
+        }
+        LightDebugRenderer.drawEdges((VoxelSet)this.data.readyShape, (ChunkSectionPos)this.data.minSectionPos, (int)READY_SHAPE_COLOR);
+        LightDebugRenderer.drawEdges((VoxelSet)this.data.shape, (ChunkSectionPos)this.data.minSectionPos, (int)DEFAULT_SHAPE_COLOR);
+        LightDebugRenderer.drawFaces((VoxelSet)this.data.readyShape, (ChunkSectionPos)this.data.minSectionPos, (int)READY_SHAPE_COLOR);
+        LightDebugRenderer.drawFaces((VoxelSet)this.data.shape, (ChunkSectionPos)this.data.minSectionPos, (int)DEFAULT_SHAPE_COLOR);
+    }
 
-      drawEdges(matrices, this.data.readyShape, this.data.minSectionPos, vertexConsumers, cameraX, cameraY, cameraZ, READY_SHAPE_COLOR);
-      drawEdges(matrices, this.data.shape, this.data.minSectionPos, vertexConsumers, cameraX, cameraY, cameraZ, DEFAULT_SHAPE_COLOR);
-      VertexConsumer vertexConsumer = vertexConsumers.getBuffer(RenderLayer.getDebugSectionQuads());
-      drawFaces(matrices, this.data.readyShape, this.data.minSectionPos, vertexConsumer, cameraX, cameraY, cameraZ, READY_SHAPE_COLOR);
-      drawFaces(matrices, this.data.shape, this.data.minSectionPos, vertexConsumer, cameraX, cameraY, cameraZ, DEFAULT_SHAPE_COLOR);
-   }
+    private static void drawFaces(VoxelSet voxelSet, ChunkSectionPos chunkSectionPos, int i) {
+        voxelSet.forEachDirection((direction, j, k, l) -> {
+            int m = j + chunkSectionPos.getX();
+            int n = k + chunkSectionPos.getY();
+            int o = l + chunkSectionPos.getZ();
+            LightDebugRenderer.drawFace((Direction)direction, (int)m, (int)n, (int)o, (int)i);
+        });
+    }
 
-   private static void drawFaces(MatrixStack matrices, VoxelSet shape, ChunkSectionPos sectionPos, VertexConsumer vertexConsumer, double cameraX, double cameraY, double cameraZ, Vector4f color) {
-      shape.forEachDirection((direction, offsetX, offsetY, offsetZ) -> {
-         int i = offsetX + sectionPos.getX();
-         int j = offsetY + sectionPos.getY();
-         int k = offsetZ + sectionPos.getZ();
-         drawFace(matrices, vertexConsumer, direction, cameraX, cameraY, cameraZ, i, j, k, color);
-      });
-   }
+    private static void drawEdges(VoxelSet voxelSet, ChunkSectionPos chunkSectionPos, int i) {
+        voxelSet.forEachEdge((j, k, l, m, n, o) -> {
+            int p = j + chunkSectionPos.getX();
+            int q = k + chunkSectionPos.getY();
+            int r = l + chunkSectionPos.getZ();
+            int s = m + chunkSectionPos.getX();
+            int t = n + chunkSectionPos.getY();
+            int u = o + chunkSectionPos.getZ();
+            LightDebugRenderer.drawEdge((int)p, (int)q, (int)r, (int)s, (int)t, (int)u, (int)i);
+        }, true);
+    }
 
-   private static void drawEdges(MatrixStack matrices, VoxelSet shape, ChunkSectionPos sectionPos, VertexConsumerProvider vertexConsumers, double cameraX, double cameraY, double cameraZ, Vector4f color) {
-      shape.forEachEdge((x1, y1, z1, x2, y2, z2) -> {
-         int i = x1 + sectionPos.getX();
-         int j = y1 + sectionPos.getY();
-         int k = z1 + sectionPos.getZ();
-         int l = x2 + sectionPos.getX();
-         int m = y2 + sectionPos.getY();
-         int n = z2 + sectionPos.getZ();
-         VertexConsumer vertexConsumer = vertexConsumers.getBuffer(RenderLayer.getDebugLineStrip(1.0));
-         drawEdge(matrices, vertexConsumer, cameraX, cameraY, cameraZ, i, j, k, l, m, n, color);
-      }, true);
-   }
+    private static void drawFace(Direction direction, int i, int j, int k, int l) {
+        Vec3d vec3d = new Vec3d((double)ChunkSectionPos.getBlockCoord((int)i), (double)ChunkSectionPos.getBlockCoord((int)j), (double)ChunkSectionPos.getBlockCoord((int)k));
+        Vec3d vec3d2 = vec3d.add(16.0, 16.0, 16.0);
+        GizmoDrawing.face((Vec3d)vec3d, (Vec3d)vec3d2, (Direction)direction, (DrawStyle)DrawStyle.filled((int)l));
+    }
 
-   private static void drawFace(MatrixStack matrices, VertexConsumer vertexConsumer, Direction direction, double cameraX, double cameraY, double cameraZ, int x, int y, int z, Vector4f color) {
-      float f = (float)((double)ChunkSectionPos.getBlockCoord(x) - cameraX);
-      float g = (float)((double)ChunkSectionPos.getBlockCoord(y) - cameraY);
-      float h = (float)((double)ChunkSectionPos.getBlockCoord(z) - cameraZ);
-      VertexRendering.drawSide(matrices, vertexConsumer, direction, f, g, h, f + 16.0F, g + 16.0F, h + 16.0F, color.x(), color.y(), color.z(), color.w());
-   }
-
-   private static void drawEdge(MatrixStack matrices, VertexConsumer vertexConsumer, double cameraX, double cameraY, double cameraZ, int x1, int y1, int z1, int x2, int y2, int z, Vector4f color) {
-      float f = (float)((double)ChunkSectionPos.getBlockCoord(x1) - cameraX);
-      float g = (float)((double)ChunkSectionPos.getBlockCoord(y1) - cameraY);
-      float h = (float)((double)ChunkSectionPos.getBlockCoord(z1) - cameraZ);
-      float i = (float)((double)ChunkSectionPos.getBlockCoord(x2) - cameraX);
-      float j = (float)((double)ChunkSectionPos.getBlockCoord(y2) - cameraY);
-      float k = (float)((double)ChunkSectionPos.getBlockCoord(z) - cameraZ);
-      Matrix4f matrix4f = matrices.peek().getPositionMatrix();
-      vertexConsumer.vertex(matrix4f, f, g, h).color(color.x(), color.y(), color.z(), 1.0F);
-      vertexConsumer.vertex(matrix4f, i, j, k).color(color.x(), color.y(), color.z(), 1.0F);
-   }
-
-   @Environment(EnvType.CLIENT)
-   static final class Data {
-      final VoxelSet readyShape;
-      final VoxelSet shape;
-      final ChunkSectionPos minSectionPos;
-
-      Data(LightingProvider lightingProvider, ChunkSectionPos sectionPos, int radius, LightType lightType) {
-         int i = radius * 2 + 1;
-         this.readyShape = new BitSetVoxelSet(i, i, i);
-         this.shape = new BitSetVoxelSet(i, i, i);
-
-         for(int j = 0; j < i; ++j) {
-            for(int k = 0; k < i; ++k) {
-               for(int l = 0; l < i; ++l) {
-                  ChunkSectionPos chunkSectionPos = ChunkSectionPos.from(sectionPos.getSectionX() + l - radius, sectionPos.getSectionY() + k - radius, sectionPos.getSectionZ() + j - radius);
-                  LightStorage.Status status = lightingProvider.getStatus(lightType, chunkSectionPos);
-                  if (status == LightStorage.Status.LIGHT_AND_DATA) {
-                     this.readyShape.set(l, k, j);
-                     this.shape.set(l, k, j);
-                  } else if (status == LightStorage.Status.LIGHT_ONLY) {
-                     this.shape.set(l, k, j);
-                  }
-               }
-            }
-         }
-
-         this.minSectionPos = ChunkSectionPos.from(sectionPos.getSectionX() - radius, sectionPos.getSectionY() - radius, sectionPos.getSectionZ() - radius);
-      }
-   }
+    private static void drawEdge(int i, int j, int k, int l, int m, int n, int o) {
+        double d = ChunkSectionPos.getBlockCoord((int)i);
+        double e = ChunkSectionPos.getBlockCoord((int)j);
+        double f = ChunkSectionPos.getBlockCoord((int)k);
+        double g = ChunkSectionPos.getBlockCoord((int)l);
+        double h = ChunkSectionPos.getBlockCoord((int)m);
+        double p = ChunkSectionPos.getBlockCoord((int)n);
+        int q = ColorHelper.fullAlpha((int)o);
+        GizmoDrawing.line((Vec3d)new Vec3d(d, e, f), (Vec3d)new Vec3d(g, h, p), (int)q);
+    }
 }
+

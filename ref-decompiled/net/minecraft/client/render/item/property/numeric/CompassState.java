@@ -1,145 +1,130 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.MapCodec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.render.item.property.numeric.CompassState
+ *  net.minecraft.client.render.item.property.numeric.CompassState$Target
+ *  net.minecraft.client.render.item.property.numeric.NeedleAngleState
+ *  net.minecraft.client.render.item.property.numeric.NeedleAngleState$Angler
+ *  net.minecraft.client.world.ClientWorld
+ *  net.minecraft.entity.LivingEntity
+ *  net.minecraft.entity.player.PlayerEntity
+ *  net.minecraft.item.ItemStack
+ *  net.minecraft.util.HeldItemContext
+ *  net.minecraft.util.math.BlockPos
+ *  net.minecraft.util.math.GlobalPos
+ *  net.minecraft.util.math.MathHelper
+ *  net.minecraft.util.math.Position
+ *  net.minecraft.util.math.Vec3d
+ *  net.minecraft.util.math.Vec3i
+ *  net.minecraft.util.math.random.Random
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.render.item.property.numeric;
 
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.render.item.property.numeric.CompassState;
+import net.minecraft.client.render.item.property.numeric.NeedleAngleState;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.LodestoneTrackerComponent;
-import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.StringIdentifiable;
+import net.minecraft.util.HeldItemContext;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.GlobalPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Position;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.math.random.Random;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
-public class CompassState extends NeedleAngleState {
-   public static final MapCodec CODEC = RecordCodecBuilder.mapCodec((instance) -> {
-      return instance.group(Codec.BOOL.optionalFieldOf("wobble", true).forGetter(NeedleAngleState::hasWobble), CompassState.Target.CODEC.fieldOf("target").forGetter(CompassState::getTarget)).apply(instance, CompassState::new);
-   });
-   private final NeedleAngleState.Angler aimedAngler = this.createAngler(0.8F);
-   private final NeedleAngleState.Angler aimlessAngler = this.createAngler(0.8F);
-   private final Target target;
-   private final Random random = Random.create();
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
+public class CompassState
+extends NeedleAngleState {
+    public static final MapCodec<CompassState> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group((App)Codec.BOOL.optionalFieldOf("wobble", (Object)true).forGetter(NeedleAngleState::hasWobble), (App)Target.CODEC.fieldOf("target").forGetter(CompassState::getTarget)).apply((Applicative)instance, CompassState::new));
+    private final NeedleAngleState.Angler aimedAngler;
+    private final NeedleAngleState.Angler aimlessAngler;
+    private final Target target;
+    private final Random random = Random.create();
 
-   public CompassState(boolean wobble, Target target) {
-      super(wobble);
-      this.target = target;
-   }
+    public CompassState(boolean wobble, Target target) {
+        super(wobble);
+        this.aimedAngler = this.createAngler(0.8f);
+        this.aimlessAngler = this.createAngler(0.8f);
+        this.target = target;
+    }
 
-   protected float getAngle(ItemStack stack, ClientWorld world, int seed, Entity user) {
-      GlobalPos globalPos = this.target.getPosition(world, stack, user);
-      long l = world.getTime();
-      return !canPointTo(user, globalPos) ? this.getAimlessAngle(seed, l) : this.getAngleTo(user, l, globalPos.pos());
-   }
+    protected float getAngle(ItemStack stack, ClientWorld world, int seed, HeldItemContext context) {
+        GlobalPos globalPos = this.target.getPosition(world, stack, context);
+        long l = world.getTime();
+        if (!CompassState.canPointTo((HeldItemContext)context, (GlobalPos)globalPos)) {
+            return this.getAimlessAngle(seed, l);
+        }
+        return this.getAngleTo(context, l, globalPos.pos());
+    }
 
-   private float getAimlessAngle(int seed, long time) {
-      if (this.aimlessAngler.shouldUpdate(time)) {
-         this.aimlessAngler.update(time, this.random.nextFloat());
-      }
+    private float getAimlessAngle(int seed, long time) {
+        if (this.aimlessAngler.shouldUpdate(time)) {
+            this.aimlessAngler.update(time, this.random.nextFloat());
+        }
+        float f = this.aimlessAngler.getAngle() + (float)CompassState.scatter((int)seed) / 2.1474836E9f;
+        return MathHelper.floorMod((float)f, (float)1.0f);
+    }
 
-      float f = this.aimlessAngler.getAngle() + (float)scatter(seed) / 2.1474836E9F;
-      return MathHelper.floorMod(f, 1.0F);
-   }
-
-   private float getAngleTo(Entity entity, long time, BlockPos pos) {
-      float f = (float)getAngleTo(entity, pos);
-      float g = getBodyYaw(entity);
-      float h;
-      if (entity instanceof PlayerEntity playerEntity) {
-         if (playerEntity.isMainPlayer() && playerEntity.getWorld().getTickManager().shouldTick()) {
+    private float getAngleTo(HeldItemContext from, long time, BlockPos to) {
+        float h;
+        PlayerEntity playerEntity;
+        float f = (float)CompassState.getAngleTo((HeldItemContext)from, (BlockPos)to);
+        float g = CompassState.getBodyYaw((HeldItemContext)from);
+        LivingEntity livingEntity = from.getEntity();
+        if (livingEntity instanceof PlayerEntity && (playerEntity = (PlayerEntity)livingEntity).isMainPlayer() && playerEntity.getEntityWorld().getTickManager().shouldTick()) {
             if (this.aimedAngler.shouldUpdate(time)) {
-               this.aimedAngler.update(time, 0.5F - (g - 0.25F));
+                this.aimedAngler.update(time, 0.5f - (g - 0.25f));
             }
-
             h = f + this.aimedAngler.getAngle();
-            return MathHelper.floorMod(h, 1.0F);
-         }
-      }
+        } else {
+            h = 0.5f - (g - 0.25f - f);
+        }
+        return MathHelper.floorMod((float)h, (float)1.0f);
+    }
 
-      h = 0.5F - (g - 0.25F - f);
-      return MathHelper.floorMod(h, 1.0F);
-   }
+    private static boolean canPointTo(HeldItemContext from, @Nullable GlobalPos to) {
+        return to != null && to.dimension() == from.getEntityWorld().getRegistryKey() && !(to.pos().getSquaredDistance((Position)from.getEntityPos()) < (double)1.0E-5f);
+    }
 
-   private static boolean canPointTo(Entity entity, @Nullable GlobalPos pos) {
-      return pos != null && pos.dimension() == entity.getWorld().getRegistryKey() && !(pos.pos().getSquaredDistance(entity.getPos()) < 9.999999747378752E-6);
-   }
+    private static double getAngleTo(HeldItemContext from, BlockPos to) {
+        Vec3d vec3d = Vec3d.ofCenter((Vec3i)to);
+        Vec3d vec3d2 = from.getEntityPos();
+        return Math.atan2(vec3d.getZ() - vec3d2.getZ(), vec3d.getX() - vec3d2.getX()) / 6.2831854820251465;
+    }
 
-   private static double getAngleTo(Entity entity, BlockPos pos) {
-      Vec3d vec3d = Vec3d.ofCenter(pos);
-      return Math.atan2(vec3d.getZ() - entity.getZ(), vec3d.getX() - entity.getX()) / 6.2831854820251465;
-   }
+    private static float getBodyYaw(HeldItemContext context) {
+        return MathHelper.floorMod((float)(context.getBodyYaw() / 360.0f), (float)1.0f);
+    }
 
-   private static float getBodyYaw(Entity entity) {
-      return MathHelper.floorMod(entity.getBodyYaw() / 360.0F, 1.0F);
-   }
+    private static int scatter(int seed) {
+        return seed * 1327217883;
+    }
 
-   private static int scatter(int seed) {
-      return seed * 1327217883;
-   }
-
-   protected Target getTarget() {
-      return this.target;
-   }
-
-   @Environment(EnvType.CLIENT)
-   public static enum Target implements StringIdentifiable {
-      NONE("none") {
-         @Nullable
-         public GlobalPos getPosition(ClientWorld world, ItemStack stack, Entity holder) {
-            return null;
-         }
-      },
-      LODESTONE("lodestone") {
-         @Nullable
-         public GlobalPos getPosition(ClientWorld world, ItemStack stack, Entity holder) {
-            LodestoneTrackerComponent lodestoneTrackerComponent = (LodestoneTrackerComponent)stack.get(DataComponentTypes.LODESTONE_TRACKER);
-            return lodestoneTrackerComponent != null ? (GlobalPos)lodestoneTrackerComponent.target().orElse((Object)null) : null;
-         }
-      },
-      SPAWN("spawn") {
-         public GlobalPos getPosition(ClientWorld world, ItemStack stack, Entity holder) {
-            return GlobalPos.create(world.getRegistryKey(), world.getSpawnPos());
-         }
-      },
-      RECOVERY("recovery") {
-         @Nullable
-         public GlobalPos getPosition(ClientWorld world, ItemStack stack, Entity holder) {
-            GlobalPos var10000;
-            if (holder instanceof PlayerEntity playerEntity) {
-               var10000 = (GlobalPos)playerEntity.getLastDeathPos().orElse((Object)null);
-            } else {
-               var10000 = null;
-            }
-
-            return var10000;
-         }
-      };
-
-      public static final Codec CODEC = StringIdentifiable.createCodec(Target::values);
-      private final String name;
-
-      Target(final String name) {
-         this.name = name;
-      }
-
-      public String asString() {
-         return this.name;
-      }
-
-      @Nullable
-      abstract GlobalPos getPosition(ClientWorld world, ItemStack stack, Entity holder);
-
-      // $FF: synthetic method
-      private static Target[] method_65655() {
-         return new Target[]{NONE, LODESTONE, SPAWN, RECOVERY};
-      }
-   }
+    protected Target getTarget() {
+        return this.target;
+    }
 }
+

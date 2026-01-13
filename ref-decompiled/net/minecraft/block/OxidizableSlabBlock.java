@@ -1,40 +1,71 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.MapCodec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
+ *  net.minecraft.block.AbstractBlock$Settings
+ *  net.minecraft.block.Block
+ *  net.minecraft.block.BlockState
+ *  net.minecraft.block.Degradable
+ *  net.minecraft.block.Oxidizable
+ *  net.minecraft.block.Oxidizable$OxidationLevel
+ *  net.minecraft.block.OxidizableSlabBlock
+ *  net.minecraft.block.SlabBlock
+ *  net.minecraft.server.world.ServerWorld
+ *  net.minecraft.util.math.BlockPos
+ *  net.minecraft.util.math.random.Random
+ */
 package net.minecraft.block;
 
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Degradable;
+import net.minecraft.block.Oxidizable;
+import net.minecraft.block.SlabBlock;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
 
-public class OxidizableSlabBlock extends SlabBlock implements Oxidizable {
-   public static final MapCodec CODEC = RecordCodecBuilder.mapCodec((instance) -> {
-      return instance.group(Oxidizable.OxidationLevel.CODEC.fieldOf("weathering_state").forGetter(Degradable::getDegradationLevel), createSettingsCodec()).apply(instance, OxidizableSlabBlock::new);
-   });
-   private final Oxidizable.OxidationLevel oxidationLevel;
+/*
+ * Exception performing whole class analysis ignored.
+ */
+public class OxidizableSlabBlock
+extends SlabBlock
+implements Oxidizable {
+    public static final MapCodec<OxidizableSlabBlock> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group((App)Oxidizable.OxidationLevel.CODEC.fieldOf("weathering_state").forGetter(Degradable::getDegradationLevel), (App)OxidizableSlabBlock.createSettingsCodec()).apply((Applicative)instance, OxidizableSlabBlock::new));
+    private final Oxidizable.OxidationLevel oxidationLevel;
 
-   public MapCodec getCodec() {
-      return CODEC;
-   }
+    public MapCodec<OxidizableSlabBlock> getCodec() {
+        return CODEC;
+    }
 
-   public OxidizableSlabBlock(Oxidizable.OxidationLevel oxidationLevel, AbstractBlock.Settings settings) {
-      super(settings);
-      this.oxidationLevel = oxidationLevel;
-   }
+    public OxidizableSlabBlock(Oxidizable.OxidationLevel oxidationLevel, AbstractBlock.Settings settings) {
+        super(settings);
+        this.oxidationLevel = oxidationLevel;
+    }
 
-   protected void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-      this.tickDegradation(state, world, pos, random);
-   }
+    protected void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        this.tickDegradation(state, world, pos, random);
+    }
 
-   protected boolean hasRandomTicks(BlockState state) {
-      return Oxidizable.getIncreasedOxidationBlock(state.getBlock()).isPresent();
-   }
+    protected boolean hasRandomTicks(BlockState state) {
+        return Oxidizable.getIncreasedOxidationBlock((Block)state.getBlock()).isPresent();
+    }
 
-   public Oxidizable.OxidationLevel getDegradationLevel() {
-      return this.oxidationLevel;
-   }
+    public Oxidizable.OxidationLevel getDegradationLevel() {
+        return this.oxidationLevel;
+    }
 
-   // $FF: synthetic method
-   public Enum getDegradationLevel() {
-      return this.getDegradationLevel();
-   }
+    public /* synthetic */ Enum getDegradationLevel() {
+        return this.getDegradationLevel();
+    }
 }
+

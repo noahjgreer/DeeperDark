@@ -1,88 +1,93 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.MinecraftClient
+ *  net.minecraft.client.render.DrawStyle
+ *  net.minecraft.client.render.Frustum
+ *  net.minecraft.client.render.debug.DebugRenderer$Renderer
+ *  net.minecraft.client.render.debug.HeightmapDebugRenderer
+ *  net.minecraft.client.render.debug.HeightmapDebugRenderer$1
+ *  net.minecraft.client.world.ClientWorld
+ *  net.minecraft.util.math.BlockPos
+ *  net.minecraft.util.math.Box
+ *  net.minecraft.util.math.ChunkPos
+ *  net.minecraft.util.math.ChunkSectionPos
+ *  net.minecraft.util.math.ColorHelper
+ *  net.minecraft.world.Heightmap$Type
+ *  net.minecraft.world.chunk.Chunk
+ *  net.minecraft.world.debug.DebugDataStore
+ *  net.minecraft.world.debug.gizmo.GizmoDrawing
+ *  org.joml.Vector3f
+ */
 package net.minecraft.client.render.debug;
 
-import java.util.Iterator;
 import java.util.Map;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.VertexRendering;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.render.DrawStyle;
+import net.minecraft.client.render.Frustum;
+import net.minecraft.client.render.debug.DebugRenderer;
+import net.minecraft.client.render.debug.HeightmapDebugRenderer;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.ChunkSectionPos;
+import net.minecraft.util.math.ColorHelper;
 import net.minecraft.world.Heightmap;
-import net.minecraft.world.WorldAccess;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.debug.DebugDataStore;
+import net.minecraft.world.debug.gizmo.GizmoDrawing;
 import org.joml.Vector3f;
 
-@Environment(EnvType.CLIENT)
-public class HeightmapDebugRenderer implements DebugRenderer.Renderer {
-   private final MinecraftClient client;
-   private static final int CHUNK_RANGE = 2;
-   private static final float BOX_HEIGHT = 0.09375F;
+@Environment(value=EnvType.CLIENT)
+public class HeightmapDebugRenderer
+implements DebugRenderer.Renderer {
+    private final MinecraftClient client;
+    private static final int CHUNK_RANGE = 2;
+    private static final float BOX_HEIGHT = 0.09375f;
 
-   public HeightmapDebugRenderer(MinecraftClient client) {
-      this.client = client;
-   }
+    public HeightmapDebugRenderer(MinecraftClient client) {
+        this.client = client;
+    }
 
-   public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, double cameraX, double cameraY, double cameraZ) {
-      WorldAccess worldAccess = this.client.world;
-      VertexConsumer vertexConsumer = vertexConsumers.getBuffer(RenderLayer.getDebugFilledBox());
-      BlockPos blockPos = BlockPos.ofFloored(cameraX, 0.0, cameraZ);
-
-      for(int i = -2; i <= 2; ++i) {
-         for(int j = -2; j <= 2; ++j) {
-            Chunk chunk = worldAccess.getChunk(blockPos.add(i * 16, 0, j * 16));
-            Iterator var15 = chunk.getHeightmaps().iterator();
-
-            while(var15.hasNext()) {
-               Map.Entry entry = (Map.Entry)var15.next();
-               Heightmap.Type type = (Heightmap.Type)entry.getKey();
-               ChunkPos chunkPos = chunk.getPos();
-               Vector3f vector3f = this.getColorForHeightmapType(type);
-
-               for(int k = 0; k < 16; ++k) {
-                  for(int l = 0; l < 16; ++l) {
-                     int m = ChunkSectionPos.getOffsetPos(chunkPos.x, k);
-                     int n = ChunkSectionPos.getOffsetPos(chunkPos.z, l);
-                     float f = (float)((double)((float)worldAccess.getTopY(type, m, n) + (float)type.ordinal() * 0.09375F) - cameraY);
-                     VertexRendering.drawFilledBox(matrices, vertexConsumer, (double)((float)m + 0.25F) - cameraX, (double)f, (double)((float)n + 0.25F) - cameraZ, (double)((float)m + 0.75F) - cameraX, (double)(f + 0.09375F), (double)((float)n + 0.75F) - cameraZ, vector3f.x(), vector3f.y(), vector3f.z(), 1.0F);
-                  }
-               }
+    public void render(double cameraX, double cameraY, double cameraZ, DebugDataStore store, Frustum frustum, float tickProgress) {
+        ClientWorld worldAccess = this.client.world;
+        BlockPos blockPos = BlockPos.ofFloored((double)cameraX, (double)0.0, (double)cameraZ);
+        for (int i = -2; i <= 2; ++i) {
+            for (int j = -2; j <= 2; ++j) {
+                Chunk chunk = worldAccess.getChunk(blockPos.add(i * 16, 0, j * 16));
+                for (Map.Entry entry : chunk.getHeightmaps()) {
+                    Heightmap.Type type = (Heightmap.Type)entry.getKey();
+                    ChunkPos chunkPos = chunk.getPos();
+                    Vector3f vector3f = this.getColorForHeightmapType(type);
+                    for (int k = 0; k < 16; ++k) {
+                        for (int l = 0; l < 16; ++l) {
+                            int m = ChunkSectionPos.getOffsetPos((int)chunkPos.x, (int)k);
+                            int n = ChunkSectionPos.getOffsetPos((int)chunkPos.z, (int)l);
+                            float f = (float)worldAccess.getTopY(type, m, n) + (float)type.ordinal() * 0.09375f;
+                            GizmoDrawing.box((Box)new Box((double)((float)m + 0.25f), (double)f, (double)((float)n + 0.25f), (double)((float)m + 0.75f), (double)(f + 0.09375f), (double)((float)n + 0.75f)), (DrawStyle)DrawStyle.filled((int)ColorHelper.fromFloats((float)1.0f, (float)vector3f.x(), (float)vector3f.y(), (float)vector3f.z())));
+                        }
+                    }
+                }
             }
-         }
-      }
+        }
+    }
 
-   }
-
-   private Vector3f getColorForHeightmapType(Heightmap.Type type) {
-      Vector3f var10000;
-      switch (type) {
-         case WORLD_SURFACE_WG:
-            var10000 = new Vector3f(1.0F, 1.0F, 0.0F);
-            break;
-         case OCEAN_FLOOR_WG:
-            var10000 = new Vector3f(1.0F, 0.0F, 1.0F);
-            break;
-         case WORLD_SURFACE:
-            var10000 = new Vector3f(0.0F, 0.7F, 0.0F);
-            break;
-         case OCEAN_FLOOR:
-            var10000 = new Vector3f(0.0F, 0.0F, 0.5F);
-            break;
-         case MOTION_BLOCKING:
-            var10000 = new Vector3f(0.0F, 0.3F, 0.3F);
-            break;
-         case MOTION_BLOCKING_NO_LEAVES:
-            var10000 = new Vector3f(0.0F, 0.5F, 0.5F);
-            break;
-         default:
-            throw new MatchException((String)null, (Throwable)null);
-      }
-
-      return var10000;
-   }
+    private Vector3f getColorForHeightmapType(Heightmap.Type type) {
+        return switch (1.field_23778[type.ordinal()]) {
+            default -> throw new MatchException(null, null);
+            case 1 -> new Vector3f(1.0f, 1.0f, 0.0f);
+            case 2 -> new Vector3f(1.0f, 0.0f, 1.0f);
+            case 3 -> new Vector3f(0.0f, 0.7f, 0.0f);
+            case 4 -> new Vector3f(0.0f, 0.0f, 0.5f);
+            case 5 -> new Vector3f(0.0f, 0.3f, 0.3f);
+            case 6 -> new Vector3f(0.0f, 0.5f, 0.5f);
+        };
+    }
 }
+

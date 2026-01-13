@@ -1,43 +1,18 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.block.entity.StructureBoxRendering
+ *  net.minecraft.block.entity.StructureBoxRendering$RenderMode
+ *  net.minecraft.block.entity.StructureBoxRendering$StructureBox
+ */
 package net.minecraft.block.entity;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.block.entity.StructureBoxRendering;
 
 public interface StructureBoxRendering {
-   RenderMode getRenderMode();
+    public RenderMode getRenderMode();
 
-   StructureBox getStructureBox();
-
-   public static enum RenderMode {
-      NONE,
-      BOX,
-      BOX_AND_INVISIBLE_BLOCKS;
-
-      // $FF: synthetic method
-      private static RenderMode[] method_66715() {
-         return new RenderMode[]{NONE, BOX, BOX_AND_INVISIBLE_BLOCKS};
-      }
-   }
-
-   public static record StructureBox(BlockPos localPos, Vec3i size) {
-      public StructureBox(BlockPos blockPos, Vec3i vec3i) {
-         this.localPos = blockPos;
-         this.size = vec3i;
-      }
-
-      public static StructureBox create(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
-         int i = Math.min(minX, maxX);
-         int j = Math.min(minY, maxY);
-         int k = Math.min(minZ, maxZ);
-         return new StructureBox(new BlockPos(i, j, k), new Vec3i(Math.max(minX, maxX) - i, Math.max(minY, maxY) - j, Math.max(minZ, maxZ) - k));
-      }
-
-      public BlockPos localPos() {
-         return this.localPos;
-      }
-
-      public Vec3i size() {
-         return this.size;
-      }
-   }
+    public StructureBox getStructureBox();
 }
+

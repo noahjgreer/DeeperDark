@@ -1,42 +1,65 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.serialization.Codec
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.option.CloudRenderMode
+ *  net.minecraft.text.Text
+ *  net.minecraft.util.StringIdentifiable
+ */
 package net.minecraft.client.option;
 
 import com.mojang.serialization.Codec;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.text.Text;
 import net.minecraft.util.StringIdentifiable;
-import net.minecraft.util.TranslatableOption;
 
-@Environment(EnvType.CLIENT)
-public enum CloudRenderMode implements TranslatableOption, StringIdentifiable {
-   OFF(0, "false", "options.off"),
-   FAST(1, "fast", "options.clouds.fast"),
-   FANCY(2, "true", "options.clouds.fancy");
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
+public final class CloudRenderMode
+extends Enum<CloudRenderMode>
+implements StringIdentifiable {
+    public static final /* enum */ CloudRenderMode OFF = new CloudRenderMode("OFF", 0, "false", "options.off");
+    public static final /* enum */ CloudRenderMode FAST = new CloudRenderMode("FAST", 1, "fast", "options.clouds.fast");
+    public static final /* enum */ CloudRenderMode FANCY = new CloudRenderMode("FANCY", 2, "true", "options.clouds.fancy");
+    public static final Codec<CloudRenderMode> CODEC;
+    private final String serializedId;
+    private final Text text;
+    private static final /* synthetic */ CloudRenderMode[] field_18168;
 
-   public static final Codec CODEC = StringIdentifiable.createCodec(CloudRenderMode::values);
-   private final int id;
-   private final String serializedId;
-   private final String translationKey;
+    public static CloudRenderMode[] values() {
+        return (CloudRenderMode[])field_18168.clone();
+    }
 
-   private CloudRenderMode(final int id, final String serializedId, final String translationKey) {
-      this.id = id;
-      this.serializedId = serializedId;
-      this.translationKey = translationKey;
-   }
+    public static CloudRenderMode valueOf(String string) {
+        return Enum.valueOf(CloudRenderMode.class, string);
+    }
 
-   public String asString() {
-      return this.serializedId;
-   }
+    private CloudRenderMode(String serializedId, String translationKey) {
+        this.serializedId = serializedId;
+        this.text = Text.translatable((String)translationKey);
+    }
 
-   public int getId() {
-      return this.id;
-   }
+    public Text getText() {
+        return this.text;
+    }
 
-   public String getTranslationKey() {
-      return this.translationKey;
-   }
+    public String asString() {
+        return this.serializedId;
+    }
 
-   // $FF: synthetic method
-   private static CloudRenderMode[] method_36860() {
-      return new CloudRenderMode[]{OFF, FAST, FANCY};
-   }
+    private static /* synthetic */ CloudRenderMode[] method_36860() {
+        return new CloudRenderMode[]{OFF, FAST, FANCY};
+    }
+
+    static {
+        field_18168 = CloudRenderMode.method_36860();
+        CODEC = StringIdentifiable.createCodec(CloudRenderMode::values);
+    }
 }
+

@@ -1,3 +1,20 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.google.common.collect.Maps
+ *  com.google.common.collect.Sets
+ *  com.mojang.authlib.GameProfile
+ *  com.mojang.authlib.minecraft.UserApiService
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.MinecraftClient
+ *  net.minecraft.client.gui.screen.Screen
+ *  net.minecraft.client.gui.screen.multiplayer.SocialInteractionsScreen
+ *  net.minecraft.client.network.PlayerListEntry
+ *  net.minecraft.client.network.SocialInteractionsManager
+ *  net.minecraft.util.Util
+ */
 package net.minecraft.client.network;
 
 import com.google.common.collect.Maps;
@@ -5,91 +22,89 @@ import com.google.common.collect.Sets;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.UserApiService;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.multiplayer.SocialInteractionsScreen;
+import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.util.Util;
 
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 public class SocialInteractionsManager {
-   private final MinecraftClient client;
-   private final Set hiddenPlayers = Sets.newHashSet();
-   private final UserApiService userApiService;
-   private final Map playerNameByUuid = Maps.newHashMap();
-   private boolean blockListLoaded;
-   private CompletableFuture blockListLoader = CompletableFuture.completedFuture((Object)null);
+    private final MinecraftClient client;
+    private final Set<UUID> hiddenPlayers = Sets.newHashSet();
+    private final UserApiService userApiService;
+    private final Map<String, UUID> playerNameByUuid = Maps.newHashMap();
+    private boolean blockListLoaded;
+    private CompletableFuture<?> blockListLoader = CompletableFuture.completedFuture(null);
 
-   public SocialInteractionsManager(MinecraftClient client, UserApiService userApiService) {
-      this.client = client;
-      this.userApiService = userApiService;
-   }
+    public SocialInteractionsManager(MinecraftClient client, UserApiService userApiService) {
+        this.client = client;
+        this.userApiService = userApiService;
+    }
 
-   public void hidePlayer(UUID uuid) {
-      this.hiddenPlayers.add(uuid);
-   }
+    public void hidePlayer(UUID uuid) {
+        this.hiddenPlayers.add(uuid);
+    }
 
-   public void showPlayer(UUID uuid) {
-      this.hiddenPlayers.remove(uuid);
-   }
+    public void showPlayer(UUID uuid) {
+        this.hiddenPlayers.remove(uuid);
+    }
 
-   public boolean isPlayerMuted(UUID uuid) {
-      return this.isPlayerHidden(uuid) || this.isPlayerBlocked(uuid);
-   }
+    public boolean isPlayerMuted(UUID uuid) {
+        return this.isPlayerHidden(uuid) || this.isPlayerBlocked(uuid);
+    }
 
-   public boolean isPlayerHidden(UUID uuid) {
-      return this.hiddenPlayers.contains(uuid);
-   }
+    public boolean isPlayerHidden(UUID uuid) {
+        return this.hiddenPlayers.contains(uuid);
+    }
 
-   public void loadBlockList() {
-      this.blockListLoaded = true;
-      CompletableFuture var10001 = this.blockListLoader;
-      UserApiService var10002 = this.userApiService;
-      Objects.requireNonNull(var10002);
-      this.blockListLoader = var10001.thenRunAsync(var10002::refreshBlockList, Util.getIoWorkerExecutor());
-   }
+    public void loadBlockList() {
+        this.blockListLoaded = true;
+        this.blockListLoader = this.blockListLoader.thenRunAsync(() -> ((UserApiService)this.userApiService).refreshBlockList(), (Executor)Util.getIoWorkerExecutor());
+    }
 
-   public void unloadBlockList() {
-      this.blockListLoaded = false;
-   }
+    public void unloadBlockList() {
+        this.blockListLoaded = false;
+    }
 
-   public boolean isPlayerBlocked(UUID uuid) {
-      if (!this.blockListLoaded) {
-         return false;
-      } else {
-         this.blockListLoader.join();
-         return this.userApiService.isBlockedPlayer(uuid);
-      }
-   }
+    public boolean isPlayerBlocked(UUID uuid) {
+        if (!this.blockListLoaded) {
+            return false;
+        }
+        this.blockListLoader.join();
+        return this.userApiService.isBlockedPlayer(uuid);
+    }
 
-   public Set getHiddenPlayers() {
-      return this.hiddenPlayers;
-   }
+    public Set<UUID> getHiddenPlayers() {
+        return this.hiddenPlayers;
+    }
 
-   public UUID getUuid(String playerName) {
-      return (UUID)this.playerNameByUuid.getOrDefault(playerName, Util.NIL_UUID);
-   }
+    public UUID getUuid(String playerName) {
+        return this.playerNameByUuid.getOrDefault(playerName, Util.NIL_UUID);
+    }
 
-   public void setPlayerOnline(PlayerListEntry player) {
-      GameProfile gameProfile = player.getProfile();
-      this.playerNameByUuid.put(gameProfile.getName(), gameProfile.getId());
-      Screen var4 = this.client.currentScreen;
-      if (var4 instanceof SocialInteractionsScreen socialInteractionsScreen) {
-         socialInteractionsScreen.setPlayerOnline(player);
-      }
+    public void setPlayerOnline(PlayerListEntry player) {
+        GameProfile gameProfile = player.getProfile();
+        this.playerNameByUuid.put(gameProfile.name(), gameProfile.id());
+        Screen screen = this.client.currentScreen;
+        if (screen instanceof SocialInteractionsScreen) {
+            SocialInteractionsScreen socialInteractionsScreen = (SocialInteractionsScreen)screen;
+            socialInteractionsScreen.setPlayerOnline(player);
+        }
+    }
 
-   }
-
-   public void setPlayerOffline(UUID uuid) {
-      Screen var3 = this.client.currentScreen;
-      if (var3 instanceof SocialInteractionsScreen socialInteractionsScreen) {
-         socialInteractionsScreen.setPlayerOffline(uuid);
-      }
-
-   }
+    public void setPlayerOffline(UUID uuid) {
+        Screen screen = this.client.currentScreen;
+        if (screen instanceof SocialInteractionsScreen) {
+            SocialInteractionsScreen socialInteractionsScreen = (SocialInteractionsScreen)screen;
+            socialInteractionsScreen.setPlayerOffline(uuid);
+        }
+    }
 }
+

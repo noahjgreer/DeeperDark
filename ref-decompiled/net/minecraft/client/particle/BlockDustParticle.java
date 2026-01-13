@@ -1,3 +1,23 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.block.BlockState
+ *  net.minecraft.block.Blocks
+ *  net.minecraft.client.MinecraftClient
+ *  net.minecraft.client.particle.BillboardParticle
+ *  net.minecraft.client.particle.BillboardParticle$RenderType
+ *  net.minecraft.client.particle.BlockDustParticle
+ *  net.minecraft.client.render.WorldRenderer
+ *  net.minecraft.client.texture.SpriteAtlasTexture
+ *  net.minecraft.client.world.ClientWorld
+ *  net.minecraft.particle.BlockStateParticleEffect
+ *  net.minecraft.util.math.BlockPos
+ *  net.minecraft.world.BlockRenderView
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.particle;
 
 import net.fabricmc.api.EnvType;
@@ -5,125 +25,80 @@ import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.particle.BillboardParticle;
 import net.minecraft.client.render.WorldRenderer;
+import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.BlockStateParticleEffect;
-import net.minecraft.particle.ParticleEffect;
 import net.minecraft.util.math.BlockPos;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.world.BlockRenderView;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
-public class BlockDustParticle extends SpriteBillboardParticle {
-   private final BlockPos blockPos;
-   private final float sampleU;
-   private final float sampleV;
+@Environment(value=EnvType.CLIENT)
+public class BlockDustParticle
+extends BillboardParticle {
+    private final BillboardParticle.RenderType renderType;
+    private final BlockPos blockPos;
+    private final float sampleU;
+    private final float sampleV;
 
-   public BlockDustParticle(ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, BlockState state) {
-      this(world, x, y, z, velocityX, velocityY, velocityZ, state, BlockPos.ofFloored(x, y, z));
-   }
+    public BlockDustParticle(ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, BlockState state) {
+        this(world, x, y, z, velocityX, velocityY, velocityZ, state, BlockPos.ofFloored((double)x, (double)y, (double)z));
+    }
 
-   public BlockDustParticle(ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, BlockState state, BlockPos blockPos) {
-      super(world, x, y, z, velocityX, velocityY, velocityZ);
-      this.blockPos = blockPos;
-      this.setSprite(MinecraftClient.getInstance().getBlockRenderManager().getModels().getModelParticleSprite(state));
-      this.gravityStrength = 1.0F;
-      this.red = 0.6F;
-      this.green = 0.6F;
-      this.blue = 0.6F;
-      if (!state.isOf(Blocks.GRASS_BLOCK)) {
-         int i = MinecraftClient.getInstance().getBlockColors().getColor(state, world, blockPos, 0);
-         this.red *= (float)(i >> 16 & 255) / 255.0F;
-         this.green *= (float)(i >> 8 & 255) / 255.0F;
-         this.blue *= (float)(i & 255) / 255.0F;
-      }
+    public BlockDustParticle(ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, BlockState state, BlockPos blockPos) {
+        super(world, x, y, z, velocityX, velocityY, velocityZ, MinecraftClient.getInstance().getBlockRenderManager().getModels().getModelParticleSprite(state));
+        this.blockPos = blockPos;
+        this.gravityStrength = 1.0f;
+        this.red = 0.6f;
+        this.green = 0.6f;
+        this.blue = 0.6f;
+        if (!state.isOf(Blocks.GRASS_BLOCK)) {
+            int i = MinecraftClient.getInstance().getBlockColors().getColor(state, (BlockRenderView)world, blockPos, 0);
+            this.red *= (float)(i >> 16 & 0xFF) / 255.0f;
+            this.green *= (float)(i >> 8 & 0xFF) / 255.0f;
+            this.blue *= (float)(i & 0xFF) / 255.0f;
+        }
+        this.scale /= 2.0f;
+        this.sampleU = this.random.nextFloat() * 3.0f;
+        this.sampleV = this.random.nextFloat() * 3.0f;
+        this.renderType = this.sprite.getAtlasId().equals((Object)SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE) ? BillboardParticle.RenderType.BLOCK_ATLAS_TRANSLUCENT : BillboardParticle.RenderType.ITEM_ATLAS_TRANSLUCENT;
+    }
 
-      this.scale /= 2.0F;
-      this.sampleU = this.random.nextFloat() * 3.0F;
-      this.sampleV = this.random.nextFloat() * 3.0F;
-   }
+    public BillboardParticle.RenderType getRenderType() {
+        return this.renderType;
+    }
 
-   public ParticleTextureSheet getType() {
-      return ParticleTextureSheet.TERRAIN_SHEET;
-   }
+    protected float getMinU() {
+        return this.sprite.getFrameU((this.sampleU + 1.0f) / 4.0f);
+    }
 
-   protected float getMinU() {
-      return this.sprite.getFrameU((this.sampleU + 1.0F) / 4.0F);
-   }
+    protected float getMaxU() {
+        return this.sprite.getFrameU(this.sampleU / 4.0f);
+    }
 
-   protected float getMaxU() {
-      return this.sprite.getFrameU(this.sampleU / 4.0F);
-   }
+    protected float getMinV() {
+        return this.sprite.getFrameV(this.sampleV / 4.0f);
+    }
 
-   protected float getMinV() {
-      return this.sprite.getFrameV(this.sampleV / 4.0F);
-   }
+    protected float getMaxV() {
+        return this.sprite.getFrameV((this.sampleV + 1.0f) / 4.0f);
+    }
 
-   protected float getMaxV() {
-      return this.sprite.getFrameV((this.sampleV + 1.0F) / 4.0F);
-   }
+    public int getBrightness(float tint) {
+        int i = super.getBrightness(tint);
+        if (i == 0 && this.world.isChunkLoaded(this.blockPos)) {
+            return WorldRenderer.getLightmapCoordinates((BlockRenderView)this.world, (BlockPos)this.blockPos);
+        }
+        return i;
+    }
 
-   public int getBrightness(float tint) {
-      int i = super.getBrightness(tint);
-      return i == 0 && this.world.isChunkLoaded(this.blockPos) ? WorldRenderer.getLightmapCoordinates(this.world, this.blockPos) : i;
-   }
-
-   @Nullable
-   static BlockDustParticle create(BlockStateParticleEffect parameters, ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ) {
-      BlockState blockState = parameters.getBlockState();
-      return !blockState.isAir() && !blockState.isOf(Blocks.MOVING_PISTON) && blockState.hasBlockBreakParticles() ? new BlockDustParticle(world, x, y, z, velocityX, velocityY, velocityZ, blockState) : null;
-   }
-
-   @Environment(EnvType.CLIENT)
-   public static class CrumbleFactory implements ParticleFactory {
-      @Nullable
-      public Particle createParticle(BlockStateParticleEffect blockStateParticleEffect, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
-         Particle particle = BlockDustParticle.create(blockStateParticleEffect, clientWorld, d, e, f, g, h, i);
-         if (particle != null) {
-            particle.setVelocity(0.0, 0.0, 0.0);
-            particle.setMaxAge(clientWorld.random.nextInt(10) + 1);
-         }
-
-         return particle;
-      }
-
-      // $FF: synthetic method
-      @Nullable
-      public Particle createParticle(final ParticleEffect particleEffect, final ClientWorld clientWorld, final double d, final double e, final double f, final double g, final double h, final double i) {
-         return this.createParticle((BlockStateParticleEffect)particleEffect, clientWorld, d, e, f, g, h, i);
-      }
-   }
-
-   @Environment(EnvType.CLIENT)
-   public static class DustPillarFactory implements ParticleFactory {
-      @Nullable
-      public Particle createParticle(BlockStateParticleEffect blockStateParticleEffect, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
-         Particle particle = BlockDustParticle.create(blockStateParticleEffect, clientWorld, d, e, f, g, h, i);
-         if (particle != null) {
-            particle.setVelocity(clientWorld.random.nextGaussian() / 30.0, h + clientWorld.random.nextGaussian() / 2.0, clientWorld.random.nextGaussian() / 30.0);
-            particle.setMaxAge(clientWorld.random.nextInt(20) + 20);
-         }
-
-         return particle;
-      }
-
-      // $FF: synthetic method
-      @Nullable
-      public Particle createParticle(final ParticleEffect particleEffect, final ClientWorld clientWorld, final double d, final double e, final double f, final double g, final double h, final double i) {
-         return this.createParticle((BlockStateParticleEffect)particleEffect, clientWorld, d, e, f, g, h, i);
-      }
-   }
-
-   @Environment(EnvType.CLIENT)
-   public static class Factory implements ParticleFactory {
-      @Nullable
-      public Particle createParticle(BlockStateParticleEffect blockStateParticleEffect, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
-         return BlockDustParticle.create(blockStateParticleEffect, clientWorld, d, e, f, g, h, i);
-      }
-
-      // $FF: synthetic method
-      @Nullable
-      public Particle createParticle(final ParticleEffect particleEffect, final ClientWorld clientWorld, final double d, final double e, final double f, final double g, final double h, final double i) {
-         return this.createParticle((BlockStateParticleEffect)particleEffect, clientWorld, d, e, f, g, h, i);
-      }
-   }
+    static @Nullable BlockDustParticle create(BlockStateParticleEffect parameters, ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ) {
+        BlockState blockState = parameters.getBlockState();
+        if (blockState.isAir() || blockState.isOf(Blocks.MOVING_PISTON) || !blockState.hasBlockBreakParticles()) {
+            return null;
+        }
+        return new BlockDustParticle(world, x, y, z, velocityX, velocityY, velocityZ, blockState);
+    }
 }
+

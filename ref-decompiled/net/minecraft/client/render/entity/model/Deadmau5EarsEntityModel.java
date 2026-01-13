@@ -1,3 +1,19 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.model.Dilation
+ *  net.minecraft.client.model.ModelData
+ *  net.minecraft.client.model.ModelPart
+ *  net.minecraft.client.model.ModelPartBuilder
+ *  net.minecraft.client.model.ModelPartData
+ *  net.minecraft.client.model.ModelTransform
+ *  net.minecraft.client.model.TexturedModelData
+ *  net.minecraft.client.render.entity.model.Deadmau5EarsEntityModel
+ *  net.minecraft.client.render.entity.model.PlayerEntityModel
+ */
 package net.minecraft.client.render.entity.model;
 
 import net.fabricmc.api.EnvType;
@@ -9,26 +25,23 @@ import net.minecraft.client.model.ModelPartBuilder;
 import net.minecraft.client.model.ModelPartData;
 import net.minecraft.client.model.ModelTransform;
 import net.minecraft.client.model.TexturedModelData;
+import net.minecraft.client.render.entity.model.PlayerEntityModel;
 
-@Environment(EnvType.CLIENT)
-public class Deadmau5EarsEntityModel extends BipedEntityModel {
-   public Deadmau5EarsEntityModel(ModelPart modelPart) {
-      super(modelPart);
-   }
+@Environment(value=EnvType.CLIENT)
+public class Deadmau5EarsEntityModel
+extends PlayerEntityModel {
+    public Deadmau5EarsEntityModel(ModelPart modelPart) {
+        super(modelPart, false);
+    }
 
-   public static TexturedModelData getTexturedModelData() {
-      ModelData modelData = BipedEntityModel.getModelData(Dilation.NONE, 0.0F);
-      ModelPartData modelPartData = modelData.getRoot();
-      ModelPartData modelPartData2 = modelPartData.addChild("head");
-      modelPartData2.addChild("hat");
-      modelPartData.addChild("body");
-      modelPartData.addChild("left_arm");
-      modelPartData.addChild("right_arm");
-      modelPartData.addChild("left_leg");
-      modelPartData.addChild("right_leg");
-      ModelPartBuilder modelPartBuilder = ModelPartBuilder.create().uv(24, 0).cuboid(-3.0F, -6.0F, -1.0F, 6.0F, 6.0F, 1.0F, new Dilation(1.0F));
-      modelPartData2.addChild("left_ear", modelPartBuilder, ModelTransform.origin(-6.0F, -6.0F, 0.0F));
-      modelPartData2.addChild("right_ear", modelPartBuilder, ModelTransform.origin(6.0F, -6.0F, 0.0F));
-      return TexturedModelData.of(modelData, 64, 64);
-   }
+    public static TexturedModelData getTexturedModelData() {
+        ModelData modelData = PlayerEntityModel.getTexturedModelData((Dilation)Dilation.NONE, (boolean)false);
+        ModelPartData modelPartData = modelData.getRoot().resetChildrenParts();
+        ModelPartData modelPartData2 = modelPartData.getChild("head");
+        ModelPartBuilder modelPartBuilder = ModelPartBuilder.create().uv(24, 0).cuboid(-3.0f, -6.0f, -1.0f, 6.0f, 6.0f, 1.0f, new Dilation(1.0f));
+        modelPartData2.addChild("left_ear", modelPartBuilder, ModelTransform.origin((float)-6.0f, (float)-6.0f, (float)0.0f));
+        modelPartData2.addChild("right_ear", modelPartBuilder, ModelTransform.origin((float)6.0f, (float)-6.0f, (float)0.0f));
+        return TexturedModelData.of((ModelData)modelData, (int)64, (int)64);
+    }
 }
+

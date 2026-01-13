@@ -1,11 +1,62 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.serialization.MapCodec
+ *  net.minecraft.block.AbstractBlock$Settings
+ *  net.minecraft.block.Block
+ *  net.minecraft.block.BlockState
+ *  net.minecraft.block.BlockWithEntity
+ *  net.minecraft.block.SculkShriekerBlock
+ *  net.minecraft.block.ShapeContext
+ *  net.minecraft.block.Waterloggable
+ *  net.minecraft.block.entity.BlockEntity
+ *  net.minecraft.block.entity.BlockEntityTicker
+ *  net.minecraft.block.entity.BlockEntityType
+ *  net.minecraft.block.entity.SculkShriekerBlockEntity
+ *  net.minecraft.entity.Entity
+ *  net.minecraft.fluid.Fluid
+ *  net.minecraft.fluid.FluidState
+ *  net.minecraft.fluid.Fluids
+ *  net.minecraft.item.ItemPlacementContext
+ *  net.minecraft.item.ItemStack
+ *  net.minecraft.server.network.ServerPlayerEntity
+ *  net.minecraft.server.world.ServerWorld
+ *  net.minecraft.state.StateManager$Builder
+ *  net.minecraft.state.property.BooleanProperty
+ *  net.minecraft.state.property.Properties
+ *  net.minecraft.state.property.Property
+ *  net.minecraft.util.math.BlockPos
+ *  net.minecraft.util.math.Direction
+ *  net.minecraft.util.math.Direction$Axis
+ *  net.minecraft.util.math.intprovider.ConstantIntProvider
+ *  net.minecraft.util.math.intprovider.IntProvider
+ *  net.minecraft.util.math.random.Random
+ *  net.minecraft.util.shape.VoxelShape
+ *  net.minecraft.world.BlockView
+ *  net.minecraft.world.World
+ *  net.minecraft.world.WorldView
+ *  net.minecraft.world.event.Vibrations$Callback
+ *  net.minecraft.world.event.Vibrations$ListenerData
+ *  net.minecraft.world.event.Vibrations$Ticker
+ *  net.minecraft.world.tick.ScheduledTickView
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.block;
 
 import com.mojang.serialization.MapCodec;
+import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.BlockWithEntity;
+import net.minecraft.block.ShapeContext;
+import net.minecraft.block.Waterloggable;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.entity.SculkShriekerBlockEntity;
 import net.minecraft.entity.Entity;
+import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
@@ -15,9 +66,11 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.Properties;
+import net.minecraft.state.property.Property;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.intprovider.ConstantIntProvider;
+import net.minecraft.util.math.intprovider.IntProvider;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
@@ -25,108 +78,97 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
 import net.minecraft.world.event.Vibrations;
 import net.minecraft.world.tick.ScheduledTickView;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-public class SculkShriekerBlock extends BlockWithEntity implements Waterloggable {
-   public static final MapCodec CODEC = createCodec(SculkShriekerBlock::new);
-   public static final BooleanProperty SHRIEKING;
-   public static final BooleanProperty WATERLOGGED;
-   public static final BooleanProperty CAN_SUMMON;
-   private static final VoxelShape SHAPE;
-   public static final double TOP;
+public class SculkShriekerBlock
+extends BlockWithEntity
+implements Waterloggable {
+    public static final MapCodec<SculkShriekerBlock> CODEC = SculkShriekerBlock.createCodec(SculkShriekerBlock::new);
+    public static final BooleanProperty SHRIEKING = Properties.SHRIEKING;
+    public static final BooleanProperty WATERLOGGED = Properties.WATERLOGGED;
+    public static final BooleanProperty CAN_SUMMON = Properties.CAN_SUMMON;
+    private static final VoxelShape SHAPE = Block.createColumnShape((double)16.0, (double)0.0, (double)8.0);
+    public static final double TOP = SHAPE.getMax(Direction.Axis.Y);
 
-   public MapCodec getCodec() {
-      return CODEC;
-   }
+    public MapCodec<SculkShriekerBlock> getCodec() {
+        return CODEC;
+    }
 
-   public SculkShriekerBlock(AbstractBlock.Settings settings) {
-      super(settings);
-      this.setDefaultState((BlockState)((BlockState)((BlockState)((BlockState)this.stateManager.getDefaultState()).with(SHRIEKING, false)).with(WATERLOGGED, false)).with(CAN_SUMMON, false));
-   }
+    public SculkShriekerBlock(AbstractBlock.Settings settings) {
+        super(settings);
+        this.setDefaultState((BlockState)((BlockState)((BlockState)((BlockState)this.stateManager.getDefaultState()).with((Property)SHRIEKING, (Comparable)Boolean.valueOf(false))).with((Property)WATERLOGGED, (Comparable)Boolean.valueOf(false))).with((Property)CAN_SUMMON, (Comparable)Boolean.valueOf(false)));
+    }
 
-   protected void appendProperties(StateManager.Builder builder) {
-      builder.add(SHRIEKING);
-      builder.add(WATERLOGGED);
-      builder.add(CAN_SUMMON);
-   }
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(new Property[]{SHRIEKING});
+        builder.add(new Property[]{WATERLOGGED});
+        builder.add(new Property[]{CAN_SUMMON});
+    }
 
-   public void onSteppedOn(World world, BlockPos pos, BlockState state, Entity entity) {
-      if (world instanceof ServerWorld serverWorld) {
-         ServerPlayerEntity serverPlayerEntity = SculkShriekerBlockEntity.findResponsiblePlayerFromEntity(entity);
-         if (serverPlayerEntity != null) {
-            serverWorld.getBlockEntity(pos, BlockEntityType.SCULK_SHRIEKER).ifPresent((blockEntity) -> {
-               blockEntity.shriek(serverWorld, serverPlayerEntity);
-            });
-         }
-      }
+    public void onSteppedOn(World world, BlockPos pos, BlockState state, Entity entity) {
+        if (world instanceof ServerWorld) {
+            ServerWorld serverWorld = (ServerWorld)world;
+            ServerPlayerEntity serverPlayerEntity = SculkShriekerBlockEntity.findResponsiblePlayerFromEntity((Entity)entity);
+            if (serverPlayerEntity != null) {
+                serverWorld.getBlockEntity(pos, BlockEntityType.SCULK_SHRIEKER).ifPresent(blockEntity -> blockEntity.shriek(serverWorld, serverPlayerEntity));
+            }
+        }
+        super.onSteppedOn(world, pos, state, entity);
+    }
 
-      super.onSteppedOn(world, pos, state, entity);
-   }
+    protected void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        if (((Boolean)state.get((Property)SHRIEKING)).booleanValue()) {
+            world.setBlockState(pos, (BlockState)state.with((Property)SHRIEKING, (Comparable)Boolean.valueOf(false)), 3);
+            world.getBlockEntity(pos, BlockEntityType.SCULK_SHRIEKER).ifPresent(blockEntity -> blockEntity.warn(world));
+        }
+    }
 
-   protected void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-      if ((Boolean)state.get(SHRIEKING)) {
-         world.setBlockState(pos, (BlockState)state.with(SHRIEKING, false), 3);
-         world.getBlockEntity(pos, BlockEntityType.SCULK_SHRIEKER).ifPresent((blockEntity) -> {
-            blockEntity.warn(world);
-         });
-      }
+    protected VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return SHAPE;
+    }
 
-   }
+    protected VoxelShape getCullingShape(BlockState state) {
+        return SHAPE;
+    }
 
-   protected VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-      return SHAPE;
-   }
+    protected boolean hasSidedTransparency(BlockState state) {
+        return true;
+    }
 
-   protected VoxelShape getCullingShape(BlockState state) {
-      return SHAPE;
-   }
+    public @Nullable BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+        return new SculkShriekerBlockEntity(pos, state);
+    }
 
-   protected boolean hasSidedTransparency(BlockState state) {
-      return true;
-   }
+    protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
+        if (((Boolean)state.get((Property)WATERLOGGED)).booleanValue()) {
+            tickView.scheduleFluidTick(pos, (Fluid)Fluids.WATER, Fluids.WATER.getTickRate(world));
+        }
+        return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
+    }
 
-   @Nullable
-   public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-      return new SculkShriekerBlockEntity(pos, state);
-   }
+    public @Nullable BlockState getPlacementState(ItemPlacementContext ctx) {
+        return (BlockState)this.getDefaultState().with((Property)WATERLOGGED, (Comparable)Boolean.valueOf(ctx.getWorld().getFluidState(ctx.getBlockPos()).getFluid() == Fluids.WATER));
+    }
 
-   protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
-      if ((Boolean)state.get(WATERLOGGED)) {
-         tickView.scheduleFluidTick(pos, Fluids.WATER, Fluids.WATER.getTickRate(world));
-      }
+    protected FluidState getFluidState(BlockState state) {
+        if (((Boolean)state.get((Property)WATERLOGGED)).booleanValue()) {
+            return Fluids.WATER.getStill(false);
+        }
+        return super.getFluidState(state);
+    }
 
-      return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
-   }
+    protected void onStacksDropped(BlockState state, ServerWorld world, BlockPos pos, ItemStack tool, boolean dropExperience) {
+        super.onStacksDropped(state, world, pos, tool, dropExperience);
+        if (dropExperience) {
+            this.dropExperienceWhenMined(world, pos, tool, (IntProvider)ConstantIntProvider.create((int)5));
+        }
+    }
 
-   @Nullable
-   public BlockState getPlacementState(ItemPlacementContext ctx) {
-      return (BlockState)this.getDefaultState().with(WATERLOGGED, ctx.getWorld().getFluidState(ctx.getBlockPos()).getFluid() == Fluids.WATER);
-   }
-
-   protected FluidState getFluidState(BlockState state) {
-      return (Boolean)state.get(WATERLOGGED) ? Fluids.WATER.getStill(false) : super.getFluidState(state);
-   }
-
-   protected void onStacksDropped(BlockState state, ServerWorld world, BlockPos pos, ItemStack tool, boolean dropExperience) {
-      super.onStacksDropped(state, world, pos, tool, dropExperience);
-      if (dropExperience) {
-         this.dropExperienceWhenMined(world, pos, tool, ConstantIntProvider.create(5));
-      }
-
-   }
-
-   @Nullable
-   public BlockEntityTicker getTicker(World world, BlockState state, BlockEntityType type) {
-      return !world.isClient ? BlockWithEntity.validateTicker(type, BlockEntityType.SCULK_SHRIEKER, (worldx, pos, statex, blockEntity) -> {
-         Vibrations.Ticker.tick(worldx, blockEntity.getVibrationListenerData(), blockEntity.getVibrationCallback());
-      }) : null;
-   }
-
-   static {
-      SHRIEKING = Properties.SHRIEKING;
-      WATERLOGGED = Properties.WATERLOGGED;
-      CAN_SUMMON = Properties.CAN_SUMMON;
-      SHAPE = Block.createColumnShape(16.0, 0.0, 8.0);
-      TOP = SHAPE.getMax(Direction.Axis.Y);
-   }
+    public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+        if (!world.isClient()) {
+            return BlockWithEntity.validateTicker(type, (BlockEntityType)BlockEntityType.SCULK_SHRIEKER, (worldx, pos, statex, blockEntity) -> Vibrations.Ticker.tick((World)worldx, (Vibrations.ListenerData)blockEntity.getVibrationListenerData(), (Vibrations.Callback)blockEntity.getVibrationCallback()));
+        }
+        return null;
+    }
 }
+

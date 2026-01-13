@@ -1,3 +1,17 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.resource.DryFoliageColormapResourceSupplier
+ *  net.minecraft.client.util.RawTextureDataLoader
+ *  net.minecraft.resource.ResourceManager
+ *  net.minecraft.resource.SinglePreparationResourceReloader
+ *  net.minecraft.util.Identifier
+ *  net.minecraft.util.profiler.Profiler
+ *  net.minecraft.world.biome.DryFoliageColors
+ */
 package net.minecraft.client.resource;
 
 import java.io.IOException;
@@ -10,24 +24,26 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.profiler.Profiler;
 import net.minecraft.world.biome.DryFoliageColors;
 
-@Environment(EnvType.CLIENT)
-public class DryFoliageColormapResourceSupplier extends SinglePreparationResourceReloader {
-   private static final Identifier DRY_FOLIAGE_COLORMAP = Identifier.ofVanilla("textures/colormap/dry_foliage.png");
+@Environment(value=EnvType.CLIENT)
+public class DryFoliageColormapResourceSupplier
+extends SinglePreparationResourceReloader<int[]> {
+    private static final Identifier DRY_FOLIAGE_COLORMAP = Identifier.ofVanilla((String)"textures/colormap/dry_foliage.png");
 
-   protected int[] reload(ResourceManager resourceManager, Profiler profiler) {
-      try {
-         return RawTextureDataLoader.loadRawTextureData(resourceManager, DRY_FOLIAGE_COLORMAP);
-      } catch (IOException var4) {
-         throw new IllegalStateException("Failed to load dry foliage color texture", var4);
-      }
-   }
+    protected int[] reload(ResourceManager resourceManager, Profiler profiler) {
+        try {
+            return RawTextureDataLoader.loadRawTextureData((ResourceManager)resourceManager, (Identifier)DRY_FOLIAGE_COLORMAP);
+        }
+        catch (IOException iOException) {
+            throw new IllegalStateException("Failed to load dry foliage color texture", iOException);
+        }
+    }
 
-   protected void apply(int[] is, ResourceManager resourceManager, Profiler profiler) {
-      DryFoliageColors.setColorMap(is);
-   }
+    protected void apply(int[] is, ResourceManager resourceManager, Profiler profiler) {
+        DryFoliageColors.setColorMap((int[])is);
+    }
 
-   // $FF: synthetic method
-   protected Object prepare(final ResourceManager manager, final Profiler profiler) {
-      return this.reload(manager, profiler);
-   }
+    protected /* synthetic */ Object prepare(ResourceManager manager, Profiler profiler) {
+        return this.reload(manager, profiler);
+    }
 }
+

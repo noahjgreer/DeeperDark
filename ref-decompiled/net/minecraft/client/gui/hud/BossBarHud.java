@@ -1,7 +1,29 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.google.common.collect.Maps
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.MinecraftClient
+ *  net.minecraft.client.gl.RenderPipelines
+ *  net.minecraft.client.gui.DrawContext
+ *  net.minecraft.client.gui.hud.BossBarHud
+ *  net.minecraft.client.gui.hud.ClientBossBar
+ *  net.minecraft.entity.boss.BossBar
+ *  net.minecraft.entity.boss.BossBar$Style
+ *  net.minecraft.network.packet.s2c.play.BossBarS2CPacket
+ *  net.minecraft.network.packet.s2c.play.BossBarS2CPacket$Consumer
+ *  net.minecraft.text.StringVisitable
+ *  net.minecraft.text.Text
+ *  net.minecraft.util.Identifier
+ *  net.minecraft.util.math.MathHelper
+ *  net.minecraft.util.profiler.Profiler
+ *  net.minecraft.util.profiler.Profilers
+ */
 package net.minecraft.client.gui.hud;
 
 import com.google.common.collect.Maps;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -10,6 +32,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.hud.ClientBossBar;
 import net.minecraft.entity.boss.BossBar;
 import net.minecraft.network.packet.s2c.play.BossBarS2CPacket;
 import net.minecraft.text.StringVisitable;
@@ -19,146 +42,97 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.profiler.Profiler;
 import net.minecraft.util.profiler.Profilers;
 
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 public class BossBarHud {
-   private static final int WIDTH = 182;
-   private static final int HEIGHT = 5;
-   private static final Identifier[] BACKGROUND_TEXTURES = new Identifier[]{Identifier.ofVanilla("boss_bar/pink_background"), Identifier.ofVanilla("boss_bar/blue_background"), Identifier.ofVanilla("boss_bar/red_background"), Identifier.ofVanilla("boss_bar/green_background"), Identifier.ofVanilla("boss_bar/yellow_background"), Identifier.ofVanilla("boss_bar/purple_background"), Identifier.ofVanilla("boss_bar/white_background")};
-   private static final Identifier[] PROGRESS_TEXTURES = new Identifier[]{Identifier.ofVanilla("boss_bar/pink_progress"), Identifier.ofVanilla("boss_bar/blue_progress"), Identifier.ofVanilla("boss_bar/red_progress"), Identifier.ofVanilla("boss_bar/green_progress"), Identifier.ofVanilla("boss_bar/yellow_progress"), Identifier.ofVanilla("boss_bar/purple_progress"), Identifier.ofVanilla("boss_bar/white_progress")};
-   private static final Identifier[] NOTCHED_BACKGROUND_TEXTURES = new Identifier[]{Identifier.ofVanilla("boss_bar/notched_6_background"), Identifier.ofVanilla("boss_bar/notched_10_background"), Identifier.ofVanilla("boss_bar/notched_12_background"), Identifier.ofVanilla("boss_bar/notched_20_background")};
-   private static final Identifier[] NOTCHED_PROGRESS_TEXTURES = new Identifier[]{Identifier.ofVanilla("boss_bar/notched_6_progress"), Identifier.ofVanilla("boss_bar/notched_10_progress"), Identifier.ofVanilla("boss_bar/notched_12_progress"), Identifier.ofVanilla("boss_bar/notched_20_progress")};
-   private final MinecraftClient client;
-   final Map bossBars = Maps.newLinkedHashMap();
+    private static final int WIDTH = 182;
+    private static final int HEIGHT = 5;
+    private static final Identifier[] BACKGROUND_TEXTURES = new Identifier[]{Identifier.ofVanilla((String)"boss_bar/pink_background"), Identifier.ofVanilla((String)"boss_bar/blue_background"), Identifier.ofVanilla((String)"boss_bar/red_background"), Identifier.ofVanilla((String)"boss_bar/green_background"), Identifier.ofVanilla((String)"boss_bar/yellow_background"), Identifier.ofVanilla((String)"boss_bar/purple_background"), Identifier.ofVanilla((String)"boss_bar/white_background")};
+    private static final Identifier[] PROGRESS_TEXTURES = new Identifier[]{Identifier.ofVanilla((String)"boss_bar/pink_progress"), Identifier.ofVanilla((String)"boss_bar/blue_progress"), Identifier.ofVanilla((String)"boss_bar/red_progress"), Identifier.ofVanilla((String)"boss_bar/green_progress"), Identifier.ofVanilla((String)"boss_bar/yellow_progress"), Identifier.ofVanilla((String)"boss_bar/purple_progress"), Identifier.ofVanilla((String)"boss_bar/white_progress")};
+    private static final Identifier[] NOTCHED_BACKGROUND_TEXTURES = new Identifier[]{Identifier.ofVanilla((String)"boss_bar/notched_6_background"), Identifier.ofVanilla((String)"boss_bar/notched_10_background"), Identifier.ofVanilla((String)"boss_bar/notched_12_background"), Identifier.ofVanilla((String)"boss_bar/notched_20_background")};
+    private static final Identifier[] NOTCHED_PROGRESS_TEXTURES = new Identifier[]{Identifier.ofVanilla((String)"boss_bar/notched_6_progress"), Identifier.ofVanilla((String)"boss_bar/notched_10_progress"), Identifier.ofVanilla((String)"boss_bar/notched_12_progress"), Identifier.ofVanilla((String)"boss_bar/notched_20_progress")};
+    private final MinecraftClient client;
+    final Map<UUID, ClientBossBar> bossBars = Maps.newLinkedHashMap();
 
-   public BossBarHud(MinecraftClient client) {
-      this.client = client;
-   }
+    public BossBarHud(MinecraftClient client) {
+        this.client = client;
+    }
 
-   public void render(DrawContext context) {
-      if (!this.bossBars.isEmpty()) {
-         context.createNewRootLayer();
-         Profiler profiler = Profilers.get();
-         profiler.push("bossHealth");
-         int i = context.getScaledWindowWidth();
-         int j = 12;
-         Iterator var5 = this.bossBars.values().iterator();
-
-         while(var5.hasNext()) {
-            ClientBossBar clientBossBar = (ClientBossBar)var5.next();
+    public void render(DrawContext context) {
+        if (this.bossBars.isEmpty()) {
+            return;
+        }
+        context.createNewRootLayer();
+        Profiler profiler = Profilers.get();
+        profiler.push("bossHealth");
+        int i = context.getScaledWindowWidth();
+        int j = 12;
+        for (ClientBossBar clientBossBar : this.bossBars.values()) {
             int k = i / 2 - 91;
-            this.renderBossBar(context, k, j, clientBossBar);
+            int l = j;
+            this.renderBossBar(context, k, l, (BossBar)clientBossBar);
             Text text = clientBossBar.getName();
             int m = this.client.textRenderer.getWidth((StringVisitable)text);
             int n = i / 2 - m / 2;
-            int o = j - 9;
-            context.drawTextWithShadow(this.client.textRenderer, (Text)text, n, o, -1);
+            int o = l - 9;
+            context.drawTextWithShadow(this.client.textRenderer, text, n, o, -1);
             Objects.requireNonNull(this.client.textRenderer);
-            j += 10 + 9;
-            if (j >= context.getScaledWindowHeight() / 3) {
-               break;
+            if ((j += 10 + 9) < context.getScaledWindowHeight() / 3) continue;
+            break;
+        }
+        profiler.pop();
+    }
+
+    private void renderBossBar(DrawContext context, int x, int y, BossBar bossBar) {
+        this.renderBossBar(context, x, y, bossBar, 182, BACKGROUND_TEXTURES, NOTCHED_BACKGROUND_TEXTURES);
+        int i = MathHelper.lerpPositive((float)bossBar.getPercent(), (int)0, (int)182);
+        if (i > 0) {
+            this.renderBossBar(context, x, y, bossBar, i, PROGRESS_TEXTURES, NOTCHED_PROGRESS_TEXTURES);
+        }
+    }
+
+    private void renderBossBar(DrawContext context, int x, int y, BossBar bossBar, int width, Identifier[] textures, Identifier[] notchedTextures) {
+        context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, textures[bossBar.getColor().ordinal()], 182, 5, 0, 0, x, y, width, 5);
+        if (bossBar.getStyle() != BossBar.Style.PROGRESS) {
+            context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, notchedTextures[bossBar.getStyle().ordinal() - 1], 182, 5, 0, 0, x, y, width, 5);
+        }
+    }
+
+    public void handlePacket(BossBarS2CPacket packet) {
+        packet.accept((BossBarS2CPacket.Consumer)new /* Unavailable Anonymous Inner Class!! */);
+    }
+
+    public void clear() {
+        this.bossBars.clear();
+    }
+
+    public boolean shouldPlayDragonMusic() {
+        if (!this.bossBars.isEmpty()) {
+            for (BossBar bossBar : this.bossBars.values()) {
+                if (!bossBar.hasDragonMusic()) continue;
+                return true;
             }
-         }
+        }
+        return false;
+    }
 
-         profiler.pop();
-      }
-   }
-
-   private void renderBossBar(DrawContext context, int x, int y, BossBar bossBar) {
-      this.renderBossBar(context, x, y, bossBar, 182, BACKGROUND_TEXTURES, NOTCHED_BACKGROUND_TEXTURES);
-      int i = MathHelper.lerpPositive(bossBar.getPercent(), 0, 182);
-      if (i > 0) {
-         this.renderBossBar(context, x, y, bossBar, i, PROGRESS_TEXTURES, NOTCHED_PROGRESS_TEXTURES);
-      }
-
-   }
-
-   private void renderBossBar(DrawContext context, int x, int y, BossBar bossBar, int width, Identifier[] textures, Identifier[] notchedTextures) {
-      context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, textures[bossBar.getColor().ordinal()], 182, 5, 0, 0, x, y, width, 5);
-      if (bossBar.getStyle() != BossBar.Style.PROGRESS) {
-         context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, notchedTextures[bossBar.getStyle().ordinal() - 1], 182, 5, 0, 0, x, y, width, 5);
-      }
-
-   }
-
-   public void handlePacket(BossBarS2CPacket packet) {
-      packet.accept(new BossBarS2CPacket.Consumer() {
-         public void add(UUID uuid, Text name, float percent, BossBar.Color color, BossBar.Style style, boolean darkenSky, boolean dragonMusic, boolean thickenFog) {
-            BossBarHud.this.bossBars.put(uuid, new ClientBossBar(uuid, name, percent, color, style, darkenSky, dragonMusic, thickenFog));
-         }
-
-         public void remove(UUID uuid) {
-            BossBarHud.this.bossBars.remove(uuid);
-         }
-
-         public void updateProgress(UUID uuid, float percent) {
-            ((ClientBossBar)BossBarHud.this.bossBars.get(uuid)).setPercent(percent);
-         }
-
-         public void updateName(UUID uuid, Text name) {
-            ((ClientBossBar)BossBarHud.this.bossBars.get(uuid)).setName(name);
-         }
-
-         public void updateStyle(UUID id, BossBar.Color color, BossBar.Style style) {
-            ClientBossBar clientBossBar = (ClientBossBar)BossBarHud.this.bossBars.get(id);
-            clientBossBar.setColor(color);
-            clientBossBar.setStyle(style);
-         }
-
-         public void updateProperties(UUID uuid, boolean darkenSky, boolean dragonMusic, boolean thickenFog) {
-            ClientBossBar clientBossBar = (ClientBossBar)BossBarHud.this.bossBars.get(uuid);
-            clientBossBar.setDarkenSky(darkenSky);
-            clientBossBar.setDragonMusic(dragonMusic);
-            clientBossBar.setThickenFog(thickenFog);
-         }
-      });
-   }
-
-   public void clear() {
-      this.bossBars.clear();
-   }
-
-   public boolean shouldPlayDragonMusic() {
-      if (!this.bossBars.isEmpty()) {
-         Iterator var1 = this.bossBars.values().iterator();
-
-         while(var1.hasNext()) {
-            BossBar bossBar = (BossBar)var1.next();
-            if (bossBar.hasDragonMusic()) {
-               return true;
+    public boolean shouldDarkenSky() {
+        if (!this.bossBars.isEmpty()) {
+            for (BossBar bossBar : this.bossBars.values()) {
+                if (!bossBar.shouldDarkenSky()) continue;
+                return true;
             }
-         }
-      }
+        }
+        return false;
+    }
 
-      return false;
-   }
-
-   public boolean shouldDarkenSky() {
-      if (!this.bossBars.isEmpty()) {
-         Iterator var1 = this.bossBars.values().iterator();
-
-         while(var1.hasNext()) {
-            BossBar bossBar = (BossBar)var1.next();
-            if (bossBar.shouldDarkenSky()) {
-               return true;
+    public boolean shouldThickenFog() {
+        if (!this.bossBars.isEmpty()) {
+            for (BossBar bossBar : this.bossBars.values()) {
+                if (!bossBar.shouldThickenFog()) continue;
+                return true;
             }
-         }
-      }
-
-      return false;
-   }
-
-   public boolean shouldThickenFog() {
-      if (!this.bossBars.isEmpty()) {
-         Iterator var1 = this.bossBars.values().iterator();
-
-         while(var1.hasNext()) {
-            BossBar bossBar = (BossBar)var1.next();
-            if (bossBar.shouldThickenFog()) {
-               return true;
-            }
-         }
-      }
-
-      return false;
-   }
+        }
+        return false;
+    }
 }
+

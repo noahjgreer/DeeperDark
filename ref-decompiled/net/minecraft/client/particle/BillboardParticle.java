@@ -1,95 +1,143 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.particle.BillboardParticle
+ *  net.minecraft.client.particle.BillboardParticle$RenderType
+ *  net.minecraft.client.particle.BillboardParticle$Rotator
+ *  net.minecraft.client.particle.BillboardParticleSubmittable
+ *  net.minecraft.client.particle.Particle
+ *  net.minecraft.client.particle.ParticleTextureSheet
+ *  net.minecraft.client.particle.SpriteProvider
+ *  net.minecraft.client.render.Camera
+ *  net.minecraft.client.texture.Sprite
+ *  net.minecraft.client.world.ClientWorld
+ *  net.minecraft.util.math.ColorHelper
+ *  net.minecraft.util.math.MathHelper
+ *  net.minecraft.util.math.Vec3d
+ *  org.joml.Quaternionf
+ */
 package net.minecraft.client.particle;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.particle.BillboardParticle;
+import net.minecraft.client.particle.BillboardParticleSubmittable;
+import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.ParticleTextureSheet;
+import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Quaternionf;
-import org.joml.Vector3f;
 
-@Environment(EnvType.CLIENT)
-public abstract class BillboardParticle extends Particle {
-   protected float scale;
+@Environment(value=EnvType.CLIENT)
+public abstract class BillboardParticle
+extends Particle {
+    protected float scale;
+    protected float red = 1.0f;
+    protected float green = 1.0f;
+    protected float blue = 1.0f;
+    protected float alpha = 1.0f;
+    protected float zRotation;
+    protected float lastZRotation;
+    protected Sprite sprite;
 
-   protected BillboardParticle(ClientWorld clientWorld, double d, double e, double f) {
-      super(clientWorld, d, e, f);
-      this.scale = 0.1F * (this.random.nextFloat() * 0.5F + 0.5F) * 2.0F;
-   }
+    protected BillboardParticle(ClientWorld world, double x, double y, double z, Sprite sprite) {
+        super(world, x, y, z);
+        this.sprite = sprite;
+        this.scale = 0.1f * (this.random.nextFloat() * 0.5f + 0.5f) * 2.0f;
+    }
 
-   protected BillboardParticle(ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
-      super(clientWorld, d, e, f, g, h, i);
-      this.scale = 0.1F * (this.random.nextFloat() * 0.5F + 0.5F) * 2.0F;
-   }
+    protected BillboardParticle(ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, Sprite sprite) {
+        super(world, x, y, z, velocityX, velocityY, velocityZ);
+        this.sprite = sprite;
+        this.scale = 0.1f * (this.random.nextFloat() * 0.5f + 0.5f) * 2.0f;
+    }
 
-   public Rotator getRotator() {
-      return BillboardParticle.Rotator.ALL_AXIS;
-   }
+    public Rotator getRotator() {
+        return Rotator.ALL_AXIS;
+    }
 
-   public void render(VertexConsumer vertexConsumer, Camera camera, float tickProgress) {
-      Quaternionf quaternionf = new Quaternionf();
-      this.getRotator().setRotation(quaternionf, camera, tickProgress);
-      if (this.angle != 0.0F) {
-         quaternionf.rotateZ(MathHelper.lerp(tickProgress, this.lastAngle, this.angle));
-      }
+    public void render(BillboardParticleSubmittable submittable, Camera camera, float tickProgress) {
+        Quaternionf quaternionf = new Quaternionf();
+        this.getRotator().setRotation(quaternionf, camera, tickProgress);
+        if (this.zRotation != 0.0f) {
+            quaternionf.rotateZ(MathHelper.lerp((float)tickProgress, (float)this.lastZRotation, (float)this.zRotation));
+        }
+        this.render(submittable, camera, quaternionf, tickProgress);
+    }
 
-      this.render(vertexConsumer, camera, quaternionf, tickProgress);
-   }
+    protected void render(BillboardParticleSubmittable submittable, Camera camera, Quaternionf rotation, float tickProgress) {
+        Vec3d vec3d = camera.getCameraPos();
+        float f = (float)(MathHelper.lerp((double)tickProgress, (double)this.lastX, (double)this.x) - vec3d.getX());
+        float g = (float)(MathHelper.lerp((double)tickProgress, (double)this.lastY, (double)this.y) - vec3d.getY());
+        float h = (float)(MathHelper.lerp((double)tickProgress, (double)this.lastZ, (double)this.z) - vec3d.getZ());
+        this.renderVertex(submittable, rotation, f, g, h, tickProgress);
+    }
 
-   protected void render(VertexConsumer vertexConsumer, Camera camera, Quaternionf quaternionf, float tickProgress) {
-      Vec3d vec3d = camera.getPos();
-      float f = (float)(MathHelper.lerp((double)tickProgress, this.lastX, this.x) - vec3d.getX());
-      float g = (float)(MathHelper.lerp((double)tickProgress, this.lastY, this.y) - vec3d.getY());
-      float h = (float)(MathHelper.lerp((double)tickProgress, this.lastZ, this.z) - vec3d.getZ());
-      this.render(vertexConsumer, quaternionf, f, g, h, tickProgress);
-   }
+    protected void renderVertex(BillboardParticleSubmittable submittable, Quaternionf rotation, float x, float y, float z, float tickProgress) {
+        submittable.render(this.getRenderType(), x, y, z, rotation.x, rotation.y, rotation.z, rotation.w, this.getSize(tickProgress), this.getMinU(), this.getMaxU(), this.getMinV(), this.getMaxV(), ColorHelper.fromFloats((float)this.alpha, (float)this.red, (float)this.green, (float)this.blue), this.getBrightness(tickProgress));
+    }
 
-   protected void render(VertexConsumer vertexConsumer, Quaternionf quaternionf, float x, float y, float z, float tickProgress) {
-      float f = this.getSize(tickProgress);
-      float g = this.getMinU();
-      float h = this.getMaxU();
-      float i = this.getMinV();
-      float j = this.getMaxV();
-      int k = this.getBrightness(tickProgress);
-      this.renderVertex(vertexConsumer, quaternionf, x, y, z, 1.0F, -1.0F, f, h, j, k);
-      this.renderVertex(vertexConsumer, quaternionf, x, y, z, 1.0F, 1.0F, f, h, i, k);
-      this.renderVertex(vertexConsumer, quaternionf, x, y, z, -1.0F, 1.0F, f, g, i, k);
-      this.renderVertex(vertexConsumer, quaternionf, x, y, z, -1.0F, -1.0F, f, g, j, k);
-   }
+    public float getSize(float tickProgress) {
+        return this.scale;
+    }
 
-   private void renderVertex(VertexConsumer vertexConsumer, Quaternionf quaternionf, float x, float y, float z, float f, float g, float size, float u, float v, int light) {
-      Vector3f vector3f = (new Vector3f(f, g, 0.0F)).rotate(quaternionf).mul(size).add(x, y, z);
-      vertexConsumer.vertex(vector3f.x(), vector3f.y(), vector3f.z()).texture(u, v).color(this.red, this.green, this.blue, this.alpha).light(light);
-   }
+    public Particle scale(float scale) {
+        this.scale *= scale;
+        return super.scale(scale);
+    }
 
-   public float getSize(float tickProgress) {
-      return this.scale;
-   }
+    public ParticleTextureSheet textureSheet() {
+        return ParticleTextureSheet.SINGLE_QUADS;
+    }
 
-   public Particle scale(float scale) {
-      this.scale *= scale;
-      return super.scale(scale);
-   }
+    public void updateSprite(SpriteProvider spriteProvider) {
+        if (!this.dead) {
+            this.setSprite(spriteProvider.getSprite(this.age, this.maxAge));
+        }
+    }
 
-   protected abstract float getMinU();
+    protected void setSprite(Sprite sprite) {
+        this.sprite = sprite;
+    }
 
-   protected abstract float getMaxU();
+    protected float getMinU() {
+        return this.sprite.getMinU();
+    }
 
-   protected abstract float getMinV();
+    protected float getMaxU() {
+        return this.sprite.getMaxU();
+    }
 
-   protected abstract float getMaxV();
+    protected float getMinV() {
+        return this.sprite.getMinV();
+    }
 
-   @Environment(EnvType.CLIENT)
-   public interface Rotator {
-      Rotator ALL_AXIS = (quaternion, camera, tickProgress) -> {
-         quaternion.set(camera.getRotation());
-      };
-      Rotator Y_AND_W_ONLY = (quaternion, camera, tickProgress) -> {
-         quaternion.set(0.0F, camera.getRotation().y, 0.0F, camera.getRotation().w);
-      };
+    protected float getMaxV() {
+        return this.sprite.getMaxV();
+    }
 
-      void setRotation(Quaternionf quaternion, Camera camera, float tickProgress);
-   }
+    protected abstract RenderType getRenderType();
+
+    public void setColor(float red, float green, float blue) {
+        this.red = red;
+        this.green = green;
+        this.blue = blue;
+    }
+
+    protected void setAlpha(float alpha) {
+        this.alpha = alpha;
+    }
+
+    public String toString() {
+        return this.getClass().getSimpleName() + ", Pos (" + this.x + "," + this.y + "," + this.z + "), RGBA (" + this.red + "," + this.green + "," + this.blue + "," + this.alpha + "), Age " + this.age;
+    }
 }
+

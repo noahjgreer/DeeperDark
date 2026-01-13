@@ -1,37 +1,42 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.blaze3d.textures.TextureFormat
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.util.annotation.DeobfuscateClass
+ */
 package com.mojang.blaze3d.textures;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.util.annotation.DeobfuscateClass;
 
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 @DeobfuscateClass
 public enum TextureFormat {
-   RGBA8(4),
-   RED8(1),
-   RED8I(1),
-   DEPTH32(4);
+    RGBA8(4),
+    RED8(1),
+    RED8I(1),
+    DEPTH32(4);
 
-   private final int pixelSize;
+    private final int pixelSize;
 
-   private TextureFormat(final int pixelSie) {
-      this.pixelSize = pixelSie;
-   }
+    private TextureFormat(int pixelSie) {
+        this.pixelSize = pixelSie;
+    }
 
-   public int pixelSize() {
-      return this.pixelSize;
-   }
+    public int pixelSize() {
+        return this.pixelSize;
+    }
 
-   public boolean hasColorAspect() {
-      return this == RGBA8 || this == RED8;
-   }
+    public boolean hasColorAspect() {
+        return this == RGBA8 || this == RED8;
+    }
 
-   public boolean hasDepthAspect() {
-      return this == DEPTH32;
-   }
-
-   // $FF: synthetic method
-   private static TextureFormat[] $values() {
-      return new TextureFormat[]{RGBA8, RED8, RED8I, DEPTH32};
-   }
+    public boolean hasDepthAspect() {
+        return this == DEPTH32;
+    }
 }
+

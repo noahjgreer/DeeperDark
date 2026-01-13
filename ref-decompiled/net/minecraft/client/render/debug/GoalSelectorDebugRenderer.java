@@ -1,84 +1,65 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.MinecraftClient
+ *  net.minecraft.client.render.Camera
+ *  net.minecraft.client.render.Frustum
+ *  net.minecraft.client.render.debug.DebugRenderer$Renderer
+ *  net.minecraft.client.render.debug.GoalSelectorDebugRenderer
+ *  net.minecraft.util.math.BlockPos
+ *  net.minecraft.util.math.Vec3d
+ *  net.minecraft.util.math.Vec3i
+ *  net.minecraft.world.debug.DebugDataStore
+ *  net.minecraft.world.debug.DebugSubscriptionTypes
+ *  net.minecraft.world.debug.data.GoalSelectorDebugData$Goal
+ *  net.minecraft.world.debug.gizmo.GizmoDrawing
+ *  net.minecraft.world.debug.gizmo.TextGizmo$Style
+ */
 package net.minecraft.client.render.debug;
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectIterator;
-import java.util.List;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.network.packet.s2c.custom.DebugGoalSelectorCustomPayload;
+import net.minecraft.client.render.Frustum;
+import net.minecraft.client.render.debug.DebugRenderer;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
+import net.minecraft.world.debug.DebugDataStore;
+import net.minecraft.world.debug.DebugSubscriptionTypes;
+import net.minecraft.world.debug.data.GoalSelectorDebugData;
+import net.minecraft.world.debug.gizmo.GizmoDrawing;
+import net.minecraft.world.debug.gizmo.TextGizmo;
 
-@Environment(EnvType.CLIENT)
-public class GoalSelectorDebugRenderer implements DebugRenderer.Renderer {
-   private static final int RANGE = 160;
-   private final MinecraftClient client;
-   private final Int2ObjectMap goalSelectors = new Int2ObjectOpenHashMap();
+@Environment(value=EnvType.CLIENT)
+public class GoalSelectorDebugRenderer
+implements DebugRenderer.Renderer {
+    private static final int RANGE = 160;
+    private final MinecraftClient client;
 
-   public void clear() {
-      this.goalSelectors.clear();
-   }
+    public GoalSelectorDebugRenderer(MinecraftClient client) {
+        this.client = client;
+    }
 
-   public void setGoalSelectorList(int index, BlockPos pos, List goals) {
-      this.goalSelectors.put(index, new Entity(pos, goals));
-   }
-
-   public void removeGoalSelectorList(int index) {
-      this.goalSelectors.remove(index);
-   }
-
-   public GoalSelectorDebugRenderer(MinecraftClient client) {
-      this.client = client;
-   }
-
-   public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, double cameraX, double cameraY, double cameraZ) {
-      Camera camera = this.client.gameRenderer.getCamera();
-      BlockPos blockPos = BlockPos.ofFloored(camera.getPos().x, 0.0, camera.getPos().z);
-      ObjectIterator var11 = this.goalSelectors.values().iterator();
-
-      while(true) {
-         Entity entity;
-         BlockPos blockPos2;
-         do {
-            if (!var11.hasNext()) {
-               return;
+    public void render(double cameraX, double cameraY, double cameraZ, DebugDataStore store, Frustum frustum, float tickProgress) {
+        Camera camera = this.client.gameRenderer.getCamera();
+        BlockPos blockPos = BlockPos.ofFloored((double)camera.getCameraPos().x, (double)0.0, (double)camera.getCameraPos().z);
+        store.forEachEntityData(DebugSubscriptionTypes.GOAL_SELECTORS, (entity, data) -> {
+            if (blockPos.isWithinDistance((Vec3i)entity.getBlockPos(), 160.0)) {
+                for (int i = 0; i < data.goals().size(); ++i) {
+                    GoalSelectorDebugData.Goal goal = (GoalSelectorDebugData.Goal)data.goals().get(i);
+                    double d = (double)entity.getBlockX() + 0.5;
+                    double e = entity.getY() + 2.0 + (double)i * 0.25;
+                    double f = (double)entity.getBlockZ() + 0.5;
+                    int j = goal.isRunning() ? -16711936 : -3355444;
+                    GizmoDrawing.text((String)goal.name(), (Vec3d)new Vec3d(d, e, f), (TextGizmo.Style)TextGizmo.Style.left((int)j));
+                }
             }
-
-            entity = (Entity)var11.next();
-            blockPos2 = entity.entityPos;
-         } while(!blockPos.isWithinDistance(blockPos2, 160.0));
-
-         for(int i = 0; i < entity.goals.size(); ++i) {
-            DebugGoalSelectorCustomPayload.Goal goal = (DebugGoalSelectorCustomPayload.Goal)entity.goals.get(i);
-            double d = (double)blockPos2.getX() + 0.5;
-            double e = (double)blockPos2.getY() + 2.0 + (double)i * 0.25;
-            double f = (double)blockPos2.getZ() + 0.5;
-            int j = goal.isRunning() ? -16711936 : -3355444;
-            DebugRenderer.drawString(matrices, vertexConsumers, goal.name(), d, e, f, j);
-         }
-      }
-   }
-
-   @Environment(EnvType.CLIENT)
-   static record Entity(BlockPos entityPos, List goals) {
-      final BlockPos entityPos;
-      final List goals;
-
-      Entity(BlockPos blockPos, List list) {
-         this.entityPos = blockPos;
-         this.goals = list;
-      }
-
-      public BlockPos entityPos() {
-         return this.entityPos;
-      }
-
-      public List goals() {
-         return this.goals;
-      }
-   }
+        });
+    }
 }
+

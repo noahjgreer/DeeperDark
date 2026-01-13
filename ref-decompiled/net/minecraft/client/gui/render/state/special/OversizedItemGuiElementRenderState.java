@@ -1,57 +1,94 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.gui.ScreenRect
+ *  net.minecraft.client.gui.render.state.ItemGuiElementRenderState
+ *  net.minecraft.client.gui.render.state.special.OversizedItemGuiElementRenderState
+ *  net.minecraft.client.gui.render.state.special.SpecialGuiElementRenderState
+ *  org.joml.Matrix3x2f
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.gui.render.state.special;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.runtime.ObjectMethods;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.ScreenRect;
 import net.minecraft.client.gui.render.state.ItemGuiElementRenderState;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.client.gui.render.state.special.SpecialGuiElementRenderState;
 import org.joml.Matrix3x2f;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
-public record OversizedItemGuiElementRenderState(ItemGuiElementRenderState guiItemRenderState, int x1, int y1, int x2, int y2) implements SpecialGuiElementRenderState {
-   public OversizedItemGuiElementRenderState(ItemGuiElementRenderState itemGuiElementRenderState, int i, int j, int k, int l) {
-      this.guiItemRenderState = itemGuiElementRenderState;
-      this.x1 = i;
-      this.y1 = j;
-      this.x2 = k;
-      this.y2 = l;
-   }
+@Environment(value=EnvType.CLIENT)
+public record OversizedItemGuiElementRenderState(ItemGuiElementRenderState guiItemRenderState, int x1, int y1, int x2, int y2) implements SpecialGuiElementRenderState
+{
+    private final ItemGuiElementRenderState guiItemRenderState;
+    private final int x1;
+    private final int y1;
+    private final int x2;
+    private final int y2;
 
-   public float scale() {
-      return 16.0F;
-   }
+    public OversizedItemGuiElementRenderState(ItemGuiElementRenderState guiItemRenderState, int x1, int y1, int x2, int y2) {
+        this.guiItemRenderState = guiItemRenderState;
+        this.x1 = x1;
+        this.y1 = y1;
+        this.x2 = x2;
+        this.y2 = y2;
+    }
 
-   public Matrix3x2f pose() {
-      return this.guiItemRenderState.pose();
-   }
+    public float scale() {
+        return 16.0f;
+    }
 
-   @Nullable
-   public ScreenRect scissorArea() {
-      return this.guiItemRenderState.scissorArea();
-   }
+    public Matrix3x2f pose() {
+        return this.guiItemRenderState.pose();
+    }
 
-   @Nullable
-   public ScreenRect bounds() {
-      return this.guiItemRenderState.bounds();
-   }
+    public @Nullable ScreenRect scissorArea() {
+        return this.guiItemRenderState.scissorArea();
+    }
 
-   public ItemGuiElementRenderState guiItemRenderState() {
-      return this.guiItemRenderState;
-   }
+    public @Nullable ScreenRect bounds() {
+        return this.guiItemRenderState.bounds();
+    }
 
-   public int x1() {
-      return this.x1;
-   }
+    @Override
+    public final String toString() {
+        return ObjectMethods.bootstrap("toString", new MethodHandle[]{OversizedItemGuiElementRenderState.class, "guiItemRenderState;x0;y0;x1;y1", "guiItemRenderState", "x1", "y1", "x2", "y2"}, this);
+    }
 
-   public int y1() {
-      return this.y1;
-   }
+    @Override
+    public final int hashCode() {
+        return (int)ObjectMethods.bootstrap("hashCode", new MethodHandle[]{OversizedItemGuiElementRenderState.class, "guiItemRenderState;x0;y0;x1;y1", "guiItemRenderState", "x1", "y1", "x2", "y2"}, this);
+    }
 
-   public int x2() {
-      return this.x2;
-   }
+    @Override
+    public final boolean equals(Object object) {
+        return (boolean)ObjectMethods.bootstrap("equals", new MethodHandle[]{OversizedItemGuiElementRenderState.class, "guiItemRenderState;x0;y0;x1;y1", "guiItemRenderState", "x1", "y1", "x2", "y2"}, this, object);
+    }
 
-   public int y2() {
-      return this.y2;
-   }
+    public ItemGuiElementRenderState guiItemRenderState() {
+        return this.guiItemRenderState;
+    }
+
+    public int x1() {
+        return this.x1;
+    }
+
+    public int y1() {
+        return this.y1;
+    }
+
+    public int x2() {
+        return this.x2;
+    }
+
+    public int y2() {
+        return this.y2;
+    }
 }
+

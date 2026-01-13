@@ -1,65 +1,49 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.google.common.collect.Lists
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.render.model.json.MultipartModelCombinedCondition
+ *  net.minecraft.client.render.model.json.MultipartModelCombinedCondition$LogicalOperator
+ *  net.minecraft.client.render.model.json.MultipartModelCondition
+ *  net.minecraft.state.State
+ *  net.minecraft.state.StateManager
+ */
 package net.minecraft.client.render.model.json;
 
 import com.google.common.collect.Lists;
-import com.mojang.serialization.Codec;
 import java.util.List;
 import java.util.function.Predicate;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.render.model.json.MultipartModelCombinedCondition;
+import net.minecraft.client.render.model.json.MultipartModelCondition;
+import net.minecraft.state.State;
 import net.minecraft.state.StateManager;
-import net.minecraft.util.StringIdentifiable;
-import net.minecraft.util.Util;
 
-@Environment(EnvType.CLIENT)
-public record MultipartModelCombinedCondition(LogicalOperator operation, List terms) implements MultipartModelCondition {
-   public MultipartModelCombinedCondition(LogicalOperator logicalOperator, List list) {
-      this.operation = logicalOperator;
-      this.terms = list;
-   }
+@Environment(value=EnvType.CLIENT)
+public record MultipartModelCombinedCondition(LogicalOperator operation, List<MultipartModelCondition> terms) implements MultipartModelCondition
+{
+    private final LogicalOperator operation;
+    private final List<MultipartModelCondition> terms;
 
-   public Predicate instantiate(StateManager stateManager) {
-      return this.operation.apply(Lists.transform(this.terms, (condition) -> {
-         return condition.instantiate(stateManager);
-      }));
-   }
+    public MultipartModelCombinedCondition(LogicalOperator operation, List<MultipartModelCondition> terms) {
+        this.operation = operation;
+        this.terms = terms;
+    }
 
-   public LogicalOperator operation() {
-      return this.operation;
-   }
+    public <O, S extends State<O, S>> Predicate<S> instantiate(StateManager<O, S> stateManager) {
+        return this.operation.apply(Lists.transform((List)this.terms, condition -> condition.instantiate(stateManager)));
+    }
 
-   public List terms() {
-      return this.terms;
-   }
+    public LogicalOperator operation() {
+        return this.operation;
+    }
 
-   @Environment(EnvType.CLIENT)
-   public static enum LogicalOperator implements StringIdentifiable {
-      AND("AND") {
-         public Predicate apply(List conditions) {
-            return Util.allOf(conditions);
-         }
-      },
-      OR("OR") {
-         public Predicate apply(List conditions) {
-            return Util.anyOf(conditions);
-         }
-      };
-
-      public static final Codec CODEC = StringIdentifiable.createCodec(LogicalOperator::values);
-      private final String name;
-
-      LogicalOperator(final String name) {
-         this.name = name;
-      }
-
-      public String asString() {
-         return this.name;
-      }
-
-      public abstract Predicate apply(List conditions);
-
-      // $FF: synthetic method
-      private static LogicalOperator[] method_36940() {
-         return new LogicalOperator[]{AND, OR};
-      }
-   }
+    public List<MultipartModelCondition> terms() {
+        return this.terms;
+    }
 }
+

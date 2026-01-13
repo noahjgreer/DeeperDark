@@ -1,42 +1,44 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.search.SearchProvider
+ *  net.minecraft.client.search.SuffixArray
+ */
 package net.minecraft.client.search;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.search.SuffixArray;
 
+/*
+ * Exception performing whole class analysis ignored.
+ */
 @FunctionalInterface
-@Environment(EnvType.CLIENT)
-public interface SearchProvider {
-   static SearchProvider empty() {
-      return (string) -> {
-         return List.of();
-      };
-   }
+@Environment(value=EnvType.CLIENT)
+public interface SearchProvider<T> {
+    public static <T> SearchProvider<T> empty() {
+        return string -> List.of();
+    }
 
-   static SearchProvider plainText(List list, Function function) {
-      if (list.isEmpty()) {
-         return empty();
-      } else {
-         SuffixArray suffixArray = new SuffixArray();
-         Iterator var3 = list.iterator();
+    public static <T> SearchProvider<T> plainText(List<T> list, Function<T, Stream<String>> function) {
+        if (list.isEmpty()) {
+            return SearchProvider.empty();
+        }
+        SuffixArray suffixArray = new SuffixArray();
+        for (Object object : list) {
+            function.apply(object).forEach(string -> suffixArray.add(object, string.toLowerCase(Locale.ROOT)));
+        }
+        suffixArray.build();
+        return arg_0 -> ((SuffixArray)suffixArray).findAll(arg_0);
+    }
 
-         while(var3.hasNext()) {
-            Object object = var3.next();
-            ((Stream)function.apply(object)).forEach((string) -> {
-               suffixArray.add(object, string.toLowerCase(Locale.ROOT));
-            });
-         }
-
-         suffixArray.build();
-         Objects.requireNonNull(suffixArray);
-         return suffixArray::findAll;
-      }
-   }
-
-   List findAll(String text);
+    public List<T> findAll(String var1);
 }
+

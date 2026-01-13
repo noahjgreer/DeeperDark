@@ -1,6 +1,18 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.MinecraftClient
+ *  net.minecraft.client.realms.dto.RealmsServer
+ *  net.minecraft.client.realms.dto.RealmsServer$McoServerComparator
+ *  net.minecraft.client.realms.util.RealmsServerFilterer
+ */
 package net.minecraft.client.realms.util;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -10,37 +22,39 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.realms.dto.RealmsServer;
 
-@Environment(EnvType.CLIENT)
-public class RealmsServerFilterer implements Iterable {
-   private final MinecraftClient client;
-   private final Set removedServers = new HashSet();
-   private List sortedServers = List.of();
+@Environment(value=EnvType.CLIENT)
+public class RealmsServerFilterer
+implements Iterable<RealmsServer> {
+    private final MinecraftClient client;
+    private final Set<RealmsServer> removedServers = new HashSet();
+    private List<RealmsServer> sortedServers = List.of();
 
-   public RealmsServerFilterer(MinecraftClient client) {
-      this.client = client;
-   }
+    public RealmsServerFilterer(MinecraftClient client) {
+        this.client = client;
+    }
 
-   public void filterAndSort(List servers) {
-      List list = new ArrayList(servers);
-      list.sort(new RealmsServer.McoServerComparator(this.client.getSession().getUsername()));
-      boolean bl = list.removeAll(this.removedServers);
-      if (!bl) {
-         this.removedServers.clear();
-      }
+    public void filterAndSort(List<RealmsServer> servers) {
+        ArrayList<RealmsServer> list = new ArrayList<RealmsServer>(servers);
+        list.sort((Comparator<RealmsServer>)new RealmsServer.McoServerComparator(this.client.getSession().getUsername()));
+        boolean bl = list.removeAll(this.removedServers);
+        if (!bl) {
+            this.removedServers.clear();
+        }
+        this.sortedServers = list;
+    }
 
-      this.sortedServers = list;
-   }
+    public void remove(RealmsServer server) {
+        this.sortedServers.remove(server);
+        this.removedServers.add(server);
+    }
 
-   public void remove(RealmsServer server) {
-      this.sortedServers.remove(server);
-      this.removedServers.add(server);
-   }
+    @Override
+    public Iterator<RealmsServer> iterator() {
+        return this.sortedServers.iterator();
+    }
 
-   public Iterator iterator() {
-      return this.sortedServers.iterator();
-   }
-
-   public boolean isEmpty() {
-      return this.sortedServers.isEmpty();
-   }
+    public boolean isEmpty() {
+        return this.sortedServers.isEmpty();
+    }
 }
+

@@ -1,3 +1,26 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.google.common.collect.ImmutableMap
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.block.BlockState
+ *  net.minecraft.block.Blocks
+ *  net.minecraft.block.entity.BlockEntity
+ *  net.minecraft.client.render.chunk.RenderedChunk
+ *  net.minecraft.util.crash.CrashException
+ *  net.minecraft.util.crash.CrashReport
+ *  net.minecraft.util.crash.CrashReportSection
+ *  net.minecraft.util.math.BlockPos
+ *  net.minecraft.world.HeightLimitView
+ *  net.minecraft.world.chunk.ChunkSection
+ *  net.minecraft.world.chunk.EmptyChunk
+ *  net.minecraft.world.chunk.PalettedContainer
+ *  net.minecraft.world.chunk.WorldChunk
+ *  net.minecraft.world.gen.chunk.DebugChunkGenerator
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.render.chunk;
 
 import com.google.common.collect.ImmutableMap;
@@ -17,67 +40,58 @@ import net.minecraft.world.chunk.EmptyChunk;
 import net.minecraft.world.chunk.PalettedContainer;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.gen.chunk.DebugChunkGenerator;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 class RenderedChunk {
-   private final Map blockEntities;
-   @Nullable
-   private final PalettedContainer blockPalette;
-   private final boolean debugWorld;
-   private final HeightLimitView heightLimitView;
+    private final Map<BlockPos, BlockEntity> blockEntities;
+    private final @Nullable PalettedContainer<BlockState> blockPalette;
+    private final boolean debugWorld;
+    private final HeightLimitView heightLimitView;
 
-   RenderedChunk(WorldChunk chunk, int sectionIndex) {
-      this.heightLimitView = chunk;
-      this.debugWorld = chunk.getWorld().isDebugWorld();
-      this.blockEntities = ImmutableMap.copyOf(chunk.getBlockEntities());
-      if (chunk instanceof EmptyChunk) {
-         this.blockPalette = null;
-      } else {
-         ChunkSection[] chunkSections = chunk.getSectionArray();
-         if (sectionIndex >= 0 && sectionIndex < chunkSections.length) {
-            ChunkSection chunkSection = chunkSections[sectionIndex];
-            this.blockPalette = chunkSection.isEmpty() ? null : chunkSection.getBlockStateContainer().copy();
-         } else {
+    RenderedChunk(WorldChunk chunk, int sectionIndex) {
+        this.heightLimitView = chunk;
+        this.debugWorld = chunk.getWorld().isDebugWorld();
+        this.blockEntities = ImmutableMap.copyOf((Map)chunk.getBlockEntities());
+        if (chunk instanceof EmptyChunk) {
             this.blockPalette = null;
-         }
-      }
+        } else {
+            ChunkSection chunkSection;
+            ChunkSection[] chunkSections = chunk.getSectionArray();
+            this.blockPalette = sectionIndex < 0 || sectionIndex >= chunkSections.length ? null : ((chunkSection = chunkSections[sectionIndex]).isEmpty() ? null : chunkSection.getBlockStateContainer().copy());
+        }
+    }
 
-   }
+    public @Nullable BlockEntity getBlockEntity(BlockPos pos) {
+        return (BlockEntity)this.blockEntities.get(pos);
+    }
 
-   @Nullable
-   public BlockEntity getBlockEntity(BlockPos pos) {
-      return (BlockEntity)this.blockEntities.get(pos);
-   }
-
-   public BlockState getBlockState(BlockPos pos) {
-      int i = pos.getX();
-      int j = pos.getY();
-      int k = pos.getZ();
-      if (this.debugWorld) {
-         BlockState blockState = null;
-         if (j == 60) {
-            blockState = Blocks.BARRIER.getDefaultState();
-         }
-
-         if (j == 70) {
-            blockState = DebugChunkGenerator.getBlockState(i, k);
-         }
-
-         return blockState == null ? Blocks.AIR.getDefaultState() : blockState;
-      } else if (this.blockPalette == null) {
-         return Blocks.AIR.getDefaultState();
-      } else {
-         try {
-            return (BlockState)this.blockPalette.get(i & 15, j & 15, k & 15);
-         } catch (Throwable var8) {
-            CrashReport crashReport = CrashReport.create(var8, "Getting block state");
+    public BlockState getBlockState(BlockPos pos) {
+        int i = pos.getX();
+        int j = pos.getY();
+        int k = pos.getZ();
+        if (this.debugWorld) {
+            BlockState blockState = null;
+            if (j == 60) {
+                blockState = Blocks.BARRIER.getDefaultState();
+            }
+            if (j == 70) {
+                blockState = DebugChunkGenerator.getBlockState((int)i, (int)k);
+            }
+            return blockState == null ? Blocks.AIR.getDefaultState() : blockState;
+        }
+        if (this.blockPalette == null) {
+            return Blocks.AIR.getDefaultState();
+        }
+        try {
+            return (BlockState)this.blockPalette.get(i & 0xF, j & 0xF, k & 0xF);
+        }
+        catch (Throwable throwable) {
+            CrashReport crashReport = CrashReport.create((Throwable)throwable, (String)"Getting block state");
             CrashReportSection crashReportSection = crashReport.addElement("Block being got");
-            crashReportSection.add("Location", () -> {
-               return CrashReportSection.createPositionString(this.heightLimitView, i, j, k);
-            });
+            crashReportSection.add("Location", () -> CrashReportSection.createPositionString((HeightLimitView)this.heightLimitView, (int)i, (int)j, (int)k));
             throw new CrashException(crashReport);
-         }
-      }
-   }
+        }
+    }
 }
+

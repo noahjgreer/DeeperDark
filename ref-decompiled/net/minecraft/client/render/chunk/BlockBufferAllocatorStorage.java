@@ -1,3 +1,14 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.render.BlockRenderLayer
+ *  net.minecraft.client.render.chunk.BlockBufferAllocatorStorage
+ *  net.minecraft.client.util.BufferAllocator
+ *  net.minecraft.util.Util
+ */
 package net.minecraft.client.render.chunk;
 
 import java.util.Arrays;
@@ -8,26 +19,27 @@ import net.minecraft.client.render.BlockRenderLayer;
 import net.minecraft.client.util.BufferAllocator;
 import net.minecraft.util.Util;
 
-@Environment(EnvType.CLIENT)
-public class BlockBufferAllocatorStorage implements AutoCloseable {
-   public static final int EXPECTED_TOTAL_SIZE = Arrays.stream(BlockRenderLayer.values()).mapToInt(BlockRenderLayer::getBufferSize).sum();
-   private final Map allocators = Util.mapEnum(BlockRenderLayer.class, (blockRenderLayer) -> {
-      return new BufferAllocator(blockRenderLayer.getBufferSize());
-   });
+@Environment(value=EnvType.CLIENT)
+public class BlockBufferAllocatorStorage
+implements AutoCloseable {
+    public static final int EXPECTED_TOTAL_SIZE = Arrays.stream(BlockRenderLayer.values()).mapToInt(BlockRenderLayer::getBufferSize).sum();
+    private final Map<BlockRenderLayer, BufferAllocator> allocators = Util.mapEnum(BlockRenderLayer.class, blockRenderLayer -> new BufferAllocator(blockRenderLayer.getBufferSize()));
 
-   public BufferAllocator get(BlockRenderLayer layer) {
-      return (BufferAllocator)this.allocators.get(layer);
-   }
+    public BufferAllocator get(BlockRenderLayer layer) {
+        return (BufferAllocator)this.allocators.get(layer);
+    }
 
-   public void clear() {
-      this.allocators.values().forEach(BufferAllocator::clear);
-   }
+    public void clear() {
+        this.allocators.values().forEach(BufferAllocator::clear);
+    }
 
-   public void reset() {
-      this.allocators.values().forEach(BufferAllocator::reset);
-   }
+    public void reset() {
+        this.allocators.values().forEach(BufferAllocator::reset);
+    }
 
-   public void close() {
-      this.allocators.values().forEach(BufferAllocator::close);
-   }
+    @Override
+    public void close() {
+        this.allocators.values().forEach(BufferAllocator::close);
+    }
 }
+

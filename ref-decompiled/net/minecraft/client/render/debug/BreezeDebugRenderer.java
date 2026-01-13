@@ -1,88 +1,69 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.MinecraftClient
+ *  net.minecraft.client.render.DrawStyle
+ *  net.minecraft.client.render.Frustum
+ *  net.minecraft.client.render.debug.BreezeDebugRenderer
+ *  net.minecraft.client.render.debug.DebugRenderer$Renderer
+ *  net.minecraft.client.world.ClientWorld
+ *  net.minecraft.util.math.Box
+ *  net.minecraft.util.math.ColorHelper
+ *  net.minecraft.util.math.Vec3d
+ *  net.minecraft.util.math.Vec3i
+ *  net.minecraft.world.debug.DebugDataStore
+ *  net.minecraft.world.debug.DebugSubscriptionTypes
+ *  net.minecraft.world.debug.gizmo.GizmoDrawing
+ */
 package net.minecraft.client.render.debug;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.EntityType;
-import net.minecraft.network.packet.s2c.custom.DebugBreezeCustomPayload;
+import net.minecraft.client.render.DrawStyle;
+import net.minecraft.client.render.Frustum;
+import net.minecraft.client.render.debug.DebugRenderer;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.Vec3d;
-import org.joml.Matrix4f;
+import net.minecraft.util.math.Vec3i;
+import net.minecraft.world.debug.DebugDataStore;
+import net.minecraft.world.debug.DebugSubscriptionTypes;
+import net.minecraft.world.debug.gizmo.GizmoDrawing;
 
-@Environment(EnvType.CLIENT)
-public class BreezeDebugRenderer {
-   private static final int PINK = ColorHelper.getArgb(255, 255, 100, 255);
-   private static final int LIGHT_BLUE = ColorHelper.getArgb(255, 100, 255, 255);
-   private static final int GREEN = ColorHelper.getArgb(255, 0, 255, 0);
-   private static final int ORANGE = ColorHelper.getArgb(255, 255, 165, 0);
-   private static final int RED = ColorHelper.getArgb(255, 255, 0, 0);
-   private static final int field_47470 = 20;
-   private static final float field_47471 = 0.31415927F;
-   private final MinecraftClient client;
-   private final Map breezes = new HashMap();
+@Environment(value=EnvType.CLIENT)
+public class BreezeDebugRenderer
+implements DebugRenderer.Renderer {
+    private static final int PINK = ColorHelper.getArgb((int)255, (int)255, (int)100, (int)255);
+    private static final int LIGHT_BLUE = ColorHelper.getArgb((int)255, (int)100, (int)255, (int)255);
+    private static final int GREEN = ColorHelper.getArgb((int)255, (int)0, (int)255, (int)0);
+    private static final int ORANGE = ColorHelper.getArgb((int)255, (int)255, (int)165, (int)0);
+    private static final int RED = ColorHelper.getArgb((int)255, (int)255, (int)0, (int)0);
+    private final MinecraftClient client;
 
-   public BreezeDebugRenderer(MinecraftClient client) {
-      this.client = client;
-   }
+    public BreezeDebugRenderer(MinecraftClient client) {
+        this.client = client;
+    }
 
-   public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, double cameraX, double cameraY, double cameraZ) {
-      ClientPlayerEntity clientPlayerEntity = this.client.player;
-      clientPlayerEntity.getWorld().getEntitiesByType(EntityType.BREEZE, clientPlayerEntity.getBoundingBox().expand(100.0), (entity) -> {
-         return true;
-      }).forEach((breeze) -> {
-         Optional optional = Optional.ofNullable((DebugBreezeCustomPayload.BreezeInfo)this.breezes.get(breeze.getId()));
-         optional.map(DebugBreezeCustomPayload.BreezeInfo::attackTarget).map((attackTarget) -> {
-            return clientPlayerEntity.getWorld().getEntityById(attackTarget);
-         }).map((attackTarget) -> {
-            return attackTarget.getLerpedPos(this.client.getRenderTickCounter().getTickProgress(true));
-         }).ifPresent((targetPos) -> {
-            drawLine(matrices, vertexConsumers, cameraX, cameraY, cameraZ, breeze.getPos(), targetPos, LIGHT_BLUE);
-            Vec3d vec3d = targetPos.add(0.0, 0.009999999776482582, 0.0);
-            drawCurve(matrices.peek().getPositionMatrix(), cameraX, cameraY, cameraZ, vertexConsumers.getBuffer(RenderLayer.getDebugLineStrip(2.0)), vec3d, 4.0F, GREEN);
-            drawCurve(matrices.peek().getPositionMatrix(), cameraX, cameraY, cameraZ, vertexConsumers.getBuffer(RenderLayer.getDebugLineStrip(2.0)), vec3d, 8.0F, ORANGE);
-            drawCurve(matrices.peek().getPositionMatrix(), cameraX, cameraY, cameraZ, vertexConsumers.getBuffer(RenderLayer.getDebugLineStrip(2.0)), vec3d, 24.0F, RED);
-         });
-         optional.map(DebugBreezeCustomPayload.BreezeInfo::jumpTarget).ifPresent((jumpTarget) -> {
-            drawLine(matrices, vertexConsumers, cameraX, cameraY, cameraZ, breeze.getPos(), jumpTarget.toCenterPos(), PINK);
-            DebugRenderer.drawBox(matrices, vertexConsumers, Box.from(Vec3d.of(jumpTarget)).offset(-cameraX, -cameraY, -cameraZ), 1.0F, 0.0F, 0.0F, 1.0F);
-         });
-      });
-   }
-
-   private static void drawLine(MatrixStack matrices, VertexConsumerProvider vertexConsumers, double cameraX, double cameraY, double cameraZ, Vec3d entityPos, Vec3d targetPos, int color) {
-      VertexConsumer vertexConsumer = vertexConsumers.getBuffer(RenderLayer.getDebugLineStrip(2.0));
-      vertexConsumer.vertex(matrices.peek(), (float)(entityPos.x - cameraX), (float)(entityPos.y - cameraY), (float)(entityPos.z - cameraZ)).color(color);
-      vertexConsumer.vertex(matrices.peek(), (float)(targetPos.x - cameraX), (float)(targetPos.y - cameraY), (float)(targetPos.z - cameraZ)).color(color);
-   }
-
-   private static void drawCurve(Matrix4f matrix, double cameraX, double cameraY, double cameraZ, VertexConsumer vertexConsumer, Vec3d targetPos, float multiplier, int color) {
-      for(int i = 0; i < 20; ++i) {
-         drawCurvePart(i, matrix, cameraX, cameraY, cameraZ, vertexConsumer, targetPos, multiplier, color);
-      }
-
-      drawCurvePart(0, matrix, cameraX, cameraY, cameraZ, vertexConsumer, targetPos, multiplier, color);
-   }
-
-   private static void drawCurvePart(int index, Matrix4f matrix, double cameraX, double cameraY, double cameraZ, VertexConsumer vertexConsumer, Vec3d targetPos, float multiplier, int color) {
-      float f = (float)index * 0.31415927F;
-      Vec3d vec3d = targetPos.add((double)multiplier * Math.cos((double)f), 0.0, (double)multiplier * Math.sin((double)f));
-      vertexConsumer.vertex(matrix, (float)(vec3d.x - cameraX), (float)(vec3d.y - cameraY), (float)(vec3d.z - cameraZ)).color(color);
-   }
-
-   public void clear() {
-      this.breezes.clear();
-   }
-
-   public void addBreezeDebugInfo(DebugBreezeCustomPayload.BreezeInfo breezeDebugInfo) {
-      this.breezes.put(breezeDebugInfo.id(), breezeDebugInfo);
-   }
+    public void render(double cameraX, double cameraY, double cameraZ, DebugDataStore store, Frustum frustum, float tickProgress) {
+        ClientWorld clientWorld = this.client.world;
+        store.forEachEntityData(DebugSubscriptionTypes.BREEZES, (entity, data) -> {
+            data.attackTarget().map(arg_0 -> ((ClientWorld)clientWorld).getEntityById(arg_0)).map(target -> target.getLerpedPos(this.client.getRenderTickCounter().getTickProgress(true))).ifPresent(targetPos -> {
+                GizmoDrawing.arrow((Vec3d)entity.getEntityPos(), (Vec3d)targetPos, (int)LIGHT_BLUE);
+                Vec3d vec3d = targetPos.add(0.0, (double)0.01f, 0.0);
+                GizmoDrawing.circle((Vec3d)vec3d, (float)4.0f, (DrawStyle)DrawStyle.stroked((int)GREEN));
+                GizmoDrawing.circle((Vec3d)vec3d, (float)8.0f, (DrawStyle)DrawStyle.stroked((int)ORANGE));
+                GizmoDrawing.circle((Vec3d)vec3d, (float)24.0f, (DrawStyle)DrawStyle.stroked((int)RED));
+            });
+            data.jumpTarget().ifPresent(jumpTarget -> {
+                GizmoDrawing.arrow((Vec3d)entity.getEntityPos(), (Vec3d)jumpTarget.toCenterPos(), (int)PINK);
+                GizmoDrawing.box((Box)Box.from((Vec3d)Vec3d.of((Vec3i)jumpTarget)), (DrawStyle)DrawStyle.filled((int)ColorHelper.fromFloats((float)1.0f, (float)1.0f, (float)0.0f, (float)0.0f)));
+            });
+        });
+    }
 }
+

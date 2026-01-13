@@ -1,217 +1,234 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.google.common.collect.Maps
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.MinecraftClient
+ *  net.minecraft.client.gui.Click
+ *  net.minecraft.client.input.KeyInput
+ *  net.minecraft.client.option.KeyBinding
+ *  net.minecraft.client.option.KeyBinding$Category
+ *  net.minecraft.client.option.StickyKeyBinding
+ *  net.minecraft.client.resource.language.I18n
+ *  net.minecraft.client.util.InputUtil
+ *  net.minecraft.client.util.InputUtil$Key
+ *  net.minecraft.client.util.InputUtil$Type
+ *  net.minecraft.client.util.Window
+ *  net.minecraft.text.Text
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.option;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.Click;
+import net.minecraft.client.input.KeyInput;
+import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.option.StickyKeyBinding;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.client.util.Window;
 import net.minecraft.text.Text;
-import net.minecraft.util.Util;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
-public class KeyBinding implements Comparable {
-   private static final Map KEYS_BY_ID = Maps.newHashMap();
-   private static final Map KEY_TO_BINDINGS = Maps.newHashMap();
-   private static final Set KEY_CATEGORIES = Sets.newHashSet();
-   public static final String MOVEMENT_CATEGORY = "key.categories.movement";
-   public static final String MISC_CATEGORY = "key.categories.misc";
-   public static final String MULTIPLAYER_CATEGORY = "key.categories.multiplayer";
-   public static final String GAMEPLAY_CATEGORY = "key.categories.gameplay";
-   public static final String INVENTORY_CATEGORY = "key.categories.inventory";
-   public static final String UI_CATEGORY = "key.categories.ui";
-   public static final String CREATIVE_CATEGORY = "key.categories.creative";
-   private static final Map CATEGORY_ORDER_MAP = (Map)Util.make(Maps.newHashMap(), (map) -> {
-      map.put("key.categories.movement", 1);
-      map.put("key.categories.gameplay", 2);
-      map.put("key.categories.inventory", 3);
-      map.put("key.categories.creative", 4);
-      map.put("key.categories.multiplayer", 5);
-      map.put("key.categories.ui", 6);
-      map.put("key.categories.misc", 7);
-   });
-   private final String translationKey;
-   private final InputUtil.Key defaultKey;
-   private final String category;
-   private InputUtil.Key boundKey;
-   private boolean pressed;
-   private int timesPressed;
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
+public class KeyBinding
+implements Comparable<KeyBinding> {
+    private static final Map<String, KeyBinding> KEYS_BY_ID = Maps.newHashMap();
+    private static final Map<InputUtil.Key, List<KeyBinding>> KEY_TO_BINDINGS = Maps.newHashMap();
+    private final String id;
+    private final InputUtil.Key defaultKey;
+    private final Category category;
+    protected InputUtil.Key boundKey;
+    private boolean pressed;
+    private int timesPressed;
+    private final int field_63464;
 
-   public static void onKeyPressed(InputUtil.Key key) {
-      KeyBinding keyBinding = (KeyBinding)KEY_TO_BINDINGS.get(key);
-      if (keyBinding != null) {
-         ++keyBinding.timesPressed;
-      }
+    public static void onKeyPressed(InputUtil.Key key2) {
+        KeyBinding.forAllKeyBinds((InputUtil.Key)key2, (T key) -> ++key.timesPressed);
+    }
 
-   }
+    public static void setKeyPressed(InputUtil.Key key2, boolean pressed) {
+        KeyBinding.forAllKeyBinds((InputUtil.Key)key2, (T key) -> key.setPressed(pressed));
+    }
 
-   public static void setKeyPressed(InputUtil.Key key, boolean pressed) {
-      KeyBinding keyBinding = (KeyBinding)KEY_TO_BINDINGS.get(key);
-      if (keyBinding != null) {
-         keyBinding.setPressed(pressed);
-      }
+    private static void forAllKeyBinds(InputUtil.Key key, Consumer<KeyBinding> keyConsumer) {
+        List list = (List)KEY_TO_BINDINGS.get(key);
+        if (list != null && !list.isEmpty()) {
+            for (KeyBinding keyBinding : list) {
+                keyConsumer.accept(keyBinding);
+            }
+        }
+    }
 
-   }
+    public static void updatePressedStates() {
+        Window window = MinecraftClient.getInstance().getWindow();
+        for (KeyBinding keyBinding : KEYS_BY_ID.values()) {
+            if (!keyBinding.shouldSetOnGameFocus()) continue;
+            keyBinding.setPressed(InputUtil.isKeyPressed((Window)window, (int)keyBinding.boundKey.getCode()));
+        }
+    }
 
-   public static void updatePressedStates() {
-      Iterator var0 = KEYS_BY_ID.values().iterator();
+    public static void unpressAll() {
+        for (KeyBinding keyBinding : KEYS_BY_ID.values()) {
+            keyBinding.reset();
+        }
+    }
 
-      while(var0.hasNext()) {
-         KeyBinding keyBinding = (KeyBinding)var0.next();
-         if (keyBinding.boundKey.getCategory() == InputUtil.Type.KEYSYM && keyBinding.boundKey.getCode() != InputUtil.UNKNOWN_KEY.getCode()) {
-            keyBinding.setPressed(InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow().getHandle(), keyBinding.boundKey.getCode()));
-         }
-      }
+    public static void restoreToggleStates() {
+        for (KeyBinding keyBinding : KEYS_BY_ID.values()) {
+            StickyKeyBinding stickyKeyBinding;
+            if (!(keyBinding instanceof StickyKeyBinding) || !(stickyKeyBinding = (StickyKeyBinding)keyBinding).shouldRestoreOnScreenClose()) continue;
+            stickyKeyBinding.setPressed(true);
+        }
+    }
 
-   }
-
-   public static void unpressAll() {
-      Iterator var0 = KEYS_BY_ID.values().iterator();
-
-      while(var0.hasNext()) {
-         KeyBinding keyBinding = (KeyBinding)var0.next();
-         keyBinding.reset();
-      }
-
-   }
-
-   public static void untoggleStickyKeys() {
-      Iterator var0 = KEYS_BY_ID.values().iterator();
-
-      while(var0.hasNext()) {
-         KeyBinding keyBinding = (KeyBinding)var0.next();
-         if (keyBinding instanceof StickyKeyBinding stickyKeyBinding) {
+    public static void untoggleStickyKeys() {
+        for (KeyBinding keyBinding : KEYS_BY_ID.values()) {
+            if (!(keyBinding instanceof StickyKeyBinding)) continue;
+            StickyKeyBinding stickyKeyBinding = (StickyKeyBinding)keyBinding;
             stickyKeyBinding.untoggle();
-         }
-      }
+        }
+    }
 
-   }
+    public static void updateKeysByCode() {
+        KEY_TO_BINDINGS.clear();
+        for (KeyBinding keyBinding : KEYS_BY_ID.values()) {
+            keyBinding.registerBinding(keyBinding.boundKey);
+        }
+    }
 
-   public static void updateKeysByCode() {
-      KEY_TO_BINDINGS.clear();
-      Iterator var0 = KEYS_BY_ID.values().iterator();
+    public KeyBinding(String id, int code, Category category) {
+        this(id, InputUtil.Type.KEYSYM, code, category);
+    }
 
-      while(var0.hasNext()) {
-         KeyBinding keyBinding = (KeyBinding)var0.next();
-         KEY_TO_BINDINGS.put(keyBinding.boundKey, keyBinding);
-      }
+    public KeyBinding(String string, InputUtil.Type type, int i, Category category) {
+        this(string, type, i, category, 0);
+    }
 
-   }
+    public KeyBinding(String id, InputUtil.Type type, int code, Category category, int i) {
+        this.id = id;
+        this.defaultKey = this.boundKey = type.createFromCode(code);
+        this.category = category;
+        this.field_63464 = i;
+        KEYS_BY_ID.put(id, this);
+        this.registerBinding(this.boundKey);
+    }
 
-   public KeyBinding(String translationKey, int code, String category) {
-      this(translationKey, InputUtil.Type.KEYSYM, code, category);
-   }
+    public boolean isPressed() {
+        return this.pressed;
+    }
 
-   public KeyBinding(String translationKey, InputUtil.Type type, int code, String category) {
-      this.translationKey = translationKey;
-      this.boundKey = type.createFromCode(code);
-      this.defaultKey = this.boundKey;
-      this.category = category;
-      KEYS_BY_ID.put(translationKey, this);
-      KEY_TO_BINDINGS.put(this.boundKey, this);
-      KEY_CATEGORIES.add(category);
-   }
+    public Category getCategory() {
+        return this.category;
+    }
 
-   public boolean isPressed() {
-      return this.pressed;
-   }
+    public boolean wasPressed() {
+        if (this.timesPressed == 0) {
+            return false;
+        }
+        --this.timesPressed;
+        return true;
+    }
 
-   public String getCategory() {
-      return this.category;
-   }
+    protected void reset() {
+        this.timesPressed = 0;
+        this.setPressed(false);
+    }
 
-   public boolean wasPressed() {
-      if (this.timesPressed == 0) {
-         return false;
-      } else {
-         --this.timesPressed;
-         return true;
-      }
-   }
+    protected boolean shouldSetOnGameFocus() {
+        return this.boundKey.getCategory() == InputUtil.Type.KEYSYM && this.boundKey.getCode() != InputUtil.UNKNOWN_KEY.getCode();
+    }
 
-   private void reset() {
-      this.timesPressed = 0;
-      this.setPressed(false);
-   }
+    public String getId() {
+        return this.id;
+    }
 
-   public String getTranslationKey() {
-      return this.translationKey;
-   }
+    public InputUtil.Key getDefaultKey() {
+        return this.defaultKey;
+    }
 
-   public InputUtil.Key getDefaultKey() {
-      return this.defaultKey;
-   }
+    public void setBoundKey(InputUtil.Key boundKey) {
+        this.boundKey = boundKey;
+    }
 
-   public void setBoundKey(InputUtil.Key boundKey) {
-      this.boundKey = boundKey;
-   }
+    @Override
+    public int compareTo(KeyBinding keyBinding) {
+        if (this.category == keyBinding.category) {
+            if (this.field_63464 == keyBinding.field_63464) {
+                return I18n.translate((String)this.id, (Object[])new Object[0]).compareTo(I18n.translate((String)keyBinding.id, (Object[])new Object[0]));
+            }
+            return Integer.compare(this.field_63464, keyBinding.field_63464);
+        }
+        return Integer.compare(Category.CATEGORIES.indexOf(this.category), Category.CATEGORIES.indexOf(keyBinding.category));
+    }
 
-   public int compareTo(KeyBinding keyBinding) {
-      return this.category.equals(keyBinding.category) ? I18n.translate(this.translationKey).compareTo(I18n.translate(keyBinding.translationKey)) : ((Integer)CATEGORY_ORDER_MAP.get(this.category)).compareTo((Integer)CATEGORY_ORDER_MAP.get(keyBinding.category));
-   }
+    public static Supplier<Text> getLocalizedName(String id) {
+        KeyBinding keyBinding = (KeyBinding)KEYS_BY_ID.get(id);
+        if (keyBinding == null) {
+            return () -> Text.translatable((String)id);
+        }
+        return () -> keyBinding.getBoundKeyLocalizedText();
+    }
 
-   public static Supplier getLocalizedName(String id) {
-      KeyBinding keyBinding = (KeyBinding)KEYS_BY_ID.get(id);
-      if (keyBinding == null) {
-         return () -> {
-            return Text.translatable(id);
-         };
-      } else {
-         Objects.requireNonNull(keyBinding);
-         return keyBinding::getBoundKeyLocalizedText;
-      }
-   }
+    public boolean equals(KeyBinding other) {
+        return this.boundKey.equals((Object)other.boundKey);
+    }
 
-   public boolean equals(KeyBinding other) {
-      return this.boundKey.equals(other.boundKey);
-   }
+    public boolean isUnbound() {
+        return this.boundKey.equals((Object)InputUtil.UNKNOWN_KEY);
+    }
 
-   public boolean isUnbound() {
-      return this.boundKey.equals(InputUtil.UNKNOWN_KEY);
-   }
+    public boolean matchesKey(KeyInput key) {
+        if (key.key() == InputUtil.UNKNOWN_KEY.getCode()) {
+            return this.boundKey.getCategory() == InputUtil.Type.SCANCODE && this.boundKey.getCode() == key.scancode();
+        }
+        return this.boundKey.getCategory() == InputUtil.Type.KEYSYM && this.boundKey.getCode() == key.key();
+    }
 
-   public boolean matchesKey(int keyCode, int scanCode) {
-      if (keyCode == InputUtil.UNKNOWN_KEY.getCode()) {
-         return this.boundKey.getCategory() == InputUtil.Type.SCANCODE && this.boundKey.getCode() == scanCode;
-      } else {
-         return this.boundKey.getCategory() == InputUtil.Type.KEYSYM && this.boundKey.getCode() == keyCode;
-      }
-   }
+    public boolean matchesMouse(Click click) {
+        return this.boundKey.getCategory() == InputUtil.Type.MOUSE && this.boundKey.getCode() == click.button();
+    }
 
-   public boolean matchesMouse(int code) {
-      return this.boundKey.getCategory() == InputUtil.Type.MOUSE && this.boundKey.getCode() == code;
-   }
+    public Text getBoundKeyLocalizedText() {
+        return this.boundKey.getLocalizedText();
+    }
 
-   public Text getBoundKeyLocalizedText() {
-      return this.boundKey.getLocalizedText();
-   }
+    public boolean isDefault() {
+        return this.boundKey.equals((Object)this.defaultKey);
+    }
 
-   public boolean isDefault() {
-      return this.boundKey.equals(this.defaultKey);
-   }
+    public String getBoundKeyTranslationKey() {
+        return this.boundKey.getTranslationKey();
+    }
 
-   public String getBoundKeyTranslationKey() {
-      return this.boundKey.getTranslationKey();
-   }
+    public void setPressed(boolean pressed) {
+        this.pressed = pressed;
+    }
 
-   public void setPressed(boolean pressed) {
-      this.pressed = pressed;
-   }
+    private void registerBinding(InputUtil.Key key) {
+        KEY_TO_BINDINGS.computeIfAbsent(key, keyx -> new ArrayList()).add(this);
+    }
 
-   @Nullable
-   public static KeyBinding byId(String id) {
-      return (KeyBinding)KEYS_BY_ID.get(id);
-   }
+    public static @Nullable KeyBinding byId(String id) {
+        return (KeyBinding)KEYS_BY_ID.get(id);
+    }
 
-   // $FF: synthetic method
-   public int compareTo(final Object other) {
-      return this.compareTo((KeyBinding)other);
-   }
+    @Override
+    public /* synthetic */ int compareTo(Object other) {
+        return this.compareTo((KeyBinding)other);
+    }
 }
+

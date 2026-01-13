@@ -1,119 +1,119 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.google.common.collect.HashBasedTable
+ *  com.google.common.collect.ImmutableList
+ *  com.google.common.collect.ImmutableList$Builder
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.gui.screen.recipebook.RecipeResultCollection
+ *  net.minecraft.client.recipebook.ClientRecipeBook
+ *  net.minecraft.client.recipebook.RecipeBookType
+ *  net.minecraft.recipe.NetworkRecipeId
+ *  net.minecraft.recipe.RecipeDisplayEntry
+ *  net.minecraft.recipe.book.RecipeBook
+ *  net.minecraft.recipe.book.RecipeBookCategory
+ *  net.minecraft.recipe.book.RecipeBookGroup
+ */
 package net.minecraft.client.recipebook;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Table;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.OptionalInt;
 import java.util.Set;
-import java.util.stream.Stream;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.screen.recipebook.RecipeResultCollection;
+import net.minecraft.client.recipebook.RecipeBookType;
 import net.minecraft.recipe.NetworkRecipeId;
 import net.minecraft.recipe.RecipeDisplayEntry;
 import net.minecraft.recipe.book.RecipeBook;
 import net.minecraft.recipe.book.RecipeBookCategory;
 import net.minecraft.recipe.book.RecipeBookGroup;
 
-@Environment(EnvType.CLIENT)
-public class ClientRecipeBook extends RecipeBook {
-   private final Map recipes = new HashMap();
-   private final Set highlightedRecipes = new HashSet();
-   private Map resultsByCategory = Map.of();
-   private List orderedResults = List.of();
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
+public class ClientRecipeBook
+extends RecipeBook {
+    private final Map<NetworkRecipeId, RecipeDisplayEntry> recipes = new HashMap();
+    private final Set<NetworkRecipeId> highlightedRecipes = new HashSet();
+    private Map<RecipeBookGroup, List<RecipeResultCollection>> resultsByCategory = Map.of();
+    private List<RecipeResultCollection> orderedResults = List.of();
 
-   public void add(RecipeDisplayEntry entry) {
-      this.recipes.put(entry.id(), entry);
-   }
+    public void add(RecipeDisplayEntry entry) {
+        this.recipes.put(entry.id(), entry);
+    }
 
-   public void remove(NetworkRecipeId recipeId) {
-      this.recipes.remove(recipeId);
-      this.highlightedRecipes.remove(recipeId);
-   }
+    public void remove(NetworkRecipeId recipeId) {
+        this.recipes.remove(recipeId);
+        this.highlightedRecipes.remove(recipeId);
+    }
 
-   public void clear() {
-      this.recipes.clear();
-      this.highlightedRecipes.clear();
-   }
+    public void clear() {
+        this.recipes.clear();
+        this.highlightedRecipes.clear();
+    }
 
-   public boolean isHighlighted(NetworkRecipeId recipeId) {
-      return this.highlightedRecipes.contains(recipeId);
-   }
+    public boolean isHighlighted(NetworkRecipeId recipeId) {
+        return this.highlightedRecipes.contains(recipeId);
+    }
 
-   public void unmarkHighlighted(NetworkRecipeId recipeId) {
-      this.highlightedRecipes.remove(recipeId);
-   }
+    public void unmarkHighlighted(NetworkRecipeId recipeId) {
+        this.highlightedRecipes.remove(recipeId);
+    }
 
-   public void markHighlighted(NetworkRecipeId recipeId) {
-      this.highlightedRecipes.add(recipeId);
-   }
+    public void markHighlighted(NetworkRecipeId recipeId) {
+        this.highlightedRecipes.add(recipeId);
+    }
 
-   public void refresh() {
-      Map map = toGroupedMap(this.recipes.values());
-      Map map2 = new HashMap();
-      ImmutableList.Builder builder = ImmutableList.builder();
-      map.forEach((group, resultCollections) -> {
-         Stream var10002 = resultCollections.stream().map(RecipeResultCollection::new);
-         Objects.requireNonNull(builder);
-         map2.put(group, (List)var10002.peek(builder::add).collect(ImmutableList.toImmutableList()));
-      });
-      RecipeBookType[] var4 = RecipeBookType.values();
-      int var5 = var4.length;
+    public void refresh() {
+        Map map = ClientRecipeBook.toGroupedMap(this.recipes.values());
+        HashMap<RecipeBookType, List> map2 = new HashMap<RecipeBookType, List>();
+        ImmutableList.Builder builder = ImmutableList.builder();
+        map.forEach((group, resultCollections) -> map2.put((RecipeBookType)group, (List)resultCollections.stream().map(RecipeResultCollection::new).peek(arg_0 -> ((ImmutableList.Builder)builder).add(arg_0)).collect(ImmutableList.toImmutableList())));
+        for (RecipeBookType recipeBookType : RecipeBookType.values()) {
+            map2.put(recipeBookType, (List)recipeBookType.getCategories().stream().flatMap(group -> map2.getOrDefault(group, List.of()).stream()).collect(ImmutableList.toImmutableList()));
+        }
+        this.resultsByCategory = Map.copyOf(map2);
+        this.orderedResults = builder.build();
+    }
 
-      for(int var6 = 0; var6 < var5; ++var6) {
-         RecipeBookType recipeBookType = var4[var6];
-         map2.put(recipeBookType, (List)recipeBookType.getCategories().stream().flatMap((group) -> {
-            return ((List)map2.getOrDefault(group, List.of())).stream();
-         }).collect(ImmutableList.toImmutableList()));
-      }
-
-      this.resultsByCategory = Map.copyOf(map2);
-      this.orderedResults = builder.build();
-   }
-
-   private static Map toGroupedMap(Iterable recipes) {
-      Map map = new HashMap();
-      Table table = HashBasedTable.create();
-      Iterator var3 = recipes.iterator();
-
-      while(var3.hasNext()) {
-         RecipeDisplayEntry recipeDisplayEntry = (RecipeDisplayEntry)var3.next();
-         RecipeBookCategory recipeBookCategory = recipeDisplayEntry.category();
-         OptionalInt optionalInt = recipeDisplayEntry.group();
-         if (optionalInt.isEmpty()) {
-            ((List)map.computeIfAbsent(recipeBookCategory, (group) -> {
-               return new ArrayList();
-            })).add(List.of(recipeDisplayEntry));
-         } else {
-            List list = (List)table.get(recipeBookCategory, optionalInt.getAsInt());
-            if (list == null) {
-               list = new ArrayList();
-               table.put(recipeBookCategory, optionalInt.getAsInt(), list);
-               ((List)map.computeIfAbsent(recipeBookCategory, (group) -> {
-                  return new ArrayList();
-               })).add(list);
+    private static Map<RecipeBookCategory, List<List<RecipeDisplayEntry>>> toGroupedMap(Iterable<RecipeDisplayEntry> recipes) {
+        HashMap<RecipeBookCategory, List<List<RecipeDisplayEntry>>> map = new HashMap<RecipeBookCategory, List<List<RecipeDisplayEntry>>>();
+        HashBasedTable table = HashBasedTable.create();
+        for (RecipeDisplayEntry recipeDisplayEntry : recipes) {
+            RecipeBookCategory recipeBookCategory = recipeDisplayEntry.category();
+            OptionalInt optionalInt = recipeDisplayEntry.group();
+            if (optionalInt.isEmpty()) {
+                map.computeIfAbsent(recipeBookCategory, group -> new ArrayList()).add(List.of(recipeDisplayEntry));
+                continue;
             }
+            ArrayList<RecipeDisplayEntry> list = (ArrayList<RecipeDisplayEntry>)table.get((Object)recipeBookCategory, (Object)optionalInt.getAsInt());
+            if (list == null) {
+                list = new ArrayList<RecipeDisplayEntry>();
+                table.put((Object)recipeBookCategory, (Object)optionalInt.getAsInt(), list);
+                map.computeIfAbsent(recipeBookCategory, group -> new ArrayList()).add(list);
+            }
+            list.add(recipeDisplayEntry);
+        }
+        return map;
+    }
 
-            ((List)list).add(recipeDisplayEntry);
-         }
-      }
+    public List<RecipeResultCollection> getOrderedResults() {
+        return this.orderedResults;
+    }
 
-      return map;
-   }
-
-   public List getOrderedResults() {
-      return this.orderedResults;
-   }
-
-   public List getResultsForCategory(RecipeBookGroup category) {
-      return (List)this.resultsByCategory.getOrDefault(category, Collections.emptyList());
-   }
+    public List<RecipeResultCollection> getResultsForCategory(RecipeBookGroup category) {
+        return this.resultsByCategory.getOrDefault(category, Collections.emptyList());
+    }
 }
+

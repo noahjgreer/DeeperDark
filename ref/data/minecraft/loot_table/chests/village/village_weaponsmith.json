@@ -96,6 +96,16 @@
         },
         {
           "type": "minecraft:item",
+          "name": "minecraft:iron_spear",
+          "weight": 5
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:copper_spear",
+          "weight": 7
+        },
+        {
+          "type": "minecraft:item",
           "name": "minecraft:iron_chestplate",
           "weight": 5
         },
@@ -150,6 +160,10 @@
           "type": "minecraft:item",
           "name": "minecraft:saddle",
           "weight": 3
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:copper_horse_armor"
         },
         {
           "type": "minecraft:item",

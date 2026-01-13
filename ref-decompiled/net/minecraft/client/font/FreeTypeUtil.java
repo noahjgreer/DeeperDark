@@ -1,3 +1,17 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.logging.LogUtils
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.font.FreeTypeUtil
+ *  org.lwjgl.PointerBuffer
+ *  org.lwjgl.system.MemoryStack
+ *  org.lwjgl.util.freetype.FT_Vector
+ *  org.lwjgl.util.freetype.FreeType
+ *  org.slf4j.Logger
+ */
 package net.minecraft.client.font;
 
 import com.mojang.logging.LogUtils;
@@ -9,80 +23,75 @@ import org.lwjgl.util.freetype.FT_Vector;
 import org.lwjgl.util.freetype.FreeType;
 import org.slf4j.Logger;
 
-@Environment(EnvType.CLIENT)
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
 public class FreeTypeUtil {
-   private static final Logger LOGGER = LogUtils.getLogger();
-   public static final Object LOCK = new Object();
-   private static long freeType = 0L;
+    private static final Logger LOGGER = LogUtils.getLogger();
+    public static final Object LOCK = new Object();
+    private static long freeType = 0L;
 
-   public static long initialize() {
-      synchronized(LOCK) {
-         if (freeType == 0L) {
-            MemoryStack memoryStack = MemoryStack.stackPush();
-
-            try {
-               PointerBuffer pointerBuffer = memoryStack.mallocPointer(1);
-               checkFatalError(FreeType.FT_Init_FreeType(pointerBuffer), "Initializing FreeType library");
-               freeType = pointerBuffer.get();
-            } catch (Throwable var6) {
-               if (memoryStack != null) {
-                  try {
-                     memoryStack.close();
-                  } catch (Throwable var5) {
-                     var6.addSuppressed(var5);
-                  }
-               }
-
-               throw var6;
+    /*
+     * WARNING - Removed try catching itself - possible behaviour change.
+     */
+    public static long initialize() {
+        Object object = LOCK;
+        synchronized (object) {
+            if (freeType == 0L) {
+                try (MemoryStack memoryStack = MemoryStack.stackPush();){
+                    PointerBuffer pointerBuffer = memoryStack.mallocPointer(1);
+                    FreeTypeUtil.checkFatalError((int)FreeType.FT_Init_FreeType((PointerBuffer)pointerBuffer), (String)"Initializing FreeType library");
+                    freeType = pointerBuffer.get();
+                }
             }
+            return freeType;
+        }
+    }
 
-            if (memoryStack != null) {
-               memoryStack.close();
+    public static void checkFatalError(int code, String description) {
+        if (code != 0) {
+            throw new IllegalStateException("FreeType error: " + FreeTypeUtil.getErrorMessage((int)code) + " (" + description + ")");
+        }
+    }
+
+    public static boolean checkError(int code, String description) {
+        if (code != 0) {
+            LOGGER.error("FreeType error: {} ({})", (Object)FreeTypeUtil.getErrorMessage((int)code), (Object)description);
+            return true;
+        }
+        return false;
+    }
+
+    private static String getErrorMessage(int code) {
+        String string = FreeType.FT_Error_String((int)code);
+        if (string != null) {
+            return string;
+        }
+        return "Unrecognized error: 0x" + Integer.toHexString(code);
+    }
+
+    public static FT_Vector set(FT_Vector vec, float x, float y) {
+        long l = Math.round(x * 64.0f);
+        long m = Math.round(y * 64.0f);
+        return vec.set(l, m);
+    }
+
+    public static float getX(FT_Vector vec) {
+        return (float)vec.x() / 64.0f;
+    }
+
+    /*
+     * WARNING - Removed try catching itself - possible behaviour change.
+     */
+    public static void release() {
+        Object object = LOCK;
+        synchronized (object) {
+            if (freeType != 0L) {
+                FreeType.FT_Done_Library((long)freeType);
+                freeType = 0L;
             }
-         }
-
-         return freeType;
-      }
-   }
-
-   public static void checkFatalError(int code, String description) {
-      if (code != 0) {
-         String var10002 = getErrorMessage(code);
-         throw new IllegalStateException("FreeType error: " + var10002 + " (" + description + ")");
-      }
-   }
-
-   public static boolean checkError(int code, String description) {
-      if (code != 0) {
-         LOGGER.error("FreeType error: {} ({})", getErrorMessage(code), description);
-         return true;
-      } else {
-         return false;
-      }
-   }
-
-   private static String getErrorMessage(int code) {
-      String string = FreeType.FT_Error_String(code);
-      return string != null ? string : "Unrecognized error: 0x" + Integer.toHexString(code);
-   }
-
-   public static FT_Vector set(FT_Vector vec, float x, float y) {
-      long l = (long)Math.round(x * 64.0F);
-      long m = (long)Math.round(y * 64.0F);
-      return vec.set(l, m);
-   }
-
-   public static float getX(FT_Vector vec) {
-      return (float)vec.x() / 64.0F;
-   }
-
-   public static void release() {
-      synchronized(LOCK) {
-         if (freeType != 0L) {
-            FreeType.FT_Done_Library(freeType);
-            freeType = 0L;
-         }
-
-      }
-   }
+        }
+    }
 }
+

@@ -1,30 +1,36 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.blaze3d.platform.SourceFactor
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.util.annotation.DeobfuscateClass
+ */
 package com.mojang.blaze3d.platform;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.util.annotation.DeobfuscateClass;
 
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 @DeobfuscateClass
 public enum SourceFactor {
-   CONSTANT_ALPHA,
-   CONSTANT_COLOR,
-   DST_ALPHA,
-   DST_COLOR,
-   ONE,
-   ONE_MINUS_CONSTANT_ALPHA,
-   ONE_MINUS_CONSTANT_COLOR,
-   ONE_MINUS_DST_ALPHA,
-   ONE_MINUS_DST_COLOR,
-   ONE_MINUS_SRC_ALPHA,
-   ONE_MINUS_SRC_COLOR,
-   SRC_ALPHA,
-   SRC_ALPHA_SATURATE,
-   SRC_COLOR,
-   ZERO;
+    CONSTANT_ALPHA,
+    CONSTANT_COLOR,
+    DST_ALPHA,
+    DST_COLOR,
+    ONE,
+    ONE_MINUS_CONSTANT_ALPHA,
+    ONE_MINUS_CONSTANT_COLOR,
+    ONE_MINUS_DST_ALPHA,
+    ONE_MINUS_DST_COLOR,
+    ONE_MINUS_SRC_ALPHA,
+    ONE_MINUS_SRC_COLOR,
+    SRC_ALPHA,
+    SRC_ALPHA_SATURATE,
+    SRC_COLOR,
+    ZERO;
 
-   // $FF: synthetic method
-   private static SourceFactor[] $values() {
-      return new SourceFactor[]{CONSTANT_ALPHA, CONSTANT_COLOR, DST_ALPHA, DST_COLOR, ONE, ONE_MINUS_CONSTANT_ALPHA, ONE_MINUS_CONSTANT_COLOR, ONE_MINUS_DST_ALPHA, ONE_MINUS_DST_COLOR, ONE_MINUS_SRC_ALPHA, ONE_MINUS_SRC_COLOR, SRC_ALPHA, SRC_ALPHA_SATURATE, SRC_COLOR, ZERO};
-   }
 }
+

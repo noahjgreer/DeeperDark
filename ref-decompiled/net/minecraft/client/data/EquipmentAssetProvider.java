@@ -1,91 +1,105 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.serialization.Codec
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.data.EquipmentAssetProvider
+ *  net.minecraft.client.render.entity.equipment.EquipmentModel
+ *  net.minecraft.client.render.entity.equipment.EquipmentModel$Layer
+ *  net.minecraft.client.render.entity.equipment.EquipmentModel$LayerType
+ *  net.minecraft.data.DataOutput
+ *  net.minecraft.data.DataOutput$OutputType
+ *  net.minecraft.data.DataOutput$PathResolver
+ *  net.minecraft.data.DataProvider
+ *  net.minecraft.data.DataWriter
+ *  net.minecraft.item.equipment.EquipmentAsset
+ *  net.minecraft.item.equipment.EquipmentAssetKeys
+ *  net.minecraft.registry.RegistryKey
+ *  net.minecraft.util.DyeColor
+ *  net.minecraft.util.Identifier
+ */
 package net.minecraft.client.data;
 
 import com.mojang.serialization.Codec;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.render.entity.equipment.EquipmentModel;
 import net.minecraft.data.DataOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.DataWriter;
+import net.minecraft.item.equipment.EquipmentAsset;
 import net.minecraft.item.equipment.EquipmentAssetKeys;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Identifier;
 
-@Environment(EnvType.CLIENT)
-public class EquipmentAssetProvider implements DataProvider {
-   private final DataOutput.PathResolver pathResolver;
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
+public class EquipmentAssetProvider
+implements DataProvider {
+    private final DataOutput.PathResolver pathResolver;
 
-   public EquipmentAssetProvider(DataOutput output) {
-      this.pathResolver = output.getResolver(DataOutput.OutputType.RESOURCE_PACK, "equipment");
-   }
+    public EquipmentAssetProvider(DataOutput output) {
+        this.pathResolver = output.getResolver(DataOutput.OutputType.RESOURCE_PACK, "equipment");
+    }
 
-   private static void bootstrap(BiConsumer equipmentBiConsumer) {
-      equipmentBiConsumer.accept(EquipmentAssetKeys.LEATHER, EquipmentModel.builder().addHumanoidLayers(Identifier.ofVanilla("leather"), true).addHumanoidLayers(Identifier.ofVanilla("leather_overlay"), false).addLayers(EquipmentModel.LayerType.HORSE_BODY, EquipmentModel.Layer.createWithLeatherColor(Identifier.ofVanilla("leather"), true)).build());
-      equipmentBiConsumer.accept(EquipmentAssetKeys.CHAINMAIL, createHumanoidOnlyModel("chainmail"));
-      equipmentBiConsumer.accept(EquipmentAssetKeys.IRON, createHumanoidAndHorseModel("iron"));
-      equipmentBiConsumer.accept(EquipmentAssetKeys.GOLD, createHumanoidAndHorseModel("gold"));
-      equipmentBiConsumer.accept(EquipmentAssetKeys.DIAMOND, createHumanoidAndHorseModel("diamond"));
-      equipmentBiConsumer.accept(EquipmentAssetKeys.TURTLE_SCUTE, EquipmentModel.builder().addMainHumanoidLayer(Identifier.ofVanilla("turtle_scute"), false).build());
-      equipmentBiConsumer.accept(EquipmentAssetKeys.NETHERITE, createHumanoidOnlyModel("netherite"));
-      equipmentBiConsumer.accept(EquipmentAssetKeys.ARMADILLO_SCUTE, EquipmentModel.builder().addLayers(EquipmentModel.LayerType.WOLF_BODY, EquipmentModel.Layer.create(Identifier.ofVanilla("armadillo_scute"), false)).addLayers(EquipmentModel.LayerType.WOLF_BODY, EquipmentModel.Layer.create(Identifier.ofVanilla("armadillo_scute_overlay"), true)).build());
-      equipmentBiConsumer.accept(EquipmentAssetKeys.ELYTRA, EquipmentModel.builder().addLayers(EquipmentModel.LayerType.WINGS, new EquipmentModel.Layer(Identifier.ofVanilla("elytra"), Optional.empty(), true)).build());
-      EquipmentModel.Layer layer = new EquipmentModel.Layer(Identifier.ofVanilla("saddle"));
-      equipmentBiConsumer.accept(EquipmentAssetKeys.SADDLE, EquipmentModel.builder().addLayers(EquipmentModel.LayerType.PIG_SADDLE, layer).addLayers(EquipmentModel.LayerType.STRIDER_SADDLE, layer).addLayers(EquipmentModel.LayerType.CAMEL_SADDLE, layer).addLayers(EquipmentModel.LayerType.HORSE_SADDLE, layer).addLayers(EquipmentModel.LayerType.DONKEY_SADDLE, layer).addLayers(EquipmentModel.LayerType.MULE_SADDLE, layer).addLayers(EquipmentModel.LayerType.SKELETON_HORSE_SADDLE, layer).addLayers(EquipmentModel.LayerType.ZOMBIE_HORSE_SADDLE, layer).build());
-      Iterator var2 = EquipmentAssetKeys.HARNESS_FROM_COLOR.entrySet().iterator();
+    private static void bootstrap(BiConsumer<RegistryKey<EquipmentAsset>, EquipmentModel> equipmentBiConsumer) {
+        RegistryKey registryKey;
+        DyeColor dyeColor;
+        equipmentBiConsumer.accept((RegistryKey<EquipmentAsset>)EquipmentAssetKeys.LEATHER, EquipmentModel.builder().addHumanoidLayers(Identifier.ofVanilla((String)"leather"), true).addHumanoidLayers(Identifier.ofVanilla((String)"leather_overlay"), false).addLayers(EquipmentModel.LayerType.HORSE_BODY, new EquipmentModel.Layer[]{EquipmentModel.Layer.createWithLeatherColor((Identifier)Identifier.ofVanilla((String)"leather"), (boolean)true), EquipmentModel.Layer.createWithLeatherColor((Identifier)Identifier.ofVanilla((String)"leather_overlay"), (boolean)false)}).build());
+        equipmentBiConsumer.accept((RegistryKey<EquipmentAsset>)EquipmentAssetKeys.CHAINMAIL, EquipmentAssetProvider.createHumanoidOnlyModel((String)"chainmail"));
+        equipmentBiConsumer.accept((RegistryKey<EquipmentAsset>)EquipmentAssetKeys.COPPER, EquipmentAssetProvider.createHumanoidAndHorseModel((String)"copper"));
+        equipmentBiConsumer.accept((RegistryKey<EquipmentAsset>)EquipmentAssetKeys.IRON, EquipmentAssetProvider.createHumanoidAndHorseModel((String)"iron"));
+        equipmentBiConsumer.accept((RegistryKey<EquipmentAsset>)EquipmentAssetKeys.GOLD, EquipmentAssetProvider.createHumanoidAndHorseModel((String)"gold"));
+        equipmentBiConsumer.accept((RegistryKey<EquipmentAsset>)EquipmentAssetKeys.DIAMOND, EquipmentAssetProvider.createHumanoidAndHorseModel((String)"diamond"));
+        equipmentBiConsumer.accept((RegistryKey<EquipmentAsset>)EquipmentAssetKeys.TURTLE_SCUTE, EquipmentModel.builder().addMainHumanoidLayer(Identifier.ofVanilla((String)"turtle_scute"), false).build());
+        equipmentBiConsumer.accept((RegistryKey<EquipmentAsset>)EquipmentAssetKeys.NETHERITE, EquipmentAssetProvider.createHumanoidAndHorseModel((String)"netherite"));
+        equipmentBiConsumer.accept((RegistryKey<EquipmentAsset>)EquipmentAssetKeys.ARMADILLO_SCUTE, EquipmentModel.builder().addLayers(EquipmentModel.LayerType.WOLF_BODY, new EquipmentModel.Layer[]{EquipmentModel.Layer.create((Identifier)Identifier.ofVanilla((String)"armadillo_scute"), (boolean)false)}).addLayers(EquipmentModel.LayerType.WOLF_BODY, new EquipmentModel.Layer[]{EquipmentModel.Layer.create((Identifier)Identifier.ofVanilla((String)"armadillo_scute_overlay"), (boolean)true)}).build());
+        equipmentBiConsumer.accept((RegistryKey<EquipmentAsset>)EquipmentAssetKeys.ELYTRA, EquipmentModel.builder().addLayers(EquipmentModel.LayerType.WINGS, new EquipmentModel.Layer[]{new EquipmentModel.Layer(Identifier.ofVanilla((String)"elytra"), Optional.empty(), true)}).build());
+        EquipmentModel.Layer layer = new EquipmentModel.Layer(Identifier.ofVanilla((String)"saddle"));
+        equipmentBiConsumer.accept((RegistryKey<EquipmentAsset>)EquipmentAssetKeys.SADDLE, EquipmentModel.builder().addLayers(EquipmentModel.LayerType.PIG_SADDLE, new EquipmentModel.Layer[]{layer}).addLayers(EquipmentModel.LayerType.STRIDER_SADDLE, new EquipmentModel.Layer[]{layer}).addLayers(EquipmentModel.LayerType.CAMEL_SADDLE, new EquipmentModel.Layer[]{layer}).addLayers(EquipmentModel.LayerType.CAMEL_HUSK_SADDLE, new EquipmentModel.Layer[]{layer}).addLayers(EquipmentModel.LayerType.HORSE_SADDLE, new EquipmentModel.Layer[]{layer}).addLayers(EquipmentModel.LayerType.DONKEY_SADDLE, new EquipmentModel.Layer[]{layer}).addLayers(EquipmentModel.LayerType.MULE_SADDLE, new EquipmentModel.Layer[]{layer}).addLayers(EquipmentModel.LayerType.SKELETON_HORSE_SADDLE, new EquipmentModel.Layer[]{layer}).addLayers(EquipmentModel.LayerType.ZOMBIE_HORSE_SADDLE, new EquipmentModel.Layer[]{layer}).addLayers(EquipmentModel.LayerType.NAUTILUS_SADDLE, new EquipmentModel.Layer[]{layer}).build());
+        for (Map.Entry entry : EquipmentAssetKeys.HARNESS_FROM_COLOR.entrySet()) {
+            dyeColor = (DyeColor)entry.getKey();
+            registryKey = (RegistryKey)entry.getValue();
+            equipmentBiConsumer.accept((RegistryKey<EquipmentAsset>)registryKey, EquipmentModel.builder().addLayers(EquipmentModel.LayerType.HAPPY_GHAST_BODY, new EquipmentModel.Layer[]{EquipmentModel.Layer.create((Identifier)Identifier.ofVanilla((String)(dyeColor.asString() + "_harness")), (boolean)false)}).build());
+        }
+        for (Map.Entry entry : EquipmentAssetKeys.CARPET_FROM_COLOR.entrySet()) {
+            dyeColor = (DyeColor)entry.getKey();
+            registryKey = (RegistryKey)entry.getValue();
+            equipmentBiConsumer.accept((RegistryKey<EquipmentAsset>)registryKey, EquipmentModel.builder().addLayers(EquipmentModel.LayerType.LLAMA_BODY, new EquipmentModel.Layer[]{new EquipmentModel.Layer(Identifier.ofVanilla((String)dyeColor.asString()))}).build());
+        }
+        equipmentBiConsumer.accept((RegistryKey<EquipmentAsset>)EquipmentAssetKeys.TRADER_LLAMA, EquipmentModel.builder().addLayers(EquipmentModel.LayerType.LLAMA_BODY, new EquipmentModel.Layer[]{new EquipmentModel.Layer(Identifier.ofVanilla((String)"trader_llama"))}).build());
+    }
 
-      Map.Entry entry;
-      DyeColor dyeColor;
-      RegistryKey registryKey;
-      while(var2.hasNext()) {
-         entry = (Map.Entry)var2.next();
-         dyeColor = (DyeColor)entry.getKey();
-         registryKey = (RegistryKey)entry.getValue();
-         equipmentBiConsumer.accept(registryKey, EquipmentModel.builder().addLayers(EquipmentModel.LayerType.HAPPY_GHAST_BODY, EquipmentModel.Layer.create(Identifier.ofVanilla(dyeColor.asString() + "_harness"), false)).build());
-      }
+    private static EquipmentModel createHumanoidOnlyModel(String id) {
+        return EquipmentModel.builder().addHumanoidLayers(Identifier.ofVanilla((String)id)).build();
+    }
 
-      var2 = EquipmentAssetKeys.CARPET_FROM_COLOR.entrySet().iterator();
+    private static EquipmentModel createHumanoidAndHorseModel(String id) {
+        return EquipmentModel.builder().addHumanoidLayers(Identifier.ofVanilla((String)id)).addLayers(EquipmentModel.LayerType.HORSE_BODY, new EquipmentModel.Layer[]{EquipmentModel.Layer.createWithLeatherColor((Identifier)Identifier.ofVanilla((String)id), (boolean)false)}).addLayers(EquipmentModel.LayerType.NAUTILUS_BODY, new EquipmentModel.Layer[]{EquipmentModel.Layer.createWithLeatherColor((Identifier)Identifier.ofVanilla((String)id), (boolean)false)}).build();
+    }
 
-      while(var2.hasNext()) {
-         entry = (Map.Entry)var2.next();
-         dyeColor = (DyeColor)entry.getKey();
-         registryKey = (RegistryKey)entry.getValue();
-         equipmentBiConsumer.accept(registryKey, EquipmentModel.builder().addLayers(EquipmentModel.LayerType.LLAMA_BODY, new EquipmentModel.Layer(Identifier.ofVanilla(dyeColor.asString()))).build());
-      }
+    public CompletableFuture<?> run(DataWriter writer) {
+        HashMap map = new HashMap();
+        EquipmentAssetProvider.bootstrap((T key, U model) -> {
+            if (map.putIfAbsent(key, model) != null) {
+                throw new IllegalStateException("Tried to register equipment asset twice for id: " + String.valueOf(key));
+            }
+        });
+        return DataProvider.writeAllToPath((DataWriter)writer, (Codec)EquipmentModel.CODEC, arg_0 -> ((DataOutput.PathResolver)this.pathResolver).resolveJson(arg_0), map);
+    }
 
-      equipmentBiConsumer.accept(EquipmentAssetKeys.TRADER_LLAMA, EquipmentModel.builder().addLayers(EquipmentModel.LayerType.LLAMA_BODY, new EquipmentModel.Layer(Identifier.ofVanilla("trader_llama"))).build());
-   }
-
-   private static EquipmentModel createHumanoidOnlyModel(String id) {
-      return EquipmentModel.builder().addHumanoidLayers(Identifier.ofVanilla(id)).build();
-   }
-
-   private static EquipmentModel createHumanoidAndHorseModel(String id) {
-      return EquipmentModel.builder().addHumanoidLayers(Identifier.ofVanilla(id)).addLayers(EquipmentModel.LayerType.HORSE_BODY, EquipmentModel.Layer.createWithLeatherColor(Identifier.ofVanilla(id), false)).build();
-   }
-
-   public CompletableFuture run(DataWriter writer) {
-      Map map = new HashMap();
-      bootstrap((key, model) -> {
-         if (map.putIfAbsent(key, model) != null) {
-            throw new IllegalStateException("Tried to register equipment asset twice for id: " + String.valueOf(key));
-         }
-      });
-      Codec var10001 = EquipmentModel.CODEC;
-      DataOutput.PathResolver var10002 = this.pathResolver;
-      Objects.requireNonNull(var10002);
-      return DataProvider.writeAllToPath(writer, (Codec)var10001, (Function)(var10002::resolveJson), map);
-   }
-
-   public String getName() {
-      return "Equipment Asset Definitions";
-   }
+    public String getName() {
+        return "Equipment Asset Definitions";
+    }
 }
+

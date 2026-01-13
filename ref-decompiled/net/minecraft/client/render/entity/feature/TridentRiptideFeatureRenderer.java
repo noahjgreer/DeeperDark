@@ -1,32 +1,56 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.model.Model
+ *  net.minecraft.client.render.OverlayTexture
+ *  net.minecraft.client.render.command.OrderedRenderCommandQueue
+ *  net.minecraft.client.render.entity.feature.FeatureRenderer
+ *  net.minecraft.client.render.entity.feature.FeatureRendererContext
+ *  net.minecraft.client.render.entity.feature.TridentRiptideFeatureRenderer
+ *  net.minecraft.client.render.entity.model.EntityModelLayers
+ *  net.minecraft.client.render.entity.model.LoadedEntityModels
+ *  net.minecraft.client.render.entity.model.PlayerEntityModel
+ *  net.minecraft.client.render.entity.model.TridentRiptideEntityModel
+ *  net.minecraft.client.render.entity.state.PlayerEntityRenderState
+ *  net.minecraft.client.util.math.MatrixStack
+ *  net.minecraft.util.Identifier
+ */
 package net.minecraft.client.render.entity.feature;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.model.Model;
 import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
+import net.minecraft.client.render.entity.feature.FeatureRenderer;
+import net.minecraft.client.render.entity.feature.FeatureRendererContext;
 import net.minecraft.client.render.entity.model.EntityModelLayers;
 import net.minecraft.client.render.entity.model.LoadedEntityModels;
+import net.minecraft.client.render.entity.model.PlayerEntityModel;
 import net.minecraft.client.render.entity.model.TridentRiptideEntityModel;
 import net.minecraft.client.render.entity.state.PlayerEntityRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 
-@Environment(EnvType.CLIENT)
-public class TridentRiptideFeatureRenderer extends FeatureRenderer {
-   public static final Identifier TEXTURE = Identifier.ofVanilla("textures/entity/trident_riptide.png");
-   private final TridentRiptideEntityModel model;
+@Environment(value=EnvType.CLIENT)
+public class TridentRiptideFeatureRenderer
+extends FeatureRenderer<PlayerEntityRenderState, PlayerEntityModel> {
+    public static final Identifier TEXTURE = Identifier.ofVanilla((String)"textures/entity/trident_riptide.png");
+    private final TridentRiptideEntityModel model;
 
-   public TridentRiptideFeatureRenderer(FeatureRendererContext context, LoadedEntityModels entityModels) {
-      super(context);
-      this.model = new TridentRiptideEntityModel(entityModels.getModelPart(EntityModelLayers.SPIN_ATTACK));
-   }
+    public TridentRiptideFeatureRenderer(FeatureRendererContext<PlayerEntityRenderState, PlayerEntityModel> context, LoadedEntityModels entityModels) {
+        super(context);
+        this.model = new TridentRiptideEntityModel(entityModels.getModelPart(EntityModelLayers.SPIN_ATTACK));
+    }
 
-   public void render(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, PlayerEntityRenderState playerEntityRenderState, float f, float g) {
-      if (playerEntityRenderState.usingRiptide) {
-         VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(this.model.getLayer(TEXTURE));
-         this.model.setAngles(playerEntityRenderState);
-         this.model.render(matrixStack, vertexConsumer, i, OverlayTexture.DEFAULT_UV);
-      }
-   }
+    public void render(MatrixStack matrixStack, OrderedRenderCommandQueue orderedRenderCommandQueue, int i, PlayerEntityRenderState playerEntityRenderState, float f, float g) {
+        if (!playerEntityRenderState.usingRiptide) {
+            return;
+        }
+        orderedRenderCommandQueue.submitModel((Model)this.model, (Object)playerEntityRenderState, matrixStack, this.model.getLayer(TEXTURE), i, OverlayTexture.DEFAULT_UV, playerEntityRenderState.outlineColor, null);
+    }
 }
+

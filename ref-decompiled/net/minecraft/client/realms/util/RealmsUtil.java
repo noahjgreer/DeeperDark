@@ -1,10 +1,34 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.logging.LogUtils
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.MinecraftClient
+ *  net.minecraft.client.gui.DrawContext
+ *  net.minecraft.client.gui.PlayerSkinDrawer
+ *  net.minecraft.client.gui.screen.Screen
+ *  net.minecraft.client.realms.RealmsClient
+ *  net.minecraft.client.realms.exception.RealmsServiceException
+ *  net.minecraft.client.realms.util.RealmsUtil
+ *  net.minecraft.client.realms.util.RealmsUtil$RealmsRunnable
+ *  net.minecraft.client.realms.util.RealmsUtil$RealmsSupplier
+ *  net.minecraft.client.texture.PlayerSkinCache$Entry
+ *  net.minecraft.component.type.ProfileComponent
+ *  net.minecraft.entity.player.SkinTextures
+ *  net.minecraft.text.Text
+ *  net.minecraft.util.Util
+ *  org.jspecify.annotations.Nullable
+ *  org.slf4j.Logger
+ */
 package net.minecraft.client.realms.util;
 
-import com.mojang.authlib.yggdrasil.ProfileResult;
 import com.mojang.logging.LogUtils;
-import java.util.Date;
+import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import net.fabricmc.api.EnvType;
@@ -15,108 +39,86 @@ import net.minecraft.client.gui.PlayerSkinDrawer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.realms.RealmsClient;
 import net.minecraft.client.realms.exception.RealmsServiceException;
-import net.minecraft.client.util.DefaultSkinHelper;
-import net.minecraft.client.util.SkinTextures;
+import net.minecraft.client.realms.util.RealmsUtil;
+import net.minecraft.client.texture.PlayerSkinCache;
+import net.minecraft.component.type.ProfileComponent;
+import net.minecraft.entity.player.SkinTextures;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 
-@Environment(EnvType.CLIENT)
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
 public class RealmsUtil {
-   private static final Logger field_61054 = LogUtils.getLogger();
-   private static final Text NOW_TEXT = Text.translatable("mco.util.time.now");
-   private static final int SECONDS_PER_MINUTE = 60;
-   private static final int SECONDS_PER_HOUR = 3600;
-   private static final int SECONDS_PER_DAY = 86400;
+    private static final Logger LOGGER = LogUtils.getLogger();
+    private static final Text NOW_TEXT = Text.translatable((String)"mco.util.time.now");
+    private static final int SECONDS_PER_MINUTE = 60;
+    private static final int SECONDS_PER_HOUR = 3600;
+    private static final int SECONDS_PER_DAY = 86400;
 
-   public static Text convertToAgePresentation(long milliseconds) {
-      if (milliseconds < 0L) {
-         return NOW_TEXT;
-      } else {
-         long l = milliseconds / 1000L;
-         if (l < 60L) {
-            return Text.translatable("mco.time.secondsAgo", l);
-         } else {
-            long m;
-            if (l < 3600L) {
-               m = l / 60L;
-               return Text.translatable("mco.time.minutesAgo", m);
-            } else if (l < 86400L) {
-               m = l / 3600L;
-               return Text.translatable("mco.time.hoursAgo", m);
-            } else {
-               m = l / 86400L;
-               return Text.translatable("mco.time.daysAgo", m);
+    public static Text convertToAgePresentation(long milliseconds) {
+        if (milliseconds < 0L) {
+            return NOW_TEXT;
+        }
+        long l = milliseconds / 1000L;
+        if (l < 60L) {
+            return Text.translatable((String)"mco.time.secondsAgo", (Object[])new Object[]{l});
+        }
+        if (l < 3600L) {
+            long m = l / 60L;
+            return Text.translatable((String)"mco.time.minutesAgo", (Object[])new Object[]{m});
+        }
+        if (l < 86400L) {
+            long m = l / 3600L;
+            return Text.translatable((String)"mco.time.hoursAgo", (Object[])new Object[]{m});
+        }
+        long m = l / 86400L;
+        return Text.translatable((String)"mco.time.daysAgo", (Object[])new Object[]{m});
+    }
+
+    public static Text convertToAgePresentation(Instant instant) {
+        return RealmsUtil.convertToAgePresentation((long)(System.currentTimeMillis() - instant.toEpochMilli()));
+    }
+
+    public static void drawPlayerHead(DrawContext context, int x, int y, int size, UUID playerUuid) {
+        PlayerSkinCache.Entry entry = MinecraftClient.getInstance().getPlayerSkinCache().get(ProfileComponent.ofDynamic((UUID)playerUuid));
+        PlayerSkinDrawer.draw((DrawContext)context, (SkinTextures)entry.getTextures(), (int)x, (int)y, (int)size);
+    }
+
+    public static <T> CompletableFuture<T> runAsync(RealmsSupplier<T> supplier, @Nullable Consumer<RealmsServiceException> errorCallback) {
+        return CompletableFuture.supplyAsync(() -> {
+            RealmsClient realmsClient = RealmsClient.create();
+            try {
+                return supplier.apply(realmsClient);
             }
-         }
-      }
-   }
-
-   public static Text convertToAgePresentation(Date date) {
-      return convertToAgePresentation(System.currentTimeMillis() - date.getTime());
-   }
-
-   public static void drawPlayerHead(DrawContext context, int x, int y, int size, UUID playerUuid) {
-      MinecraftClient minecraftClient = MinecraftClient.getInstance();
-      ProfileResult profileResult = minecraftClient.getSessionService().fetchProfile(playerUuid, false);
-      SkinTextures skinTextures = profileResult != null ? minecraftClient.getSkinProvider().getSkinTextures(profileResult.profile()) : DefaultSkinHelper.getSkinTextures(playerUuid);
-      PlayerSkinDrawer.draw(context, skinTextures, x, y, size);
-   }
-
-   public static CompletableFuture method_72217(class_11539 arg, @Nullable Consumer consumer) {
-      return CompletableFuture.supplyAsync(() -> {
-         RealmsClient realmsClient = RealmsClient.create();
-
-         try {
-            return arg.apply(realmsClient);
-         } catch (Throwable var5) {
-            if (var5 instanceof RealmsServiceException realmsServiceException) {
-               if (consumer != null) {
-                  consumer.accept(realmsServiceException);
-               }
-            } else {
-               field_61054.error("Unhandled exception", var5);
+            catch (Throwable throwable) {
+                if (throwable instanceof RealmsServiceException) {
+                    RealmsServiceException realmsServiceException = (RealmsServiceException)throwable;
+                    if (errorCallback != null) {
+                        errorCallback.accept(realmsServiceException);
+                    }
+                } else {
+                    LOGGER.error("Unhandled exception", throwable);
+                }
+                throw new RuntimeException(throwable);
             }
+        }, (Executor)Util.getDownloadWorkerExecutor());
+    }
 
-            throw new RuntimeException(var5);
-         }
-      }, Util.getDownloadWorkerExecutor());
-   }
+    public static CompletableFuture<Void> runAsync(RealmsRunnable runnable, @Nullable Consumer<RealmsServiceException> errorCallback) {
+        return RealmsUtil.runAsync((RealmsSupplier)runnable, errorCallback);
+    }
 
-   public static CompletableFuture method_72216(class_11538 arg, @Nullable Consumer consumer) {
-      return method_72217(arg, consumer);
-   }
+    public static Consumer<RealmsServiceException> openingScreen(Function<RealmsServiceException, Screen> screenCreator) {
+        MinecraftClient minecraftClient = MinecraftClient.getInstance();
+        return error -> minecraftClient.execute(() -> minecraftClient.setScreen((Screen)screenCreator.apply((RealmsServiceException)((Object)error))));
+    }
 
-   public static Consumer method_72220(Function function) {
-      MinecraftClient minecraftClient = MinecraftClient.getInstance();
-      return (realmsServiceException) -> {
-         minecraftClient.execute(() -> {
-            minecraftClient.setScreen((Screen)function.apply(realmsServiceException));
-         });
-      };
-   }
-
-   public static Consumer method_72221(Function function, String string) {
-      return method_72220(function).andThen((realmsServiceException) -> {
-         field_61054.error(string, realmsServiceException);
-      });
-   }
-
-   @FunctionalInterface
-   @Environment(EnvType.CLIENT)
-   public interface class_11539 {
-      Object apply(RealmsClient realmsClient) throws RealmsServiceException;
-   }
-
-   @FunctionalInterface
-   @Environment(EnvType.CLIENT)
-   public interface class_11538 extends class_11539 {
-      void accept(RealmsClient realmsClient) throws RealmsServiceException;
-
-      default Void apply(RealmsClient realmsClient) throws RealmsServiceException {
-         this.accept(realmsClient);
-         return null;
-      }
-   }
+    public static Consumer<RealmsServiceException> openingScreenAndLogging(Function<RealmsServiceException, Screen> screenCreator, String errorPrefix) {
+        return RealmsUtil.openingScreen(screenCreator).andThen(error -> LOGGER.error(errorPrefix, (Throwable)error));
+    }
 }
+

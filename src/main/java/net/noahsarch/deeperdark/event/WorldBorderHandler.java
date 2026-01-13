@@ -66,7 +66,7 @@ public class WorldBorderHandler {
             if (strengthZ > 4.0) strengthZ = 4.0;
 
             entity.addVelocity(-Math.signum(dx) * strengthX, 0, -Math.signum(dz) * strengthZ);
-            entity.velocityModified = true;
+            entity.velocityDirty = true;
 
             if (entity instanceof ServerPlayerEntity player) {
                 player.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(player));

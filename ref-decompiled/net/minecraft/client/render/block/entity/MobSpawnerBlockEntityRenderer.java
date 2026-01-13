@@ -1,53 +1,98 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.block.entity.BlockEntity
+ *  net.minecraft.block.entity.MobSpawnerBlockEntity
+ *  net.minecraft.block.spawner.MobSpawnerLogic
+ *  net.minecraft.client.render.block.entity.BlockEntityRenderer
+ *  net.minecraft.client.render.block.entity.BlockEntityRendererFactory$Context
+ *  net.minecraft.client.render.block.entity.MobSpawnerBlockEntityRenderer
+ *  net.minecraft.client.render.block.entity.TrialSpawnerBlockEntityRenderer
+ *  net.minecraft.client.render.block.entity.state.BlockEntityRenderState
+ *  net.minecraft.client.render.block.entity.state.MobSpawnerBlockEntityRenderState
+ *  net.minecraft.client.render.command.OrderedRenderCommandQueue
+ *  net.minecraft.client.render.entity.EntityRenderManager
+ *  net.minecraft.client.render.entity.state.EntityRenderState
+ *  net.minecraft.client.render.state.CameraRenderState
+ *  net.minecraft.client.util.math.MatrixStack
+ *  net.minecraft.entity.Entity
+ *  net.minecraft.util.math.RotationAxis
+ *  net.minecraft.util.math.Vec3d
+ *  org.joml.Quaternionfc
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.render.block.entity;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.MobSpawnerBlockEntity;
 import net.minecraft.block.spawner.MobSpawnerLogic;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.EntityRenderDispatcher;
+import net.minecraft.client.render.block.entity.BlockEntityRenderer;
+import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.render.block.entity.TrialSpawnerBlockEntityRenderer;
+import net.minecraft.client.render.block.entity.state.BlockEntityRenderState;
+import net.minecraft.client.render.block.entity.state.MobSpawnerBlockEntityRenderState;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
+import net.minecraft.client.render.entity.EntityRenderManager;
+import net.minecraft.client.render.entity.state.EntityRenderState;
+import net.minecraft.client.render.state.CameraRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import org.joml.Quaternionfc;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
-public class MobSpawnerBlockEntityRenderer implements BlockEntityRenderer {
-   private final EntityRenderDispatcher entityRenderDispatcher;
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
+public class MobSpawnerBlockEntityRenderer
+implements BlockEntityRenderer<MobSpawnerBlockEntity, MobSpawnerBlockEntityRenderState> {
+    private final EntityRenderManager entityRenderDispatcher;
 
-   public MobSpawnerBlockEntityRenderer(BlockEntityRendererFactory.Context ctx) {
-      this.entityRenderDispatcher = ctx.getEntityRenderDispatcher();
-   }
+    public MobSpawnerBlockEntityRenderer(BlockEntityRendererFactory.Context ctx) {
+        this.entityRenderDispatcher = ctx.entityRenderDispatcher();
+    }
 
-   public void render(MobSpawnerBlockEntity mobSpawnerBlockEntity, float f, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, int j, Vec3d vec3d) {
-      World world = mobSpawnerBlockEntity.getWorld();
-      if (world != null) {
-         MobSpawnerLogic mobSpawnerLogic = mobSpawnerBlockEntity.getLogic();
-         Entity entity = mobSpawnerLogic.getRenderedEntity(world, mobSpawnerBlockEntity.getPos());
-         if (entity != null) {
-            render(f, matrixStack, vertexConsumerProvider, i, entity, this.entityRenderDispatcher, mobSpawnerLogic.getLastRotation(), mobSpawnerLogic.getRotation());
-         }
+    public MobSpawnerBlockEntityRenderState createRenderState() {
+        return new MobSpawnerBlockEntityRenderState();
+    }
 
-      }
-   }
+    public void updateRenderState(MobSpawnerBlockEntity mobSpawnerBlockEntity, MobSpawnerBlockEntityRenderState mobSpawnerBlockEntityRenderState, float f, Vec3d vec3d, // Could not load outer class - annotation placement on inner may be incorrect
+     @Nullable ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlayCommand) {
+        super.updateRenderState((BlockEntity)mobSpawnerBlockEntity, (BlockEntityRenderState)mobSpawnerBlockEntityRenderState, f, vec3d, crumblingOverlayCommand);
+        if (mobSpawnerBlockEntity.getWorld() == null) {
+            return;
+        }
+        MobSpawnerLogic mobSpawnerLogic = mobSpawnerBlockEntity.getLogic();
+        Entity entity = mobSpawnerLogic.getRenderedEntity(mobSpawnerBlockEntity.getWorld(), mobSpawnerBlockEntity.getPos());
+        TrialSpawnerBlockEntityRenderer.updateSpawnerRenderState((MobSpawnerBlockEntityRenderState)mobSpawnerBlockEntityRenderState, (float)f, (Entity)entity, (EntityRenderManager)this.entityRenderDispatcher, (double)mobSpawnerLogic.getLastRotation(), (double)mobSpawnerLogic.getRotation());
+    }
 
-   public static void render(float tickProgress, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, Entity entity, EntityRenderDispatcher entityRenderDispatcher, double lastRotation, double rotation) {
-      matrices.push();
-      matrices.translate(0.5F, 0.0F, 0.5F);
-      float f = 0.53125F;
-      float g = Math.max(entity.getWidth(), entity.getHeight());
-      if ((double)g > 1.0) {
-         f /= g;
-      }
+    public void render(MobSpawnerBlockEntityRenderState mobSpawnerBlockEntityRenderState, MatrixStack matrixStack, OrderedRenderCommandQueue orderedRenderCommandQueue, CameraRenderState cameraRenderState) {
+        if (mobSpawnerBlockEntityRenderState.displayEntityRenderState != null) {
+            MobSpawnerBlockEntityRenderer.renderDisplayEntity((MatrixStack)matrixStack, (OrderedRenderCommandQueue)orderedRenderCommandQueue, (EntityRenderState)mobSpawnerBlockEntityRenderState.displayEntityRenderState, (EntityRenderManager)this.entityRenderDispatcher, (float)mobSpawnerBlockEntityRenderState.displayEntityRotation, (float)mobSpawnerBlockEntityRenderState.displayEntityScale, (CameraRenderState)cameraRenderState);
+        }
+    }
 
-      matrices.translate(0.0F, 0.4F, 0.0F);
-      matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float)MathHelper.lerp((double)tickProgress, lastRotation, rotation) * 10.0F));
-      matrices.translate(0.0F, -0.2F, 0.0F);
-      matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-30.0F));
-      matrices.scale(f, f, f);
-      entityRenderDispatcher.render(entity, 0.0, 0.0, 0.0, tickProgress, matrices, vertexConsumers, light);
-      matrices.pop();
-   }
+    public static void renderDisplayEntity(MatrixStack matrices, OrderedRenderCommandQueue queue, EntityRenderState state, EntityRenderManager entityRenderDispatcher, float rotation, float scale, CameraRenderState cameraRenderState) {
+        matrices.push();
+        matrices.translate(0.5f, 0.4f, 0.5f);
+        matrices.multiply((Quaternionfc)RotationAxis.POSITIVE_Y.rotationDegrees(rotation));
+        matrices.translate(0.0f, -0.2f, 0.0f);
+        matrices.multiply((Quaternionfc)RotationAxis.POSITIVE_X.rotationDegrees(-30.0f));
+        matrices.scale(scale, scale, scale);
+        entityRenderDispatcher.render(state, cameraRenderState, 0.0, 0.0, 0.0, matrices, queue);
+        matrices.pop();
+    }
+
+    public /* synthetic */ BlockEntityRenderState createRenderState() {
+        return this.createRenderState();
+    }
 }
+

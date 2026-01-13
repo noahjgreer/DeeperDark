@@ -1,3 +1,18 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.block.entity.SignBlockEntity
+ *  net.minecraft.client.gl.RenderPipelines
+ *  net.minecraft.client.gui.DrawContext
+ *  net.minecraft.client.gui.screen.ingame.AbstractSignEditScreen
+ *  net.minecraft.client.gui.screen.ingame.HangingSignEditScreen
+ *  net.minecraft.text.Text
+ *  net.minecraft.util.Identifier
+ *  org.joml.Vector3f
+ */
 package net.minecraft.client.gui.screen.ingame;
 
 import net.fabricmc.api.EnvType;
@@ -5,34 +20,37 @@ import net.fabricmc.api.Environment;
 import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.ingame.AbstractSignEditScreen;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.joml.Vector3f;
 
-@Environment(EnvType.CLIENT)
-public class HangingSignEditScreen extends AbstractSignEditScreen {
-   public static final float BACKGROUND_SCALE = 4.5F;
-   private static final Vector3f TEXT_SCALE = new Vector3f(1.0F, 1.0F, 1.0F);
-   private static final int field_40433 = 16;
-   private static final int field_40434 = 16;
-   private final Identifier texture;
+@Environment(value=EnvType.CLIENT)
+public class HangingSignEditScreen
+extends AbstractSignEditScreen {
+    public static final float BACKGROUND_SCALE = 4.5f;
+    private static final Vector3f TEXT_SCALE = new Vector3f(1.0f, 1.0f, 1.0f);
+    private static final int field_40433 = 16;
+    private static final int field_40434 = 16;
+    private final Identifier texture;
 
-   public HangingSignEditScreen(SignBlockEntity signBlockEntity, boolean bl, boolean bl2) {
-      super(signBlockEntity, bl, bl2, Text.translatable("hanging_sign.edit"));
-      this.texture = Identifier.ofVanilla("textures/gui/hanging_signs/" + this.signType.name() + ".png");
-   }
+    public HangingSignEditScreen(SignBlockEntity signBlockEntity, boolean bl, boolean bl2) {
+        super(signBlockEntity, bl, bl2, (Text)Text.translatable((String)"hanging_sign.edit"));
+        this.texture = Identifier.ofVanilla((String)("textures/gui/hanging_signs/" + this.signType.name() + ".png"));
+    }
 
-   protected float getYOffset() {
-      return 125.0F;
-   }
+    protected float getYOffset() {
+        return 125.0f;
+    }
 
-   protected void renderSignBackground(DrawContext context) {
-      context.getMatrices().translate(0.0F, -13.0F);
-      context.getMatrices().scale(4.5F, 4.5F);
-      context.drawTexture(RenderPipelines.GUI_TEXTURED, this.texture, -8, -8, 0.0F, 0.0F, 16, 16, 16, 16);
-   }
+    protected void renderSignBackground(DrawContext context) {
+        context.getMatrices().translate(0.0f, -13.0f);
+        context.getMatrices().scale(4.5f, 4.5f);
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, this.texture, -8, -8, 0.0f, 0.0f, 16, 16, 16, 16);
+    }
 
-   protected Vector3f getTextScale() {
-      return TEXT_SCALE;
-   }
+    protected Vector3f getTextScale() {
+        return TEXT_SCALE;
+    }
 }
+

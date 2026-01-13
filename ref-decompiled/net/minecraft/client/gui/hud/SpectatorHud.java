@@ -1,3 +1,25 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.MinecraftClient
+ *  net.minecraft.client.gl.RenderPipelines
+ *  net.minecraft.client.gui.DrawContext
+ *  net.minecraft.client.gui.hud.SpectatorHud
+ *  net.minecraft.client.gui.hud.spectator.SpectatorMenu
+ *  net.minecraft.client.gui.hud.spectator.SpectatorMenuCloseCallback
+ *  net.minecraft.client.gui.hud.spectator.SpectatorMenuCommand
+ *  net.minecraft.client.gui.hud.spectator.SpectatorMenuState
+ *  net.minecraft.text.StringVisitable
+ *  net.minecraft.text.Text
+ *  net.minecraft.util.Identifier
+ *  net.minecraft.util.Util
+ *  net.minecraft.util.math.ColorHelper
+ *  net.minecraft.util.math.MathHelper
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.gui.hud;
 
 import net.fabricmc.api.EnvType;
@@ -15,124 +37,118 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
-public class SpectatorHud implements SpectatorMenuCloseCallback {
-   private static final Identifier HOTBAR_TEXTURE = Identifier.ofVanilla("hud/hotbar");
-   private static final Identifier HOTBAR_SELECTION_TEXTURE = Identifier.ofVanilla("hud/hotbar_selection");
-   private static final long FADE_OUT_DELAY = 5000L;
-   private static final long FADE_OUT_DURATION = 2000L;
-   private final MinecraftClient client;
-   private long lastInteractionTime;
-   @Nullable
-   private SpectatorMenu spectatorMenu;
+@Environment(value=EnvType.CLIENT)
+public class SpectatorHud
+implements SpectatorMenuCloseCallback {
+    private static final Identifier HOTBAR_TEXTURE = Identifier.ofVanilla((String)"hud/hotbar");
+    private static final Identifier HOTBAR_SELECTION_TEXTURE = Identifier.ofVanilla((String)"hud/hotbar_selection");
+    private static final long FADE_OUT_DELAY = 5000L;
+    private static final long FADE_OUT_DURATION = 2000L;
+    private final MinecraftClient client;
+    private long lastInteractionTime;
+    private @Nullable SpectatorMenu spectatorMenu;
 
-   public SpectatorHud(MinecraftClient client) {
-      this.client = client;
-   }
+    public SpectatorHud(MinecraftClient client) {
+        this.client = client;
+    }
 
-   public void selectSlot(int slot) {
-      this.lastInteractionTime = Util.getMeasuringTimeMs();
-      if (this.spectatorMenu != null) {
-         this.spectatorMenu.useCommand(slot);
-      } else {
-         this.spectatorMenu = new SpectatorMenu(this);
-      }
+    public void selectSlot(int slot) {
+        this.lastInteractionTime = Util.getMeasuringTimeMs();
+        if (this.spectatorMenu != null) {
+            this.spectatorMenu.useCommand(slot);
+        } else {
+            this.spectatorMenu = new SpectatorMenu((SpectatorMenuCloseCallback)this);
+        }
+    }
 
-   }
+    private float getSpectatorMenuHeight() {
+        long l = this.lastInteractionTime - Util.getMeasuringTimeMs() + 5000L;
+        return MathHelper.clamp((float)((float)l / 2000.0f), (float)0.0f, (float)1.0f);
+    }
 
-   private float getSpectatorMenuHeight() {
-      long l = this.lastInteractionTime - Util.getMeasuringTimeMs() + 5000L;
-      return MathHelper.clamp((float)l / 2000.0F, 0.0F, 1.0F);
-   }
-
-   public void renderSpectatorMenu(DrawContext context) {
-      if (this.spectatorMenu != null) {
-         float f = this.getSpectatorMenuHeight();
-         if (f <= 0.0F) {
+    public void renderSpectatorMenu(DrawContext context) {
+        if (this.spectatorMenu == null) {
+            return;
+        }
+        float f = this.getSpectatorMenuHeight();
+        if (f <= 0.0f) {
             this.spectatorMenu.close();
-         } else {
-            int i = context.getScaledWindowWidth() / 2;
-            int j = MathHelper.floor((float)context.getScaledWindowHeight() - 22.0F * f);
-            SpectatorMenuState spectatorMenuState = this.spectatorMenu.getCurrentState();
-            this.renderSpectatorMenu(context, f, i, j, spectatorMenuState);
-         }
-      }
-   }
+            return;
+        }
+        int i = context.getScaledWindowWidth() / 2;
+        int j = MathHelper.floor((float)((float)context.getScaledWindowHeight() - 22.0f * f));
+        SpectatorMenuState spectatorMenuState = this.spectatorMenu.getCurrentState();
+        this.renderSpectatorMenu(context, f, i, j, spectatorMenuState);
+    }
 
-   protected void renderSpectatorMenu(DrawContext context, float height, int x, int y, SpectatorMenuState state) {
-      int i = ColorHelper.getWhite(height);
-      context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, HOTBAR_TEXTURE, x - 91, y, 182, 22, i);
-      if (state.getSelectedSlot() >= 0) {
-         context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, HOTBAR_SELECTION_TEXTURE, x - 91 - 1 + state.getSelectedSlot() * 20, y - 1, 24, 23, i);
-      }
+    protected void renderSpectatorMenu(DrawContext context, float height, int x, int y, SpectatorMenuState state) {
+        int i = ColorHelper.getWhite((float)height);
+        context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, HOTBAR_TEXTURE, x - 91, y, 182, 22, i);
+        if (state.getSelectedSlot() >= 0) {
+            context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, HOTBAR_SELECTION_TEXTURE, x - 91 - 1 + state.getSelectedSlot() * 20, y - 1, 24, 23, i);
+        }
+        for (int j = 0; j < 9; ++j) {
+            this.renderSpectatorCommand(context, j, context.getScaledWindowWidth() / 2 - 90 + j * 20 + 2, (float)(y + 3), height, state.getCommand(j));
+        }
+    }
 
-      for(int j = 0; j < 9; ++j) {
-         this.renderSpectatorCommand(context, j, context.getScaledWindowWidth() / 2 - 90 + j * 20 + 2, (float)(y + 3), height, state.getCommand(j));
-      }
+    private void renderSpectatorCommand(DrawContext context, int slot, int x, float y, float height, SpectatorMenuCommand command) {
+        if (command != SpectatorMenu.BLANK_COMMAND) {
+            context.getMatrices().pushMatrix();
+            context.getMatrices().translate((float)x, y);
+            float f = command.isEnabled() ? 1.0f : 0.25f;
+            command.renderIcon(context, f, height);
+            context.getMatrices().popMatrix();
+            if (height > 0.0f && command.isEnabled()) {
+                Text text = this.client.options.hotbarKeys[slot].getBoundKeyLocalizedText();
+                context.drawTextWithShadow(this.client.textRenderer, text, x + 19 - 2 - this.client.textRenderer.getWidth((StringVisitable)text), (int)y + 6 + 3, ColorHelper.getWhite((float)height));
+            }
+        }
+    }
 
-   }
+    public void render(DrawContext context) {
+        float f = this.getSpectatorMenuHeight();
+        if (f > 0.0f && this.spectatorMenu != null) {
+            SpectatorMenuCommand spectatorMenuCommand = this.spectatorMenu.getSelectedCommand();
+            Text text = spectatorMenuCommand == SpectatorMenu.BLANK_COMMAND ? this.spectatorMenu.getCurrentGroup().getPrompt() : spectatorMenuCommand.getName();
+            int i = this.client.textRenderer.getWidth((StringVisitable)text);
+            int j = (context.getScaledWindowWidth() - i) / 2;
+            int k = context.getScaledWindowHeight() - 35;
+            context.drawTextWithBackground(this.client.textRenderer, text, j, k, i, ColorHelper.getWhite((float)f));
+        }
+    }
 
-   private void renderSpectatorCommand(DrawContext context, int slot, int x, float y, float height, SpectatorMenuCommand command) {
-      if (command != SpectatorMenu.BLANK_COMMAND) {
-         context.getMatrices().pushMatrix();
-         context.getMatrices().translate((float)x, y);
-         float f = command.isEnabled() ? 1.0F : 0.25F;
-         command.renderIcon(context, f, height);
-         context.getMatrices().popMatrix();
-         if (height > 0.0F && command.isEnabled()) {
-            Text text = this.client.options.hotbarKeys[slot].getBoundKeyLocalizedText();
-            context.drawTextWithShadow(this.client.textRenderer, text, x + 19 - 2 - this.client.textRenderer.getWidth((StringVisitable)text), (int)y + 6 + 3, ColorHelper.withAlpha(height, -1));
-         }
-      }
+    public void close(SpectatorMenu menu) {
+        this.spectatorMenu = null;
+        this.lastInteractionTime = 0L;
+    }
 
-   }
+    public boolean isOpen() {
+        return this.spectatorMenu != null;
+    }
 
-   public void render(DrawContext context) {
-      float f = this.getSpectatorMenuHeight();
-      if (f > 0.0F && this.spectatorMenu != null) {
-         SpectatorMenuCommand spectatorMenuCommand = this.spectatorMenu.getSelectedCommand();
-         Text text = spectatorMenuCommand == SpectatorMenu.BLANK_COMMAND ? this.spectatorMenu.getCurrentGroup().getPrompt() : spectatorMenuCommand.getName();
-         int i = this.client.textRenderer.getWidth((StringVisitable)text);
-         int j = (context.getScaledWindowWidth() - i) / 2;
-         int k = context.getScaledWindowHeight() - 35;
-         context.drawTextWithBackground(this.client.textRenderer, text, j, k, i, ColorHelper.withAlpha(f, -1));
-      }
-
-   }
-
-   public void close(SpectatorMenu menu) {
-      this.spectatorMenu = null;
-      this.lastInteractionTime = 0L;
-   }
-
-   public boolean isOpen() {
-      return this.spectatorMenu != null;
-   }
-
-   public void cycleSlot(int offset) {
-      int i;
-      for(i = this.spectatorMenu.getSelectedSlot() + offset; i >= 0 && i <= 8 && (this.spectatorMenu.getCommand(i) == SpectatorMenu.BLANK_COMMAND || !this.spectatorMenu.getCommand(i).isEnabled()); i += offset) {
-      }
-
-      if (i >= 0 && i <= 8) {
-         this.spectatorMenu.useCommand(i);
-         this.lastInteractionTime = Util.getMeasuringTimeMs();
-      }
-
-   }
-
-   public void useSelectedCommand() {
-      this.lastInteractionTime = Util.getMeasuringTimeMs();
-      if (this.isOpen()) {
-         int i = this.spectatorMenu.getSelectedSlot();
-         if (i != -1) {
+    public void cycleSlot(int offset) {
+        int i;
+        for (i = this.spectatorMenu.getSelectedSlot() + offset; !(i < 0 || i > 8 || this.spectatorMenu.getCommand(i) != SpectatorMenu.BLANK_COMMAND && this.spectatorMenu.getCommand(i).isEnabled()); i += offset) {
+        }
+        if (i >= 0 && i <= 8) {
             this.spectatorMenu.useCommand(i);
-         }
-      } else {
-         this.spectatorMenu = new SpectatorMenu(this);
-      }
+            this.lastInteractionTime = Util.getMeasuringTimeMs();
+        }
+    }
 
-   }
+    public void useSelectedCommand() {
+        this.lastInteractionTime = Util.getMeasuringTimeMs();
+        if (this.isOpen()) {
+            int i = this.spectatorMenu.getSelectedSlot();
+            if (i != -1) {
+                this.spectatorMenu.useCommand(i);
+            }
+        } else {
+            this.spectatorMenu = new SpectatorMenu((SpectatorMenuCloseCallback)this);
+        }
+    }
 }
+

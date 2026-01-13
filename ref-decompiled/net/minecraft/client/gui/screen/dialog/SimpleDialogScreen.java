@@ -1,31 +1,50 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.gui.screen.Screen
+ *  net.minecraft.client.gui.screen.dialog.DialogControls
+ *  net.minecraft.client.gui.screen.dialog.DialogNetworkAccess
+ *  net.minecraft.client.gui.screen.dialog.DialogScreen
+ *  net.minecraft.client.gui.screen.dialog.SimpleDialogScreen
+ *  net.minecraft.client.gui.widget.DirectionalLayoutWidget
+ *  net.minecraft.client.gui.widget.ThreePartsLayoutWidget
+ *  net.minecraft.client.gui.widget.Widget
+ *  net.minecraft.dialog.DialogActionButtonData
+ *  net.minecraft.dialog.type.SimpleDialog
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.gui.screen.dialog;
 
-import java.util.Iterator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.dialog.DialogControls;
+import net.minecraft.client.gui.screen.dialog.DialogNetworkAccess;
+import net.minecraft.client.gui.screen.dialog.DialogScreen;
 import net.minecraft.client.gui.widget.DirectionalLayoutWidget;
 import net.minecraft.client.gui.widget.ThreePartsLayoutWidget;
+import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.dialog.DialogActionButtonData;
 import net.minecraft.dialog.type.SimpleDialog;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
-public class SimpleDialogScreen extends DialogScreen {
-   public SimpleDialogScreen(@Nullable Screen parent, SimpleDialog dialog, DialogNetworkAccess networkAccess) {
-      super(parent, dialog, networkAccess);
-   }
+@Environment(value=EnvType.CLIENT)
+public class SimpleDialogScreen<T extends SimpleDialog>
+extends DialogScreen<T> {
+    public SimpleDialogScreen(@Nullable Screen parent, T dialog, DialogNetworkAccess networkAccess) {
+        super(parent, dialog, networkAccess);
+    }
 
-   protected void initHeaderAndFooter(ThreePartsLayoutWidget threePartsLayoutWidget, DialogControls dialogControls, SimpleDialog simpleDialog, DialogNetworkAccess dialogNetworkAccess) {
-      super.initHeaderAndFooter(threePartsLayoutWidget, dialogControls, simpleDialog, dialogNetworkAccess);
-      DirectionalLayoutWidget directionalLayoutWidget = DirectionalLayoutWidget.horizontal().spacing(8);
-      Iterator var6 = simpleDialog.getButtons().iterator();
-
-      while(var6.hasNext()) {
-         DialogActionButtonData dialogActionButtonData = (DialogActionButtonData)var6.next();
-         directionalLayoutWidget.add(dialogControls.createButton(dialogActionButtonData).build());
-      }
-
-      threePartsLayoutWidget.addFooter(directionalLayoutWidget);
-   }
+    protected void initHeaderAndFooter(ThreePartsLayoutWidget threePartsLayoutWidget, DialogControls dialogControls, T simpleDialog, DialogNetworkAccess dialogNetworkAccess) {
+        super.initHeaderAndFooter(threePartsLayoutWidget, dialogControls, simpleDialog, dialogNetworkAccess);
+        DirectionalLayoutWidget directionalLayoutWidget = DirectionalLayoutWidget.horizontal().spacing(8);
+        for (DialogActionButtonData dialogActionButtonData : simpleDialog.getButtons()) {
+            directionalLayoutWidget.add((Widget)dialogControls.createButton(dialogActionButtonData).build());
+        }
+        threePartsLayoutWidget.addFooter((Widget)directionalLayoutWidget);
+    }
 }
+

@@ -1,24 +1,43 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.gui.screen.Screen
+ *  net.minecraft.client.gui.screen.dialog.DialogNetworkAccess
+ *  net.minecraft.dialog.type.Dialog
+ *  net.minecraft.nbt.NbtElement
+ *  net.minecraft.registry.entry.RegistryEntry
+ *  net.minecraft.server.ServerLinks
+ *  net.minecraft.text.Text
+ *  net.minecraft.util.Identifier
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.gui.screen.dialog;
 
 import java.util.Optional;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.dialog.type.Dialog;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.ServerLinks;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 public interface DialogNetworkAccess {
-   void disconnect(Text reason);
+    public void disconnect(Text var1);
 
-   void runClickEventCommand(String command, @Nullable Screen afterActionScreen);
+    public void runClickEventCommand(String var1, @Nullable Screen var2);
 
-   void showDialog(RegistryEntry dialog, @Nullable Screen afterActionScreen);
+    public void showDialog(RegistryEntry<Dialog> var1, @Nullable Screen var2);
 
-   void sendCustomClickActionPacket(Identifier id, Optional payload);
+    public void sendCustomClickActionPacket(Identifier var1, Optional<NbtElement> var2);
 
-   ServerLinks getServerLinks();
+    public ServerLinks getServerLinks();
 }
+

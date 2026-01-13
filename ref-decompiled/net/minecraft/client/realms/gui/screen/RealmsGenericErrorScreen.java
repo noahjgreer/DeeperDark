@@ -1,98 +1,96 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.font.Alignment
+ *  net.minecraft.client.font.DrawnTextConsumer
+ *  net.minecraft.client.font.MultilineText
+ *  net.minecraft.client.font.TextRenderer
+ *  net.minecraft.client.gui.DrawContext
+ *  net.minecraft.client.gui.Element
+ *  net.minecraft.client.gui.screen.Screen
+ *  net.minecraft.client.gui.widget.ButtonWidget
+ *  net.minecraft.client.realms.exception.RealmsServiceException
+ *  net.minecraft.client.realms.gui.screen.RealmsGenericErrorScreen
+ *  net.minecraft.client.realms.gui.screen.RealmsGenericErrorScreen$ErrorMessages
+ *  net.minecraft.client.realms.gui.screen.RealmsScreen
+ *  net.minecraft.screen.ScreenTexts
+ *  net.minecraft.text.Style
+ *  net.minecraft.text.Text
+ *  net.minecraft.text.Texts
+ */
 package net.minecraft.client.realms.gui.screen;
 
 import java.util.Objects;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.font.Alignment;
+import net.minecraft.client.font.DrawnTextConsumer;
 import net.minecraft.client.font.MultilineText;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.realms.RealmsError;
 import net.minecraft.client.realms.exception.RealmsServiceException;
-import net.minecraft.client.util.NarratorManager;
+import net.minecraft.client.realms.gui.screen.RealmsGenericErrorScreen;
+import net.minecraft.client.realms.gui.screen.RealmsScreen;
 import net.minecraft.screen.ScreenTexts;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.text.Texts;
 
-@Environment(EnvType.CLIENT)
-public class RealmsGenericErrorScreen extends RealmsScreen {
-   private final Screen parent;
-   private final ErrorMessages errorMessages;
-   private MultilineText description;
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
+public class RealmsGenericErrorScreen
+extends RealmsScreen {
+    private static final Text GENERIC_ERROR_TEXT = Text.translatable((String)"mco.errorMessage.generic");
+    private final Screen parent;
+    private final Text detail;
+    private MultilineText text = MultilineText.EMPTY;
 
-   public RealmsGenericErrorScreen(RealmsServiceException realmsServiceException, Screen parent) {
-      super(NarratorManager.EMPTY);
-      this.description = MultilineText.EMPTY;
-      this.parent = parent;
-      this.errorMessages = getErrorMessages(realmsServiceException);
-   }
+    public RealmsGenericErrorScreen(RealmsServiceException realmsServiceException, Screen parent) {
+        this(ErrorMessages.of((RealmsServiceException)realmsServiceException), parent);
+    }
 
-   public RealmsGenericErrorScreen(Text description, Screen parent) {
-      super(NarratorManager.EMPTY);
-      this.description = MultilineText.EMPTY;
-      this.parent = parent;
-      this.errorMessages = getErrorMessages(description);
-   }
+    public RealmsGenericErrorScreen(Text description, Screen parent) {
+        this(new ErrorMessages(GENERIC_ERROR_TEXT, description), parent);
+    }
 
-   public RealmsGenericErrorScreen(Text title, Text description, Screen parent) {
-      super(NarratorManager.EMPTY);
-      this.description = MultilineText.EMPTY;
-      this.parent = parent;
-      this.errorMessages = getErrorMessages(title, description);
-   }
+    public RealmsGenericErrorScreen(Text title, Text description, Screen parent) {
+        this(new ErrorMessages(title, description), parent);
+    }
 
-   private static ErrorMessages getErrorMessages(RealmsServiceException exception) {
-      RealmsError realmsError = exception.error;
-      return getErrorMessages(Text.translatable("mco.errorMessage.realmsService.realmsError", realmsError.getErrorCode()), realmsError.getText());
-   }
+    private RealmsGenericErrorScreen(ErrorMessages messages, Screen parent) {
+        super(messages.title);
+        this.parent = parent;
+        this.detail = Texts.withStyle((Text)messages.detail, (Style)Style.EMPTY.withColor(-2142128));
+    }
 
-   private static ErrorMessages getErrorMessages(Text description) {
-      return getErrorMessages(Text.translatable("mco.errorMessage.generic"), description);
-   }
+    public void init() {
+        this.addDrawableChild((Element)ButtonWidget.builder((Text)ScreenTexts.OK, button -> this.close()).dimensions(this.width / 2 - 100, this.height - 52, 200, 20).build());
+        this.text = MultilineText.create((TextRenderer)this.textRenderer, (Text)this.detail, (int)(this.width * 3 / 4));
+    }
 
-   private static ErrorMessages getErrorMessages(Text title, Text description) {
-      return new ErrorMessages(title, description);
-   }
+    public void close() {
+        this.client.setScreen(this.parent);
+    }
 
-   public void init() {
-      this.addDrawableChild(ButtonWidget.builder(ScreenTexts.OK, (button) -> {
-         this.close();
-      }).dimensions(this.width / 2 - 100, this.height - 52, 200, 20).build());
-      this.description = MultilineText.create(this.textRenderer, this.errorMessages.detail, this.width * 3 / 4);
-   }
+    public Text getNarratedTitle() {
+        return ScreenTexts.joinSentences((Text[])new Text[]{super.getNarratedTitle(), this.detail});
+    }
 
-   public void close() {
-      this.client.setScreen(this.parent);
-   }
-
-   public Text getNarratedTitle() {
-      return Text.empty().append(this.errorMessages.title).append(": ").append(this.errorMessages.detail);
-   }
-
-   public void render(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
-      super.render(context, mouseX, mouseY, deltaTicks);
-      context.drawCenteredTextWithShadow(this.textRenderer, (Text)this.errorMessages.title, this.width / 2, 80, -1);
-      MultilineText var10000 = this.description;
-      int var10002 = this.width / 2;
-      Objects.requireNonNull(this.client.textRenderer);
-      var10000.drawCenterWithShadow(context, var10002, 100, 9, -2142128);
-   }
-
-   @Environment(EnvType.CLIENT)
-   private static record ErrorMessages(Text title, Text detail) {
-      final Text title;
-      final Text detail;
-
-      ErrorMessages(Text text, Text text2) {
-         this.title = text;
-         this.detail = text2;
-      }
-
-      public Text title() {
-         return this.title;
-      }
-
-      public Text detail() {
-         return this.detail;
-      }
-   }
+    public void render(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
+        super.render(context, mouseX, mouseY, deltaTicks);
+        context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 80, -1);
+        DrawnTextConsumer drawnTextConsumer = context.getTextConsumer();
+        int n = this.width / 2;
+        Objects.requireNonNull(this.client.textRenderer);
+        this.text.draw(Alignment.CENTER, n, 100, 9, drawnTextConsumer);
+    }
 }
+

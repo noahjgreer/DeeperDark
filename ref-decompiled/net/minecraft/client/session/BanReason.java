@@ -1,127 +1,83 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.session.BanReason
+ *  net.minecraft.text.Text
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.session;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.text.Text;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
-public enum BanReason {
-   GENERIC_VIOLATION("generic_violation"),
-   FALSE_REPORTING("false_reporting"),
-   HATE_SPEECH("hate_speech"),
-   HATE_TERRORISM_NOTORIOUS_FIGURE("hate_terrorism_notorious_figure"),
-   HARASSMENT_OR_BULLYING("harassment_or_bullying"),
-   DEFAMATION_IMPERSONATION_FALSE_INFORMATION("defamation_impersonation_false_information"),
-   DRUGS("drugs"),
-   FRAUD("fraud"),
-   SPAM_OR_ADVERTISING("spam_or_advertising"),
-   NUDITY_OR_PORNOGRAPHY("nudity_or_pornography"),
-   SEXUALLY_INAPPROPRIATE("sexually_inappropriate"),
-   EXTREME_VIOLENCE_OR_GORE("extreme_violence_or_gore"),
-   IMMINENT_HARM_TO_PERSON_OR_PROPERTY("imminent_harm_to_person_or_property");
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
+public final class BanReason
+extends Enum<BanReason> {
+    public static final /* enum */ BanReason GENERIC_VIOLATION = new BanReason("GENERIC_VIOLATION", 0, "generic_violation");
+    public static final /* enum */ BanReason FALSE_REPORTING = new BanReason("FALSE_REPORTING", 1, "false_reporting");
+    public static final /* enum */ BanReason HATE_SPEECH = new BanReason("HATE_SPEECH", 2, "hate_speech");
+    public static final /* enum */ BanReason HATE_TERRORISM_NOTORIOUS_FIGURE = new BanReason("HATE_TERRORISM_NOTORIOUS_FIGURE", 3, "hate_terrorism_notorious_figure");
+    public static final /* enum */ BanReason HARASSMENT_OR_BULLYING = new BanReason("HARASSMENT_OR_BULLYING", 4, "harassment_or_bullying");
+    public static final /* enum */ BanReason DEFAMATION_IMPERSONATION_FALSE_INFORMATION = new BanReason("DEFAMATION_IMPERSONATION_FALSE_INFORMATION", 5, "defamation_impersonation_false_information");
+    public static final /* enum */ BanReason DRUGS = new BanReason("DRUGS", 6, "drugs");
+    public static final /* enum */ BanReason FRAUD = new BanReason("FRAUD", 7, "fraud");
+    public static final /* enum */ BanReason SPAM_OR_ADVERTISING = new BanReason("SPAM_OR_ADVERTISING", 8, "spam_or_advertising");
+    public static final /* enum */ BanReason NUDITY_OR_PORNOGRAPHY = new BanReason("NUDITY_OR_PORNOGRAPHY", 9, "nudity_or_pornography");
+    public static final /* enum */ BanReason SEXUALLY_INAPPROPRIATE = new BanReason("SEXUALLY_INAPPROPRIATE", 10, "sexually_inappropriate");
+    public static final /* enum */ BanReason EXTREME_VIOLENCE_OR_GORE = new BanReason("EXTREME_VIOLENCE_OR_GORE", 11, "extreme_violence_or_gore");
+    public static final /* enum */ BanReason IMMINENT_HARM_TO_PERSON_OR_PROPERTY = new BanReason("IMMINENT_HARM_TO_PERSON_OR_PROPERTY", 12, "imminent_harm_to_person_or_property");
+    private final Text description;
+    private static final /* synthetic */ BanReason[] field_42905;
 
-   private final Text description;
+    public static BanReason[] values() {
+        return (BanReason[])field_42905.clone();
+    }
 
-   private BanReason(final String id) {
-      this.description = Text.translatable("gui.banned.reason." + id);
-   }
+    public static BanReason valueOf(String string) {
+        return Enum.valueOf(BanReason.class, string);
+    }
 
-   public Text getDescription() {
-      return this.description;
-   }
+    private BanReason(String id) {
+        this.description = Text.translatable((String)("gui.banned.reason." + id));
+    }
 
-   @Nullable
-   public static BanReason byId(int id) {
-      BanReason var10000;
-      switch (id) {
-         case 2:
-            var10000 = FALSE_REPORTING;
-            break;
-         case 3:
-         case 4:
-         case 6:
-         case 7:
-         case 8:
-         case 9:
-         case 10:
-         case 11:
-         case 12:
-         case 13:
-         case 14:
-         case 15:
-         case 18:
-         case 20:
-         case 22:
-         case 24:
-         case 26:
-         case 37:
-         case 38:
-         case 39:
-         case 40:
-         case 41:
-         case 42:
-         case 43:
-         case 44:
-         case 45:
-         case 46:
-         case 47:
-         case 48:
-         case 49:
-         case 50:
-         case 51:
-         case 52:
-         default:
-            var10000 = null;
-            break;
-         case 5:
-            var10000 = HATE_SPEECH;
-            break;
-         case 16:
-         case 25:
-            var10000 = HATE_TERRORISM_NOTORIOUS_FIGURE;
-            break;
-         case 17:
-         case 19:
-         case 23:
-         case 31:
-            var10000 = GENERIC_VIOLATION;
-            break;
-         case 21:
-            var10000 = HARASSMENT_OR_BULLYING;
-            break;
-         case 27:
-            var10000 = DEFAMATION_IMPERSONATION_FALSE_INFORMATION;
-            break;
-         case 28:
-            var10000 = DRUGS;
-            break;
-         case 29:
-            var10000 = FRAUD;
-            break;
-         case 30:
-            var10000 = SPAM_OR_ADVERTISING;
-            break;
-         case 32:
-            var10000 = NUDITY_OR_PORNOGRAPHY;
-            break;
-         case 33:
-         case 35:
-         case 36:
-            var10000 = SEXUALLY_INAPPROPRIATE;
-            break;
-         case 34:
-            var10000 = EXTREME_VIOLENCE_OR_GORE;
-            break;
-         case 53:
-            var10000 = IMMINENT_HARM_TO_PERSON_OR_PROPERTY;
-      }
+    public Text getDescription() {
+        return this.description;
+    }
 
-      return var10000;
-   }
+    public static @Nullable BanReason byId(int id) {
+        return switch (id) {
+            case 17, 19, 23, 31 -> GENERIC_VIOLATION;
+            case 2 -> FALSE_REPORTING;
+            case 5 -> HATE_SPEECH;
+            case 16, 25 -> HATE_TERRORISM_NOTORIOUS_FIGURE;
+            case 21 -> HARASSMENT_OR_BULLYING;
+            case 27 -> DEFAMATION_IMPERSONATION_FALSE_INFORMATION;
+            case 28 -> DRUGS;
+            case 29 -> FRAUD;
+            case 30 -> SPAM_OR_ADVERTISING;
+            case 32 -> NUDITY_OR_PORNOGRAPHY;
+            case 33, 35, 36 -> SEXUALLY_INAPPROPRIATE;
+            case 34 -> EXTREME_VIOLENCE_OR_GORE;
+            case 53 -> IMMINENT_HARM_TO_PERSON_OR_PROPERTY;
+            default -> null;
+        };
+    }
 
-   // $FF: synthetic method
-   private static BanReason[] method_49314() {
-      return new BanReason[]{GENERIC_VIOLATION, FALSE_REPORTING, HATE_SPEECH, HATE_TERRORISM_NOTORIOUS_FIGURE, HARASSMENT_OR_BULLYING, DEFAMATION_IMPERSONATION_FALSE_INFORMATION, DRUGS, FRAUD, SPAM_OR_ADVERTISING, NUDITY_OR_PORNOGRAPHY, SEXUALLY_INAPPROPRIATE, EXTREME_VIOLENCE_OR_GORE, IMMINENT_HARM_TO_PERSON_OR_PROPERTY};
-   }
+    private static /* synthetic */ BanReason[] method_49314() {
+        return new BanReason[]{GENERIC_VIOLATION, FALSE_REPORTING, HATE_SPEECH, HATE_TERRORISM_NOTORIOUS_FIGURE, HARASSMENT_OR_BULLYING, DEFAMATION_IMPERSONATION_FALSE_INFORMATION, DRUGS, FRAUD, SPAM_OR_ADVERTISING, NUDITY_OR_PORNOGRAPHY, SEXUALLY_INAPPROPRIATE, EXTREME_VIOLENCE_OR_GORE, IMMINENT_HARM_TO_PERSON_OR_PROPERTY};
+    }
+
+    static {
+        field_42905 = BanReason.method_49314();
+    }
 }
+

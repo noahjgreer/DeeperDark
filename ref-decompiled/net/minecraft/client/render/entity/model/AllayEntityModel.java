@@ -1,3 +1,27 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.model.Dilation
+ *  net.minecraft.client.model.ModelData
+ *  net.minecraft.client.model.ModelPart
+ *  net.minecraft.client.model.ModelPartBuilder
+ *  net.minecraft.client.model.ModelPartData
+ *  net.minecraft.client.model.ModelTransform
+ *  net.minecraft.client.model.TexturedModelData
+ *  net.minecraft.client.render.RenderLayers
+ *  net.minecraft.client.render.entity.model.AllayEntityModel
+ *  net.minecraft.client.render.entity.model.EntityModel
+ *  net.minecraft.client.render.entity.model.ModelWithArms
+ *  net.minecraft.client.render.entity.state.AllayEntityRenderState
+ *  net.minecraft.client.util.math.MatrixStack
+ *  net.minecraft.util.Arm
+ *  net.minecraft.util.math.MathHelper
+ *  net.minecraft.util.math.RotationAxis
+ *  org.joml.Quaternionfc
+ */
 package net.minecraft.client.render.entity.model;
 
 import net.fabricmc.api.EnvType;
@@ -9,102 +33,106 @@ import net.minecraft.client.model.ModelPartBuilder;
 import net.minecraft.client.model.ModelPartData;
 import net.minecraft.client.model.ModelTransform;
 import net.minecraft.client.model.TexturedModelData;
-import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.RenderLayers;
+import net.minecraft.client.render.entity.model.EntityModel;
+import net.minecraft.client.render.entity.model.ModelWithArms;
 import net.minecraft.client.render.entity.state.AllayEntityRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Arm;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
+import org.joml.Quaternionfc;
 
-@Environment(EnvType.CLIENT)
-public class AllayEntityModel extends EntityModel implements ModelWithArms {
-   private final ModelPart head;
-   private final ModelPart body;
-   private final ModelPart rightArm;
-   private final ModelPart leftArm;
-   private final ModelPart rightWing;
-   private final ModelPart leftWing;
-   private static final float field_38999 = 0.7853982F;
-   private static final float field_39000 = -1.134464F;
-   private static final float field_39001 = -1.0471976F;
+@Environment(value=EnvType.CLIENT)
+public class AllayEntityModel
+extends EntityModel<AllayEntityRenderState>
+implements ModelWithArms<AllayEntityRenderState> {
+    private final ModelPart head;
+    private final ModelPart body;
+    private final ModelPart rightArm;
+    private final ModelPart leftArm;
+    private final ModelPart rightWing;
+    private final ModelPart leftWing;
+    private static final float field_38999 = 0.7853982f;
+    private static final float field_39000 = -1.134464f;
+    private static final float field_39001 = -1.0471976f;
 
-   public AllayEntityModel(ModelPart modelPart) {
-      super(modelPart.getChild("root"), RenderLayer::getEntityTranslucent);
-      this.head = this.root.getChild("head");
-      this.body = this.root.getChild("body");
-      this.rightArm = this.body.getChild("right_arm");
-      this.leftArm = this.body.getChild("left_arm");
-      this.rightWing = this.body.getChild("right_wing");
-      this.leftWing = this.body.getChild("left_wing");
-   }
+    public AllayEntityModel(ModelPart modelPart) {
+        super(modelPart.getChild("root"), RenderLayers::entityTranslucent);
+        this.head = this.root.getChild("head");
+        this.body = this.root.getChild("body");
+        this.rightArm = this.body.getChild("right_arm");
+        this.leftArm = this.body.getChild("left_arm");
+        this.rightWing = this.body.getChild("right_wing");
+        this.leftWing = this.body.getChild("left_wing");
+    }
 
-   public static TexturedModelData getTexturedModelData() {
-      ModelData modelData = new ModelData();
-      ModelPartData modelPartData = modelData.getRoot();
-      ModelPartData modelPartData2 = modelPartData.addChild("root", ModelPartBuilder.create(), ModelTransform.origin(0.0F, 23.5F, 0.0F));
-      modelPartData2.addChild("head", ModelPartBuilder.create().uv(0, 0).cuboid(-2.5F, -5.0F, -2.5F, 5.0F, 5.0F, 5.0F, new Dilation(0.0F)), ModelTransform.origin(0.0F, -3.99F, 0.0F));
-      ModelPartData modelPartData3 = modelPartData2.addChild("body", ModelPartBuilder.create().uv(0, 10).cuboid(-1.5F, 0.0F, -1.0F, 3.0F, 4.0F, 2.0F, new Dilation(0.0F)).uv(0, 16).cuboid(-1.5F, 0.0F, -1.0F, 3.0F, 5.0F, 2.0F, new Dilation(-0.2F)), ModelTransform.origin(0.0F, -4.0F, 0.0F));
-      modelPartData3.addChild("right_arm", ModelPartBuilder.create().uv(23, 0).cuboid(-0.75F, -0.5F, -1.0F, 1.0F, 4.0F, 2.0F, new Dilation(-0.01F)), ModelTransform.origin(-1.75F, 0.5F, 0.0F));
-      modelPartData3.addChild("left_arm", ModelPartBuilder.create().uv(23, 6).cuboid(-0.25F, -0.5F, -1.0F, 1.0F, 4.0F, 2.0F, new Dilation(-0.01F)), ModelTransform.origin(1.75F, 0.5F, 0.0F));
-      modelPartData3.addChild("right_wing", ModelPartBuilder.create().uv(16, 14).cuboid(0.0F, 1.0F, 0.0F, 0.0F, 5.0F, 8.0F, new Dilation(0.0F)), ModelTransform.origin(-0.5F, 0.0F, 0.6F));
-      modelPartData3.addChild("left_wing", ModelPartBuilder.create().uv(16, 14).cuboid(0.0F, 1.0F, 0.0F, 0.0F, 5.0F, 8.0F, new Dilation(0.0F)), ModelTransform.origin(0.5F, 0.0F, 0.6F));
-      return TexturedModelData.of(modelData, 32, 32);
-   }
+    public static TexturedModelData getTexturedModelData() {
+        ModelData modelData = new ModelData();
+        ModelPartData modelPartData = modelData.getRoot();
+        ModelPartData modelPartData2 = modelPartData.addChild("root", ModelPartBuilder.create(), ModelTransform.origin((float)0.0f, (float)23.5f, (float)0.0f));
+        modelPartData2.addChild("head", ModelPartBuilder.create().uv(0, 0).cuboid(-2.5f, -5.0f, -2.5f, 5.0f, 5.0f, 5.0f, new Dilation(0.0f)), ModelTransform.origin((float)0.0f, (float)-3.99f, (float)0.0f));
+        ModelPartData modelPartData3 = modelPartData2.addChild("body", ModelPartBuilder.create().uv(0, 10).cuboid(-1.5f, 0.0f, -1.0f, 3.0f, 4.0f, 2.0f, new Dilation(0.0f)).uv(0, 16).cuboid(-1.5f, 0.0f, -1.0f, 3.0f, 5.0f, 2.0f, new Dilation(-0.2f)), ModelTransform.origin((float)0.0f, (float)-4.0f, (float)0.0f));
+        modelPartData3.addChild("right_arm", ModelPartBuilder.create().uv(23, 0).cuboid(-0.75f, -0.5f, -1.0f, 1.0f, 4.0f, 2.0f, new Dilation(-0.01f)), ModelTransform.origin((float)-1.75f, (float)0.5f, (float)0.0f));
+        modelPartData3.addChild("left_arm", ModelPartBuilder.create().uv(23, 6).cuboid(-0.25f, -0.5f, -1.0f, 1.0f, 4.0f, 2.0f, new Dilation(-0.01f)), ModelTransform.origin((float)1.75f, (float)0.5f, (float)0.0f));
+        modelPartData3.addChild("right_wing", ModelPartBuilder.create().uv(16, 14).cuboid(0.0f, 1.0f, 0.0f, 0.0f, 5.0f, 8.0f, new Dilation(0.0f)), ModelTransform.origin((float)-0.5f, (float)0.0f, (float)0.6f));
+        modelPartData3.addChild("left_wing", ModelPartBuilder.create().uv(16, 14).cuboid(0.0f, 1.0f, 0.0f, 0.0f, 5.0f, 8.0f, new Dilation(0.0f)), ModelTransform.origin((float)0.5f, (float)0.0f, (float)0.6f));
+        return TexturedModelData.of((ModelData)modelData, (int)32, (int)32);
+    }
 
-   public void setAngles(AllayEntityRenderState allayEntityRenderState) {
-      super.setAngles(allayEntityRenderState);
-      float f = allayEntityRenderState.limbSwingAmplitude;
-      float g = allayEntityRenderState.limbSwingAnimationProgress;
-      float h = allayEntityRenderState.age * 20.0F * 0.017453292F + g;
-      float i = MathHelper.cos(h) * 3.1415927F * 0.15F + f;
-      float j = allayEntityRenderState.age * 9.0F * 0.017453292F;
-      float k = Math.min(f / 0.3F, 1.0F);
-      float l = 1.0F - k;
-      float m = allayEntityRenderState.itemHoldAnimationTicks;
-      float n;
-      float o;
-      float p;
-      if (allayEntityRenderState.dancing) {
-         n = allayEntityRenderState.age * 8.0F * 0.017453292F + f;
-         o = MathHelper.cos(n) * 16.0F * 0.017453292F;
-         p = allayEntityRenderState.spinningAnimationTicks;
-         float q = MathHelper.cos(n) * 14.0F * 0.017453292F;
-         float r = MathHelper.cos(n) * 30.0F * 0.017453292F;
-         this.root.yaw = allayEntityRenderState.spinning ? 12.566371F * p : this.root.yaw;
-         this.root.roll = o * (1.0F - p);
-         this.head.yaw = r * (1.0F - p);
-         this.head.roll = q * (1.0F - p);
-      } else {
-         this.head.pitch = allayEntityRenderState.pitch * 0.017453292F;
-         this.head.yaw = allayEntityRenderState.relativeHeadYaw * 0.017453292F;
-      }
+    public void setAngles(AllayEntityRenderState allayEntityRenderState) {
+        float p;
+        float o;
+        float n;
+        super.setAngles((Object)allayEntityRenderState);
+        float f = allayEntityRenderState.limbSwingAmplitude;
+        float g = allayEntityRenderState.limbSwingAnimationProgress;
+        float h = allayEntityRenderState.age * 20.0f * ((float)Math.PI / 180) + g;
+        float i = MathHelper.cos((double)h) * (float)Math.PI * 0.15f + f;
+        float j = allayEntityRenderState.age * 9.0f * ((float)Math.PI / 180);
+        float k = Math.min(f / 0.3f, 1.0f);
+        float l = 1.0f - k;
+        float m = allayEntityRenderState.itemHoldAnimationTicks;
+        if (allayEntityRenderState.dancing) {
+            n = allayEntityRenderState.age * 8.0f * ((float)Math.PI / 180) + f;
+            o = MathHelper.cos((double)n) * 16.0f * ((float)Math.PI / 180);
+            p = allayEntityRenderState.spinningAnimationTicks;
+            float q = MathHelper.cos((double)n) * 14.0f * ((float)Math.PI / 180);
+            float r = MathHelper.cos((double)n) * 30.0f * ((float)Math.PI / 180);
+            this.root.yaw = allayEntityRenderState.spinning ? (float)Math.PI * 4 * p : this.root.yaw;
+            this.root.roll = o * (1.0f - p);
+            this.head.yaw = r * (1.0f - p);
+            this.head.roll = q * (1.0f - p);
+        } else {
+            this.head.pitch = allayEntityRenderState.pitch * ((float)Math.PI / 180);
+            this.head.yaw = allayEntityRenderState.relativeHeadYaw * ((float)Math.PI / 180);
+        }
+        this.rightWing.pitch = 0.43633232f * (1.0f - k);
+        this.rightWing.yaw = -0.7853982f + i;
+        this.leftWing.pitch = 0.43633232f * (1.0f - k);
+        this.leftWing.yaw = 0.7853982f - i;
+        this.body.pitch = k * 0.7853982f;
+        n = m * MathHelper.lerp((float)k, (float)-1.0471976f, (float)-1.134464f);
+        this.root.originY += (float)Math.cos(j) * 0.25f * l;
+        this.rightArm.pitch = n;
+        this.leftArm.pitch = n;
+        o = l * (1.0f - m);
+        p = 0.43633232f - MathHelper.cos((double)(j + 4.712389f)) * (float)Math.PI * 0.075f * o;
+        this.leftArm.roll = -p;
+        this.rightArm.roll = p;
+        this.rightArm.yaw = 0.27925268f * m;
+        this.leftArm.yaw = -0.27925268f * m;
+    }
 
-      this.rightWing.pitch = 0.43633232F * (1.0F - k);
-      this.rightWing.yaw = -0.7853982F + i;
-      this.leftWing.pitch = 0.43633232F * (1.0F - k);
-      this.leftWing.yaw = 0.7853982F - i;
-      this.body.pitch = k * 0.7853982F;
-      n = m * MathHelper.lerp(k, -1.0471976F, -1.134464F);
-      ModelPart var10000 = this.root;
-      var10000.originY += (float)Math.cos((double)j) * 0.25F * l;
-      this.rightArm.pitch = n;
-      this.leftArm.pitch = n;
-      o = l * (1.0F - m);
-      p = 0.43633232F - MathHelper.cos(j + 4.712389F) * 3.1415927F * 0.075F * o;
-      this.leftArm.roll = -p;
-      this.rightArm.roll = p;
-      this.rightArm.yaw = 0.27925268F * m;
-      this.leftArm.yaw = -0.27925268F * m;
-   }
-
-   public void setArmAngle(Arm arm, MatrixStack matrices) {
-      float f = 1.0F;
-      float g = 3.0F;
-      this.root.applyTransform(matrices);
-      this.body.applyTransform(matrices);
-      matrices.translate(0.0F, 0.0625F, 0.1875F);
-      matrices.multiply(RotationAxis.POSITIVE_X.rotation(this.rightArm.pitch));
-      matrices.scale(0.7F, 0.7F, 0.7F);
-      matrices.translate(0.0625F, 0.0F, 0.0F);
-   }
+    public void setArmAngle(AllayEntityRenderState allayEntityRenderState, Arm arm, MatrixStack matrixStack) {
+        float f = 1.0f;
+        float g = 3.0f;
+        this.root.applyTransform(matrixStack);
+        this.body.applyTransform(matrixStack);
+        matrixStack.translate(0.0f, 0.0625f, 0.1875f);
+        matrixStack.multiply((Quaternionfc)RotationAxis.POSITIVE_X.rotation(this.rightArm.pitch));
+        matrixStack.scale(0.7f, 0.7f, 0.7f);
+        matrixStack.translate(0.0625f, 0.0f, 0.0f);
+    }
 }
+

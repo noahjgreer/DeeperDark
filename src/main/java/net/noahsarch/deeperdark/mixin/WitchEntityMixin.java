@@ -6,7 +6,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.raid.RaiderEntity;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.world.World;
@@ -14,6 +13,7 @@ import net.minecraft.entity.SpawnReason;
 import net.minecraft.village.VillagerType;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -31,10 +31,12 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.noahsarch.deeperdark.duck.EntityAccessor;
 
 @Mixin(WitchEntity.class)
 public abstract class WitchEntityMixin extends RaiderEntity implements WitchConversionAccessor {
 
+    // ...existing code...
     protected WitchEntityMixin(EntityType<? extends RaiderEntity> entityType, World world) {
         super(entityType, world);
     }
@@ -77,10 +79,11 @@ public abstract class WitchEntityMixin extends RaiderEntity implements WitchConv
 
     @Inject(method = "tickMovement", at = @At("TAIL"))
     public void tickMovement(CallbackInfo ci) {
-        if (!this.getWorld().isClient && this.isAlive() && this.deeperdark$isConverting()) {
+        World world = ((EntityAccessor)this).deeperdark$getWorld();
+        if (!world.isClient() && this.isAlive() && this.deeperdark$isConverting()) {
             this.conversionTimer--;
             if (this.conversionTimer <= 0) {
-                this.deeperdark$finishConversion((ServerWorld) this.getWorld());
+                this.deeperdark$finishConversion((ServerWorld) world);
             }
         }
     }
@@ -92,12 +95,13 @@ public abstract class WitchEntityMixin extends RaiderEntity implements WitchConv
 
     @Unique
     public void deeperdark$setConverting(@Nullable UUID uuid, int delay) {
+        World world = ((EntityAccessor)this).deeperdark$getWorld();
         this.converter = uuid;
         this.conversionTimer = delay;
         this.converting = true;
         this.removeStatusEffect(StatusEffects.WEAKNESS);
-        this.addStatusEffect(new StatusEffectInstance(StatusEffects.STRENGTH, delay, Math.min(this.getWorld().getDifficulty().getId() - 1, 0)));
-        this.getWorld().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.ENTITY_ZOMBIE_VILLAGER_CURE, this.getSoundCategory(), 1.0F + this.random.nextFloat(), this.random.nextFloat() * 0.7F + 0.3F);
+        this.addStatusEffect(new StatusEffectInstance(StatusEffects.STRENGTH, delay, Math.min(world.getDifficulty().getId() - 1, 0)));
+        world.playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.ENTITY_ZOMBIE_VILLAGER_CURE, this.getSoundCategory(), 1.0F + this.random.nextFloat(), this.random.nextFloat() * 0.7F + 0.3F);
     }
 
     @Unique
@@ -129,7 +133,7 @@ public abstract class WitchEntityMixin extends RaiderEntity implements WitchConv
                 if (!player.getAbilities().creativeMode) {
                     itemStack.decrement(1);
                 }
-                if (!this.getWorld().isClient) {
+                if (!((EntityAccessor)this).deeperdark$getWorld().isClient()) {
                     this.deeperdark$setConverting(player.getUuid(), this.random.nextInt(2401) + 3600);
                 }
                 return ActionResult.SUCCESS;

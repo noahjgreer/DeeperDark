@@ -1,99 +1,68 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.blaze3d.buffers.GpuBuffer
+ *  com.mojang.blaze3d.buffers.GpuBufferSlice
+ *  com.mojang.blaze3d.pipeline.RenderPipeline
+ *  com.mojang.blaze3d.systems.RenderPass
+ *  com.mojang.blaze3d.systems.RenderPass$RenderObject
+ *  com.mojang.blaze3d.textures.GpuTextureView
+ *  com.mojang.blaze3d.vertex.VertexFormat$IndexType
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.gl.GpuSampler
+ *  net.minecraft.util.annotation.DeobfuscateClass
+ *  org.jspecify.annotations.Nullable
+ */
 package com.mojang.blaze3d.systems;
 
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.textures.GpuTextureView;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import java.util.Collection;
-import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.gl.GpuSampler;
 import net.minecraft.util.annotation.DeobfuscateClass;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 @DeobfuscateClass
-public interface RenderPass extends AutoCloseable {
-   void pushDebugGroup(Supplier labelGetter);
+public interface RenderPass
+extends AutoCloseable {
+    public void pushDebugGroup(Supplier<String> var1);
 
-   void popDebugGroup();
+    public void popDebugGroup();
 
-   void setPipeline(RenderPipeline pipeline);
+    public void setPipeline(RenderPipeline var1);
 
-   void bindSampler(String name, @Nullable GpuTextureView texture);
+    public void bindTexture(String var1, @Nullable GpuTextureView var2, @Nullable GpuSampler var3);
 
-   void setUniform(String name, GpuBuffer buffer);
+    public void setUniform(String var1, GpuBuffer var2);
 
-   void setUniform(String name, GpuBufferSlice slice);
+    public void setUniform(String var1, GpuBufferSlice var2);
 
-   void enableScissor(int x, int y, int width, int height);
+    public void enableScissor(int var1, int var2, int var3, int var4);
 
-   void disableScissor();
+    public void disableScissor();
 
-   void setVertexBuffer(int index, GpuBuffer buffer);
+    public void setVertexBuffer(int var1, GpuBuffer var2);
 
-   void setIndexBuffer(GpuBuffer indexBuffer, VertexFormat.IndexType indexType);
+    public void setIndexBuffer(GpuBuffer var1, VertexFormat.IndexType var2);
 
-   void drawIndexed(int baseVertex, int firstIndex, int count, int instanceCount);
+    public void drawIndexed(int var1, int var2, int var3, int var4);
 
-   void drawMultipleIndexed(Collection objects, @Nullable GpuBuffer buffer, @Nullable VertexFormat.IndexType indexType, Collection validationSkippedUniforms, Object object);
+    public <T> void drawMultipleIndexed(Collection<RenderObject<T>> var1, @Nullable GpuBuffer var2, // Could not load outer class - annotation placement on inner may be incorrect
+     @Nullable VertexFormat.IndexType var3, Collection<String> var4, T var5);
 
-   void draw(int offset, int count);
+    public void draw(int var1, int var2);
 
-   void close();
-
-   @Environment(EnvType.CLIENT)
-   public interface UniformUploader {
-      void upload(String name, GpuBufferSlice slice);
-   }
-
-   @Environment(EnvType.CLIENT)
-   public static record RenderObject(int slot, GpuBuffer vertexBuffer, @Nullable GpuBuffer indexBuffer, @Nullable VertexFormat.IndexType indexType, int firstIndex, int indexCount, @Nullable BiConsumer uniformUploaderConsumer) {
-      public RenderObject(int slot, GpuBuffer vertexBuffer, GpuBuffer indexBuffer, VertexFormat.IndexType indexType, int firstIndex, int indexCount) {
-         this(slot, vertexBuffer, indexBuffer, indexType, firstIndex, indexCount, (BiConsumer)null);
-      }
-
-      public RenderObject(int i, GpuBuffer gpuBuffer, @Nullable GpuBuffer gpuBuffer2, @Nullable VertexFormat.IndexType indexType, int j, int k, @Nullable BiConsumer biConsumer) {
-         this.slot = i;
-         this.vertexBuffer = gpuBuffer;
-         this.indexBuffer = gpuBuffer2;
-         this.indexType = indexType;
-         this.firstIndex = j;
-         this.indexCount = k;
-         this.uniformUploaderConsumer = biConsumer;
-      }
-
-      public int slot() {
-         return this.slot;
-      }
-
-      public GpuBuffer vertexBuffer() {
-         return this.vertexBuffer;
-      }
-
-      @Nullable
-      public GpuBuffer indexBuffer() {
-         return this.indexBuffer;
-      }
-
-      @Nullable
-      public VertexFormat.IndexType indexType() {
-         return this.indexType;
-      }
-
-      public int firstIndex() {
-         return this.firstIndex;
-      }
-
-      public int indexCount() {
-         return this.indexCount;
-      }
-
-      @Nullable
-      public BiConsumer uniformUploaderConsumer() {
-         return this.uniformUploaderConsumer;
-      }
-   }
+    @Override
+    public void close();
 }
+

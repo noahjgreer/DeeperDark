@@ -1,3 +1,13 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.block.Block
+ *  net.minecraft.client.data.BlockModelDefinitionCreator
+ *  net.minecraft.client.render.model.json.BlockModelDefinition
+ */
 package net.minecraft.client.data;
 
 import net.fabricmc.api.EnvType;
@@ -5,9 +15,10 @@ import net.fabricmc.api.Environment;
 import net.minecraft.block.Block;
 import net.minecraft.client.render.model.json.BlockModelDefinition;
 
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 public interface BlockModelDefinitionCreator {
-   Block getBlock();
+    public Block getBlock();
 
-   BlockModelDefinition createBlockModelDefinition();
+    public BlockModelDefinition createBlockModelDefinition();
 }
+

@@ -1,28 +1,52 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.block.enums.SlabType
+ *  net.minecraft.util.StringIdentifiable
+ */
 package net.minecraft.block.enums;
 
 import net.minecraft.util.StringIdentifiable;
 
-public enum SlabType implements StringIdentifiable {
-   TOP("top"),
-   BOTTOM("bottom"),
-   DOUBLE("double");
+/*
+ * Exception performing whole class analysis ignored.
+ */
+public final class SlabType
+extends Enum<SlabType>
+implements StringIdentifiable {
+    public static final /* enum */ SlabType TOP = new SlabType("TOP", 0, "top");
+    public static final /* enum */ SlabType BOTTOM = new SlabType("BOTTOM", 1, "bottom");
+    public static final /* enum */ SlabType DOUBLE = new SlabType("DOUBLE", 2, "double");
+    private final String name;
+    private static final /* synthetic */ SlabType[] field_12680;
 
-   private final String name;
+    public static SlabType[] values() {
+        return (SlabType[])field_12680.clone();
+    }
 
-   private SlabType(final String name) {
-      this.name = name;
-   }
+    public static SlabType valueOf(String string) {
+        return Enum.valueOf(SlabType.class, string);
+    }
 
-   public String toString() {
-      return this.name;
-   }
+    private SlabType(String name) {
+        this.name = name;
+    }
 
-   public String asString() {
-      return this.name;
-   }
+    public String toString() {
+        return this.name;
+    }
 
-   // $FF: synthetic method
-   private static SlabType[] method_36735() {
-      return new SlabType[]{TOP, BOTTOM, DOUBLE};
-   }
+    public String asString() {
+        return this.name;
+    }
+
+    private static /* synthetic */ SlabType[] method_36735() {
+        return new SlabType[]{TOP, BOTTOM, DOUBLE};
+    }
+
+    static {
+        field_12680 = SlabType.method_36735();
+    }
 }
+

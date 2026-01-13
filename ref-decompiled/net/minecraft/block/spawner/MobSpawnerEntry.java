@@ -1,112 +1,94 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
+ *  net.minecraft.block.spawner.MobSpawnerEntry
+ *  net.minecraft.block.spawner.MobSpawnerEntry$CustomSpawnRules
+ *  net.minecraft.entity.EquipmentTable
+ *  net.minecraft.nbt.NbtCompound
+ *  net.minecraft.util.Identifier
+ *  net.minecraft.util.collection.Pool
+ */
 package net.minecraft.block.spawner;
 
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
-import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import java.lang.invoke.MethodHandle;
+import java.lang.runtime.ObjectMethods;
 import java.util.Optional;
+import net.minecraft.block.spawner.MobSpawnerEntry;
 import net.minecraft.entity.EquipmentTable;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.Pool;
-import net.minecraft.util.dynamic.Range;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.LightType;
 
-public record MobSpawnerEntry(NbtCompound entity, Optional customSpawnRules, Optional equipment) {
-   public static final String ENTITY_KEY = "entity";
-   public static final Codec CODEC = RecordCodecBuilder.create((instance) -> {
-      return instance.group(NbtCompound.CODEC.fieldOf("entity").forGetter((entry) -> {
-         return entry.entity;
-      }), MobSpawnerEntry.CustomSpawnRules.CODEC.optionalFieldOf("custom_spawn_rules").forGetter((entry) -> {
-         return entry.customSpawnRules;
-      }), EquipmentTable.CODEC.optionalFieldOf("equipment").forGetter((entry) -> {
-         return entry.equipment;
-      })).apply(instance, MobSpawnerEntry::new);
-   });
-   public static final Codec DATA_POOL_CODEC;
+public record MobSpawnerEntry(NbtCompound entity, Optional<CustomSpawnRules> customSpawnRules, Optional<EquipmentTable> equipment) {
+    private final NbtCompound entity;
+    private final Optional<CustomSpawnRules> customSpawnRules;
+    private final Optional<EquipmentTable> equipment;
+    public static final String ENTITY_KEY = "entity";
+    public static final Codec<MobSpawnerEntry> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)NbtCompound.CODEC.fieldOf(ENTITY_KEY).forGetter(entry -> entry.entity), (App)CustomSpawnRules.CODEC.optionalFieldOf("custom_spawn_rules").forGetter(entry -> entry.customSpawnRules), (App)EquipmentTable.CODEC.optionalFieldOf("equipment").forGetter(entry -> entry.equipment)).apply((Applicative)instance, MobSpawnerEntry::new));
+    public static final Codec<Pool<MobSpawnerEntry>> DATA_POOL_CODEC = Pool.createCodec((Codec)CODEC);
 
-   public MobSpawnerEntry() {
-      this(new NbtCompound(), Optional.empty(), Optional.empty());
-   }
+    public MobSpawnerEntry() {
+        this(new NbtCompound(), Optional.empty(), Optional.empty());
+    }
 
-   public MobSpawnerEntry(NbtCompound nbtCompound, Optional optional, Optional optional2) {
-      Optional optional3 = nbtCompound.get("id", Identifier.CODEC);
-      if (optional3.isPresent()) {
-         nbtCompound.put("id", Identifier.CODEC, (Identifier)optional3.get());
-      } else {
-         nbtCompound.remove("id");
-      }
+    public MobSpawnerEntry(NbtCompound entity, Optional<CustomSpawnRules> customSpawnRules, Optional<EquipmentTable> equipment) {
+        Optional optional = entity.get("id", Identifier.CODEC);
+        if (optional.isPresent()) {
+            entity.put("id", Identifier.CODEC, (Object)((Identifier)optional.get()));
+        } else {
+            entity.remove("id");
+        }
+        this.entity = entity;
+        this.customSpawnRules = customSpawnRules;
+        this.equipment = equipment;
+    }
 
-      this.entity = nbtCompound;
-      this.customSpawnRules = optional;
-      this.equipment = optional2;
-   }
+    public NbtCompound getNbt() {
+        return this.entity;
+    }
 
-   public NbtCompound getNbt() {
-      return this.entity;
-   }
+    public Optional<CustomSpawnRules> getCustomSpawnRules() {
+        return this.customSpawnRules;
+    }
 
-   public Optional getCustomSpawnRules() {
-      return this.customSpawnRules;
-   }
+    public Optional<EquipmentTable> getEquipment() {
+        return this.equipment;
+    }
 
-   public Optional getEquipment() {
-      return this.equipment;
-   }
+    @Override
+    public final String toString() {
+        return ObjectMethods.bootstrap("toString", new MethodHandle[]{MobSpawnerEntry.class, "entityToSpawn;customSpawnRules;equipment", "entity", "customSpawnRules", "equipment"}, this);
+    }
 
-   public NbtCompound entity() {
-      return this.entity;
-   }
+    @Override
+    public final int hashCode() {
+        return (int)ObjectMethods.bootstrap("hashCode", new MethodHandle[]{MobSpawnerEntry.class, "entityToSpawn;customSpawnRules;equipment", "entity", "customSpawnRules", "equipment"}, this);
+    }
 
-   public Optional customSpawnRules() {
-      return this.customSpawnRules;
-   }
+    @Override
+    public final boolean equals(Object o) {
+        return (boolean)ObjectMethods.bootstrap("equals", new MethodHandle[]{MobSpawnerEntry.class, "entityToSpawn;customSpawnRules;equipment", "entity", "customSpawnRules", "equipment"}, this, o);
+    }
 
-   public Optional equipment() {
-      return this.equipment;
-   }
+    public NbtCompound entity() {
+        return this.entity;
+    }
 
-   static {
-      DATA_POOL_CODEC = Pool.createCodec(CODEC);
-   }
+    public Optional<CustomSpawnRules> customSpawnRules() {
+        return this.customSpawnRules;
+    }
 
-   public static record CustomSpawnRules(Range blockLightLimit, Range skyLightLimit) {
-      private static final Range DEFAULT = new Range(0, 15);
-      public static final Codec CODEC = RecordCodecBuilder.create((instance) -> {
-         return instance.group(createLightLimitCodec("block_light_limit").forGetter((rules) -> {
-            return rules.blockLightLimit;
-         }), createLightLimitCodec("sky_light_limit").forGetter((rules) -> {
-            return rules.skyLightLimit;
-         })).apply(instance, CustomSpawnRules::new);
-      });
-
-      public CustomSpawnRules(Range range, Range range2) {
-         this.blockLightLimit = range;
-         this.skyLightLimit = range2;
-      }
-
-      private static DataResult validate(Range provider) {
-         return !DEFAULT.contains(provider) ? DataResult.error(() -> {
-            return "Light values must be withing range " + String.valueOf(DEFAULT);
-         }) : DataResult.success(provider);
-      }
-
-      private static MapCodec createLightLimitCodec(String name) {
-         return Range.CODEC.lenientOptionalFieldOf(name, DEFAULT).validate(CustomSpawnRules::validate);
-      }
-
-      public boolean canSpawn(BlockPos pos, ServerWorld world) {
-         return this.blockLightLimit.contains((Comparable)world.getLightLevel(LightType.BLOCK, pos)) && this.skyLightLimit.contains((Comparable)world.getLightLevel(LightType.SKY, pos));
-      }
-
-      public Range blockLightLimit() {
-         return this.blockLightLimit;
-      }
-
-      public Range skyLightLimit() {
-         return this.skyLightLimit;
-      }
-   }
+    public Optional<EquipmentTable> equipment() {
+        return this.equipment;
+    }
 }
+

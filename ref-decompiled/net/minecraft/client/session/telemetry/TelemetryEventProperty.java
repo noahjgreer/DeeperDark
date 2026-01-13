@@ -1,232 +1,161 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.authlib.minecraft.TelemetryPropertyContainer
+ *  com.mojang.serialization.Codec
+ *  it.unimi.dsi.fastutil.longs.LongArrayList
+ *  it.unimi.dsi.fastutil.longs.LongList
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.session.telemetry.GameLoadTimeEvent$Measurement
+ *  net.minecraft.client.session.telemetry.PropertyMap
+ *  net.minecraft.client.session.telemetry.TelemetryEventProperty
+ *  net.minecraft.client.session.telemetry.TelemetryEventProperty$GameMode
+ *  net.minecraft.client.session.telemetry.TelemetryEventProperty$PropertyExporter
+ *  net.minecraft.client.session.telemetry.TelemetryEventProperty$ServerType
+ *  net.minecraft.text.MutableText
+ *  net.minecraft.text.Text
+ *  net.minecraft.util.Uuids
+ *  net.minecraft.util.dynamic.Codecs
+ */
 package net.minecraft.client.session.telemetry;
 
 import com.mojang.authlib.minecraft.TelemetryPropertyContainer;
 import com.mojang.serialization.Codec;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
+import it.unimi.dsi.fastutil.longs.LongList;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.session.telemetry.GameLoadTimeEvent;
+import net.minecraft.client.session.telemetry.PropertyMap;
+import net.minecraft.client.session.telemetry.TelemetryEventProperty;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.Uuids;
 import net.minecraft.util.dynamic.Codecs;
 
-@Environment(EnvType.CLIENT)
-public record TelemetryEventProperty(String id, String exportKey, Codec codec, PropertyExporter exporter) {
-   private static final DateTimeFormatter DATE_TIME_FORMATTER;
-   public static final TelemetryEventProperty USER_ID;
-   public static final TelemetryEventProperty CLIENT_ID;
-   public static final TelemetryEventProperty MINECRAFT_SESSION_ID;
-   public static final TelemetryEventProperty GAME_VERSION;
-   public static final TelemetryEventProperty OPERATING_SYSTEM;
-   public static final TelemetryEventProperty PLATFORM;
-   public static final TelemetryEventProperty CLIENT_MODDED;
-   public static final TelemetryEventProperty LAUNCHER_NAME;
-   public static final TelemetryEventProperty WORLD_SESSION_ID;
-   public static final TelemetryEventProperty SERVER_MODDED;
-   public static final TelemetryEventProperty SERVER_TYPE;
-   public static final TelemetryEventProperty OPT_IN;
-   public static final TelemetryEventProperty EVENT_TIMESTAMP_UTC;
-   public static final TelemetryEventProperty GAME_MODE;
-   public static final TelemetryEventProperty REALMS_MAP_CONTENT;
-   public static final TelemetryEventProperty SECONDS_SINCE_LOAD;
-   public static final TelemetryEventProperty TICKS_SINCE_LOAD;
-   public static final TelemetryEventProperty FRAME_RATE_SAMPLES;
-   public static final TelemetryEventProperty RENDER_TIME_SAMPLES;
-   public static final TelemetryEventProperty USED_MEMORY_SAMPLES;
-   public static final TelemetryEventProperty NUMBER_OF_SAMPLES;
-   public static final TelemetryEventProperty RENDER_DISTANCE;
-   public static final TelemetryEventProperty DEDICATED_MEMORY_KB;
-   public static final TelemetryEventProperty WORLD_LOAD_TIME_MS;
-   public static final TelemetryEventProperty NEW_WORLD;
-   public static final TelemetryEventProperty LOAD_TIME_TOTAL_TIME_MS;
-   public static final TelemetryEventProperty LOAD_TIME_PRE_WINDOW_MS;
-   public static final TelemetryEventProperty LOAD_TIME_BOOTSTRAP_MS;
-   public static final TelemetryEventProperty LOAD_TIME_LOADING_OVERLAY_MS;
-   public static final TelemetryEventProperty ADVANCEMENT_ID;
-   public static final TelemetryEventProperty ADVANCEMENT_GAME_TIME;
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
+public record TelemetryEventProperty<T>(String id, String exportKey, Codec<T> codec, PropertyExporter<T> exporter) {
+    private final String id;
+    private final String exportKey;
+    private final Codec<T> codec;
+    private final PropertyExporter<T> exporter;
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ISO_OFFSET_DATE_TIME.withZone(ZoneId.from(ZoneOffset.UTC));
+    public static final TelemetryEventProperty<String> USER_ID = TelemetryEventProperty.ofString((String)"user_id", (String)"userId");
+    public static final TelemetryEventProperty<String> CLIENT_ID = TelemetryEventProperty.ofString((String)"client_id", (String)"clientId");
+    public static final TelemetryEventProperty<UUID> MINECRAFT_SESSION_ID = TelemetryEventProperty.ofUuid((String)"minecraft_session_id", (String)"deviceSessionId");
+    public static final TelemetryEventProperty<String> GAME_VERSION = TelemetryEventProperty.ofString((String)"game_version", (String)"buildDisplayName");
+    public static final TelemetryEventProperty<String> OPERATING_SYSTEM = TelemetryEventProperty.ofString((String)"operating_system", (String)"buildPlatform");
+    public static final TelemetryEventProperty<String> PLATFORM = TelemetryEventProperty.ofString((String)"platform", (String)"platform");
+    public static final TelemetryEventProperty<Boolean> CLIENT_MODDED = TelemetryEventProperty.ofBoolean((String)"client_modded", (String)"clientModded");
+    public static final TelemetryEventProperty<String> LAUNCHER_NAME = TelemetryEventProperty.ofString((String)"launcher_name", (String)"launcherName");
+    public static final TelemetryEventProperty<UUID> WORLD_SESSION_ID = TelemetryEventProperty.ofUuid((String)"world_session_id", (String)"worldSessionId");
+    public static final TelemetryEventProperty<Boolean> SERVER_MODDED = TelemetryEventProperty.ofBoolean((String)"server_modded", (String)"serverModded");
+    public static final TelemetryEventProperty<ServerType> SERVER_TYPE = TelemetryEventProperty.of((String)"server_type", (String)"serverType", (Codec)ServerType.CODEC, (container, exportKey, value) -> container.addProperty(exportKey, value.asString()));
+    public static final TelemetryEventProperty<Boolean> OPT_IN = TelemetryEventProperty.ofBoolean((String)"opt_in", (String)"isOptional");
+    public static final TelemetryEventProperty<Instant> EVENT_TIMESTAMP_UTC = TelemetryEventProperty.of((String)"event_timestamp_utc", (String)"eventTimestampUtc", (Codec)Codecs.INSTANT, (container, exportKey, value) -> container.addProperty(exportKey, DATE_TIME_FORMATTER.format((TemporalAccessor)value)));
+    public static final TelemetryEventProperty<GameMode> GAME_MODE = TelemetryEventProperty.of((String)"game_mode", (String)"playerGameMode", (Codec)GameMode.CODEC, (container, exportKey, value) -> container.addProperty(exportKey, value.getRawId()));
+    public static final TelemetryEventProperty<String> REALMS_MAP_CONTENT = TelemetryEventProperty.ofString((String)"realms_map_content", (String)"realmsMapContent");
+    public static final TelemetryEventProperty<Integer> SECONDS_SINCE_LOAD = TelemetryEventProperty.ofInteger((String)"seconds_since_load", (String)"secondsSinceLoad");
+    public static final TelemetryEventProperty<Integer> TICKS_SINCE_LOAD = TelemetryEventProperty.ofInteger((String)"ticks_since_load", (String)"ticksSinceLoad");
+    public static final TelemetryEventProperty<LongList> FRAME_RATE_SAMPLES = TelemetryEventProperty.ofLongList((String)"frame_rate_samples", (String)"serializedFpsSamples");
+    public static final TelemetryEventProperty<LongList> RENDER_TIME_SAMPLES = TelemetryEventProperty.ofLongList((String)"render_time_samples", (String)"serializedRenderTimeSamples");
+    public static final TelemetryEventProperty<LongList> USED_MEMORY_SAMPLES = TelemetryEventProperty.ofLongList((String)"used_memory_samples", (String)"serializedUsedMemoryKbSamples");
+    public static final TelemetryEventProperty<Integer> NUMBER_OF_SAMPLES = TelemetryEventProperty.ofInteger((String)"number_of_samples", (String)"numSamples");
+    public static final TelemetryEventProperty<Integer> RENDER_DISTANCE = TelemetryEventProperty.ofInteger((String)"render_distance", (String)"renderDistance");
+    public static final TelemetryEventProperty<Integer> DEDICATED_MEMORY_KB = TelemetryEventProperty.ofInteger((String)"dedicated_memory_kb", (String)"dedicatedMemoryKb");
+    public static final TelemetryEventProperty<Integer> WORLD_LOAD_TIME_MS = TelemetryEventProperty.ofInteger((String)"world_load_time_ms", (String)"worldLoadTimeMs");
+    public static final TelemetryEventProperty<Boolean> NEW_WORLD = TelemetryEventProperty.ofBoolean((String)"new_world", (String)"newWorld");
+    public static final TelemetryEventProperty<GameLoadTimeEvent.Measurement> LOAD_TIME_TOTAL_TIME_MS = TelemetryEventProperty.ofTimeMeasurement((String)"load_time_total_time_ms", (String)"loadTimeTotalTimeMs");
+    public static final TelemetryEventProperty<GameLoadTimeEvent.Measurement> LOAD_TIME_PRE_WINDOW_MS = TelemetryEventProperty.ofTimeMeasurement((String)"load_time_pre_window_ms", (String)"loadTimePreWindowMs");
+    public static final TelemetryEventProperty<GameLoadTimeEvent.Measurement> LOAD_TIME_BOOTSTRAP_MS = TelemetryEventProperty.ofTimeMeasurement((String)"load_time_bootstrap_ms", (String)"loadTimeBootstrapMs");
+    public static final TelemetryEventProperty<GameLoadTimeEvent.Measurement> LOAD_TIME_LOADING_OVERLAY_MS = TelemetryEventProperty.ofTimeMeasurement((String)"load_time_loading_overlay_ms", (String)"loadTimeLoadingOverlayMs");
+    public static final TelemetryEventProperty<String> ADVANCEMENT_ID = TelemetryEventProperty.ofString((String)"advancement_id", (String)"advancementId");
+    public static final TelemetryEventProperty<Long> ADVANCEMENT_GAME_TIME = TelemetryEventProperty.ofLong((String)"advancement_game_time", (String)"advancementGameTime");
 
-   public TelemetryEventProperty(String string, String string2, Codec codec, PropertyExporter propertyExporter) {
-      this.id = string;
-      this.exportKey = string2;
-      this.codec = codec;
-      this.exporter = propertyExporter;
-   }
+    public TelemetryEventProperty(String id, String exportKey, Codec<T> codec, PropertyExporter<T> exporter) {
+        this.id = id;
+        this.exportKey = exportKey;
+        this.codec = codec;
+        this.exporter = exporter;
+    }
 
-   public static TelemetryEventProperty of(String id, String exportKey, Codec codec, PropertyExporter exporter) {
-      return new TelemetryEventProperty(id, exportKey, codec, exporter);
-   }
+    public static <T> TelemetryEventProperty<T> of(String id, String exportKey, Codec<T> codec, PropertyExporter<T> exporter) {
+        return new TelemetryEventProperty(id, exportKey, codec, exporter);
+    }
 
-   public static TelemetryEventProperty ofBoolean(String id, String exportKey) {
-      return of(id, exportKey, Codec.BOOL, TelemetryPropertyContainer::addProperty);
-   }
+    public static TelemetryEventProperty<Boolean> ofBoolean(String id, String exportKey) {
+        return TelemetryEventProperty.of((String)id, (String)exportKey, (Codec)Codec.BOOL, TelemetryPropertyContainer::addProperty);
+    }
 
-   public static TelemetryEventProperty ofString(String id, String exportKey) {
-      return of(id, exportKey, Codec.STRING, TelemetryPropertyContainer::addProperty);
-   }
+    public static TelemetryEventProperty<String> ofString(String id, String exportKey) {
+        return TelemetryEventProperty.of((String)id, (String)exportKey, (Codec)Codec.STRING, TelemetryPropertyContainer::addProperty);
+    }
 
-   public static TelemetryEventProperty ofInteger(String id, String exportKey) {
-      return of(id, exportKey, Codec.INT, TelemetryPropertyContainer::addProperty);
-   }
+    public static TelemetryEventProperty<Integer> ofInteger(String id, String exportKey) {
+        return TelemetryEventProperty.of((String)id, (String)exportKey, (Codec)Codec.INT, TelemetryPropertyContainer::addProperty);
+    }
 
-   public static TelemetryEventProperty ofLong(String id, String exportKey) {
-      return of(id, exportKey, Codec.LONG, TelemetryPropertyContainer::addProperty);
-   }
+    public static TelemetryEventProperty<Long> ofLong(String id, String exportKey) {
+        return TelemetryEventProperty.of((String)id, (String)exportKey, (Codec)Codec.LONG, TelemetryPropertyContainer::addProperty);
+    }
 
-   public static TelemetryEventProperty ofUuid(String id, String exportKey) {
-      return of(id, exportKey, Uuids.STRING_CODEC, (container, key, value) -> {
-         container.addProperty(key, value.toString());
-      });
-   }
+    public static TelemetryEventProperty<UUID> ofUuid(String id, String exportKey) {
+        return TelemetryEventProperty.of((String)id, (String)exportKey, (Codec)Uuids.STRING_CODEC, (container, key, value) -> container.addProperty(key, value.toString()));
+    }
 
-   public static TelemetryEventProperty ofTimeMeasurement(String id, String exportKey) {
-      return of(id, exportKey, GameLoadTimeEvent.Measurement.CODEC, (container, key, value) -> {
-         container.addProperty(key, value.millis());
-      });
-   }
+    public static TelemetryEventProperty<GameLoadTimeEvent.Measurement> ofTimeMeasurement(String id, String exportKey) {
+        return TelemetryEventProperty.of((String)id, (String)exportKey, (Codec)GameLoadTimeEvent.Measurement.CODEC, (container, key, value) -> container.addProperty(key, value.millis()));
+    }
 
-   public static TelemetryEventProperty ofLongList(String id, String exportKey) {
-      return of(id, exportKey, Codec.LONG.listOf().xmap(LongArrayList::new, Function.identity()), (container, key, value) -> {
-         container.addProperty(key, (String)value.longStream().mapToObj(String::valueOf).collect(Collectors.joining(";")));
-      });
-   }
+    public static TelemetryEventProperty<LongList> ofLongList(String id, String exportKey) {
+        return TelemetryEventProperty.of((String)id, (String)exportKey, (Codec)Codec.LONG.listOf().xmap(LongArrayList::new, Function.identity()), (container, key, value) -> container.addProperty(key, value.longStream().mapToObj(String::valueOf).collect(Collectors.joining(";"))));
+    }
 
-   public void addTo(PropertyMap map, TelemetryPropertyContainer container) {
-      Object object = map.get(this);
-      if (object != null) {
-         this.exporter.apply(container, this.exportKey, object);
-      } else {
-         container.addNullProperty(this.exportKey);
-      }
+    public void addTo(PropertyMap map, TelemetryPropertyContainer container) {
+        Object object = map.get(this);
+        if (object != null) {
+            this.exporter.apply(container, this.exportKey, object);
+        } else {
+            container.addNullProperty(this.exportKey);
+        }
+    }
 
-   }
+    public MutableText getTitle() {
+        return Text.translatable((String)("telemetry.property." + this.id + ".title"));
+    }
 
-   public MutableText getTitle() {
-      return Text.translatable("telemetry.property." + this.id + ".title");
-   }
+    @Override
+    public String toString() {
+        return "TelemetryProperty[" + this.id + "]";
+    }
 
-   public String toString() {
-      return "TelemetryProperty[" + this.id + "]";
-   }
+    public String id() {
+        return this.id;
+    }
 
-   public String id() {
-      return this.id;
-   }
+    public String exportKey() {
+        return this.exportKey;
+    }
 
-   public String exportKey() {
-      return this.exportKey;
-   }
+    public Codec<T> codec() {
+        return this.codec;
+    }
 
-   public Codec codec() {
-      return this.codec;
-   }
-
-   public PropertyExporter exporter() {
-      return this.exporter;
-   }
-
-   static {
-      DATE_TIME_FORMATTER = DateTimeFormatter.ISO_OFFSET_DATE_TIME.withZone(ZoneId.from(ZoneOffset.UTC));
-      USER_ID = ofString("user_id", "userId");
-      CLIENT_ID = ofString("client_id", "clientId");
-      MINECRAFT_SESSION_ID = ofUuid("minecraft_session_id", "deviceSessionId");
-      GAME_VERSION = ofString("game_version", "buildDisplayName");
-      OPERATING_SYSTEM = ofString("operating_system", "buildPlatform");
-      PLATFORM = ofString("platform", "platform");
-      CLIENT_MODDED = ofBoolean("client_modded", "clientModded");
-      LAUNCHER_NAME = ofString("launcher_name", "launcherName");
-      WORLD_SESSION_ID = ofUuid("world_session_id", "worldSessionId");
-      SERVER_MODDED = ofBoolean("server_modded", "serverModded");
-      SERVER_TYPE = of("server_type", "serverType", TelemetryEventProperty.ServerType.CODEC, (container, exportKey, value) -> {
-         container.addProperty(exportKey, value.asString());
-      });
-      OPT_IN = ofBoolean("opt_in", "isOptional");
-      EVENT_TIMESTAMP_UTC = of("event_timestamp_utc", "eventTimestampUtc", Codecs.INSTANT, (container, exportKey, value) -> {
-         container.addProperty(exportKey, DATE_TIME_FORMATTER.format(value));
-      });
-      GAME_MODE = of("game_mode", "playerGameMode", TelemetryEventProperty.GameMode.CODEC, (container, exportKey, value) -> {
-         container.addProperty(exportKey, value.getRawId());
-      });
-      REALMS_MAP_CONTENT = ofString("realms_map_content", "realmsMapContent");
-      SECONDS_SINCE_LOAD = ofInteger("seconds_since_load", "secondsSinceLoad");
-      TICKS_SINCE_LOAD = ofInteger("ticks_since_load", "ticksSinceLoad");
-      FRAME_RATE_SAMPLES = ofLongList("frame_rate_samples", "serializedFpsSamples");
-      RENDER_TIME_SAMPLES = ofLongList("render_time_samples", "serializedRenderTimeSamples");
-      USED_MEMORY_SAMPLES = ofLongList("used_memory_samples", "serializedUsedMemoryKbSamples");
-      NUMBER_OF_SAMPLES = ofInteger("number_of_samples", "numSamples");
-      RENDER_DISTANCE = ofInteger("render_distance", "renderDistance");
-      DEDICATED_MEMORY_KB = ofInteger("dedicated_memory_kb", "dedicatedMemoryKb");
-      WORLD_LOAD_TIME_MS = ofInteger("world_load_time_ms", "worldLoadTimeMs");
-      NEW_WORLD = ofBoolean("new_world", "newWorld");
-      LOAD_TIME_TOTAL_TIME_MS = ofTimeMeasurement("load_time_total_time_ms", "loadTimeTotalTimeMs");
-      LOAD_TIME_PRE_WINDOW_MS = ofTimeMeasurement("load_time_pre_window_ms", "loadTimePreWindowMs");
-      LOAD_TIME_BOOTSTRAP_MS = ofTimeMeasurement("load_time_bootstrap_ms", "loadTimeBootstrapMs");
-      LOAD_TIME_LOADING_OVERLAY_MS = ofTimeMeasurement("load_time_loading_overlay_ms", "loadTimeLoadingOverlayMs");
-      ADVANCEMENT_ID = ofString("advancement_id", "advancementId");
-      ADVANCEMENT_GAME_TIME = ofLong("advancement_game_time", "advancementGameTime");
-   }
-
-   @Environment(EnvType.CLIENT)
-   public interface PropertyExporter {
-      void apply(TelemetryPropertyContainer container, String key, Object value);
-   }
-
-   @Environment(EnvType.CLIENT)
-   public static enum GameMode implements StringIdentifiable {
-      SURVIVAL("survival", 0),
-      CREATIVE("creative", 1),
-      ADVENTURE("adventure", 2),
-      SPECTATOR("spectator", 6),
-      HARDCORE("hardcore", 99);
-
-      public static final Codec CODEC = StringIdentifiable.createCodec(GameMode::values);
-      private final String id;
-      private final int rawId;
-
-      private GameMode(final String id, final int rawId) {
-         this.id = id;
-         this.rawId = rawId;
-      }
-
-      public int getRawId() {
-         return this.rawId;
-      }
-
-      public String asString() {
-         return this.id;
-      }
-
-      // $FF: synthetic method
-      private static GameMode[] method_47757() {
-         return new GameMode[]{SURVIVAL, CREATIVE, ADVENTURE, SPECTATOR, HARDCORE};
-      }
-   }
-
-   @Environment(EnvType.CLIENT)
-   public static enum ServerType implements StringIdentifiable {
-      REALM("realm"),
-      LOCAL("local"),
-      OTHER("server");
-
-      public static final Codec CODEC = StringIdentifiable.createCodec(ServerType::values);
-      private final String id;
-
-      private ServerType(final String id) {
-         this.id = id;
-      }
-
-      public String asString() {
-         return this.id;
-      }
-
-      // $FF: synthetic method
-      private static ServerType[] method_47758() {
-         return new ServerType[]{REALM, LOCAL, OTHER};
-      }
-   }
+    public PropertyExporter<T> exporter() {
+        return this.exporter;
+    }
 }
+

@@ -1,55 +1,76 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.render.OverlayTexture
+ *  net.minecraft.client.render.command.OrderedRenderCommandQueue
+ *  net.minecraft.client.render.entity.feature.FeatureRenderer
+ *  net.minecraft.client.render.entity.feature.FeatureRendererContext
+ *  net.minecraft.client.render.entity.feature.FoxHeldItemFeatureRenderer
+ *  net.minecraft.client.render.entity.model.FoxEntityModel
+ *  net.minecraft.client.render.entity.state.FoxEntityRenderState
+ *  net.minecraft.client.render.item.ItemRenderState
+ *  net.minecraft.client.util.math.MatrixStack
+ *  net.minecraft.util.math.RotationAxis
+ *  org.joml.Quaternionfc
+ */
 package net.minecraft.client.render.entity.feature;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
+import net.minecraft.client.render.entity.feature.FeatureRenderer;
+import net.minecraft.client.render.entity.feature.FeatureRendererContext;
 import net.minecraft.client.render.entity.model.FoxEntityModel;
 import net.minecraft.client.render.entity.state.FoxEntityRenderState;
 import net.minecraft.client.render.item.ItemRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.RotationAxis;
+import org.joml.Quaternionfc;
 
-@Environment(EnvType.CLIENT)
-public class FoxHeldItemFeatureRenderer extends FeatureRenderer {
-   public FoxHeldItemFeatureRenderer(FeatureRendererContext featureRendererContext) {
-      super(featureRendererContext);
-   }
+@Environment(value=EnvType.CLIENT)
+public class FoxHeldItemFeatureRenderer
+extends FeatureRenderer<FoxEntityRenderState, FoxEntityModel> {
+    public FoxHeldItemFeatureRenderer(FeatureRendererContext<FoxEntityRenderState, FoxEntityModel> featureRendererContext) {
+        super(featureRendererContext);
+    }
 
-   public void render(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, FoxEntityRenderState foxEntityRenderState, float f, float g) {
-      ItemRenderState itemRenderState = foxEntityRenderState.itemRenderState;
-      if (!itemRenderState.isEmpty()) {
-         boolean bl = foxEntityRenderState.sleeping;
-         boolean bl2 = foxEntityRenderState.baby;
-         matrixStack.push();
-         matrixStack.translate(((FoxEntityModel)this.getContextModel()).head.originX / 16.0F, ((FoxEntityModel)this.getContextModel()).head.originY / 16.0F, ((FoxEntityModel)this.getContextModel()).head.originZ / 16.0F);
-         if (bl2) {
-            float h = 0.75F;
-            matrixStack.scale(0.75F, 0.75F, 0.75F);
-         }
-
-         matrixStack.multiply(RotationAxis.POSITIVE_Z.rotation(foxEntityRenderState.headRoll));
-         matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(f));
-         matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(g));
-         if (foxEntityRenderState.baby) {
+    public void render(MatrixStack matrixStack, OrderedRenderCommandQueue orderedRenderCommandQueue, int i, FoxEntityRenderState foxEntityRenderState, float f, float g) {
+        ItemRenderState itemRenderState = foxEntityRenderState.itemRenderState;
+        if (itemRenderState.isEmpty()) {
+            return;
+        }
+        boolean bl = foxEntityRenderState.sleeping;
+        boolean bl2 = foxEntityRenderState.baby;
+        matrixStack.push();
+        matrixStack.translate(((FoxEntityModel)this.getContextModel()).head.originX / 16.0f, ((FoxEntityModel)this.getContextModel()).head.originY / 16.0f, ((FoxEntityModel)this.getContextModel()).head.originZ / 16.0f);
+        if (bl2) {
+            float h = 0.75f;
+            matrixStack.scale(0.75f, 0.75f, 0.75f);
+        }
+        matrixStack.multiply((Quaternionfc)RotationAxis.POSITIVE_Z.rotation(foxEntityRenderState.headRoll));
+        matrixStack.multiply((Quaternionfc)RotationAxis.POSITIVE_Y.rotationDegrees(f));
+        matrixStack.multiply((Quaternionfc)RotationAxis.POSITIVE_X.rotationDegrees(g));
+        if (foxEntityRenderState.baby) {
             if (bl) {
-               matrixStack.translate(0.4F, 0.26F, 0.15F);
+                matrixStack.translate(0.4f, 0.26f, 0.15f);
             } else {
-               matrixStack.translate(0.06F, 0.26F, -0.5F);
+                matrixStack.translate(0.06f, 0.26f, -0.5f);
             }
-         } else if (bl) {
-            matrixStack.translate(0.46F, 0.26F, 0.22F);
-         } else {
-            matrixStack.translate(0.06F, 0.27F, -0.5F);
-         }
-
-         matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(90.0F));
-         if (bl) {
-            matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(90.0F));
-         }
-
-         itemRenderState.render(matrixStack, vertexConsumerProvider, i, OverlayTexture.DEFAULT_UV);
-         matrixStack.pop();
-      }
-   }
+        } else if (bl) {
+            matrixStack.translate(0.46f, 0.26f, 0.22f);
+        } else {
+            matrixStack.translate(0.06f, 0.27f, -0.5f);
+        }
+        matrixStack.multiply((Quaternionfc)RotationAxis.POSITIVE_X.rotationDegrees(90.0f));
+        if (bl) {
+            matrixStack.multiply((Quaternionfc)RotationAxis.POSITIVE_Z.rotationDegrees(90.0f));
+        }
+        itemRenderState.render(matrixStack, orderedRenderCommandQueue, i, OverlayTexture.DEFAULT_UV, foxEntityRenderState.outlineColor);
+        matrixStack.pop();
+    }
 }
+

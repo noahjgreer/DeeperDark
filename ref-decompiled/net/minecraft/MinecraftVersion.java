@@ -1,3 +1,19 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.google.gson.JsonObject
+ *  com.google.gson.JsonParseException
+ *  com.mojang.logging.LogUtils
+ *  net.minecraft.GameVersion
+ *  net.minecraft.GameVersion$Impl
+ *  net.minecraft.MinecraftVersion
+ *  net.minecraft.SaveVersion
+ *  net.minecraft.SharedConstants
+ *  net.minecraft.resource.PackVersion
+ *  net.minecraft.util.JsonHelper
+ *  org.slf4j.Logger
+ */
 package net.minecraft;
 
 import com.google.gson.JsonObject;
@@ -7,80 +23,56 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.UUID;
+import net.minecraft.GameVersion;
+import net.minecraft.SaveVersion;
+import net.minecraft.SharedConstants;
+import net.minecraft.resource.PackVersion;
 import net.minecraft.util.JsonHelper;
 import org.slf4j.Logger;
 
+/*
+ * Exception performing whole class analysis ignored.
+ */
 public class MinecraftVersion {
-   private static final Logger LOGGER = LogUtils.getLogger();
-   public static final GameVersion CURRENT = createCurrent();
+    private static final Logger LOGGER = LogUtils.getLogger();
+    public static final GameVersion DEVELOPMENT = MinecraftVersion.create((String)UUID.randomUUID().toString().replaceAll("-", ""), (String)"Development Version");
 
-   private static GameVersion createCurrent() {
-      return new GameVersion.Impl(UUID.randomUUID().toString().replaceAll("-", ""), "1.21.8", new SaveVersion(4440, "main"), SharedConstants.getProtocolVersion(), 64, 81, new Date(), true);
-   }
+    public static GameVersion create(String id, String name) {
+        return MinecraftVersion.create((String)id, (String)name, (boolean)true);
+    }
 
-   private static GameVersion fromJson(JsonObject json) {
-      JsonObject jsonObject = JsonHelper.getObject(json, "pack_version");
-      return new GameVersion.Impl(JsonHelper.getString(json, "id"), JsonHelper.getString(json, "name"), new SaveVersion(JsonHelper.getInt(json, "world_version"), JsonHelper.getString(json, "series_id", "main")), JsonHelper.getInt(json, "protocol_version"), JsonHelper.getInt(jsonObject, "resource"), JsonHelper.getInt(jsonObject, "data"), Date.from(ZonedDateTime.parse(JsonHelper.getString(json, "build_time")).toInstant()), JsonHelper.getBoolean(json, "stable"));
-   }
+    public static GameVersion create(String id, String name, boolean stable) {
+        return new GameVersion.Impl(id, name, new SaveVersion(4671, "main"), SharedConstants.getProtocolVersion(), PackVersion.of((int)75, (int)0), PackVersion.of((int)94, (int)1), new Date(), stable);
+    }
 
-   public static GameVersion create() {
-      try {
-         InputStream inputStream = MinecraftVersion.class.getResourceAsStream("/version.json");
+    private static GameVersion fromJson(JsonObject json) {
+        JsonObject jsonObject = JsonHelper.getObject((JsonObject)json, (String)"pack_version");
+        return new GameVersion.Impl(JsonHelper.getString((JsonObject)json, (String)"id"), JsonHelper.getString((JsonObject)json, (String)"name"), new SaveVersion(JsonHelper.getInt((JsonObject)json, (String)"world_version"), JsonHelper.getString((JsonObject)json, (String)"series_id", (String)"main")), JsonHelper.getInt((JsonObject)json, (String)"protocol_version"), PackVersion.of((int)JsonHelper.getInt((JsonObject)jsonObject, (String)"resource_major"), (int)JsonHelper.getInt((JsonObject)jsonObject, (String)"resource_minor")), PackVersion.of((int)JsonHelper.getInt((JsonObject)jsonObject, (String)"data_major"), (int)JsonHelper.getInt((JsonObject)jsonObject, (String)"data_minor")), Date.from(ZonedDateTime.parse(JsonHelper.getString((JsonObject)json, (String)"build_time")).toInstant()), JsonHelper.getBoolean((JsonObject)json, (String)"stable"));
+    }
 
-         GameVersion var9;
-         label63: {
-            GameVersion var2;
-            try {
-               if (inputStream == null) {
-                  LOGGER.warn("Missing version information!");
-                  var9 = CURRENT;
-                  break label63;
-               }
-
-               InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-
-               try {
-                  var2 = fromJson(JsonHelper.deserialize((Reader)inputStreamReader));
-               } catch (Throwable var6) {
-                  try {
-                     inputStreamReader.close();
-                  } catch (Throwable var5) {
-                     var6.addSuppressed(var5);
-                  }
-
-                  throw var6;
-               }
-
-               inputStreamReader.close();
-            } catch (Throwable var7) {
-               if (inputStream != null) {
-                  try {
-                     inputStream.close();
-                  } catch (Throwable var4) {
-                     var7.addSuppressed(var4);
-                  }
-               }
-
-               throw var7;
+    /*
+     * Enabled aggressive exception aggregation
+     */
+    public static GameVersion create() {
+        try (InputStream inputStream = MinecraftVersion.class.getResourceAsStream("/version.json");){
+            GameVersion gameVersion;
+            if (inputStream == null) {
+                LOGGER.warn("Missing version information!");
+                GameVersion gameVersion2 = DEVELOPMENT;
+                return gameVersion2;
             }
-
-            if (inputStream != null) {
-               inputStream.close();
+            try (InputStreamReader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);){
+                gameVersion = MinecraftVersion.fromJson((JsonObject)JsonHelper.deserialize((Reader)inputStreamReader));
             }
-
-            return var2;
-         }
-
-         if (inputStream != null) {
-            inputStream.close();
-         }
-
-         return var9;
-      } catch (JsonParseException | IOException var8) {
-         throw new IllegalStateException("Game version information is corrupt", var8);
-      }
-   }
+            return gameVersion;
+        }
+        catch (JsonParseException | IOException exception) {
+            throw new IllegalStateException("Game version information is corrupt", exception);
+        }
+    }
 }
+

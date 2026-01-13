@@ -1,365 +1,276 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.SharedConstants
+ *  net.minecraft.client.gl.RenderPipelines
+ *  net.minecraft.client.gui.ScreenRect
+ *  net.minecraft.client.gui.render.state.ColoredQuadGuiElementRenderState
+ *  net.minecraft.client.gui.render.state.GuiElementRenderState
+ *  net.minecraft.client.gui.render.state.GuiRenderState
+ *  net.minecraft.client.gui.render.state.GuiRenderState$Layer
+ *  net.minecraft.client.gui.render.state.GuiRenderState$LayerFilter
+ *  net.minecraft.client.gui.render.state.ItemGuiElementRenderState
+ *  net.minecraft.client.gui.render.state.SimpleGuiElementRenderState
+ *  net.minecraft.client.gui.render.state.TextGuiElementRenderState
+ *  net.minecraft.client.gui.render.state.TexturedQuadGuiElementRenderState
+ *  net.minecraft.client.gui.render.state.special.SpecialGuiElementRenderState
+ *  net.minecraft.client.texture.TextureSetup
+ *  org.joml.Matrix3x2f
+ *  org.joml.Matrix3x2fc
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.gui.render.state;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.SharedConstants;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.ScreenRect;
+import net.minecraft.client.gui.render.state.ColoredQuadGuiElementRenderState;
+import net.minecraft.client.gui.render.state.GuiElementRenderState;
+import net.minecraft.client.gui.render.state.GuiRenderState;
+import net.minecraft.client.gui.render.state.ItemGuiElementRenderState;
+import net.minecraft.client.gui.render.state.SimpleGuiElementRenderState;
+import net.minecraft.client.gui.render.state.TextGuiElementRenderState;
+import net.minecraft.client.gui.render.state.TexturedQuadGuiElementRenderState;
 import net.minecraft.client.gui.render.state.special.SpecialGuiElementRenderState;
-import org.apache.commons.lang3.mutable.MutableInt;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.client.texture.TextureSetup;
+import org.joml.Matrix3x2f;
+import org.joml.Matrix3x2fc;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 public class GuiRenderState {
-   private static final int field_60454 = 2000962815;
-   private final List rootLayers = new ArrayList();
-   private int blurLayer = Integer.MAX_VALUE;
-   private Layer currentLayer;
-   private final Set itemModelKeys = new HashSet();
-   @Nullable
-   private ScreenRect currentLayerBounds;
+    private static final int field_60454 = 0x774444FF;
+    private final List<Layer> rootLayers = new ArrayList();
+    private int blurLayer = Integer.MAX_VALUE;
+    private Layer currentLayer;
+    private final Set<Object> itemModelKeys = new HashSet();
+    private @Nullable ScreenRect currentLayerBounds;
 
-   public GuiRenderState() {
-      this.createNewRootLayer();
-   }
+    public GuiRenderState() {
+        this.createNewRootLayer();
+    }
 
-   public void createNewRootLayer() {
-      this.currentLayer = new Layer((Layer)null);
-      this.rootLayers.add(this.currentLayer);
-   }
+    public void createNewRootLayer() {
+        this.currentLayer = new Layer(null);
+        this.rootLayers.add(this.currentLayer);
+    }
 
-   public void applyBlur() {
-      if (this.blurLayer != Integer.MAX_VALUE) {
-         throw new IllegalStateException("Can only blur once per frame");
-      } else {
-         this.blurLayer = this.rootLayers.size() - 1;
-      }
-   }
+    public void applyBlur() {
+        if (this.blurLayer != Integer.MAX_VALUE) {
+            throw new IllegalStateException("Can only blur once per frame");
+        }
+        this.blurLayer = this.rootLayers.size() - 1;
+    }
 
-   public void goUpLayer() {
-      if (this.currentLayer.up == null) {
-         this.currentLayer.up = new Layer(this.currentLayer);
-      }
+    public void goUpLayer() {
+        if (this.currentLayer.up == null) {
+            this.currentLayer.up = new Layer(this.currentLayer);
+        }
+        this.currentLayer = this.currentLayer.up;
+    }
 
-      this.currentLayer = this.currentLayer.up;
-   }
+    public void addItem(ItemGuiElementRenderState state) {
+        if (!this.findAndGoToLayerToAdd((GuiElementRenderState)state)) {
+            return;
+        }
+        this.itemModelKeys.add(state.state().getModelKey());
+        this.currentLayer.addItem(state);
+        this.onElementAdded(state.bounds());
+    }
 
-   public void goDownLayer() {
-      if (this.currentLayer.down == null) {
-         this.currentLayer.down = new Layer(this.currentLayer);
-      }
+    public void addText(TextGuiElementRenderState state) {
+        if (!this.findAndGoToLayerToAdd((GuiElementRenderState)state)) {
+            return;
+        }
+        this.currentLayer.addText(state);
+        this.onElementAdded(state.bounds());
+    }
 
-      this.currentLayer = this.currentLayer.down;
-   }
+    public void addSpecialElement(SpecialGuiElementRenderState state) {
+        if (!this.findAndGoToLayerToAdd((GuiElementRenderState)state)) {
+            return;
+        }
+        this.currentLayer.addSpecialElement(state);
+        this.onElementAdded(state.bounds());
+    }
 
-   public void addItem(ItemGuiElementRenderState state) {
-      if (this.findAndGoToLayerToAdd(state)) {
-         this.itemModelKeys.add(state.state().getModelKey());
-         this.currentLayer.addItem(state);
-         this.onElementAdded(state.bounds());
-      }
-   }
+    public void addSimpleElement(SimpleGuiElementRenderState state) {
+        if (!this.findAndGoToLayerToAdd((GuiElementRenderState)state)) {
+            return;
+        }
+        this.currentLayer.addSimpleElement(state);
+        this.onElementAdded(state.bounds());
+    }
 
-   public void addText(TextGuiElementRenderState state) {
-      if (this.findAndGoToLayerToAdd(state)) {
-         this.currentLayer.addText(state);
-         this.onElementAdded(state.bounds());
-      }
-   }
+    private void onElementAdded(@Nullable ScreenRect bounds) {
+        if (!SharedConstants.RENDER_UI_LAYERING_RECTANGLES || bounds == null) {
+            return;
+        }
+        this.goUpLayer();
+        this.currentLayer.addSimpleElement((SimpleGuiElementRenderState)new ColoredQuadGuiElementRenderState(RenderPipelines.GUI, TextureSetup.empty(), (Matrix3x2fc)new Matrix3x2f(), 0, 0, 10000, 10000, 0x774444FF, 0x774444FF, bounds));
+    }
 
-   public void addSpecialElement(SpecialGuiElementRenderState state) {
-      if (this.findAndGoToLayerToAdd(state)) {
-         this.currentLayer.addSpecialElement(state);
-         this.onElementAdded(state.bounds());
-      }
-   }
-
-   public void addSimpleElement(SimpleGuiElementRenderState state) {
-      if (this.findAndGoToLayerToAdd(state)) {
-         this.currentLayer.addSimpleElement(state);
-         this.onElementAdded(state.bounds());
-      }
-   }
-
-   private void onElementAdded(@Nullable ScreenRect bounds) {
-   }
-
-   private boolean findAndGoToLayerToAdd(GuiElementRenderState state) {
-      ScreenRect screenRect = state.bounds();
-      if (screenRect == null) {
-         return false;
-      } else {
-         if (this.currentLayerBounds != null && this.currentLayerBounds.contains(screenRect)) {
+    private boolean findAndGoToLayerToAdd(GuiElementRenderState state) {
+        ScreenRect screenRect = state.bounds();
+        if (screenRect == null) {
+            return false;
+        }
+        if (this.currentLayerBounds != null && this.currentLayerBounds.contains(screenRect)) {
             this.goUpLayer();
-         } else {
+        } else {
             this.findAndGoToLayerIntersecting(screenRect);
-         }
+        }
+        this.currentLayerBounds = screenRect;
+        return true;
+    }
 
-         this.currentLayerBounds = screenRect;
-         return true;
-      }
-   }
-
-   private void findAndGoToLayerIntersecting(ScreenRect bounds) {
-      Layer layer;
-      for(layer = (Layer)this.rootLayers.getLast(); layer.up != null; layer = layer.up) {
-      }
-
-      boolean bl = false;
-
-      while(!bl) {
-         bl = this.anyIntersect(bounds, layer.simpleElementRenderStates) || this.anyIntersect(bounds, layer.itemElementRenderStates) || this.anyIntersect(bounds, layer.textElementRenderStates) || this.anyIntersect(bounds, layer.specialElementRenderStates);
-         if (layer.parent == null) {
-            break;
-         }
-
-         if (!bl) {
+    private void findAndGoToLayerIntersecting(ScreenRect bounds) {
+        Layer layer = (Layer)this.rootLayers.getLast();
+        while (layer.up != null) {
+            layer = layer.up;
+        }
+        boolean bl = false;
+        while (!bl) {
+            boolean bl2 = bl = this.anyIntersect(bounds, layer.simpleElementRenderStates) || this.anyIntersect(bounds, layer.itemElementRenderStates) || this.anyIntersect(bounds, layer.textElementRenderStates) || this.anyIntersect(bounds, layer.specialElementRenderStates);
+            if (layer.parent == null) break;
+            if (bl) continue;
             layer = layer.parent;
-         }
-      }
+        }
+        this.currentLayer = layer;
+        if (bl) {
+            this.goUpLayer();
+        }
+    }
 
-      this.currentLayer = layer;
-      if (bl) {
-         this.goUpLayer();
-      }
-
-   }
-
-   private boolean anyIntersect(ScreenRect bounds, @Nullable List elementRenderStates) {
-      if (elementRenderStates != null) {
-         Iterator var3 = elementRenderStates.iterator();
-
-         while(var3.hasNext()) {
-            GuiElementRenderState guiElementRenderState = (GuiElementRenderState)var3.next();
-            ScreenRect screenRect = guiElementRenderState.bounds();
-            if (screenRect != null && screenRect.intersects(bounds)) {
-               return true;
+    private boolean anyIntersect(ScreenRect bounds, @Nullable List<? extends GuiElementRenderState> elementRenderStates) {
+        if (elementRenderStates != null) {
+            for (GuiElementRenderState guiElementRenderState : elementRenderStates) {
+                ScreenRect screenRect = guiElementRenderState.bounds();
+                if (screenRect == null || !screenRect.intersects(bounds)) continue;
+                return true;
             }
-         }
-      }
+        }
+        return false;
+    }
 
-      return false;
-   }
+    public void addSimpleElementToCurrentLayer(TexturedQuadGuiElementRenderState state) {
+        this.currentLayer.addSimpleElement((SimpleGuiElementRenderState)state);
+    }
 
-   public void addSimpleElementToCurrentLayer(TexturedQuadGuiElementRenderState state) {
-      this.currentLayer.addSimpleElement(state);
-   }
+    public void addPreparedTextElement(SimpleGuiElementRenderState state) {
+        this.currentLayer.addPreparedText(state);
+    }
 
-   public void addPreparedTextElement(SimpleGuiElementRenderState state) {
-      this.currentLayer.addPreparedText(state);
-   }
+    public Set<Object> getItemModelKeys() {
+        return this.itemModelKeys;
+    }
 
-   public Set getItemModelKeys() {
-      return this.itemModelKeys;
-   }
-
-   public void forEachSimpleElement(SimpleElementStateConsumer simpleElementStateConsumer, LayerFilter filter) {
-      MutableInt mutableInt = new MutableInt(0);
-      this.forEachLayer((layer) -> {
-         if (layer.simpleElementRenderStates != null || layer.preparedTextElementRenderStates != null) {
-            int i = mutableInt.incrementAndGet();
-            Iterator var4;
-            SimpleGuiElementRenderState simpleGuiElementRenderState;
+    public void forEachSimpleElement(Consumer<SimpleGuiElementRenderState> consumer, LayerFilter filter) {
+        this.forEachLayer(layer -> {
+            if (layer.simpleElementRenderStates == null && layer.preparedTextElementRenderStates == null) {
+                return;
+            }
             if (layer.simpleElementRenderStates != null) {
-               var4 = layer.simpleElementRenderStates.iterator();
-
-               while(var4.hasNext()) {
-                  simpleGuiElementRenderState = (SimpleGuiElementRenderState)var4.next();
-                  simpleElementStateConsumer.accept(simpleGuiElementRenderState, i);
-               }
+                for (SimpleGuiElementRenderState simpleGuiElementRenderState : layer.simpleElementRenderStates) {
+                    consumer.accept(simpleGuiElementRenderState);
+                }
             }
-
             if (layer.preparedTextElementRenderStates != null) {
-               var4 = layer.preparedTextElementRenderStates.iterator();
-
-               while(var4.hasNext()) {
-                  simpleGuiElementRenderState = (SimpleGuiElementRenderState)var4.next();
-                  simpleElementStateConsumer.accept(simpleGuiElementRenderState, i);
-               }
+                for (SimpleGuiElementRenderState simpleGuiElementRenderState : layer.preparedTextElementRenderStates) {
+                    consumer.accept(simpleGuiElementRenderState);
+                }
             }
+        }, filter);
+    }
 
-         }
-      }, filter);
-   }
-
-   public void forEachItemElement(Consumer itemElementStateConsumer) {
-      Layer layer = this.currentLayer;
-      this.forEachLayer((layerx) -> {
-         if (layerx.itemElementRenderStates != null) {
-            this.currentLayer = layerx;
-            Iterator var3 = layerx.itemElementRenderStates.iterator();
-
-            while(var3.hasNext()) {
-               ItemGuiElementRenderState itemGuiElementRenderState = (ItemGuiElementRenderState)var3.next();
-               itemElementStateConsumer.accept(itemGuiElementRenderState);
+    public void forEachItemElement(Consumer<ItemGuiElementRenderState> itemElementStateConsumer) {
+        Layer layer2 = this.currentLayer;
+        this.forEachLayer(layer -> {
+            if (layer.itemElementRenderStates != null) {
+                this.currentLayer = layer;
+                for (ItemGuiElementRenderState itemGuiElementRenderState : layer.itemElementRenderStates) {
+                    itemElementStateConsumer.accept(itemGuiElementRenderState);
+                }
             }
-         }
+        }, LayerFilter.ALL);
+        this.currentLayer = layer2;
+    }
 
-      }, GuiRenderState.LayerFilter.ALL);
-      this.currentLayer = layer;
-   }
-
-   public void forEachTextElement(Consumer textElementStateConsumer) {
-      Layer layer = this.currentLayer;
-      this.forEachLayer((layerx) -> {
-         if (layerx.textElementRenderStates != null) {
-            Iterator var3 = layerx.textElementRenderStates.iterator();
-
-            while(var3.hasNext()) {
-               TextGuiElementRenderState textGuiElementRenderState = (TextGuiElementRenderState)var3.next();
-               this.currentLayer = layerx;
-               textElementStateConsumer.accept(textGuiElementRenderState);
+    public void forEachTextElement(Consumer<TextGuiElementRenderState> textElementStateConsumer) {
+        Layer layer2 = this.currentLayer;
+        this.forEachLayer(layer -> {
+            if (layer.textElementRenderStates != null) {
+                for (TextGuiElementRenderState textGuiElementRenderState : layer.textElementRenderStates) {
+                    this.currentLayer = layer;
+                    textElementStateConsumer.accept(textGuiElementRenderState);
+                }
             }
-         }
+        }, LayerFilter.ALL);
+        this.currentLayer = layer2;
+    }
 
-      }, GuiRenderState.LayerFilter.ALL);
-      this.currentLayer = layer;
-   }
-
-   public void forEachSpecialElement(Consumer specialElementStateConsumer) {
-      Layer layer = this.currentLayer;
-      this.forEachLayer((layerx) -> {
-         if (layerx.specialElementRenderStates != null) {
-            this.currentLayer = layerx;
-            Iterator var3 = layerx.specialElementRenderStates.iterator();
-
-            while(var3.hasNext()) {
-               SpecialGuiElementRenderState specialGuiElementRenderState = (SpecialGuiElementRenderState)var3.next();
-               specialElementStateConsumer.accept(specialGuiElementRenderState);
+    public void forEachSpecialElement(Consumer<SpecialGuiElementRenderState> specialElementStateConsumer) {
+        Layer layer2 = this.currentLayer;
+        this.forEachLayer(layer -> {
+            if (layer.specialElementRenderStates != null) {
+                this.currentLayer = layer;
+                for (SpecialGuiElementRenderState specialGuiElementRenderState : layer.specialElementRenderStates) {
+                    specialElementStateConsumer.accept(specialGuiElementRenderState);
+                }
             }
-         }
+        }, LayerFilter.ALL);
+        this.currentLayer = layer2;
+    }
 
-      }, GuiRenderState.LayerFilter.ALL);
-      this.currentLayer = layer;
-   }
+    public void sortSimpleElements(Comparator<SimpleGuiElementRenderState> simpleElementStateComparator) {
+        this.forEachLayer(layer -> {
+            if (layer.simpleElementRenderStates != null) {
+                if (SharedConstants.SHUFFLE_UI_RENDERING_ORDER) {
+                    Collections.shuffle(layer.simpleElementRenderStates);
+                }
+                layer.simpleElementRenderStates.sort(simpleElementStateComparator);
+            }
+        }, LayerFilter.ALL);
+    }
 
-   public void sortSimpleElements(Comparator simpleElementStateComparator) {
-      this.forEachLayer((layer) -> {
-         if (layer.simpleElementRenderStates != null) {
-            layer.simpleElementRenderStates.sort(simpleElementStateComparator);
-         }
+    private void forEachLayer(Consumer<Layer> layerConsumer, LayerFilter filter) {
+        int i = 0;
+        int j = this.rootLayers.size();
+        if (filter == LayerFilter.BEFORE_BLUR) {
+            j = Math.min(this.blurLayer, this.rootLayers.size());
+        } else if (filter == LayerFilter.AFTER_BLUR) {
+            i = this.blurLayer;
+        }
+        for (int k = i; k < j; ++k) {
+            Layer layer = (Layer)this.rootLayers.get(k);
+            this.traverseLayers(layer, layerConsumer);
+        }
+    }
 
-      }, GuiRenderState.LayerFilter.ALL);
-   }
+    private void traverseLayers(Layer layer, Consumer<Layer> layerConsumer) {
+        layerConsumer.accept(layer);
+        if (layer.up != null) {
+            this.traverseLayers(layer.up, layerConsumer);
+        }
+    }
 
-   private void forEachLayer(Consumer layerConsumer, LayerFilter filter) {
-      int i = 0;
-      int j = this.rootLayers.size();
-      if (filter == GuiRenderState.LayerFilter.BEFORE_BLUR) {
-         j = Math.min(this.blurLayer, this.rootLayers.size());
-      } else if (filter == GuiRenderState.LayerFilter.AFTER_BLUR) {
-         i = this.blurLayer;
-      }
-
-      for(int k = i; k < j; ++k) {
-         Layer layer = (Layer)this.rootLayers.get(k);
-         this.traverseLayers(layer, layerConsumer);
-      }
-
-   }
-
-   private void traverseLayers(Layer layer, Consumer layerConsumer) {
-      if (layer.down != null) {
-         this.traverseLayers(layer.down, layerConsumer);
-      }
-
-      layerConsumer.accept(layer);
-      if (layer.up != null) {
-         this.traverseLayers(layer.up, layerConsumer);
-      }
-
-   }
-
-   public void clear() {
-      this.itemModelKeys.clear();
-      this.rootLayers.clear();
-      this.blurLayer = Integer.MAX_VALUE;
-      this.createNewRootLayer();
-   }
-
-   @Environment(EnvType.CLIENT)
-   static class Layer {
-      @Nullable
-      public final Layer parent;
-      @Nullable
-      public Layer up;
-      @Nullable
-      public Layer down;
-      @Nullable
-      public List simpleElementRenderStates;
-      @Nullable
-      public List preparedTextElementRenderStates;
-      @Nullable
-      public List itemElementRenderStates;
-      @Nullable
-      public List textElementRenderStates;
-      @Nullable
-      public List specialElementRenderStates;
-
-      Layer(@Nullable Layer parent) {
-         this.parent = parent;
-      }
-
-      public void addItem(ItemGuiElementRenderState state) {
-         if (this.itemElementRenderStates == null) {
-            this.itemElementRenderStates = new ArrayList();
-         }
-
-         this.itemElementRenderStates.add(state);
-      }
-
-      public void addText(TextGuiElementRenderState state) {
-         if (this.textElementRenderStates == null) {
-            this.textElementRenderStates = new ArrayList();
-         }
-
-         this.textElementRenderStates.add(state);
-      }
-
-      public void addSpecialElement(SpecialGuiElementRenderState state) {
-         if (this.specialElementRenderStates == null) {
-            this.specialElementRenderStates = new ArrayList();
-         }
-
-         this.specialElementRenderStates.add(state);
-      }
-
-      public void addSimpleElement(SimpleGuiElementRenderState state) {
-         if (this.simpleElementRenderStates == null) {
-            this.simpleElementRenderStates = new ArrayList();
-         }
-
-         this.simpleElementRenderStates.add(state);
-      }
-
-      public void addPreparedText(SimpleGuiElementRenderState state) {
-         if (this.preparedTextElementRenderStates == null) {
-            this.preparedTextElementRenderStates = new ArrayList();
-         }
-
-         this.preparedTextElementRenderStates.add(state);
-      }
-   }
-
-   @Environment(EnvType.CLIENT)
-   public interface SimpleElementStateConsumer {
-      void accept(SimpleGuiElementRenderState simpleElementState, int depth);
-   }
-
-   @Environment(EnvType.CLIENT)
-   public static enum LayerFilter {
-      ALL,
-      BEFORE_BLUR,
-      AFTER_BLUR;
-
-      // $FF: synthetic method
-      private static LayerFilter[] method_71300() {
-         return new LayerFilter[]{ALL, BEFORE_BLUR, AFTER_BLUR};
-      }
-   }
+    public void clear() {
+        this.itemModelKeys.clear();
+        this.rootLayers.clear();
+        this.blurLayer = Integer.MAX_VALUE;
+        this.createNewRootLayer();
+    }
 }
+

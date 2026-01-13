@@ -1,58 +1,52 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.search.IdentifierSearcher
+ *  net.minecraft.client.search.SuffixArray
+ *  net.minecraft.util.Identifier
+ */
 package net.minecraft.client.search;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.search.SuffixArray;
+import net.minecraft.util.Identifier;
 
-@Environment(EnvType.CLIENT)
-public interface IdentifierSearcher {
-   static IdentifierSearcher of() {
-      return new IdentifierSearcher() {
-         public List searchNamespace(String namespace) {
-            return List.of();
-         }
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
+public interface IdentifierSearcher<T> {
+    public static <T> IdentifierSearcher<T> of() {
+        return new /* Unavailable Anonymous Inner Class!! */;
+    }
 
-         public List searchPath(String path) {
-            return List.of();
-         }
-      };
-   }
-
-   static IdentifierSearcher of(List values, Function identifiersGetter) {
-      if (values.isEmpty()) {
-         return of();
-      } else {
-         final SuffixArray suffixArray = new SuffixArray();
-         final SuffixArray suffixArray2 = new SuffixArray();
-         Iterator var4 = values.iterator();
-
-         while(var4.hasNext()) {
-            Object object = var4.next();
-            ((Stream)identifiersGetter.apply(object)).forEach((id) -> {
-               suffixArray.add(object, id.getNamespace().toLowerCase(Locale.ROOT));
-               suffixArray2.add(object, id.getPath().toLowerCase(Locale.ROOT));
+    public static <T> IdentifierSearcher<T> of(List<T> values, Function<T, Stream<Identifier>> identifiersGetter) {
+        if (values.isEmpty()) {
+            return IdentifierSearcher.of();
+        }
+        SuffixArray suffixArray = new SuffixArray();
+        SuffixArray suffixArray2 = new SuffixArray();
+        for (Object object : values) {
+            identifiersGetter.apply(object).forEach(id -> {
+                suffixArray.add(object, id.getNamespace().toLowerCase(Locale.ROOT));
+                suffixArray2.add(object, id.getPath().toLowerCase(Locale.ROOT));
             });
-         }
+        }
+        suffixArray.build();
+        suffixArray2.build();
+        return new /* Unavailable Anonymous Inner Class!! */;
+    }
 
-         suffixArray.build();
-         suffixArray2.build();
-         return new IdentifierSearcher() {
-            public List searchNamespace(String namespace) {
-               return suffixArray.findAll(namespace);
-            }
+    public List<T> searchNamespace(String var1);
 
-            public List searchPath(String path) {
-               return suffixArray2.findAll(path);
-            }
-         };
-      }
-   }
-
-   List searchNamespace(String namespace);
-
-   List searchPath(String path);
+    public List<T> searchPath(String var1);
 }
+

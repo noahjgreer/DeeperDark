@@ -1,3 +1,16 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.google.gson.annotations.JsonAdapter
+ *  com.google.gson.annotations.SerializedName
+ *  com.mojang.util.UUIDTypeAdapter
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.realms.RealmsSerializable
+ *  net.minecraft.client.realms.dto.PlayerInfo
+ *  net.minecraft.client.realms.dto.ValueObject
+ */
 package net.minecraft.client.realms.dto;
 
 import com.google.gson.annotations.JsonAdapter;
@@ -7,60 +20,30 @@ import java.util.UUID;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.realms.RealmsSerializable;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.client.realms.dto.ValueObject;
 
-@Environment(EnvType.CLIENT)
-public class PlayerInfo extends ValueObject implements RealmsSerializable {
-   @SerializedName("name")
-   @Nullable
-   private String name;
-   @SerializedName("uuid")
-   @JsonAdapter(UUIDTypeAdapter.class)
-   private UUID uuid;
-   @SerializedName("operator")
-   private boolean operator;
-   @SerializedName("accepted")
-   private boolean accepted;
-   @SerializedName("online")
-   private boolean online;
+@Environment(value=EnvType.CLIENT)
+public class PlayerInfo
+extends ValueObject
+implements RealmsSerializable {
+    @SerializedName(value="name")
+    public final String name;
+    @SerializedName(value="uuid")
+    @JsonAdapter(value=UUIDTypeAdapter.class)
+    public final UUID uuid;
+    @SerializedName(value="operator")
+    public boolean operator;
+    @SerializedName(value="accepted")
+    public final boolean accepted;
+    @SerializedName(value="online")
+    public final boolean online;
 
-   public String getName() {
-      return this.name == null ? "" : this.name;
-   }
-
-   public void setName(String name) {
-      this.name = name;
-   }
-
-   public UUID getUuid() {
-      return this.uuid;
-   }
-
-   public void setUuid(UUID uuid) {
-      this.uuid = uuid;
-   }
-
-   public boolean isOperator() {
-      return this.operator;
-   }
-
-   public void setOperator(boolean operator) {
-      this.operator = operator;
-   }
-
-   public boolean isAccepted() {
-      return this.accepted;
-   }
-
-   public void setAccepted(boolean accepted) {
-      this.accepted = accepted;
-   }
-
-   public boolean isOnline() {
-      return this.online;
-   }
-
-   public void setOnline(boolean online) {
-      this.online = online;
-   }
+    public PlayerInfo(String string, UUID uUID, boolean bl, boolean bl2, boolean bl3) {
+        this.name = string;
+        this.uuid = uUID;
+        this.operator = bl;
+        this.accepted = bl2;
+        this.online = bl3;
+    }
 }
+

@@ -1,29 +1,43 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.render.command.OrderedRenderCommandQueue
+ *  net.minecraft.client.render.item.model.special.SimpleSpecialModelRenderer
+ *  net.minecraft.client.render.item.model.special.SpecialModelRenderer
+ *  net.minecraft.client.util.math.MatrixStack
+ *  net.minecraft.item.ItemDisplayContext
+ *  net.minecraft.item.ItemStack
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.render.item.model.special;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
+import net.minecraft.client.render.item.model.special.SpecialModelRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.item.ItemStack;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
-public interface SimpleSpecialModelRenderer extends SpecialModelRenderer {
-   @Nullable
-   default Void getData(ItemStack itemStack) {
-      return null;
-   }
+@Environment(value=EnvType.CLIENT)
+public interface SimpleSpecialModelRenderer
+extends SpecialModelRenderer<Void> {
+    default public @Nullable Void getData(ItemStack itemStack) {
+        return null;
+    }
 
-   default void render(@Nullable Void void_, ItemDisplayContext itemDisplayContext, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, int j, boolean bl) {
-      this.render(itemDisplayContext, matrixStack, vertexConsumerProvider, i, j, bl);
-   }
+    default public void render(@Nullable Void void_, ItemDisplayContext itemDisplayContext, MatrixStack matrixStack, OrderedRenderCommandQueue orderedRenderCommandQueue, int i, int j, boolean bl, int k) {
+        this.render(itemDisplayContext, matrixStack, orderedRenderCommandQueue, i, j, bl, k);
+    }
 
-   void render(ItemDisplayContext displayContext, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, boolean glint);
+    public void render(ItemDisplayContext var1, MatrixStack var2, OrderedRenderCommandQueue var3, int var4, int var5, boolean var6, int var7);
 
-   // $FF: synthetic method
-   @Nullable
-   default Object getData(final ItemStack stack) {
-      return this.getData(stack);
-   }
+    default public /* synthetic */ @Nullable Object getData(ItemStack stack) {
+        return this.getData(stack);
+    }
 }
+

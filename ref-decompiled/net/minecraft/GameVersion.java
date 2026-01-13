@@ -1,81 +1,32 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.GameVersion
+ *  net.minecraft.SaveVersion
+ *  net.minecraft.resource.PackVersion
+ *  net.minecraft.resource.ResourceType
+ */
 package net.minecraft;
 
 import java.util.Date;
+import net.minecraft.SaveVersion;
+import net.minecraft.resource.PackVersion;
 import net.minecraft.resource.ResourceType;
 
 public interface GameVersion {
-   SaveVersion dataVersion();
+    public SaveVersion dataVersion();
 
-   String id();
+    public String id();
 
-   String name();
+    public String name();
 
-   int protocolVersion();
+    public int protocolVersion();
 
-   int packVersion(ResourceType type);
+    public PackVersion packVersion(ResourceType var1);
 
-   Date buildTime();
+    public Date buildTime();
 
-   boolean stable();
-
-   public static record Impl(String id, String name, SaveVersion dataVersion, int protocolVersion, int resourcePackVersion, int datapackVersion, Date buildTime, boolean stable) implements GameVersion {
-      public Impl(String string, String string2, SaveVersion saveVersion, int i, int j, int k, Date date, boolean bl) {
-         this.id = string;
-         this.name = string2;
-         this.dataVersion = saveVersion;
-         this.protocolVersion = i;
-         this.resourcePackVersion = j;
-         this.datapackVersion = k;
-         this.buildTime = date;
-         this.stable = bl;
-      }
-
-      public int packVersion(ResourceType type) {
-         int var10000;
-         switch (type) {
-            case CLIENT_RESOURCES:
-               var10000 = this.resourcePackVersion;
-               break;
-            case SERVER_DATA:
-               var10000 = this.datapackVersion;
-               break;
-            default:
-               throw new MatchException((String)null, (Throwable)null);
-         }
-
-         return var10000;
-      }
-
-      public String id() {
-         return this.id;
-      }
-
-      public String name() {
-         return this.name;
-      }
-
-      public SaveVersion dataVersion() {
-         return this.dataVersion;
-      }
-
-      public int protocolVersion() {
-         return this.protocolVersion;
-      }
-
-      public int resourcePackVersion() {
-         return this.resourcePackVersion;
-      }
-
-      public int datapackVersion() {
-         return this.datapackVersion;
-      }
-
-      public Date buildTime() {
-         return this.buildTime;
-      }
-
-      public boolean stable() {
-         return this.stable;
-      }
-   }
+    public boolean stable();
 }
+

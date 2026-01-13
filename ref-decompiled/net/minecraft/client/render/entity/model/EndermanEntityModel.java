@@ -1,3 +1,21 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.model.Dilation
+ *  net.minecraft.client.model.ModelData
+ *  net.minecraft.client.model.ModelPart
+ *  net.minecraft.client.model.ModelPartBuilder
+ *  net.minecraft.client.model.ModelPartData
+ *  net.minecraft.client.model.ModelTransform
+ *  net.minecraft.client.model.TexturedModelData
+ *  net.minecraft.client.render.entity.model.BipedEntityModel
+ *  net.minecraft.client.render.entity.model.EndermanEntityModel
+ *  net.minecraft.client.render.entity.state.EndermanEntityRenderState
+ *  net.minecraft.util.math.MathHelper
+ */
 package net.minecraft.client.render.entity.model;
 
 import net.fabricmc.api.EnvType;
@@ -9,60 +27,54 @@ import net.minecraft.client.model.ModelPartBuilder;
 import net.minecraft.client.model.ModelPartData;
 import net.minecraft.client.model.ModelTransform;
 import net.minecraft.client.model.TexturedModelData;
-import net.minecraft.client.render.entity.state.BipedEntityRenderState;
+import net.minecraft.client.render.entity.model.BipedEntityModel;
 import net.minecraft.client.render.entity.state.EndermanEntityRenderState;
 import net.minecraft.util.math.MathHelper;
 
-@Environment(EnvType.CLIENT)
-public class EndermanEntityModel extends BipedEntityModel {
-   public EndermanEntityModel(ModelPart modelPart) {
-      super(modelPart);
-   }
+@Environment(value=EnvType.CLIENT)
+public class EndermanEntityModel<T extends EndermanEntityRenderState>
+extends BipedEntityModel<T> {
+    public EndermanEntityModel(ModelPart modelPart) {
+        super(modelPart);
+    }
 
-   public static TexturedModelData getTexturedModelData() {
-      float f = -14.0F;
-      ModelData modelData = BipedEntityModel.getModelData(Dilation.NONE, -14.0F);
-      ModelPartData modelPartData = modelData.getRoot();
-      ModelPartData modelPartData2 = modelPartData.addChild("head", ModelPartBuilder.create().uv(0, 0).cuboid(-4.0F, -8.0F, -4.0F, 8.0F, 8.0F, 8.0F), ModelTransform.origin(0.0F, -13.0F, 0.0F));
-      modelPartData2.addChild("hat", ModelPartBuilder.create().uv(0, 16).cuboid(-4.0F, -8.0F, -4.0F, 8.0F, 8.0F, 8.0F, new Dilation(-0.5F)), ModelTransform.NONE);
-      modelPartData.addChild("body", ModelPartBuilder.create().uv(32, 16).cuboid(-4.0F, 0.0F, -2.0F, 8.0F, 12.0F, 4.0F), ModelTransform.origin(0.0F, -14.0F, 0.0F));
-      modelPartData.addChild("right_arm", ModelPartBuilder.create().uv(56, 0).cuboid(-1.0F, -2.0F, -1.0F, 2.0F, 30.0F, 2.0F), ModelTransform.origin(-5.0F, -12.0F, 0.0F));
-      modelPartData.addChild("left_arm", ModelPartBuilder.create().uv(56, 0).mirrored().cuboid(-1.0F, -2.0F, -1.0F, 2.0F, 30.0F, 2.0F), ModelTransform.origin(5.0F, -12.0F, 0.0F));
-      modelPartData.addChild("right_leg", ModelPartBuilder.create().uv(56, 0).cuboid(-1.0F, 0.0F, -1.0F, 2.0F, 30.0F, 2.0F), ModelTransform.origin(-2.0F, -5.0F, 0.0F));
-      modelPartData.addChild("left_leg", ModelPartBuilder.create().uv(56, 0).mirrored().cuboid(-1.0F, 0.0F, -1.0F, 2.0F, 30.0F, 2.0F), ModelTransform.origin(2.0F, -5.0F, 0.0F));
-      return TexturedModelData.of(modelData, 64, 32);
-   }
+    public static TexturedModelData getTexturedModelData() {
+        float f = -14.0f;
+        ModelData modelData = BipedEntityModel.getModelData((Dilation)Dilation.NONE, (float)-14.0f);
+        ModelPartData modelPartData = modelData.getRoot();
+        ModelPartData modelPartData2 = modelPartData.addChild("head", ModelPartBuilder.create().uv(0, 0).cuboid(-4.0f, -8.0f, -4.0f, 8.0f, 8.0f, 8.0f), ModelTransform.origin((float)0.0f, (float)-13.0f, (float)0.0f));
+        modelPartData2.addChild("hat", ModelPartBuilder.create().uv(0, 16).cuboid(-4.0f, -8.0f, -4.0f, 8.0f, 8.0f, 8.0f, new Dilation(-0.5f)), ModelTransform.NONE);
+        modelPartData.addChild("body", ModelPartBuilder.create().uv(32, 16).cuboid(-4.0f, 0.0f, -2.0f, 8.0f, 12.0f, 4.0f), ModelTransform.origin((float)0.0f, (float)-14.0f, (float)0.0f));
+        modelPartData.addChild("right_arm", ModelPartBuilder.create().uv(56, 0).cuboid(-1.0f, -2.0f, -1.0f, 2.0f, 30.0f, 2.0f), ModelTransform.origin((float)-5.0f, (float)-12.0f, (float)0.0f));
+        modelPartData.addChild("left_arm", ModelPartBuilder.create().uv(56, 0).mirrored().cuboid(-1.0f, -2.0f, -1.0f, 2.0f, 30.0f, 2.0f), ModelTransform.origin((float)5.0f, (float)-12.0f, (float)0.0f));
+        modelPartData.addChild("right_leg", ModelPartBuilder.create().uv(56, 0).cuboid(-1.0f, 0.0f, -1.0f, 2.0f, 30.0f, 2.0f), ModelTransform.origin((float)-2.0f, (float)-5.0f, (float)0.0f));
+        modelPartData.addChild("left_leg", ModelPartBuilder.create().uv(56, 0).mirrored().cuboid(-1.0f, 0.0f, -1.0f, 2.0f, 30.0f, 2.0f), ModelTransform.origin((float)2.0f, (float)-5.0f, (float)0.0f));
+        return TexturedModelData.of((ModelData)modelData, (int)64, (int)32);
+    }
 
-   public void setAngles(EndermanEntityRenderState endermanEntityRenderState) {
-      super.setAngles((BipedEntityRenderState)endermanEntityRenderState);
-      this.head.visible = true;
-      ModelPart var10000 = this.rightArm;
-      var10000.pitch *= 0.5F;
-      var10000 = this.leftArm;
-      var10000.pitch *= 0.5F;
-      var10000 = this.rightLeg;
-      var10000.pitch *= 0.5F;
-      var10000 = this.leftLeg;
-      var10000.pitch *= 0.5F;
-      float f = 0.4F;
-      this.rightArm.pitch = MathHelper.clamp(this.rightArm.pitch, -0.4F, 0.4F);
-      this.leftArm.pitch = MathHelper.clamp(this.leftArm.pitch, -0.4F, 0.4F);
-      this.rightLeg.pitch = MathHelper.clamp(this.rightLeg.pitch, -0.4F, 0.4F);
-      this.leftLeg.pitch = MathHelper.clamp(this.leftLeg.pitch, -0.4F, 0.4F);
-      if (endermanEntityRenderState.carriedBlock != null) {
-         this.rightArm.pitch = -0.5F;
-         this.leftArm.pitch = -0.5F;
-         this.rightArm.roll = 0.05F;
-         this.leftArm.roll = -0.05F;
-      }
-
-      if (endermanEntityRenderState.angry) {
-         float g = 5.0F;
-         var10000 = this.head;
-         var10000.originY -= 5.0F;
-         var10000 = this.hat;
-         var10000.originY += 5.0F;
-      }
-
-   }
+    public void setAngles(T endermanEntityRenderState) {
+        super.setAngles(endermanEntityRenderState);
+        this.head.visible = true;
+        this.rightArm.pitch *= 0.5f;
+        this.leftArm.pitch *= 0.5f;
+        this.rightLeg.pitch *= 0.5f;
+        this.leftLeg.pitch *= 0.5f;
+        float f = 0.4f;
+        this.rightArm.pitch = MathHelper.clamp((float)this.rightArm.pitch, (float)-0.4f, (float)0.4f);
+        this.leftArm.pitch = MathHelper.clamp((float)this.leftArm.pitch, (float)-0.4f, (float)0.4f);
+        this.rightLeg.pitch = MathHelper.clamp((float)this.rightLeg.pitch, (float)-0.4f, (float)0.4f);
+        this.leftLeg.pitch = MathHelper.clamp((float)this.leftLeg.pitch, (float)-0.4f, (float)0.4f);
+        if (((EndermanEntityRenderState)endermanEntityRenderState).carriedBlock != null) {
+            this.rightArm.pitch = -0.5f;
+            this.leftArm.pitch = -0.5f;
+            this.rightArm.roll = 0.05f;
+            this.leftArm.roll = -0.05f;
+        }
+        if (((EndermanEntityRenderState)endermanEntityRenderState).angry) {
+            float g = 5.0f;
+            this.head.originY -= 5.0f;
+            this.hat.originY += 5.0f;
+        }
+    }
 }
+

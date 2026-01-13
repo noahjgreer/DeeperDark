@@ -1,8 +1,70 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.MapCodec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
+ *  net.minecraft.block.AbstractBlock$Settings
+ *  net.minecraft.block.AbstractSignBlock
+ *  net.minecraft.block.Block
+ *  net.minecraft.block.BlockState
+ *  net.minecraft.block.Blocks
+ *  net.minecraft.block.HorizontalFacingBlock
+ *  net.minecraft.block.ShapeContext
+ *  net.minecraft.block.SideShapeType
+ *  net.minecraft.block.WallHangingSignBlock
+ *  net.minecraft.block.WoodType
+ *  net.minecraft.block.entity.BlockEntity
+ *  net.minecraft.block.entity.BlockEntityTicker
+ *  net.minecraft.block.entity.BlockEntityType
+ *  net.minecraft.block.entity.HangingSignBlockEntity
+ *  net.minecraft.block.entity.SignBlockEntity
+ *  net.minecraft.entity.ai.pathing.NavigationType
+ *  net.minecraft.entity.player.PlayerEntity
+ *  net.minecraft.fluid.FluidState
+ *  net.minecraft.fluid.Fluids
+ *  net.minecraft.item.HangingSignItem
+ *  net.minecraft.item.ItemPlacementContext
+ *  net.minecraft.item.ItemStack
+ *  net.minecraft.registry.tag.BlockTags
+ *  net.minecraft.state.StateManager$Builder
+ *  net.minecraft.state.property.EnumProperty
+ *  net.minecraft.state.property.Property
+ *  net.minecraft.util.ActionResult
+ *  net.minecraft.util.BlockMirror
+ *  net.minecraft.util.BlockRotation
+ *  net.minecraft.util.Hand
+ *  net.minecraft.util.hit.BlockHitResult
+ *  net.minecraft.util.math.BlockPos
+ *  net.minecraft.util.math.Direction
+ *  net.minecraft.util.math.Direction$Axis
+ *  net.minecraft.util.math.random.Random
+ *  net.minecraft.util.shape.VoxelShape
+ *  net.minecraft.util.shape.VoxelShapes
+ *  net.minecraft.world.BlockView
+ *  net.minecraft.world.World
+ *  net.minecraft.world.WorldView
+ *  net.minecraft.world.tick.ScheduledTickView
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.block;
 
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.Map;
+import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.AbstractSignBlock;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.HorizontalFacingBlock;
+import net.minecraft.block.ShapeContext;
+import net.minecraft.block.SideShapeType;
+import net.minecraft.block.WoodType;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
@@ -18,6 +80,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.EnumProperty;
+import net.minecraft.state.property.Property;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
@@ -32,126 +95,116 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
 import net.minecraft.world.tick.ScheduledTickView;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-public class WallHangingSignBlock extends AbstractSignBlock {
-   public static final MapCodec CODEC = RecordCodecBuilder.mapCodec((instance) -> {
-      return instance.group(WoodType.CODEC.fieldOf("wood_type").forGetter(AbstractSignBlock::getWoodType), createSettingsCodec()).apply(instance, WallHangingSignBlock::new);
-   });
-   public static final EnumProperty FACING;
-   private static final Map COLLISION_SHAPES_BY_AXIS;
-   private static final Map OUTLINE_SHAPES_BY_AXIS;
+/*
+ * Exception performing whole class analysis ignored.
+ */
+public class WallHangingSignBlock
+extends AbstractSignBlock {
+    public static final MapCodec<WallHangingSignBlock> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group((App)WoodType.CODEC.fieldOf("wood_type").forGetter(AbstractSignBlock::getWoodType), (App)WallHangingSignBlock.createSettingsCodec()).apply((Applicative)instance, WallHangingSignBlock::new));
+    public static final EnumProperty<Direction> FACING = HorizontalFacingBlock.FACING;
+    private static final Map<Direction.Axis, VoxelShape> COLLISION_SHAPES_BY_AXIS = VoxelShapes.createHorizontalAxisShapeMap((VoxelShape)Block.createColumnShape((double)16.0, (double)4.0, (double)14.0, (double)16.0));
+    private static final Map<Direction.Axis, VoxelShape> OUTLINE_SHAPES_BY_AXIS = VoxelShapes.createHorizontalAxisShapeMap((VoxelShape)VoxelShapes.union((VoxelShape)((VoxelShape)COLLISION_SHAPES_BY_AXIS.get(Direction.Axis.Z)), (VoxelShape)Block.createColumnShape((double)14.0, (double)2.0, (double)0.0, (double)10.0)));
 
-   public MapCodec getCodec() {
-      return CODEC;
-   }
+    public MapCodec<WallHangingSignBlock> getCodec() {
+        return CODEC;
+    }
 
-   public WallHangingSignBlock(WoodType woodType, AbstractBlock.Settings settings) {
-      super(woodType, settings.sounds(woodType.hangingSignSoundType()));
-      this.setDefaultState((BlockState)((BlockState)((BlockState)this.stateManager.getDefaultState()).with(FACING, Direction.NORTH)).with(WATERLOGGED, false));
-   }
+    public WallHangingSignBlock(WoodType woodType, AbstractBlock.Settings settings) {
+        super(woodType, settings.sounds(woodType.hangingSignSoundType()));
+        this.setDefaultState((BlockState)((BlockState)((BlockState)this.stateManager.getDefaultState()).with((Property)FACING, (Comparable)Direction.NORTH)).with((Property)WATERLOGGED, (Comparable)Boolean.valueOf(false)));
+    }
 
-   protected ActionResult onUseWithItem(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-      BlockEntity var9 = world.getBlockEntity(pos);
-      if (var9 instanceof SignBlockEntity signBlockEntity) {
-         if (this.shouldTryAttaching(state, player, hit, signBlockEntity, stack)) {
+    protected ActionResult onUseWithItem(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        SignBlockEntity signBlockEntity;
+        BlockEntity blockEntity = world.getBlockEntity(pos);
+        if (blockEntity instanceof SignBlockEntity && this.shouldTryAttaching(state, player, hit, signBlockEntity = (SignBlockEntity)blockEntity, stack)) {
             return ActionResult.PASS;
-         }
-      }
+        }
+        return super.onUseWithItem(stack, state, world, pos, player, hand, hit);
+    }
 
-      return super.onUseWithItem(stack, state, world, pos, player, hand, hit);
-   }
+    private boolean shouldTryAttaching(BlockState state, PlayerEntity player, BlockHitResult hitResult, SignBlockEntity sign, ItemStack stack) {
+        return !sign.canRunCommandClickEvent(sign.isPlayerFacingFront(player), player) && stack.getItem() instanceof HangingSignItem && !this.isHitOnFacingAxis(hitResult, state);
+    }
 
-   private boolean shouldTryAttaching(BlockState state, PlayerEntity player, BlockHitResult hitResult, SignBlockEntity sign, ItemStack stack) {
-      return !sign.canRunCommandClickEvent(sign.isPlayerFacingFront(player), player) && stack.getItem() instanceof HangingSignItem && !this.isHitOnFacingAxis(hitResult, state);
-   }
+    private boolean isHitOnFacingAxis(BlockHitResult hitResult, BlockState state) {
+        return hitResult.getSide().getAxis() == ((Direction)state.get((Property)FACING)).getAxis();
+    }
 
-   private boolean isHitOnFacingAxis(BlockHitResult hitResult, BlockState state) {
-      return hitResult.getSide().getAxis() == ((Direction)state.get(FACING)).getAxis();
-   }
+    protected VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return (VoxelShape)OUTLINE_SHAPES_BY_AXIS.get(((Direction)state.get((Property)FACING)).getAxis());
+    }
 
-   protected VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-      return (VoxelShape)OUTLINE_SHAPES_BY_AXIS.get(((Direction)state.get(FACING)).getAxis());
-   }
+    protected VoxelShape getSidesShape(BlockState state, BlockView world, BlockPos pos) {
+        return this.getOutlineShape(state, world, pos, ShapeContext.absent());
+    }
 
-   protected VoxelShape getSidesShape(BlockState state, BlockView world, BlockPos pos) {
-      return this.getOutlineShape(state, world, pos, ShapeContext.absent());
-   }
+    protected VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return (VoxelShape)COLLISION_SHAPES_BY_AXIS.get(((Direction)state.get((Property)FACING)).getAxis());
+    }
 
-   protected VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-      return (VoxelShape)COLLISION_SHAPES_BY_AXIS.get(((Direction)state.get(FACING)).getAxis());
-   }
+    public boolean canAttachAt(BlockState state, WorldView world, BlockPos pos) {
+        Direction direction = ((Direction)state.get((Property)FACING)).rotateYClockwise();
+        Direction direction2 = ((Direction)state.get((Property)FACING)).rotateYCounterclockwise();
+        return this.canAttachTo(world, state, pos.offset(direction), direction2) || this.canAttachTo(world, state, pos.offset(direction2), direction);
+    }
 
-   public boolean canAttachAt(BlockState state, WorldView world, BlockPos pos) {
-      Direction direction = ((Direction)state.get(FACING)).rotateYClockwise();
-      Direction direction2 = ((Direction)state.get(FACING)).rotateYCounterclockwise();
-      return this.canAttachTo(world, state, pos.offset(direction), direction2) || this.canAttachTo(world, state, pos.offset(direction2), direction);
-   }
+    public boolean canAttachTo(WorldView world, BlockState state, BlockPos toPos, Direction direction) {
+        BlockState blockState = world.getBlockState(toPos);
+        if (blockState.isIn(BlockTags.WALL_HANGING_SIGNS)) {
+            return ((Direction)blockState.get((Property)FACING)).getAxis().test((Direction)state.get((Property)FACING));
+        }
+        return blockState.isSideSolid((BlockView)world, toPos, direction, SideShapeType.FULL);
+    }
 
-   public boolean canAttachTo(WorldView world, BlockState state, BlockPos toPos, Direction direction) {
-      BlockState blockState = world.getBlockState(toPos);
-      return blockState.isIn(BlockTags.WALL_HANGING_SIGNS) ? ((Direction)blockState.get(FACING)).getAxis().test((Direction)state.get(FACING)) : blockState.isSideSolid(world, toPos, direction, SideShapeType.FULL);
-   }
+    public @Nullable BlockState getPlacementState(ItemPlacementContext ctx) {
+        BlockState blockState = this.getDefaultState();
+        FluidState fluidState = ctx.getWorld().getFluidState(ctx.getBlockPos());
+        World worldView = ctx.getWorld();
+        BlockPos blockPos = ctx.getBlockPos();
+        for (Direction direction : ctx.getPlacementDirections()) {
+            Direction direction2;
+            if (!direction.getAxis().isHorizontal() || direction.getAxis().test(ctx.getSide()) || !(blockState = (BlockState)blockState.with((Property)FACING, (Comparable)(direction2 = direction.getOpposite()))).canPlaceAt((WorldView)worldView, blockPos) || !this.canAttachAt(blockState, (WorldView)worldView, blockPos)) continue;
+            return (BlockState)blockState.with((Property)WATERLOGGED, (Comparable)Boolean.valueOf(fluidState.getFluid() == Fluids.WATER));
+        }
+        return null;
+    }
 
-   @Nullable
-   public BlockState getPlacementState(ItemPlacementContext ctx) {
-      BlockState blockState = this.getDefaultState();
-      FluidState fluidState = ctx.getWorld().getFluidState(ctx.getBlockPos());
-      WorldView worldView = ctx.getWorld();
-      BlockPos blockPos = ctx.getBlockPos();
-      Direction[] var6 = ctx.getPlacementDirections();
-      int var7 = var6.length;
+    protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
+        if (direction.getAxis() == ((Direction)state.get((Property)FACING)).rotateYClockwise().getAxis() && !state.canPlaceAt(world, pos)) {
+            return Blocks.AIR.getDefaultState();
+        }
+        return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
+    }
 
-      for(int var8 = 0; var8 < var7; ++var8) {
-         Direction direction = var6[var8];
-         if (direction.getAxis().isHorizontal() && !direction.getAxis().test(ctx.getSide())) {
-            Direction direction2 = direction.getOpposite();
-            blockState = (BlockState)blockState.with(FACING, direction2);
-            if (blockState.canPlaceAt(worldView, blockPos) && this.canAttachAt(blockState, worldView, blockPos)) {
-               return (BlockState)blockState.with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
-            }
-         }
-      }
+    public float getRotationDegrees(BlockState state) {
+        return ((Direction)state.get((Property)FACING)).getPositiveHorizontalDegrees();
+    }
 
-      return null;
-   }
+    protected BlockState rotate(BlockState state, BlockRotation rotation) {
+        return (BlockState)state.with((Property)FACING, (Comparable)rotation.rotate((Direction)state.get((Property)FACING)));
+    }
 
-   protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
-      return direction.getAxis() == ((Direction)state.get(FACING)).rotateYClockwise().getAxis() && !state.canPlaceAt(world, pos) ? Blocks.AIR.getDefaultState() : super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
-   }
+    protected BlockState mirror(BlockState state, BlockMirror mirror) {
+        return state.rotate(mirror.getRotation((Direction)state.get((Property)FACING)));
+    }
 
-   public float getRotationDegrees(BlockState state) {
-      return ((Direction)state.get(FACING)).getPositiveHorizontalDegrees();
-   }
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(new Property[]{FACING, WATERLOGGED});
+    }
 
-   protected BlockState rotate(BlockState state, BlockRotation rotation) {
-      return (BlockState)state.with(FACING, rotation.rotate((Direction)state.get(FACING)));
-   }
+    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+        return new HangingSignBlockEntity(pos, state);
+    }
 
-   protected BlockState mirror(BlockState state, BlockMirror mirror) {
-      return state.rotate(mirror.getRotation((Direction)state.get(FACING)));
-   }
+    protected boolean canPathfindThrough(BlockState state, NavigationType type) {
+        return false;
+    }
 
-   protected void appendProperties(StateManager.Builder builder) {
-      builder.add(FACING, WATERLOGGED);
-   }
-
-   public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-      return new HangingSignBlockEntity(pos, state);
-   }
-
-   protected boolean canPathfindThrough(BlockState state, NavigationType type) {
-      return false;
-   }
-
-   @Nullable
-   public BlockEntityTicker getTicker(World world, BlockState state, BlockEntityType type) {
-      return validateTicker(type, BlockEntityType.HANGING_SIGN, SignBlockEntity::tick);
-   }
-
-   static {
-      FACING = HorizontalFacingBlock.FACING;
-      COLLISION_SHAPES_BY_AXIS = VoxelShapes.createHorizontalAxisShapeMap(Block.createColumnShape(16.0, 4.0, 14.0, 16.0));
-      OUTLINE_SHAPES_BY_AXIS = VoxelShapes.createHorizontalAxisShapeMap(VoxelShapes.union((VoxelShape)COLLISION_SHAPES_BY_AXIS.get(Direction.Axis.Z), Block.createColumnShape(14.0, 2.0, 0.0, 10.0)));
-   }
+    public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+        return WallHangingSignBlock.validateTicker(type, (BlockEntityType)BlockEntityType.HANGING_SIGN, SignBlockEntity::tick);
+    }
 }
+

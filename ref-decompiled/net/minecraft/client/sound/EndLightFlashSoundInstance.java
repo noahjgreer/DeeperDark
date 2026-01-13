@@ -1,0 +1,55 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.render.Camera
+ *  net.minecraft.client.sound.EndLightFlashSoundInstance
+ *  net.minecraft.client.sound.MovingSoundInstance
+ *  net.minecraft.client.sound.SoundInstance$AttenuationType
+ *  net.minecraft.sound.SoundCategory
+ *  net.minecraft.sound.SoundEvent
+ *  net.minecraft.util.math.Vec3d
+ *  net.minecraft.util.math.random.Random
+ */
+package net.minecraft.client.sound;
+
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.render.Camera;
+import net.minecraft.client.sound.MovingSoundInstance;
+import net.minecraft.client.sound.SoundInstance;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvent;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
+
+@Environment(value=EnvType.CLIENT)
+public class EndLightFlashSoundInstance
+extends MovingSoundInstance {
+    private final Camera camera;
+    private final float lightFlashPitch;
+    private final float lightFlashYaw;
+
+    public EndLightFlashSoundInstance(SoundEvent soundEvent, SoundCategory category, Random random, Camera camera, float rotationDegreesX, float rotationDegreesY) {
+        super(soundEvent, category, random);
+        this.camera = camera;
+        this.lightFlashPitch = rotationDegreesX;
+        this.lightFlashYaw = rotationDegreesY;
+        this.update();
+    }
+
+    private void update() {
+        Vec3d vec3d = Vec3d.fromPolar((float)this.lightFlashPitch, (float)this.lightFlashYaw).multiply(10.0);
+        this.x = this.camera.getCameraPos().x + vec3d.x;
+        this.y = this.camera.getCameraPos().y + vec3d.y;
+        this.z = this.camera.getCameraPos().z + vec3d.z;
+        this.attenuationType = SoundInstance.AttenuationType.NONE;
+    }
+
+    public void tick() {
+        this.update();
+    }
+}
+

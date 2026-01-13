@@ -1,39 +1,51 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.render.entity.state.ArmedEntityRenderState
+ *  net.minecraft.client.render.entity.state.BipedEntityRenderState
+ *  net.minecraft.item.ItemStack
+ *  net.minecraft.util.Arm
+ *  net.minecraft.util.Hand
+ */
 package net.minecraft.client.render.entity.state;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.render.entity.state.ArmedEntityRenderState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Arm;
 import net.minecraft.util.Hand;
 
-@Environment(EnvType.CLIENT)
-public class BipedEntityRenderState extends ArmedEntityRenderState {
-   public float leaningPitch;
-   public float handSwingProgress;
-   public float limbAmplitudeInverse = 1.0F;
-   public float crossbowPullTime;
-   public int itemUseTime;
-   public Arm preferredArm;
-   public Hand activeHand;
-   public boolean isInSneakingPose;
-   public boolean isGliding;
-   public boolean isSwimming;
-   public boolean hasVehicle;
-   public boolean isUsingItem;
-   public float leftWingPitch;
-   public float leftWingYaw;
-   public float leftWingRoll;
-   public ItemStack equippedHeadStack;
-   public ItemStack equippedChestStack;
-   public ItemStack equippedLegsStack;
-   public ItemStack equippedFeetStack;
+@Environment(value=EnvType.CLIENT)
+public class BipedEntityRenderState
+extends ArmedEntityRenderState {
+    public float leaningPitch;
+    public float limbAmplitudeInverse = 1.0f;
+    public float crossbowPullTime;
+    public float itemUseTime;
+    public Arm preferredArm = Arm.RIGHT;
+    public Hand activeHand = Hand.MAIN_HAND;
+    public boolean isInSneakingPose;
+    public boolean isGliding;
+    public boolean isSwimming;
+    public boolean hasVehicle;
+    public boolean isUsingItem;
+    public float leftWingPitch;
+    public float leftWingYaw;
+    public float leftWingRoll;
+    public ItemStack equippedHeadStack = ItemStack.EMPTY;
+    public ItemStack equippedChestStack = ItemStack.EMPTY;
+    public ItemStack equippedLegsStack = ItemStack.EMPTY;
+    public ItemStack equippedFeetStack = ItemStack.EMPTY;
 
-   public BipedEntityRenderState() {
-      this.preferredArm = Arm.RIGHT;
-      this.activeHand = Hand.MAIN_HAND;
-      this.equippedHeadStack = ItemStack.EMPTY;
-      this.equippedChestStack = ItemStack.EMPTY;
-      this.equippedLegsStack = ItemStack.EMPTY;
-      this.equippedFeetStack = ItemStack.EMPTY;
-   }
+    public float getItemUseTime(Arm arm) {
+        if (this.isUsingItem && this.activeHand == Hand.MAIN_HAND == (arm == this.mainArm)) {
+            return this.itemUseTime;
+        }
+        return 0.0f;
+    }
 }
+

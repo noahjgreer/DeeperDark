@@ -1,3 +1,14 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.recipebook.RecipeBookType
+ *  net.minecraft.recipe.book.RecipeBookCategories
+ *  net.minecraft.recipe.book.RecipeBookCategory
+ *  net.minecraft.recipe.book.RecipeBookGroup
+ */
 package net.minecraft.client.recipebook;
 
 import java.util.List;
@@ -7,25 +18,42 @@ import net.minecraft.recipe.book.RecipeBookCategories;
 import net.minecraft.recipe.book.RecipeBookCategory;
 import net.minecraft.recipe.book.RecipeBookGroup;
 
-@Environment(EnvType.CLIENT)
-public enum RecipeBookType implements RecipeBookGroup {
-   CRAFTING(new RecipeBookCategory[]{RecipeBookCategories.CRAFTING_EQUIPMENT, RecipeBookCategories.CRAFTING_BUILDING_BLOCKS, RecipeBookCategories.CRAFTING_MISC, RecipeBookCategories.CRAFTING_REDSTONE}),
-   FURNACE(new RecipeBookCategory[]{RecipeBookCategories.FURNACE_FOOD, RecipeBookCategories.FURNACE_BLOCKS, RecipeBookCategories.FURNACE_MISC}),
-   BLAST_FURNACE(new RecipeBookCategory[]{RecipeBookCategories.BLAST_FURNACE_BLOCKS, RecipeBookCategories.BLAST_FURNACE_MISC}),
-   SMOKER(new RecipeBookCategory[]{RecipeBookCategories.SMOKER_FOOD});
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
+public final class RecipeBookType
+extends Enum<RecipeBookType>
+implements RecipeBookGroup {
+    public static final /* enum */ RecipeBookType CRAFTING = new RecipeBookType("CRAFTING", 0, new RecipeBookCategory[]{RecipeBookCategories.CRAFTING_EQUIPMENT, RecipeBookCategories.CRAFTING_BUILDING_BLOCKS, RecipeBookCategories.CRAFTING_MISC, RecipeBookCategories.CRAFTING_REDSTONE});
+    public static final /* enum */ RecipeBookType FURNACE = new RecipeBookType("FURNACE", 1, new RecipeBookCategory[]{RecipeBookCategories.FURNACE_FOOD, RecipeBookCategories.FURNACE_BLOCKS, RecipeBookCategories.FURNACE_MISC});
+    public static final /* enum */ RecipeBookType BLAST_FURNACE = new RecipeBookType("BLAST_FURNACE", 2, new RecipeBookCategory[]{RecipeBookCategories.BLAST_FURNACE_BLOCKS, RecipeBookCategories.BLAST_FURNACE_MISC});
+    public static final /* enum */ RecipeBookType SMOKER = new RecipeBookType("SMOKER", 3, new RecipeBookCategory[]{RecipeBookCategories.SMOKER_FOOD});
+    private final List<RecipeBookCategory> categories;
+    private static final /* synthetic */ RecipeBookType[] field_54842;
 
-   private final List categories;
+    public static RecipeBookType[] values() {
+        return (RecipeBookType[])field_54842.clone();
+    }
 
-   private RecipeBookType(final RecipeBookCategory... categories) {
-      this.categories = List.of(categories);
-   }
+    public static RecipeBookType valueOf(String string) {
+        return Enum.valueOf(RecipeBookType.class, string);
+    }
 
-   public List getCategories() {
-      return this.categories;
-   }
+    private RecipeBookType(RecipeBookCategory ... categories) {
+        this.categories = List.of(categories);
+    }
 
-   // $FF: synthetic method
-   private static RecipeBookType[] method_64889() {
-      return new RecipeBookType[]{CRAFTING, FURNACE, BLAST_FURNACE, SMOKER};
-   }
+    public List<RecipeBookCategory> getCategories() {
+        return this.categories;
+    }
+
+    private static /* synthetic */ RecipeBookType[] method_64889() {
+        return new RecipeBookType[]{CRAFTING, FURNACE, BLAST_FURNACE, SMOKER};
+    }
+
+    static {
+        field_54842 = RecipeBookType.method_64889();
+    }
 }
+

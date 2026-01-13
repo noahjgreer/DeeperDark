@@ -1,3 +1,15 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.authlib.minecraft.UserApiService
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.session.ProfileKeys
+ *  net.minecraft.client.session.ProfileKeysImpl
+ *  net.minecraft.client.session.Session
+ *  net.minecraft.network.encryption.PlayerKeyPair
+ */
 package net.minecraft.client.session;
 
 import com.mojang.authlib.minecraft.UserApiService;
@@ -6,24 +18,20 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.session.ProfileKeysImpl;
+import net.minecraft.client.session.Session;
+import net.minecraft.network.encryption.PlayerKeyPair;
 
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 public interface ProfileKeys {
-   ProfileKeys MISSING = new ProfileKeys() {
-      public CompletableFuture fetchKeyPair() {
-         return CompletableFuture.completedFuture(Optional.empty());
-      }
+    public static final ProfileKeys MISSING = new /* Unavailable Anonymous Inner Class!! */;
 
-      public boolean isExpired() {
-         return false;
-      }
-   };
+    public static ProfileKeys create(UserApiService userApiService, Session session, Path root) {
+        return new ProfileKeysImpl(userApiService, session.getUuidOrNull(), root);
+    }
 
-   static ProfileKeys create(UserApiService userApiService, Session session, Path root) {
-      return (ProfileKeys)(session.getAccountType() == Session.AccountType.MSA ? new ProfileKeysImpl(userApiService, session.getUuidOrNull(), root) : MISSING);
-   }
+    public CompletableFuture<Optional<PlayerKeyPair>> fetchKeyPair();
 
-   CompletableFuture fetchKeyPair();
-
-   boolean isExpired();
+    public boolean isExpired();
 }
+

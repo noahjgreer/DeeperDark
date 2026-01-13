@@ -1,3 +1,122 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.blaze3d.buffers.GpuBufferSlice
+ *  com.mojang.blaze3d.systems.GpuDevice
+ *  com.mojang.blaze3d.systems.ProjectionType
+ *  com.mojang.blaze3d.systems.RenderSystem
+ *  com.mojang.jtracy.TracyClient
+ *  com.mojang.logging.LogUtils
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.SharedConstants
+ *  net.minecraft.block.BlockState
+ *  net.minecraft.block.enums.CameraSubmersionType
+ *  net.minecraft.block.pattern.CachedBlockPosition
+ *  net.minecraft.client.MinecraftClient
+ *  net.minecraft.client.font.TextRenderer$GlyphDrawer
+ *  net.minecraft.client.gl.Framebuffer
+ *  net.minecraft.client.gl.GlobalSettings
+ *  net.minecraft.client.gl.PostEffectProcessor
+ *  net.minecraft.client.gl.RenderPipelines
+ *  net.minecraft.client.gl.ShaderSourceGetter
+ *  net.minecraft.client.gui.CubeMapRenderer
+ *  net.minecraft.client.gui.DrawContext
+ *  net.minecraft.client.gui.RotatingCubeMapRenderer
+ *  net.minecraft.client.gui.hud.InGameOverlayRenderer
+ *  net.minecraft.client.gui.hud.debug.DebugHudEntries
+ *  net.minecraft.client.gui.render.BannerResultGuiElementRenderer
+ *  net.minecraft.client.gui.render.BookModelGuiElementRenderer
+ *  net.minecraft.client.gui.render.EntityGuiElementRenderer
+ *  net.minecraft.client.gui.render.GuiRenderer
+ *  net.minecraft.client.gui.render.PlayerSkinGuiElementRenderer
+ *  net.minecraft.client.gui.render.ProfilerChartGuiElementRenderer
+ *  net.minecraft.client.gui.render.SignGuiElementRenderer
+ *  net.minecraft.client.gui.render.state.GuiRenderState
+ *  net.minecraft.client.gui.screen.DebugOptionsScreen
+ *  net.minecraft.client.network.AbstractClientPlayerEntity
+ *  net.minecraft.client.network.ClientPlayerEntity
+ *  net.minecraft.client.network.ClientPlayerLikeState
+ *  net.minecraft.client.option.GameOptions
+ *  net.minecraft.client.option.TextureFilteringMode
+ *  net.minecraft.client.render.BufferBuilderStorage
+ *  net.minecraft.client.render.Camera
+ *  net.minecraft.client.render.CameraOverride
+ *  net.minecraft.client.render.DefaultFramebufferSet
+ *  net.minecraft.client.render.DiffuseLighting
+ *  net.minecraft.client.render.DiffuseLighting$Type
+ *  net.minecraft.client.render.GameRenderer
+ *  net.minecraft.client.render.LightmapTextureManager
+ *  net.minecraft.client.render.OverlayTexture
+ *  net.minecraft.client.render.ProjectionMatrix3
+ *  net.minecraft.client.render.RawProjectionMatrix
+ *  net.minecraft.client.render.RenderTickCounter
+ *  net.minecraft.client.render.VertexConsumerProvider
+ *  net.minecraft.client.render.VertexConsumerProvider$Immediate
+ *  net.minecraft.client.render.block.BlockRenderManager
+ *  net.minecraft.client.render.command.OrderedRenderCommandQueue
+ *  net.minecraft.client.render.command.OrderedRenderCommandQueueImpl
+ *  net.minecraft.client.render.command.RenderDispatcher
+ *  net.minecraft.client.render.fog.FogRenderer
+ *  net.minecraft.client.render.fog.FogRenderer$FogType
+ *  net.minecraft.client.render.item.HeldItemRenderer
+ *  net.minecraft.client.render.state.CameraRenderState
+ *  net.minecraft.client.render.state.WorldRenderState
+ *  net.minecraft.client.texture.AtlasManager
+ *  net.minecraft.client.texture.NativeImage
+ *  net.minecraft.client.texture.SpriteHolder
+ *  net.minecraft.client.util.ObjectAllocator
+ *  net.minecraft.client.util.Pool
+ *  net.minecraft.client.util.ScreenshotRecorder
+ *  net.minecraft.client.util.math.MatrixStack
+ *  net.minecraft.client.world.ClientWorld
+ *  net.minecraft.entity.Entity
+ *  net.minecraft.entity.LivingEntity
+ *  net.minecraft.entity.effect.StatusEffectInstance
+ *  net.minecraft.entity.effect.StatusEffects
+ *  net.minecraft.entity.mob.CreeperEntity
+ *  net.minecraft.entity.mob.EndermanEntity
+ *  net.minecraft.entity.mob.SpiderEntity
+ *  net.minecraft.entity.player.PlayerEntity
+ *  net.minecraft.item.ItemStack
+ *  net.minecraft.registry.Registry
+ *  net.minecraft.registry.RegistryKeys
+ *  net.minecraft.resource.ResourceFactory
+ *  net.minecraft.server.integrated.IntegratedServer
+ *  net.minecraft.util.Identifier
+ *  net.minecraft.util.Util
+ *  net.minecraft.util.crash.CrashException
+ *  net.minecraft.util.crash.CrashReport
+ *  net.minecraft.util.crash.CrashReportSection
+ *  net.minecraft.util.hit.BlockHitResult
+ *  net.minecraft.util.hit.EntityHitResult
+ *  net.minecraft.util.hit.HitResult
+ *  net.minecraft.util.hit.HitResult$Type
+ *  net.minecraft.util.math.BlockPos
+ *  net.minecraft.util.math.MathHelper
+ *  net.minecraft.util.math.RotationAxis
+ *  net.minecraft.util.math.Vec3d
+ *  net.minecraft.util.math.random.Random
+ *  net.minecraft.util.profiler.Profiler
+ *  net.minecraft.util.profiler.Profilers
+ *  net.minecraft.util.profiler.ScopedProfiler
+ *  net.minecraft.world.GameMode
+ *  net.minecraft.world.World
+ *  net.minecraft.world.WorldView
+ *  net.minecraft.world.waypoint.TrackedWaypoint$PitchProvider
+ *  org.apache.commons.io.IOUtils
+ *  org.joml.Matrix4f
+ *  org.joml.Matrix4fStack
+ *  org.joml.Matrix4fc
+ *  org.joml.Quaternionf
+ *  org.joml.Quaternionfc
+ *  org.joml.Vector3f
+ *  org.joml.Vector3fc
+ *  org.joml.Vector4f
+ *  org.jspecify.annotations.Nullable
+ *  org.slf4j.Logger
+ */
 package net.minecraft.client.render;
 
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
@@ -6,27 +125,32 @@ import com.mojang.blaze3d.systems.ProjectionType;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.jtracy.TracyClient;
 import com.mojang.logging.LogUtils;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.lang.runtime.SwitchBootstraps;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.function.BiFunction;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.SharedConstants;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.enums.CameraSubmersionType;
 import net.minecraft.block.pattern.CachedBlockPosition;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.gl.GlobalSettings;
 import net.minecraft.client.gl.PostEffectProcessor;
 import net.minecraft.client.gl.RenderPipelines;
+import net.minecraft.client.gl.ShaderSourceGetter;
 import net.minecraft.client.gui.CubeMapRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.RotatingCubeMapRenderer;
 import net.minecraft.client.gui.hud.InGameOverlayRenderer;
+import net.minecraft.client.gui.hud.debug.DebugHudEntries;
 import net.minecraft.client.gui.render.BannerResultGuiElementRenderer;
 import net.minecraft.client.gui.render.BookModelGuiElementRenderer;
 import net.minecraft.client.gui.render.EntityGuiElementRenderer;
@@ -35,12 +159,35 @@ import net.minecraft.client.gui.render.PlayerSkinGuiElementRenderer;
 import net.minecraft.client.gui.render.ProfilerChartGuiElementRenderer;
 import net.minecraft.client.gui.render.SignGuiElementRenderer;
 import net.minecraft.client.gui.render.state.GuiRenderState;
+import net.minecraft.client.gui.screen.DebugOptionsScreen;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.network.ClientPlayerLikeState;
 import net.minecraft.client.option.GameOptions;
+import net.minecraft.client.option.TextureFilteringMode;
+import net.minecraft.client.render.BufferBuilderStorage;
+import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.CameraOverride;
+import net.minecraft.client.render.DefaultFramebufferSet;
+import net.minecraft.client.render.DiffuseLighting;
+import net.minecraft.client.render.LightmapTextureManager;
+import net.minecraft.client.render.OverlayTexture;
+import net.minecraft.client.render.ProjectionMatrix3;
+import net.minecraft.client.render.RawProjectionMatrix;
+import net.minecraft.client.render.RenderTickCounter;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.block.BlockRenderManager;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
+import net.minecraft.client.render.command.OrderedRenderCommandQueueImpl;
+import net.minecraft.client.render.command.RenderDispatcher;
 import net.minecraft.client.render.fog.FogRenderer;
 import net.minecraft.client.render.item.HeldItemRenderer;
+import net.minecraft.client.render.state.CameraRenderState;
+import net.minecraft.client.render.state.WorldRenderState;
+import net.minecraft.client.texture.AtlasManager;
 import net.minecraft.client.texture.NativeImage;
+import net.minecraft.client.texture.SpriteHolder;
+import net.minecraft.client.util.ObjectAllocator;
 import net.minecraft.client.util.Pool;
 import net.minecraft.client.util.ScreenshotRecorder;
 import net.minecraft.client.util.math.MatrixStack;
@@ -53,9 +200,7 @@ import net.minecraft.entity.mob.CreeperEntity;
 import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.entity.mob.SpiderEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.ItemStack;
-import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.resource.ResourceFactory;
@@ -69,8 +214,6 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
@@ -79,746 +222,731 @@ import net.minecraft.util.profiler.Profiler;
 import net.minecraft.util.profiler.Profilers;
 import net.minecraft.util.profiler.ScopedProfiler;
 import net.minecraft.world.GameMode;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldView;
 import net.minecraft.world.waypoint.TrackedWaypoint;
 import org.apache.commons.io.IOUtils;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
+import org.joml.Matrix4fc;
 import org.joml.Quaternionf;
+import org.joml.Quaternionfc;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.joml.Vector4f;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 
-@Environment(EnvType.CLIENT)
-public class GameRenderer implements TrackedWaypoint.PitchProvider, AutoCloseable {
-   private static final Identifier BLUR_ID = Identifier.ofVanilla("blur");
-   public static final int field_49904 = 10;
-   private static final Logger LOGGER = LogUtils.getLogger();
-   public static final float CAMERA_DEPTH = 0.05F;
-   public static final float field_60107 = 100.0F;
-   private static final float field_55869 = 20.0F;
-   private static final float field_55870 = 7.0F;
-   private final MinecraftClient client;
-   private final Random random = Random.create();
-   private float viewDistanceBlocks;
-   public final HeldItemRenderer firstPersonRenderer;
-   private final InGameOverlayRenderer overlayRenderer;
-   private final BufferBuilderStorage buffers;
-   private float nauseaEffectTime;
-   private float nauseaEffectSpeed;
-   private float fovMultiplier;
-   private float lastFovMultiplier;
-   private float skyDarkness;
-   private float lastSkyDarkness;
-   private boolean blockOutlineEnabled = true;
-   private long lastWorldIconUpdate;
-   private boolean hasWorldIcon;
-   private long lastWindowFocusedTime = Util.getMeasuringTimeMs();
-   private final LightmapTextureManager lightmapTextureManager;
-   private final OverlayTexture overlayTexture = new OverlayTexture();
-   private boolean renderingPanorama;
-   protected final CubeMapRenderer panoramaRenderer = new CubeMapRenderer(Identifier.ofVanilla("textures/gui/title/background/panorama"));
-   protected final RotatingCubeMapRenderer rotatingPanoramaRenderer;
-   private final Pool pool;
-   private final FogRenderer fogRenderer;
-   private final GuiRenderer guiRenderer;
-   private final GuiRenderState guiState;
-   @Nullable
-   private Identifier postProcessorId;
-   private boolean postProcessorEnabled;
-   private final Camera camera;
-   private final DiffuseLighting diffuseLighting;
-   private final GlobalSettings globalSettings;
-   private final RawProjectionMatrix worldProjectionMatrix;
-   private final ProjectionMatrix3 hudProjectionMatrix;
+@Environment(value=EnvType.CLIENT)
+public class GameRenderer
+implements TrackedWaypoint.PitchProvider,
+AutoCloseable {
+    private static final Identifier BLUR_ID = Identifier.ofVanilla((String)"blur");
+    public static final int field_49904 = 10;
+    private static final Logger LOGGER = LogUtils.getLogger();
+    public static final float CAMERA_DEPTH = 0.05f;
+    public static final float field_60107 = 100.0f;
+    private static final float field_55869 = 20.0f;
+    private static final float field_55870 = 7.0f;
+    private final MinecraftClient client;
+    private final Random random = Random.create();
+    private float viewDistanceBlocks;
+    public final HeldItemRenderer firstPersonRenderer;
+    private final InGameOverlayRenderer overlayRenderer;
+    private final BufferBuilderStorage buffers;
+    private float nauseaEffectTime;
+    private float nauseaEffectSpeed;
+    private float fovMultiplier;
+    private float lastFovMultiplier;
+    private float skyDarkness;
+    private float lastSkyDarkness;
+    private boolean blockOutlineEnabled = true;
+    private long lastWorldIconUpdate;
+    private boolean hasWorldIcon;
+    private long lastWindowFocusedTime = Util.getMeasuringTimeMs();
+    private final LightmapTextureManager lightmapTextureManager;
+    private final OverlayTexture overlayTexture = new OverlayTexture();
+    private @Nullable CameraOverride cameraOverride;
+    protected final CubeMapRenderer panoramaRenderer = new CubeMapRenderer(Identifier.ofVanilla((String)"textures/gui/title/background/panorama"));
+    protected final RotatingCubeMapRenderer rotatingPanoramaRenderer = new RotatingCubeMapRenderer(this.panoramaRenderer);
+    private final Pool pool = new Pool(3);
+    private final FogRenderer fogRenderer = new FogRenderer();
+    private final GuiRenderer guiRenderer;
+    final GuiRenderState guiState;
+    private final WorldRenderState worldRenderState = new WorldRenderState();
+    private final OrderedRenderCommandQueueImpl orderedRenderCommandQueue;
+    private final RenderDispatcher entityRenderDispatcher;
+    private @Nullable Identifier postProcessorId;
+    private boolean postProcessorEnabled;
+    private final Camera camera = new Camera();
+    private final DiffuseLighting diffuseLighting = new DiffuseLighting();
+    private final GlobalSettings globalSettings = new GlobalSettings();
+    private final RawProjectionMatrix worldProjectionMatrix = new RawProjectionMatrix("level");
+    private final ProjectionMatrix3 hudProjectionMatrix = new ProjectionMatrix3("3d hud", 0.05f, 100.0f);
 
-   public GameRenderer(MinecraftClient client, HeldItemRenderer firstPersonHeldItemRenderer, BufferBuilderStorage buffers) {
-      this.rotatingPanoramaRenderer = new RotatingCubeMapRenderer(this.panoramaRenderer);
-      this.pool = new Pool(3);
-      this.fogRenderer = new FogRenderer();
-      this.camera = new Camera();
-      this.diffuseLighting = new DiffuseLighting();
-      this.globalSettings = new GlobalSettings();
-      this.worldProjectionMatrix = new RawProjectionMatrix("level");
-      this.hudProjectionMatrix = new ProjectionMatrix3("3d hud", 0.05F, 100.0F);
-      this.client = client;
-      this.firstPersonRenderer = firstPersonHeldItemRenderer;
-      this.lightmapTextureManager = new LightmapTextureManager(this, client);
-      this.buffers = buffers;
-      this.guiState = new GuiRenderState();
-      VertexConsumerProvider.Immediate immediate = buffers.getEntityVertexConsumers();
-      this.guiRenderer = new GuiRenderer(this.guiState, immediate, List.of(new EntityGuiElementRenderer(immediate, client.getEntityRenderDispatcher()), new PlayerSkinGuiElementRenderer(immediate), new BookModelGuiElementRenderer(immediate), new BannerResultGuiElementRenderer(immediate), new SignGuiElementRenderer(immediate), new ProfilerChartGuiElementRenderer(immediate)));
-      this.overlayRenderer = new InGameOverlayRenderer(client, immediate);
-   }
+    public GameRenderer(MinecraftClient client, HeldItemRenderer firstPersonHeldItemRenderer, BufferBuilderStorage buffers, BlockRenderManager blockRenderManager) {
+        this.client = client;
+        this.firstPersonRenderer = firstPersonHeldItemRenderer;
+        this.lightmapTextureManager = new LightmapTextureManager(this, client);
+        this.buffers = buffers;
+        this.guiState = new GuiRenderState();
+        VertexConsumerProvider.Immediate immediate = buffers.getEntityVertexConsumers();
+        AtlasManager atlasManager = client.getAtlasManager();
+        this.orderedRenderCommandQueue = new OrderedRenderCommandQueueImpl();
+        this.entityRenderDispatcher = new RenderDispatcher(this.orderedRenderCommandQueue, blockRenderManager, immediate, atlasManager, buffers.getOutlineVertexConsumers(), buffers.getEffectVertexConsumers(), client.textRenderer);
+        this.guiRenderer = new GuiRenderer(this.guiState, immediate, (OrderedRenderCommandQueue)this.orderedRenderCommandQueue, this.entityRenderDispatcher, List.of(new EntityGuiElementRenderer(immediate, client.getEntityRenderDispatcher()), new PlayerSkinGuiElementRenderer(immediate), new BookModelGuiElementRenderer(immediate), new BannerResultGuiElementRenderer(immediate, (SpriteHolder)atlasManager), new SignGuiElementRenderer(immediate, (SpriteHolder)atlasManager), new ProfilerChartGuiElementRenderer(immediate)));
+        this.overlayRenderer = new InGameOverlayRenderer(client, (SpriteHolder)atlasManager, (VertexConsumerProvider)immediate);
+    }
 
-   public void close() {
-      this.globalSettings.close();
-      this.lightmapTextureManager.close();
-      this.overlayTexture.close();
-      this.pool.close();
-      this.guiRenderer.close();
-      this.worldProjectionMatrix.close();
-      this.hudProjectionMatrix.close();
-      this.diffuseLighting.close();
-      this.panoramaRenderer.close();
-      this.fogRenderer.close();
-   }
+    @Override
+    public void close() {
+        this.globalSettings.close();
+        this.lightmapTextureManager.close();
+        this.overlayTexture.close();
+        this.pool.close();
+        this.guiRenderer.close();
+        this.worldProjectionMatrix.close();
+        this.hudProjectionMatrix.close();
+        this.diffuseLighting.close();
+        this.panoramaRenderer.close();
+        this.fogRenderer.close();
+        this.entityRenderDispatcher.close();
+    }
 
-   public void setBlockOutlineEnabled(boolean blockOutlineEnabled) {
-      this.blockOutlineEnabled = blockOutlineEnabled;
-   }
+    public OrderedRenderCommandQueueImpl getEntityRenderCommandQueue() {
+        return this.orderedRenderCommandQueue;
+    }
 
-   public void setRenderingPanorama(boolean renderingPanorama) {
-      this.renderingPanorama = renderingPanorama;
-   }
+    public RenderDispatcher getEntityRenderDispatcher() {
+        return this.entityRenderDispatcher;
+    }
 
-   public boolean isRenderingPanorama() {
-      return this.renderingPanorama;
-   }
+    public WorldRenderState getEntityRenderStates() {
+        return this.worldRenderState;
+    }
 
-   public void clearPostProcessor() {
-      this.postProcessorId = null;
-   }
+    public void setBlockOutlineEnabled(boolean blockOutlineEnabled) {
+        this.blockOutlineEnabled = blockOutlineEnabled;
+    }
 
-   public void togglePostProcessorEnabled() {
-      this.postProcessorEnabled = !this.postProcessorEnabled;
-   }
+    public void setCameraOverride(@Nullable CameraOverride cameraOverride) {
+        this.cameraOverride = cameraOverride;
+    }
 
-   public void onCameraEntitySet(@Nullable Entity entity) {
-      this.postProcessorId = null;
-      if (entity instanceof CreeperEntity) {
-         this.setPostProcessor(Identifier.ofVanilla("creeper"));
-      } else if (entity instanceof SpiderEntity) {
-         this.setPostProcessor(Identifier.ofVanilla("spider"));
-      } else if (entity instanceof EndermanEntity) {
-         this.setPostProcessor(Identifier.ofVanilla("invert"));
-      }
+    public @Nullable CameraOverride getCameraOverride() {
+        return this.cameraOverride;
+    }
 
-   }
+    public boolean isRenderingPanorama() {
+        return this.cameraOverride != null;
+    }
 
-   private void setPostProcessor(Identifier id) {
-      this.postProcessorId = id;
-      this.postProcessorEnabled = true;
-   }
+    public void clearPostProcessor() {
+        this.postProcessorId = null;
+        this.postProcessorEnabled = false;
+    }
 
-   public void renderBlur() {
-      PostEffectProcessor postEffectProcessor = this.client.getShaderLoader().loadPostEffect(BLUR_ID, DefaultFramebufferSet.MAIN_ONLY);
-      if (postEffectProcessor != null) {
-         postEffectProcessor.render(this.client.getFramebuffer(), this.pool);
-      }
+    public void togglePostProcessorEnabled() {
+        this.postProcessorEnabled = !this.postProcessorEnabled;
+    }
 
-   }
-
-   public void preloadPrograms(ResourceFactory factory) {
-      GpuDevice gpuDevice = RenderSystem.getDevice();
-      BiFunction biFunction = (id, type) -> {
-         Identifier identifier = type.idConverter().toResourcePath(id);
-
-         try {
-            Reader reader = factory.getResourceOrThrow(identifier).getReader();
-
-            String var5;
-            try {
-               var5 = IOUtils.toString(reader);
-            } catch (Throwable var8) {
-               if (reader != null) {
-                  try {
-                     reader.close();
-                  } catch (Throwable var7) {
-                     var8.addSuppressed(var7);
-                  }
-               }
-
-               throw var8;
+    public void onCameraEntitySet(@Nullable Entity entity) {
+        Entity entity2 = entity;
+        int n = 0;
+        switch (SwitchBootstraps.typeSwitch("typeSwitch", new Object[]{CreeperEntity.class, SpiderEntity.class, EndermanEntity.class}, (Object)entity2, n)) {
+            case 0: {
+                CreeperEntity creeperEntity = (CreeperEntity)entity2;
+                this.setPostProcessor(Identifier.ofVanilla((String)"creeper"));
+                break;
             }
-
-            if (reader != null) {
-               reader.close();
+            case 1: {
+                SpiderEntity spiderEntity = (SpiderEntity)entity2;
+                this.setPostProcessor(Identifier.ofVanilla((String)"spider"));
+                break;
             }
-
-            return var5;
-         } catch (IOException var9) {
-            LOGGER.error("Coudln't preload {} shader {}: {}", new Object[]{type, id, var9});
-            return null;
-         }
-      };
-      gpuDevice.precompilePipeline(RenderPipelines.GUI, biFunction);
-      gpuDevice.precompilePipeline(RenderPipelines.GUI_TEXTURED, biFunction);
-      if (TracyClient.isAvailable()) {
-         gpuDevice.precompilePipeline(RenderPipelines.TRACY_BLIT, biFunction);
-      }
-
-   }
-
-   public void tick() {
-      this.updateFovMultiplier();
-      this.lightmapTextureManager.tick();
-      ClientPlayerEntity clientPlayerEntity = this.client.player;
-      if (this.client.getCameraEntity() == null) {
-         this.client.setCameraEntity(clientPlayerEntity);
-      }
-
-      this.camera.updateEyeHeight();
-      this.firstPersonRenderer.updateHeldItems();
-      float f = clientPlayerEntity.nauseaIntensity;
-      float g = clientPlayerEntity.getEffectFadeFactor(StatusEffects.NAUSEA, 1.0F);
-      if (!(f > 0.0F) && !(g > 0.0F)) {
-         this.nauseaEffectSpeed = 0.0F;
-      } else {
-         this.nauseaEffectSpeed = (f * 20.0F + g * 7.0F) / (f + g);
-         this.nauseaEffectTime += this.nauseaEffectSpeed;
-      }
-
-      if (this.client.world.getTickManager().shouldTick()) {
-         this.client.worldRenderer.addWeatherParticlesAndSound(this.camera);
-         this.lastSkyDarkness = this.skyDarkness;
-         if (this.client.inGameHud.getBossBarHud().shouldDarkenSky()) {
-            this.skyDarkness += 0.05F;
-            if (this.skyDarkness > 1.0F) {
-               this.skyDarkness = 1.0F;
+            case 2: {
+                EndermanEntity endermanEntity = (EndermanEntity)entity2;
+                this.setPostProcessor(Identifier.ofVanilla((String)"invert"));
+                break;
             }
-         } else if (this.skyDarkness > 0.0F) {
-            this.skyDarkness -= 0.0125F;
-         }
-
-         this.overlayRenderer.tickFloatingItemTimer();
-      }
-   }
-
-   @Nullable
-   public Identifier getPostProcessorId() {
-      return this.postProcessorId;
-   }
-
-   public void onResized(int width, int height) {
-      this.pool.clear();
-      this.client.worldRenderer.onResized(width, height);
-   }
-
-   public void updateCrosshairTarget(float tickProgress) {
-      Entity entity = this.client.getCameraEntity();
-      if (entity != null) {
-         if (this.client.world != null && this.client.player != null) {
-            Profilers.get().push("pick");
-            double d = this.client.player.getBlockInteractionRange();
-            double e = this.client.player.getEntityInteractionRange();
-            HitResult hitResult = this.findCrosshairTarget(entity, d, e, tickProgress);
-            this.client.crosshairTarget = hitResult;
-            MinecraftClient var10000 = this.client;
-            Entity var10001;
-            if (hitResult instanceof EntityHitResult) {
-               EntityHitResult entityHitResult = (EntityHitResult)hitResult;
-               var10001 = entityHitResult.getEntity();
-            } else {
-               var10001 = null;
+            default: {
+                this.clearPostProcessor();
             }
+        }
+    }
 
-            var10000.targetedEntity = var10001;
-            Profilers.get().pop();
-         }
-      }
-   }
+    private void setPostProcessor(Identifier id) {
+        this.postProcessorId = id;
+        this.postProcessorEnabled = true;
+    }
 
-   private HitResult findCrosshairTarget(Entity camera, double blockInteractionRange, double entityInteractionRange, float tickProgress) {
-      double d = Math.max(blockInteractionRange, entityInteractionRange);
-      double e = MathHelper.square(d);
-      Vec3d vec3d = camera.getCameraPosVec(tickProgress);
-      HitResult hitResult = camera.raycast(d, tickProgress, false);
-      double f = hitResult.getPos().squaredDistanceTo(vec3d);
-      if (hitResult.getType() != HitResult.Type.MISS) {
-         e = f;
-         d = Math.sqrt(f);
-      }
+    public void renderBlur() {
+        PostEffectProcessor postEffectProcessor = this.client.getShaderLoader().loadPostEffect(BLUR_ID, DefaultFramebufferSet.MAIN_ONLY);
+        if (postEffectProcessor != null) {
+            postEffectProcessor.render(this.client.getFramebuffer(), (ObjectAllocator)this.pool);
+        }
+    }
 
-      Vec3d vec3d2 = camera.getRotationVec(tickProgress);
-      Vec3d vec3d3 = vec3d.add(vec3d2.x * d, vec3d2.y * d, vec3d2.z * d);
-      float g = 1.0F;
-      Box box = camera.getBoundingBox().stretch(vec3d2.multiply(d)).expand(1.0, 1.0, 1.0);
-      EntityHitResult entityHitResult = ProjectileUtil.raycast(camera, vec3d, vec3d3, box, EntityPredicates.CAN_HIT, e);
-      return entityHitResult != null && entityHitResult.getPos().squaredDistanceTo(vec3d) < f ? ensureTargetInRange(entityHitResult, vec3d, entityInteractionRange) : ensureTargetInRange(hitResult, vec3d, blockInteractionRange);
-   }
-
-   private static HitResult ensureTargetInRange(HitResult hitResult, Vec3d cameraPos, double interactionRange) {
-      Vec3d vec3d = hitResult.getPos();
-      if (!vec3d.isInRange(cameraPos, interactionRange)) {
-         Vec3d vec3d2 = hitResult.getPos();
-         Direction direction = Direction.getFacing(vec3d2.x - cameraPos.x, vec3d2.y - cameraPos.y, vec3d2.z - cameraPos.z);
-         return BlockHitResult.createMissed(vec3d2, direction, BlockPos.ofFloored(vec3d2));
-      } else {
-         return hitResult;
-      }
-   }
-
-   private void updateFovMultiplier() {
-      Entity var3 = this.client.getCameraEntity();
-      float g;
-      if (var3 instanceof AbstractClientPlayerEntity abstractClientPlayerEntity) {
-         GameOptions gameOptions = this.client.options;
-         boolean bl = gameOptions.getPerspective().isFirstPerson();
-         float f = ((Double)gameOptions.getFovEffectScale().getValue()).floatValue();
-         g = abstractClientPlayerEntity.getFovMultiplier(bl, f);
-      } else {
-         g = 1.0F;
-      }
-
-      this.lastFovMultiplier = this.fovMultiplier;
-      this.fovMultiplier += (g - this.fovMultiplier) * 0.5F;
-      this.fovMultiplier = MathHelper.clamp(this.fovMultiplier, 0.1F, 1.5F);
-   }
-
-   private float getFov(Camera camera, float tickProgress, boolean changingFov) {
-      if (this.renderingPanorama) {
-         return 90.0F;
-      } else {
-         float f = 70.0F;
-         if (changingFov) {
-            f = (float)(Integer)this.client.options.getFov().getValue();
-            f *= MathHelper.lerp(tickProgress, this.lastFovMultiplier, this.fovMultiplier);
-         }
-
-         Entity var6 = camera.getFocusedEntity();
-         float g;
-         if (var6 instanceof LivingEntity) {
-            LivingEntity livingEntity = (LivingEntity)var6;
-            if (livingEntity.isDead()) {
-               g = Math.min((float)livingEntity.deathTime + tickProgress, 20.0F);
-               f /= (1.0F - 500.0F / (g + 500.0F)) * 2.0F + 1.0F;
+    public void preloadPrograms(ResourceFactory factory) {
+        GpuDevice gpuDevice = RenderSystem.getDevice();
+        ShaderSourceGetter shaderSourceGetter = (id, type) -> {
+            String string;
+            block8: {
+                Identifier identifier = type.idConverter().toResourcePath(id);
+                BufferedReader reader = factory.getResourceOrThrow(identifier).getReader();
+                try {
+                    string = IOUtils.toString((Reader)reader);
+                    if (reader == null) break block8;
+                }
+                catch (Throwable throwable) {
+                    try {
+                        if (reader != null) {
+                            try {
+                                ((Reader)reader).close();
+                            }
+                            catch (Throwable throwable2) {
+                                throwable.addSuppressed(throwable2);
+                            }
+                        }
+                        throw throwable;
+                    }
+                    catch (IOException iOException) {
+                        LOGGER.error("Coudln't preload {} shader {}: {}", new Object[]{type, id, iOException});
+                        return null;
+                    }
+                }
+                ((Reader)reader).close();
             }
-         }
+            return string;
+        };
+        gpuDevice.precompilePipeline(RenderPipelines.GUI, shaderSourceGetter);
+        gpuDevice.precompilePipeline(RenderPipelines.GUI_TEXTURED, shaderSourceGetter);
+        if (TracyClient.isAvailable()) {
+            gpuDevice.precompilePipeline(RenderPipelines.TRACY_BLIT, shaderSourceGetter);
+        }
+    }
 
-         CameraSubmersionType cameraSubmersionType = camera.getSubmersionType();
-         if (cameraSubmersionType == CameraSubmersionType.LAVA || cameraSubmersionType == CameraSubmersionType.WATER) {
-            g = ((Double)this.client.options.getFovEffectScale().getValue()).floatValue();
-            f *= MathHelper.lerp(g, 1.0F, 0.85714287F);
-         }
-
-         return f;
-      }
-   }
-
-   private void tiltViewWhenHurt(MatrixStack matrices, float tickProgress) {
-      Entity var4 = this.client.getCameraEntity();
-      if (var4 instanceof LivingEntity livingEntity) {
-         float f = (float)livingEntity.hurtTime - tickProgress;
-         float g;
-         if (livingEntity.isDead()) {
-            g = Math.min((float)livingEntity.deathTime + tickProgress, 20.0F);
-            matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(40.0F - 8000.0F / (g + 200.0F)));
-         }
-
-         if (f < 0.0F) {
+    public void tick() {
+        this.updateFovMultiplier();
+        this.lightmapTextureManager.tick();
+        ClientPlayerEntity clientPlayerEntity = this.client.player;
+        if (this.client.getCameraEntity() == null) {
+            this.client.setCameraEntity((Entity)clientPlayerEntity);
+        }
+        this.camera.updateEyeHeight();
+        this.firstPersonRenderer.updateHeldItems();
+        float f = clientPlayerEntity.nauseaIntensity;
+        float g = clientPlayerEntity.getEffectFadeFactor(StatusEffects.NAUSEA, 1.0f);
+        if (f > 0.0f || g > 0.0f) {
+            this.nauseaEffectSpeed = (f * 20.0f + g * 7.0f) / (f + g);
+            this.nauseaEffectTime += this.nauseaEffectSpeed;
+        } else {
+            this.nauseaEffectSpeed = 0.0f;
+        }
+        if (!this.client.world.getTickManager().shouldTick()) {
             return;
-         }
+        }
+        this.lastSkyDarkness = this.skyDarkness;
+        if (this.client.inGameHud.getBossBarHud().shouldDarkenSky()) {
+            this.skyDarkness += 0.05f;
+            if (this.skyDarkness > 1.0f) {
+                this.skyDarkness = 1.0f;
+            }
+        } else if (this.skyDarkness > 0.0f) {
+            this.skyDarkness -= 0.0125f;
+        }
+        this.overlayRenderer.tickFloatingItemTimer();
+        Profiler profiler = Profilers.get();
+        profiler.push("levelRenderer");
+        this.client.worldRenderer.tick(this.camera);
+        profiler.pop();
+    }
 
-         f /= (float)livingEntity.maxHurtTime;
-         f = MathHelper.sin(f * f * f * f * 3.1415927F);
-         g = livingEntity.getDamageTiltYaw();
-         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-g));
-         float h = (float)((double)(-f) * 14.0 * (Double)this.client.options.getDamageTiltStrength().getValue());
-         matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(h));
-         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(g));
-      }
+    public @Nullable Identifier getPostProcessorId() {
+        return this.postProcessorId;
+    }
 
-   }
+    public void onResized(int width, int height) {
+        this.pool.clear();
+        this.client.worldRenderer.onResized(width, height);
+    }
 
-   private void bobView(MatrixStack matrices, float tickProgress) {
-      Entity var4 = this.client.getCameraEntity();
-      if (var4 instanceof AbstractClientPlayerEntity abstractClientPlayerEntity) {
-         float f = abstractClientPlayerEntity.distanceMoved - abstractClientPlayerEntity.lastDistanceMoved;
-         float g = -(abstractClientPlayerEntity.distanceMoved + f * tickProgress);
-         float h = MathHelper.lerp(tickProgress, abstractClientPlayerEntity.lastStrideDistance, abstractClientPlayerEntity.strideDistance);
-         matrices.translate(MathHelper.sin(g * 3.1415927F) * h * 0.5F, -Math.abs(MathHelper.cos(g * 3.1415927F) * h), 0.0F);
-         matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(MathHelper.sin(g * 3.1415927F) * h * 3.0F));
-         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(Math.abs(MathHelper.cos(g * 3.1415927F - 0.2F) * h) * 5.0F));
-      }
-   }
+    public void updateCrosshairTarget(float tickProgress) {
+        Entity entity;
+        Entity entity2 = this.client.getCameraEntity();
+        if (entity2 == null) {
+            return;
+        }
+        if (this.client.world == null || this.client.player == null) {
+            return;
+        }
+        Profilers.get().push("pick");
+        HitResult hitResult = this.client.crosshairTarget = this.client.player.getCrosshairTarget(tickProgress, entity2);
+        if (hitResult instanceof EntityHitResult) {
+            EntityHitResult entityHitResult = (EntityHitResult)hitResult;
+            entity = entityHitResult.getEntity();
+        } else {
+            entity = null;
+        }
+        this.client.targetedEntity = entity;
+        Profilers.get().pop();
+    }
 
-   private void renderHand(float tickProgress, boolean sleeping, Matrix4f positionMatrix) {
-      if (!this.renderingPanorama) {
-         MatrixStack matrixStack = new MatrixStack();
-         matrixStack.push();
-         matrixStack.multiplyPositionMatrix(positionMatrix.invert(new Matrix4f()));
-         Matrix4fStack matrix4fStack = RenderSystem.getModelViewStack();
-         matrix4fStack.pushMatrix().mul(positionMatrix);
-         this.tiltViewWhenHurt(matrixStack, tickProgress);
-         if ((Boolean)this.client.options.getBobView().getValue()) {
+    private void updateFovMultiplier() {
+        float g;
+        Entity entity = this.client.getCameraEntity();
+        if (entity instanceof AbstractClientPlayerEntity) {
+            AbstractClientPlayerEntity abstractClientPlayerEntity = (AbstractClientPlayerEntity)entity;
+            GameOptions gameOptions = this.client.options;
+            boolean bl = gameOptions.getPerspective().isFirstPerson();
+            float f = ((Double)gameOptions.getFovEffectScale().getValue()).floatValue();
+            g = abstractClientPlayerEntity.getFovMultiplier(bl, f);
+        } else {
+            g = 1.0f;
+        }
+        this.lastFovMultiplier = this.fovMultiplier;
+        this.fovMultiplier += (g - this.fovMultiplier) * 0.5f;
+        this.fovMultiplier = MathHelper.clamp((float)this.fovMultiplier, (float)0.1f, (float)1.5f);
+    }
+
+    private float getFov(Camera camera, float tickProgress, boolean changingFov) {
+        CameraSubmersionType cameraSubmersionType;
+        LivingEntity livingEntity;
+        Entity entity;
+        if (this.isRenderingPanorama()) {
+            return 90.0f;
+        }
+        float f = 70.0f;
+        if (changingFov) {
+            f = ((Integer)this.client.options.getFov().getValue()).intValue();
+            f *= MathHelper.lerp((float)tickProgress, (float)this.lastFovMultiplier, (float)this.fovMultiplier);
+        }
+        if ((entity = camera.getFocusedEntity()) instanceof LivingEntity && (livingEntity = (LivingEntity)entity).isDead()) {
+            float g = Math.min((float)livingEntity.deathTime + tickProgress, 20.0f);
+            f /= (1.0f - 500.0f / (g + 500.0f)) * 2.0f + 1.0f;
+        }
+        if ((cameraSubmersionType = camera.getSubmersionType()) == CameraSubmersionType.LAVA || cameraSubmersionType == CameraSubmersionType.WATER) {
+            float g = ((Double)this.client.options.getFovEffectScale().getValue()).floatValue();
+            f *= MathHelper.lerp((float)g, (float)1.0f, (float)0.85714287f);
+        }
+        return f;
+    }
+
+    private void tiltViewWhenHurt(MatrixStack matrices, float tickProgress) {
+        Entity entity = this.client.getCameraEntity();
+        if (entity instanceof LivingEntity) {
+            float g;
+            LivingEntity livingEntity = (LivingEntity)entity;
+            float f = (float)livingEntity.hurtTime - tickProgress;
+            if (livingEntity.isDead()) {
+                g = Math.min((float)livingEntity.deathTime + tickProgress, 20.0f);
+                matrices.multiply((Quaternionfc)RotationAxis.POSITIVE_Z.rotationDegrees(40.0f - 8000.0f / (g + 200.0f)));
+            }
+            if (f < 0.0f) {
+                return;
+            }
+            f /= (float)livingEntity.maxHurtTime;
+            f = MathHelper.sin((double)(f * f * f * f * (float)Math.PI));
+            g = livingEntity.getDamageTiltYaw();
+            matrices.multiply((Quaternionfc)RotationAxis.POSITIVE_Y.rotationDegrees(-g));
+            float h = (float)((double)(-f) * 14.0 * (Double)this.client.options.getDamageTiltStrength().getValue());
+            matrices.multiply((Quaternionfc)RotationAxis.POSITIVE_Z.rotationDegrees(h));
+            matrices.multiply((Quaternionfc)RotationAxis.POSITIVE_Y.rotationDegrees(g));
+        }
+    }
+
+    private void bobView(MatrixStack matrices, float tickProgress) {
+        Entity entity = this.client.getCameraEntity();
+        if (!(entity instanceof AbstractClientPlayerEntity)) {
+            return;
+        }
+        AbstractClientPlayerEntity abstractClientPlayerEntity = (AbstractClientPlayerEntity)entity;
+        ClientPlayerLikeState clientPlayerLikeState = abstractClientPlayerEntity.getState();
+        float f = clientPlayerLikeState.getReverseLerpedDistanceMoved(tickProgress);
+        float g = clientPlayerLikeState.lerpMovement(tickProgress);
+        matrices.translate(MathHelper.sin((double)(f * (float)Math.PI)) * g * 0.5f, -Math.abs(MathHelper.cos((double)(f * (float)Math.PI)) * g), 0.0f);
+        matrices.multiply((Quaternionfc)RotationAxis.POSITIVE_Z.rotationDegrees(MathHelper.sin((double)(f * (float)Math.PI)) * g * 3.0f));
+        matrices.multiply((Quaternionfc)RotationAxis.POSITIVE_X.rotationDegrees(Math.abs(MathHelper.cos((double)(f * (float)Math.PI - 0.2f)) * g) * 5.0f));
+    }
+
+    private void renderHand(float tickProgress, boolean sleeping, Matrix4f positionMatrix) {
+        if (this.isRenderingPanorama()) {
+            return;
+        }
+        this.entityRenderDispatcher.render();
+        this.buffers.getEntityVertexConsumers().draw();
+        MatrixStack matrixStack = new MatrixStack();
+        matrixStack.push();
+        matrixStack.multiplyPositionMatrix((Matrix4fc)positionMatrix.invert(new Matrix4f()));
+        Matrix4fStack matrix4fStack = RenderSystem.getModelViewStack();
+        matrix4fStack.pushMatrix().mul((Matrix4fc)positionMatrix);
+        this.tiltViewWhenHurt(matrixStack, tickProgress);
+        if (((Boolean)this.client.options.getBobView().getValue()).booleanValue()) {
             this.bobView(matrixStack, tickProgress);
-         }
+        }
+        if (this.client.options.getPerspective().isFirstPerson() && !sleeping && !this.client.options.hudHidden && this.client.interactionManager.getCurrentGameMode() != GameMode.SPECTATOR) {
+            this.firstPersonRenderer.renderItem(tickProgress, matrixStack, (OrderedRenderCommandQueue)this.client.gameRenderer.getEntityRenderCommandQueue(), this.client.player, this.client.getEntityRenderDispatcher().getLight((Entity)this.client.player, tickProgress));
+        }
+        matrix4fStack.popMatrix();
+        matrixStack.pop();
+    }
 
-         if (this.client.options.getPerspective().isFirstPerson() && !sleeping && !this.client.options.hudHidden && this.client.interactionManager.getCurrentGameMode() != GameMode.SPECTATOR) {
-            this.lightmapTextureManager.enable();
-            this.firstPersonRenderer.renderItem(tickProgress, matrixStack, this.buffers.getEntityVertexConsumers(), this.client.player, this.client.getEntityRenderDispatcher().getLight(this.client.player, tickProgress));
-            this.lightmapTextureManager.disable();
-         }
+    public Matrix4f getBasicProjectionMatrix(float fovDegrees) {
+        Matrix4f matrix4f = new Matrix4f();
+        return matrix4f.perspective(fovDegrees * ((float)Math.PI / 180), (float)this.client.getWindow().getFramebufferWidth() / (float)this.client.getWindow().getFramebufferHeight(), 0.05f, this.getFarPlaneDistance());
+    }
 
-         matrix4fStack.popMatrix();
-         matrixStack.pop();
-      }
-   }
+    public float getFarPlaneDistance() {
+        return Math.max(this.viewDistanceBlocks * 4.0f, (float)((Integer)this.client.options.getCloudRenderDistance().getValue() * 16));
+    }
 
-   public Matrix4f getBasicProjectionMatrix(float fovDegrees) {
-      Matrix4f matrix4f = new Matrix4f();
-      return matrix4f.perspective(fovDegrees * 0.017453292F, (float)this.client.getWindow().getFramebufferWidth() / (float)this.client.getWindow().getFramebufferHeight(), 0.05F, this.getFarPlaneDistance());
-   }
+    public static float getNightVisionStrength(LivingEntity entity, float tickProgress) {
+        StatusEffectInstance statusEffectInstance = entity.getStatusEffect(StatusEffects.NIGHT_VISION);
+        if (!statusEffectInstance.isDurationBelow(200)) {
+            return 1.0f;
+        }
+        return 0.7f + MathHelper.sin((double)(((float)statusEffectInstance.getDuration() - tickProgress) * (float)Math.PI * 0.2f)) * 0.3f;
+    }
 
-   public float getFarPlaneDistance() {
-      return Math.max(this.viewDistanceBlocks * 4.0F, (float)((Integer)this.client.options.getCloudRenderDistance().getValue() * 16));
-   }
-
-   public static float getNightVisionStrength(LivingEntity entity, float tickProgress) {
-      StatusEffectInstance statusEffectInstance = entity.getStatusEffect(StatusEffects.NIGHT_VISION);
-      return !statusEffectInstance.isDurationBelow(200) ? 1.0F : 0.7F + MathHelper.sin(((float)statusEffectInstance.getDuration() - tickProgress) * 3.1415927F * 0.2F) * 0.3F;
-   }
-
-   public void render(RenderTickCounter tickCounter, boolean tick) {
-      if (!this.client.isWindowFocused() && this.client.options.pauseOnLostFocus && (!(Boolean)this.client.options.getTouchscreen().getValue() || !this.client.mouse.wasRightButtonClicked())) {
-         if (Util.getMeasuringTimeMs() - this.lastWindowFocusedTime > 500L) {
+    public void render(RenderTickCounter tickCounter, boolean tick) {
+        if (this.client.isWindowFocused() || !this.client.options.pauseOnLostFocus || ((Boolean)this.client.options.getTouchscreen().getValue()).booleanValue() && this.client.mouse.wasRightButtonClicked()) {
+            this.lastWindowFocusedTime = Util.getMeasuringTimeMs();
+        } else if (Util.getMeasuringTimeMs() - this.lastWindowFocusedTime > 500L) {
             this.client.openGameMenu(false);
-         }
-      } else {
-         this.lastWindowFocusedTime = Util.getMeasuringTimeMs();
-      }
-
-      if (!this.client.skipGameRender) {
-         this.globalSettings.set(this.client.getWindow().getFramebufferWidth(), this.client.getWindow().getFramebufferHeight(), (Double)this.client.options.getGlintStrength().getValue(), this.client.world == null ? 0L : this.client.world.getTime(), tickCounter, this.client.options.getMenuBackgroundBlurrinessValue());
-         Profiler profiler = Profilers.get();
-         boolean bl = this.client.isFinishedLoading();
-         int i = (int)this.client.mouse.getScaledX(this.client.getWindow());
-         int j = (int)this.client.mouse.getScaledY(this.client.getWindow());
-         if (bl && tick && this.client.world != null) {
+        }
+        if (this.client.skipGameRender) {
+            return;
+        }
+        Profiler profiler = Profilers.get();
+        profiler.push("camera");
+        this.updateCamera(tickCounter);
+        profiler.pop();
+        this.globalSettings.set(this.client.getWindow().getFramebufferWidth(), this.client.getWindow().getFramebufferHeight(), ((Double)this.client.options.getGlintStrength().getValue()).doubleValue(), this.client.world == null ? 0L : this.client.world.getTime(), tickCounter, this.client.options.getMenuBackgroundBlurrinessValue(), this.camera, this.client.options.getTextureFiltering().getValue() == TextureFilteringMode.RGSS);
+        boolean bl = this.client.isFinishedLoading();
+        int i = (int)this.client.mouse.getScaledX(this.client.getWindow());
+        int j = (int)this.client.mouse.getScaledY(this.client.getWindow());
+        if (bl && tick && this.client.world != null) {
+            PostEffectProcessor postEffectProcessor;
             profiler.push("world");
             this.renderWorld(tickCounter);
             this.updateWorldIcon();
             this.client.worldRenderer.drawEntityOutlinesFramebuffer();
-            if (this.postProcessorId != null && this.postProcessorEnabled) {
-               RenderSystem.resetTextureMatrix();
-               PostEffectProcessor postEffectProcessor = this.client.getShaderLoader().loadPostEffect(this.postProcessorId, DefaultFramebufferSet.MAIN_ONLY);
-               if (postEffectProcessor != null) {
-                  postEffectProcessor.render(this.client.getFramebuffer(), this.pool);
-               }
+            if (this.postProcessorId != null && this.postProcessorEnabled && (postEffectProcessor = this.client.getShaderLoader().loadPostEffect(this.postProcessorId, DefaultFramebufferSet.MAIN_ONLY)) != null) {
+                postEffectProcessor.render(this.client.getFramebuffer(), (ObjectAllocator)this.pool);
             }
-         }
-
-         this.fogRenderer.rotate();
-         Framebuffer framebuffer = this.client.getFramebuffer();
-         RenderSystem.getDevice().createCommandEncoder().clearDepthTexture(framebuffer.getDepthAttachment(), 1.0);
-         this.client.gameRenderer.getDiffuseLighting().setShaderLights(DiffuseLighting.Type.ITEMS_3D);
-         this.guiState.clear();
-         DrawContext drawContext = new DrawContext(this.client, this.guiState);
-         if (bl && tick && this.client.world != null) {
-            profiler.swap("gui");
-            this.client.inGameHud.render(drawContext, tickCounter);
             profiler.pop();
-         }
-
-         CrashReport crashReport;
-         CrashReportSection crashReportSection;
-         if (this.client.getOverlay() != null) {
+        }
+        this.fogRenderer.rotate();
+        Framebuffer framebuffer = this.client.getFramebuffer();
+        RenderSystem.getDevice().createCommandEncoder().clearDepthTexture(framebuffer.getDepthAttachment(), 1.0);
+        this.client.gameRenderer.getDiffuseLighting().setShaderLights(DiffuseLighting.Type.ITEMS_3D);
+        this.guiState.clear();
+        profiler.push("guiExtraction");
+        DrawContext drawContext = new DrawContext(this.client, this.guiState, i, j);
+        if (bl && tick && this.client.world != null) {
+            this.client.inGameHud.render(drawContext, tickCounter);
+        }
+        if (this.client.getOverlay() != null) {
             try {
-               this.client.getOverlay().render(drawContext, i, j, tickCounter.getDynamicDeltaTicks());
-            } catch (Throwable var15) {
-               crashReport = CrashReport.create(var15, "Rendering overlay");
-               crashReportSection = crashReport.addElement("Overlay render details");
-               crashReportSection.add("Overlay name", () -> {
-                  return this.client.getOverlay().getClass().getCanonicalName();
-               });
-               throw new CrashException(crashReport);
+                this.client.getOverlay().render(drawContext, i, j, tickCounter.getDynamicDeltaTicks());
             }
-         } else if (bl && this.client.currentScreen != null) {
+            catch (Throwable throwable) {
+                CrashReport crashReport = CrashReport.create((Throwable)throwable, (String)"Rendering overlay");
+                CrashReportSection crashReportSection = crashReport.addElement("Overlay render details");
+                crashReportSection.add("Overlay name", () -> this.client.getOverlay().getClass().getCanonicalName());
+                throw new CrashException(crashReport);
+            }
+        }
+        if (bl && this.client.currentScreen != null) {
             try {
-               this.client.currentScreen.renderWithTooltip(drawContext, i, j, tickCounter.getDynamicDeltaTicks());
-            } catch (Throwable var14) {
-               crashReport = CrashReport.create(var14, "Rendering screen");
-               crashReportSection = crashReport.addElement("Screen render details");
-               crashReportSection.add("Screen name", () -> {
-                  return this.client.currentScreen.getClass().getCanonicalName();
-               });
-               this.client.mouse.addCrashReportSection(crashReportSection, this.client.getWindow());
-               throw new CrashException(crashReport);
+                this.client.currentScreen.renderWithTooltip(drawContext, i, j, tickCounter.getDynamicDeltaTicks());
             }
-
+            catch (Throwable throwable) {
+                CrashReport crashReport = CrashReport.create((Throwable)throwable, (String)"Rendering screen");
+                CrashReportSection crashReportSection = crashReport.addElement("Screen render details");
+                crashReportSection.add("Screen name", () -> this.client.currentScreen.getClass().getCanonicalName());
+                this.client.mouse.addCrashReportSection(crashReportSection, this.client.getWindow());
+                throw new CrashException(crashReport);
+            }
+            if (SharedConstants.CURSOR_POS) {
+                this.client.mouse.drawScaledPos(this.client.textRenderer, drawContext);
+            }
             try {
-               if (this.client.currentScreen != null) {
-                  this.client.currentScreen.updateNarrator();
-               }
-            } catch (Throwable var13) {
-               crashReport = CrashReport.create(var13, "Narrating screen");
-               crashReportSection = crashReport.addElement("Screen details");
-               crashReportSection.add("Screen name", () -> {
-                  return this.client.currentScreen.getClass().getCanonicalName();
-               });
-               throw new CrashException(crashReport);
+                if (this.client.currentScreen != null) {
+                    this.client.currentScreen.updateNarrator();
+                }
             }
-         }
-
-         if (bl && tick && this.client.world != null) {
+            catch (Throwable throwable) {
+                CrashReport crashReport = CrashReport.create((Throwable)throwable, (String)"Narrating screen");
+                CrashReportSection crashReportSection = crashReport.addElement("Screen details");
+                crashReportSection.add("Screen name", () -> this.client.currentScreen.getClass().getCanonicalName());
+                throw new CrashException(crashReport);
+            }
+        }
+        if (bl && tick && this.client.world != null) {
             this.client.inGameHud.renderAutosaveIndicator(drawContext, tickCounter);
-         }
-
-         if (bl) {
-            ScopedProfiler scopedProfiler = profiler.scoped("toasts");
-
-            try {
-               this.client.getToastManager().draw(drawContext);
-            } catch (Throwable var16) {
-               if (scopedProfiler != null) {
-                  try {
-                     scopedProfiler.close();
-                  } catch (Throwable var12) {
-                     var16.addSuppressed(var12);
-                  }
-               }
-
-               throw var16;
+        }
+        if (bl) {
+            try (ScopedProfiler scopedProfiler = profiler.scoped("toasts");){
+                this.client.getToastManager().draw(drawContext);
             }
+        }
+        if (!(this.client.currentScreen instanceof DebugOptionsScreen)) {
+            this.client.inGameHud.renderDebugHud(drawContext);
+        }
+        this.client.inGameHud.renderDeferredSubtitles();
+        if (SharedConstants.ACTIVE_TEXT_AREAS) {
+            this.renderActiveTextAreas();
+        }
+        profiler.swap("guiRendering");
+        this.guiRenderer.render(this.fogRenderer.getFogBuffer(FogRenderer.FogType.NONE));
+        this.guiRenderer.incrementFrame();
+        profiler.pop();
+        drawContext.applyCursorTo(this.client.getWindow());
+        this.orderedRenderCommandQueue.onNextFrame();
+        this.entityRenderDispatcher.endLayeredCustoms();
+        this.pool.decrementLifespan();
+    }
 
-            if (scopedProfiler != null) {
-               scopedProfiler.close();
+    private void renderActiveTextAreas() {
+        this.guiState.createNewRootLayer();
+        this.guiState.forEachTextElement(text -> text.prepare().draw((TextRenderer.GlyphDrawer)new /* Unavailable Anonymous Inner Class!! */));
+    }
+
+    private void updateWorldIcon() {
+        if (this.hasWorldIcon || !this.client.isInSingleplayer()) {
+            return;
+        }
+        long l = Util.getMeasuringTimeMs();
+        if (l - this.lastWorldIconUpdate < 1000L) {
+            return;
+        }
+        this.lastWorldIconUpdate = l;
+        IntegratedServer integratedServer = this.client.getServer();
+        if (integratedServer == null || integratedServer.isStopped()) {
+            return;
+        }
+        integratedServer.getIconFile().ifPresent(path -> {
+            if (Files.isRegularFile(path, new LinkOption[0])) {
+                this.hasWorldIcon = true;
+            } else {
+                this.updateWorldIcon(path);
             }
-         }
+        });
+    }
 
-         this.guiRenderer.render(this.fogRenderer.getFogBuffer(FogRenderer.FogType.NONE));
-         this.guiRenderer.incrementFrame();
-         this.pool.decrementLifespan();
-      }
-   }
+    private void updateWorldIcon(Path path) {
+        if (this.client.worldRenderer.getCompletedChunkCount() > 10 && this.client.worldRenderer.isTerrainRenderComplete()) {
+            ScreenshotRecorder.takeScreenshot((Framebuffer)this.client.getFramebuffer(), screenshot -> Util.getIoWorkerExecutor().execute(() -> {
+                int i = screenshot.getWidth();
+                int j = screenshot.getHeight();
+                int k = 0;
+                int l = 0;
+                if (i > j) {
+                    k = (i - j) / 2;
+                    i = j;
+                } else {
+                    l = (j - i) / 2;
+                    j = i;
+                }
+                try (NativeImage nativeImage2 = new NativeImage(64, 64, false);){
+                    screenshot.resizeSubRectTo(k, l, i, j, nativeImage2);
+                    nativeImage2.writeTo(path);
+                }
+                catch (IOException iOException) {
+                    LOGGER.warn("Couldn't save auto screenshot", (Throwable)iOException);
+                }
+                finally {
+                    screenshot.close();
+                }
+            }));
+        }
+    }
 
-   private void updateWorldIcon() {
-      if (!this.hasWorldIcon && this.client.isInSingleplayer()) {
-         long l = Util.getMeasuringTimeMs();
-         if (l - this.lastWorldIconUpdate >= 1000L) {
-            this.lastWorldIconUpdate = l;
-            IntegratedServer integratedServer = this.client.getServer();
-            if (integratedServer != null && !integratedServer.isStopped()) {
-               integratedServer.getIconFile().ifPresent((path) -> {
-                  if (Files.isRegularFile(path, new LinkOption[0])) {
-                     this.hasWorldIcon = true;
-                  } else {
-                     this.updateWorldIcon(path);
-                  }
-
-               });
-            }
-         }
-      }
-   }
-
-   private void updateWorldIcon(Path path) {
-      if (this.client.worldRenderer.getCompletedChunkCount() > 10 && this.client.worldRenderer.isTerrainRenderComplete()) {
-         ScreenshotRecorder.takeScreenshot(this.client.getFramebuffer(), (screenshot) -> {
-            Util.getIoWorkerExecutor().execute(() -> {
-               int i = screenshot.getWidth();
-               int j = screenshot.getHeight();
-               int k = 0;
-               int l = 0;
-               if (i > j) {
-                  k = (i - j) / 2;
-                  i = j;
-               } else {
-                  l = (j - i) / 2;
-                  j = i;
-               }
-
-               try {
-                  NativeImage nativeImage2 = new NativeImage(64, 64, false);
-
-                  try {
-                     screenshot.resizeSubRectTo(k, l, i, j, nativeImage2);
-                     nativeImage2.writeTo(path);
-                  } catch (Throwable var15) {
-                     try {
-                        nativeImage2.close();
-                     } catch (Throwable var14) {
-                        var15.addSuppressed(var14);
-                     }
-
-                     throw var15;
-                  }
-
-                  nativeImage2.close();
-               } catch (IOException var16) {
-                  LOGGER.warn("Couldn't save auto screenshot", var16);
-               } finally {
-                  screenshot.close();
-               }
-
-            });
-         });
-      }
-
-   }
-
-   private boolean shouldRenderBlockOutline() {
-      if (!this.blockOutlineEnabled) {
-         return false;
-      } else {
-         Entity entity = this.client.getCameraEntity();
-         boolean bl = entity instanceof PlayerEntity && !this.client.options.hudHidden;
-         if (bl && !((PlayerEntity)entity).getAbilities().allowModifyWorld) {
+    private boolean shouldRenderBlockOutline() {
+        boolean bl;
+        if (!this.blockOutlineEnabled) {
+            return false;
+        }
+        Entity entity = this.client.getCameraEntity();
+        boolean bl2 = bl = entity instanceof PlayerEntity && !this.client.options.hudHidden;
+        if (bl && !((PlayerEntity)entity).getAbilities().allowModifyWorld) {
             ItemStack itemStack = ((LivingEntity)entity).getMainHandStack();
             HitResult hitResult = this.client.crosshairTarget;
             if (hitResult != null && hitResult.getType() == HitResult.Type.BLOCK) {
-               BlockPos blockPos = ((BlockHitResult)hitResult).getBlockPos();
-               BlockState blockState = this.client.world.getBlockState(blockPos);
-               if (this.client.interactionManager.getCurrentGameMode() == GameMode.SPECTATOR) {
-                  bl = blockState.createScreenHandlerFactory(this.client.world, blockPos) != null;
-               } else {
-                  CachedBlockPosition cachedBlockPosition = new CachedBlockPosition(this.client.world, blockPos, false);
-                  Registry registry = this.client.world.getRegistryManager().getOrThrow(RegistryKeys.BLOCK);
-                  bl = !itemStack.isEmpty() && (itemStack.canBreak(cachedBlockPosition) || itemStack.canPlaceOn(cachedBlockPosition));
-               }
+                BlockPos blockPos = ((BlockHitResult)hitResult).getBlockPos();
+                BlockState blockState = this.client.world.getBlockState(blockPos);
+                if (this.client.interactionManager.getCurrentGameMode() == GameMode.SPECTATOR) {
+                    bl = blockState.createScreenHandlerFactory((World)this.client.world, blockPos) != null;
+                } else {
+                    CachedBlockPosition cachedBlockPosition = new CachedBlockPosition((WorldView)this.client.world, blockPos, false);
+                    Registry registry = this.client.world.getRegistryManager().getOrThrow(RegistryKeys.BLOCK);
+                    bl = !itemStack.isEmpty() && (itemStack.canBreak(cachedBlockPosition) || itemStack.canPlaceOn(cachedBlockPosition));
+                }
             }
-         }
+        }
+        return bl;
+    }
 
-         return bl;
-      }
-   }
+    public void updateCamera(RenderTickCounter tickCounter) {
+        float f = tickCounter.getTickProgress(true);
+        ClientPlayerEntity clientPlayerEntity = this.client.player;
+        if (clientPlayerEntity == null || this.client.world == null) {
+            return;
+        }
+        if (this.client.getCameraEntity() == null) {
+            this.client.setCameraEntity((Entity)clientPlayerEntity);
+        }
+        ClientPlayerEntity entity = this.client.getCameraEntity() == null ? clientPlayerEntity : this.client.getCameraEntity();
+        float g = this.client.world.getTickManager().shouldSkipTick((Entity)entity) ? 1.0f : f;
+        this.camera.update((World)this.client.world, (Entity)entity, !this.client.options.getPerspective().isFirstPerson(), this.client.options.getPerspective().isFrontView(), g);
+    }
 
-   public void renderWorld(RenderTickCounter renderTickCounter) {
-      float f = renderTickCounter.getTickProgress(true);
-      ClientPlayerEntity clientPlayerEntity = this.client.player;
-      this.lightmapTextureManager.update(f);
-      if (this.client.getCameraEntity() == null) {
-         this.client.setCameraEntity(clientPlayerEntity);
-      }
+    public void renderWorld(RenderTickCounter renderTickCounter) {
+        float f = renderTickCounter.getTickProgress(true);
+        ClientPlayerEntity clientPlayerEntity = this.client.player;
+        this.lightmapTextureManager.update(1.0f);
+        this.updateCrosshairTarget(f);
+        Profiler profiler = Profilers.get();
+        boolean bl = this.shouldRenderBlockOutline();
+        this.updateCameraState(f);
+        this.viewDistanceBlocks = this.client.options.getClampedViewDistance() * 16;
+        profiler.push("matrices");
+        float g = this.getFov(this.camera, f, true);
+        Matrix4f matrix4f = this.getBasicProjectionMatrix(g);
+        MatrixStack matrixStack = new MatrixStack();
+        this.tiltViewWhenHurt(matrixStack, this.camera.getLastTickProgress());
+        if (((Boolean)this.client.options.getBobView().getValue()).booleanValue()) {
+            this.bobView(matrixStack, this.camera.getLastTickProgress());
+        }
+        matrix4f.mul((Matrix4fc)matrixStack.peek().getPositionMatrix());
+        float h = ((Double)this.client.options.getDistortionEffectScale().getValue()).floatValue();
+        float i = MathHelper.lerp((float)f, (float)clientPlayerEntity.lastNauseaIntensity, (float)clientPlayerEntity.nauseaIntensity);
+        float j = clientPlayerEntity.getEffectFadeFactor(StatusEffects.NAUSEA, f);
+        float k = Math.max(i, j) * (h * h);
+        if (k > 0.0f) {
+            float l = 5.0f / (k * k + 5.0f) - k * 0.04f;
+            l *= l;
+            Vector3f vector3f = new Vector3f(0.0f, MathHelper.SQUARE_ROOT_OF_TWO / 2.0f, MathHelper.SQUARE_ROOT_OF_TWO / 2.0f);
+            float m = (this.nauseaEffectTime + f * this.nauseaEffectSpeed) * ((float)Math.PI / 180);
+            matrix4f.rotate(m, (Vector3fc)vector3f);
+            matrix4f.scale(1.0f / l, 1.0f, 1.0f);
+            matrix4f.rotate(-m, (Vector3fc)vector3f);
+        }
+        RenderSystem.setProjectionMatrix((GpuBufferSlice)this.worldProjectionMatrix.set(matrix4f), (ProjectionType)ProjectionType.PERSPECTIVE);
+        Quaternionf quaternionf = this.camera.getRotation().conjugate(new Quaternionf());
+        Matrix4f matrix4f2 = new Matrix4f().rotation((Quaternionfc)quaternionf);
+        profiler.swap("fog");
+        Vector4f vector4f = this.fogRenderer.applyFog(this.camera, this.client.options.getClampedViewDistance(), renderTickCounter, this.getSkyDarkness(f), this.client.world);
+        GpuBufferSlice gpuBufferSlice = this.fogRenderer.getFogBuffer(FogRenderer.FogType.WORLD);
+        profiler.swap("level");
+        boolean bl2 = this.client.inGameHud.getBossBarHud().shouldThickenFog();
+        this.client.worldRenderer.render((ObjectAllocator)this.pool, renderTickCounter, bl, this.camera, matrix4f2, matrix4f, this.getProjectionMatrix(g), gpuBufferSlice, vector4f, !bl2);
+        profiler.swap("hand");
+        boolean bl3 = this.client.getCameraEntity() instanceof LivingEntity && ((LivingEntity)this.client.getCameraEntity()).isSleeping();
+        RenderSystem.setProjectionMatrix((GpuBufferSlice)this.hudProjectionMatrix.set(this.client.getWindow().getFramebufferWidth(), this.client.getWindow().getFramebufferHeight(), this.getFov(this.camera, f, false)), (ProjectionType)ProjectionType.PERSPECTIVE);
+        RenderSystem.getDevice().createCommandEncoder().clearDepthTexture(this.client.getFramebuffer().getDepthAttachment(), 1.0);
+        this.renderHand(f, bl3, matrix4f2);
+        profiler.swap("screenEffects");
+        VertexConsumerProvider.Immediate immediate = this.buffers.getEntityVertexConsumers();
+        this.overlayRenderer.renderOverlays(bl3, f, (OrderedRenderCommandQueue)this.orderedRenderCommandQueue);
+        this.entityRenderDispatcher.render();
+        immediate.draw();
+        profiler.pop();
+        RenderSystem.setShaderFog((GpuBufferSlice)this.fogRenderer.getFogBuffer(FogRenderer.FogType.NONE));
+        if (this.client.debugHudEntryList.isEntryVisible(DebugHudEntries.THREE_DIMENSIONAL_CROSSHAIR) && this.client.options.getPerspective().isFirstPerson() && !this.client.options.hudHidden) {
+            this.client.getDebugHud().renderDebugCrosshair(this.camera);
+        }
+    }
 
-      this.updateCrosshairTarget(f);
-      Profiler profiler = Profilers.get();
-      profiler.push("center");
-      boolean bl = this.shouldRenderBlockOutline();
-      profiler.swap("camera");
-      Camera camera = this.camera;
-      Entity entity = this.client.getCameraEntity() == null ? clientPlayerEntity : this.client.getCameraEntity();
-      float g = this.client.world.getTickManager().shouldSkipTick((Entity)entity) ? 1.0F : f;
-      camera.update(this.client.world, (Entity)entity, !this.client.options.getPerspective().isFirstPerson(), this.client.options.getPerspective().isFrontView(), g);
-      this.viewDistanceBlocks = (float)(this.client.options.getClampedViewDistance() * 16);
-      float h = this.getFov(camera, f, true);
-      Matrix4f matrix4f = this.getBasicProjectionMatrix(h);
-      MatrixStack matrixStack = new MatrixStack();
-      this.tiltViewWhenHurt(matrixStack, camera.getLastTickProgress());
-      if ((Boolean)this.client.options.getBobView().getValue()) {
-         this.bobView(matrixStack, camera.getLastTickProgress());
-      }
+    private void updateCameraState(float f) {
+        CameraRenderState cameraRenderState = this.worldRenderState.cameraRenderState;
+        cameraRenderState.initialized = this.camera.isReady();
+        cameraRenderState.pos = this.camera.getCameraPos();
+        cameraRenderState.blockPos = this.camera.getBlockPos();
+        cameraRenderState.entityPos = this.camera.getFocusedEntity().getLerpedPos(f);
+        cameraRenderState.orientation = new Quaternionf((Quaternionfc)this.camera.getRotation());
+    }
 
-      matrix4f.mul(matrixStack.peek().getPositionMatrix());
-      float i = ((Double)this.client.options.getDistortionEffectScale().getValue()).floatValue();
-      float j = MathHelper.lerp(f, clientPlayerEntity.lastNauseaIntensity, clientPlayerEntity.nauseaIntensity);
-      float k = clientPlayerEntity.getEffectFadeFactor(StatusEffects.NAUSEA, f);
-      float l = Math.max(j, k) * i * i;
-      float m;
-      if (l > 0.0F) {
-         m = 5.0F / (l * l + 5.0F) - l * 0.04F;
-         m *= m;
-         Vector3f vector3f = new Vector3f(0.0F, MathHelper.SQUARE_ROOT_OF_TWO / 2.0F, MathHelper.SQUARE_ROOT_OF_TWO / 2.0F);
-         float n = (this.nauseaEffectTime + f * this.nauseaEffectSpeed) * 0.017453292F;
-         matrix4f.rotate(n, vector3f);
-         matrix4f.scale(1.0F / m, 1.0F, 1.0F);
-         matrix4f.rotate(-n, vector3f);
-      }
+    private Matrix4f getProjectionMatrix(float f) {
+        float g = Math.max(f, (float)((Integer)this.client.options.getFov().getValue()).intValue());
+        return this.getBasicProjectionMatrix(g);
+    }
 
-      m = Math.max(h, (float)(Integer)this.client.options.getFov().getValue());
-      Matrix4f matrix4f2 = this.getBasicProjectionMatrix(m);
-      RenderSystem.setProjectionMatrix(this.worldProjectionMatrix.set(matrix4f), ProjectionType.PERSPECTIVE);
-      Quaternionf quaternionf = camera.getRotation().conjugate(new Quaternionf());
-      Matrix4f matrix4f3 = (new Matrix4f()).rotation(quaternionf);
-      this.client.worldRenderer.setupFrustum(camera.getPos(), matrix4f3, matrix4f2);
-      profiler.swap("fog");
-      boolean bl2 = this.client.world.getDimensionEffects().useThickFog(camera.getBlockPos().getX(), camera.getBlockPos().getZ()) || this.client.inGameHud.getBossBarHud().shouldThickenFog();
-      Vector4f vector4f = this.fogRenderer.applyFog(camera, this.client.options.getClampedViewDistance(), bl2, renderTickCounter, this.getSkyDarkness(f), this.client.world);
-      GpuBufferSlice gpuBufferSlice = this.fogRenderer.getFogBuffer(FogRenderer.FogType.WORLD);
-      profiler.swap("level");
-      this.client.worldRenderer.render(this.pool, renderTickCounter, bl, camera, matrix4f3, matrix4f, gpuBufferSlice, vector4f, !bl2);
-      profiler.swap("hand");
-      boolean bl3 = this.client.getCameraEntity() instanceof LivingEntity && ((LivingEntity)this.client.getCameraEntity()).isSleeping();
-      RenderSystem.setProjectionMatrix(this.hudProjectionMatrix.set(this.client.getWindow().getFramebufferWidth(), this.client.getWindow().getFramebufferHeight(), this.getFov(camera, f, false)), ProjectionType.PERSPECTIVE);
-      RenderSystem.getDevice().createCommandEncoder().clearDepthTexture(this.client.getFramebuffer().getDepthAttachment(), 1.0);
-      this.renderHand(f, bl3, matrix4f3);
-      profiler.swap("screen effects");
-      VertexConsumerProvider.Immediate immediate = this.buffers.getEntityVertexConsumers();
-      this.overlayRenderer.renderOverlays(bl3, f);
-      immediate.draw();
-      profiler.pop();
-      RenderSystem.setShaderFog(this.fogRenderer.getFogBuffer(FogRenderer.FogType.NONE));
-      if (this.client.inGameHud.shouldRenderCrosshair()) {
-         this.client.getDebugHud().renderDebugCrosshair(camera);
-      }
+    public void reset() {
+        this.overlayRenderer.clearFloatingItem();
+        this.client.getMapTextureManager().clear();
+        this.camera.reset();
+        this.hasWorldIcon = false;
+    }
 
-   }
+    public void showFloatingItem(ItemStack floatingItem) {
+        this.overlayRenderer.setFloatingItem(floatingItem, this.random);
+    }
 
-   public void reset() {
-      this.overlayRenderer.clearFloatingItem();
-      this.client.getMapTextureManager().clear();
-      this.camera.reset();
-      this.hasWorldIcon = false;
-   }
+    public MinecraftClient getClient() {
+        return this.client;
+    }
 
-   public void showFloatingItem(ItemStack floatingItem) {
-      this.overlayRenderer.setFloatingItem(floatingItem, this.random);
-   }
+    public float getSkyDarkness(float tickProgress) {
+        return MathHelper.lerp((float)tickProgress, (float)this.lastSkyDarkness, (float)this.skyDarkness);
+    }
 
-   public MinecraftClient getClient() {
-      return this.client;
-   }
+    public float getViewDistanceBlocks() {
+        return this.viewDistanceBlocks;
+    }
 
-   public float getSkyDarkness(float tickProgress) {
-      return MathHelper.lerp(tickProgress, this.lastSkyDarkness, this.skyDarkness);
-   }
+    public Camera getCamera() {
+        return this.camera;
+    }
 
-   public float getViewDistanceBlocks() {
-      return this.viewDistanceBlocks;
-   }
+    public LightmapTextureManager getLightmapTextureManager() {
+        return this.lightmapTextureManager;
+    }
 
-   public Camera getCamera() {
-      return this.camera;
-   }
+    public OverlayTexture getOverlayTexture() {
+        return this.overlayTexture;
+    }
 
-   public LightmapTextureManager getLightmapTextureManager() {
-      return this.lightmapTextureManager;
-   }
+    public Vec3d project(Vec3d sourcePos) {
+        Matrix4f matrix4f = this.getBasicProjectionMatrix(this.getFov(this.camera, 0.0f, true));
+        Quaternionf quaternionf = this.camera.getRotation().conjugate(new Quaternionf());
+        Matrix4f matrix4f2 = new Matrix4f().rotation((Quaternionfc)quaternionf);
+        Matrix4f matrix4f3 = matrix4f.mul((Matrix4fc)matrix4f2);
+        Vec3d vec3d = this.camera.getCameraPos();
+        Vec3d vec3d2 = sourcePos.subtract(vec3d);
+        Vector3f vector3f = matrix4f3.transformProject(vec3d2.toVector3f());
+        return new Vec3d((Vector3fc)vector3f);
+    }
 
-   public OverlayTexture getOverlayTexture() {
-      return this.overlayTexture;
-   }
+    public double getPitch() {
+        float f = this.camera.getPitch();
+        if (f <= -90.0f) {
+            return Double.NEGATIVE_INFINITY;
+        }
+        if (f >= 90.0f) {
+            return Double.POSITIVE_INFINITY;
+        }
+        float g = this.getFov(this.camera, 0.0f, true);
+        return Math.tan(f * ((float)Math.PI / 180)) / Math.tan(g / 2.0f * ((float)Math.PI / 180));
+    }
 
-   public Vec3d project(Vec3d sourcePos) {
-      Matrix4f matrix4f = this.getBasicProjectionMatrix(this.getFov(this.camera, 0.0F, true));
-      Quaternionf quaternionf = this.camera.getRotation().conjugate(new Quaternionf());
-      Matrix4f matrix4f2 = (new Matrix4f()).rotation(quaternionf);
-      Matrix4f matrix4f3 = matrix4f.mul(matrix4f2);
-      Vec3d vec3d = this.camera.getPos();
-      Vec3d vec3d2 = sourcePos.subtract(vec3d);
-      Vector3f vector3f = matrix4f3.transformProject(vec3d2.toVector3f());
-      return new Vec3d(vector3f);
-   }
+    public GlobalSettings getGlobalSettings() {
+        return this.globalSettings;
+    }
 
-   public double getPitch() {
-      float f = this.camera.getPitch();
-      if (f <= -90.0F) {
-         return Double.NEGATIVE_INFINITY;
-      } else if (f >= 90.0F) {
-         return Double.POSITIVE_INFINITY;
-      } else {
-         float g = this.getFov(this.camera, 0.0F, true);
-         return Math.tan((double)(f * 0.017453292F)) / Math.tan((double)(g / 2.0F * 0.017453292F));
-      }
-   }
+    public DiffuseLighting getDiffuseLighting() {
+        return this.diffuseLighting;
+    }
 
-   public GlobalSettings getGlobalSettings() {
-      return this.globalSettings;
-   }
+    public void setWorld(@Nullable ClientWorld world) {
+        if (world != null) {
+            this.diffuseLighting.updateLevelBuffer(world.getDimension().cardinalLightType());
+        }
+    }
 
-   public DiffuseLighting getDiffuseLighting() {
-      return this.diffuseLighting;
-   }
-
-   public void setWorld(@Nullable ClientWorld world) {
-      if (world != null) {
-         this.diffuseLighting.updateLevelBuffer(world.getDimensionEffects().isDarkened());
-      }
-
-   }
-
-   public RotatingCubeMapRenderer getRotatingPanoramaRenderer() {
-      return this.rotatingPanoramaRenderer;
-   }
+    public RotatingCubeMapRenderer getRotatingPanoramaRenderer() {
+        return this.rotatingPanoramaRenderer;
+    }
 }
+

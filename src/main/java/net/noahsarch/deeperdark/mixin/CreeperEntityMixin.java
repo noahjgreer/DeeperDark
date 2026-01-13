@@ -3,7 +3,9 @@ package net.noahsarch.deeperdark.mixin;
 import net.minecraft.entity.AreaEffectCloudEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.mob.CreeperEntity;
+import net.minecraft.world.World;
 import net.noahsarch.deeperdark.DeeperDarkConfig;
+import net.noahsarch.deeperdark.duck.EntityAccessor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -17,9 +19,10 @@ public class CreeperEntityMixin {
     @Inject(method = "spawnEffectsCloud", at = @At("HEAD"), cancellable = true)
     private void deeperdark$spawnEffectsCloud(CallbackInfo ci) {
         CreeperEntity self = (CreeperEntity) (Object) this;
+        World world = ((EntityAccessor)self).deeperdark$getWorld();
         Collection<StatusEffectInstance> collection = self.getStatusEffects();
         if (!collection.isEmpty()) {
-            AreaEffectCloudEntity areaEffectCloudEntity = new AreaEffectCloudEntity(self.getWorld(), self.getX(), self.getY(), self.getZ());
+            AreaEffectCloudEntity areaEffectCloudEntity = new AreaEffectCloudEntity(world, self.getX(), self.getY(), self.getZ());
             areaEffectCloudEntity.setRadius(2.5F);
             areaEffectCloudEntity.setRadiusOnUse(-0.5F);
             areaEffectCloudEntity.setWaitTime(10);
@@ -34,7 +37,7 @@ public class CreeperEntityMixin {
             for (StatusEffectInstance statusEffectInstance : collection) {
                 StatusEffectInstance toAdd;
                 if (statusEffectInstance.isInfinite()) {
-                    int roll = self.getWorld().random.nextInt(max - min + 1) + min;
+                    int roll = world.random.nextInt(max - min + 1) + min;
                     toAdd = new StatusEffectInstance(statusEffectInstance.getEffectType(), roll, statusEffectInstance.getAmplifier(), statusEffectInstance.isAmbient(), statusEffectInstance.shouldShowParticles(), statusEffectInstance.shouldShowIcon());
                 } else {
                     toAdd = new StatusEffectInstance(statusEffectInstance);
@@ -42,7 +45,7 @@ public class CreeperEntityMixin {
                 areaEffectCloudEntity.addEffect(toAdd);
             }
 
-            self.getWorld().spawnEntity(areaEffectCloudEntity);
+            world.spawnEntity(areaEffectCloudEntity);
         }
 
         ci.cancel();

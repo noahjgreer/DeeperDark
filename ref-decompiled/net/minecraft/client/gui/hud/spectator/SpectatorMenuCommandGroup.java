@@ -1,13 +1,25 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.gui.hud.spectator.SpectatorMenuCommand
+ *  net.minecraft.client.gui.hud.spectator.SpectatorMenuCommandGroup
+ *  net.minecraft.text.Text
+ */
 package net.minecraft.client.gui.hud.spectator;
 
 import java.util.List;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.gui.hud.spectator.SpectatorMenuCommand;
 import net.minecraft.text.Text;
 
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 public interface SpectatorMenuCommandGroup {
-   List getCommands();
+    public List<SpectatorMenuCommand> getCommands();
 
-   Text getPrompt();
+    public Text getPrompt();
 }
+

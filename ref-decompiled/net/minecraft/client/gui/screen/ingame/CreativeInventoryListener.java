@@ -1,3 +1,15 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.MinecraftClient
+ *  net.minecraft.client.gui.screen.ingame.CreativeInventoryListener
+ *  net.minecraft.item.ItemStack
+ *  net.minecraft.screen.ScreenHandler
+ *  net.minecraft.screen.ScreenHandlerListener
+ */
 package net.minecraft.client.gui.screen.ingame;
 
 import net.fabricmc.api.EnvType;
@@ -7,18 +19,20 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerListener;
 
-@Environment(EnvType.CLIENT)
-public class CreativeInventoryListener implements ScreenHandlerListener {
-   private final MinecraftClient client;
+@Environment(value=EnvType.CLIENT)
+public class CreativeInventoryListener
+implements ScreenHandlerListener {
+    private final MinecraftClient client;
 
-   public CreativeInventoryListener(MinecraftClient client) {
-      this.client = client;
-   }
+    public CreativeInventoryListener(MinecraftClient client) {
+        this.client = client;
+    }
 
-   public void onSlotUpdate(ScreenHandler handler, int slotId, ItemStack stack) {
-      this.client.interactionManager.clickCreativeStack(stack, slotId);
-   }
+    public void onSlotUpdate(ScreenHandler handler, int slotId, ItemStack stack) {
+        this.client.interactionManager.clickCreativeStack(stack, slotId);
+    }
 
-   public void onPropertyUpdate(ScreenHandler handler, int property, int value) {
-   }
+    public void onPropertyUpdate(ScreenHandler handler, int property, int value) {
+    }
 }
+

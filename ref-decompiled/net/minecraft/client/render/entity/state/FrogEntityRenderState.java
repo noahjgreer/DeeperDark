@@ -1,21 +1,31 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.render.entity.state.FrogEntityRenderState
+ *  net.minecraft.client.render.entity.state.LivingEntityRenderState
+ *  net.minecraft.entity.AnimationState
+ *  net.minecraft.util.Identifier
+ */
 package net.minecraft.client.render.entity.state;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.render.entity.state.LivingEntityRenderState;
 import net.minecraft.entity.AnimationState;
 import net.minecraft.util.Identifier;
 
-@Environment(EnvType.CLIENT)
-public class FrogEntityRenderState extends LivingEntityRenderState {
-   private static final Identifier DEFAULT_TEXTURE = Identifier.ofVanilla("textures/entity/frog/temperate_frog.png");
-   public boolean insideWaterOrBubbleColumn;
-   public final AnimationState longJumpingAnimationState = new AnimationState();
-   public final AnimationState croakingAnimationState = new AnimationState();
-   public final AnimationState usingTongueAnimationState = new AnimationState();
-   public final AnimationState idlingInWaterAnimationState = new AnimationState();
-   public Identifier texture;
-
-   public FrogEntityRenderState() {
-      this.texture = DEFAULT_TEXTURE;
-   }
+@Environment(value=EnvType.CLIENT)
+public class FrogEntityRenderState
+extends LivingEntityRenderState {
+    private static final Identifier DEFAULT_TEXTURE = Identifier.ofVanilla((String)"textures/entity/frog/temperate_frog.png");
+    public boolean insideWaterOrBubbleColumn;
+    public final AnimationState longJumpingAnimationState = new AnimationState();
+    public final AnimationState croakingAnimationState = new AnimationState();
+    public final AnimationState usingTongueAnimationState = new AnimationState();
+    public final AnimationState idlingInWaterAnimationState = new AnimationState();
+    public Identifier texture = DEFAULT_TEXTURE;
 }
+

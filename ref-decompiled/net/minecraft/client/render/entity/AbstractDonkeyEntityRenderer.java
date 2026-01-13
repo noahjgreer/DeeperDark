@@ -1,80 +1,76 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.render.entity.AbstractDonkeyEntityRenderer
+ *  net.minecraft.client.render.entity.AbstractDonkeyEntityRenderer$Type
+ *  net.minecraft.client.render.entity.AbstractHorseEntityRenderer
+ *  net.minecraft.client.render.entity.EntityRendererFactory$Context
+ *  net.minecraft.client.render.entity.feature.FeatureRenderer
+ *  net.minecraft.client.render.entity.feature.FeatureRendererContext
+ *  net.minecraft.client.render.entity.feature.SaddleFeatureRenderer
+ *  net.minecraft.client.render.entity.model.DonkeyEntityModel
+ *  net.minecraft.client.render.entity.model.EntityModel
+ *  net.minecraft.client.render.entity.model.HorseSaddleEntityModel
+ *  net.minecraft.client.render.entity.state.DonkeyEntityRenderState
+ *  net.minecraft.client.render.entity.state.EntityRenderState
+ *  net.minecraft.client.render.entity.state.LivingEntityRenderState
+ *  net.minecraft.client.render.entity.state.LivingHorseEntityRenderState
+ *  net.minecraft.entity.passive.AbstractDonkeyEntity
+ *  net.minecraft.util.Identifier
+ */
 package net.minecraft.client.render.entity;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.render.entity.equipment.EquipmentModel;
+import net.minecraft.client.render.entity.AbstractDonkeyEntityRenderer;
+import net.minecraft.client.render.entity.AbstractHorseEntityRenderer;
+import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.render.entity.feature.FeatureRenderer;
+import net.minecraft.client.render.entity.feature.FeatureRendererContext;
 import net.minecraft.client.render.entity.feature.SaddleFeatureRenderer;
 import net.minecraft.client.render.entity.model.DonkeyEntityModel;
-import net.minecraft.client.render.entity.model.EntityModelLayer;
-import net.minecraft.client.render.entity.model.EntityModelLayers;
+import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.render.entity.model.HorseSaddleEntityModel;
 import net.minecraft.client.render.entity.state.DonkeyEntityRenderState;
 import net.minecraft.client.render.entity.state.EntityRenderState;
 import net.minecraft.client.render.entity.state.LivingEntityRenderState;
 import net.minecraft.client.render.entity.state.LivingHorseEntityRenderState;
 import net.minecraft.entity.passive.AbstractDonkeyEntity;
-import net.minecraft.entity.passive.AbstractHorseEntity;
 import net.minecraft.util.Identifier;
 
-@Environment(EnvType.CLIENT)
-public class AbstractDonkeyEntityRenderer extends AbstractHorseEntityRenderer {
-   private final Identifier texture;
+@Environment(value=EnvType.CLIENT)
+public class AbstractDonkeyEntityRenderer<T extends AbstractDonkeyEntity>
+extends AbstractHorseEntityRenderer<T, DonkeyEntityRenderState, DonkeyEntityModel> {
+    private final Identifier texture;
 
-   public AbstractDonkeyEntityRenderer(EntityRendererFactory.Context context, Type type) {
-      super(context, new DonkeyEntityModel(context.getPart(type.adultModelLayer)), new DonkeyEntityModel(context.getPart(type.babyModelLayer)));
-      this.texture = type.texture;
-      this.addFeature(new SaddleFeatureRenderer(this, context.getEquipmentRenderer(), type.saddleLayerType, (donkeyEntityRenderState) -> {
-         return donkeyEntityRenderState.saddleStack;
-      }, new HorseSaddleEntityModel(context.getPart(type.adultSaddleModelLayer)), new HorseSaddleEntityModel(context.getPart(type.babySaddleModelLayer))));
-   }
+    public AbstractDonkeyEntityRenderer(EntityRendererFactory.Context context, Type type) {
+        super(context, (EntityModel)new DonkeyEntityModel(context.getPart(type.adultModelLayer)), (EntityModel)new DonkeyEntityModel(context.getPart(type.babyModelLayer)));
+        this.texture = type.texture;
+        this.addFeature((FeatureRenderer)new SaddleFeatureRenderer((FeatureRendererContext)this, context.getEquipmentRenderer(), type.saddleLayerType, state -> state.saddleStack, (EntityModel)new HorseSaddleEntityModel(context.getPart(type.adultSaddleModelLayer)), (EntityModel)new HorseSaddleEntityModel(context.getPart(type.babySaddleModelLayer))));
+    }
 
-   public Identifier getTexture(DonkeyEntityRenderState donkeyEntityRenderState) {
-      return this.texture;
-   }
+    public Identifier getTexture(DonkeyEntityRenderState donkeyEntityRenderState) {
+        return this.texture;
+    }
 
-   public DonkeyEntityRenderState createRenderState() {
-      return new DonkeyEntityRenderState();
-   }
+    public DonkeyEntityRenderState createRenderState() {
+        return new DonkeyEntityRenderState();
+    }
 
-   public void updateRenderState(AbstractDonkeyEntity abstractDonkeyEntity, DonkeyEntityRenderState donkeyEntityRenderState, float f) {
-      super.updateRenderState((AbstractHorseEntity)abstractDonkeyEntity, (LivingHorseEntityRenderState)donkeyEntityRenderState, f);
-      donkeyEntityRenderState.hasChest = abstractDonkeyEntity.hasChest();
-   }
+    public void updateRenderState(T abstractDonkeyEntity, DonkeyEntityRenderState donkeyEntityRenderState, float f) {
+        super.updateRenderState(abstractDonkeyEntity, (LivingHorseEntityRenderState)donkeyEntityRenderState, f);
+        donkeyEntityRenderState.hasChest = abstractDonkeyEntity.hasChest();
+    }
 
-   // $FF: synthetic method
-   public Identifier getTexture(final LivingEntityRenderState state) {
-      return this.getTexture((DonkeyEntityRenderState)state);
-   }
+    public /* synthetic */ Identifier getTexture(LivingEntityRenderState state) {
+        return this.getTexture((DonkeyEntityRenderState)state);
+    }
 
-   // $FF: synthetic method
-   public EntityRenderState createRenderState() {
-      return this.createRenderState();
-   }
-
-   @Environment(EnvType.CLIENT)
-   public static enum Type {
-      DONKEY(Identifier.ofVanilla("textures/entity/horse/donkey.png"), EntityModelLayers.DONKEY, EntityModelLayers.DONKEY_BABY, EquipmentModel.LayerType.DONKEY_SADDLE, EntityModelLayers.DONKEY_SADDLE, EntityModelLayers.DONKEY_BABY_SADDLE),
-      MULE(Identifier.ofVanilla("textures/entity/horse/mule.png"), EntityModelLayers.MULE, EntityModelLayers.MULE_BABY, EquipmentModel.LayerType.MULE_SADDLE, EntityModelLayers.MULE_SADDLE, EntityModelLayers.MULE_BABY_SADDLE);
-
-      final Identifier texture;
-      final EntityModelLayer adultModelLayer;
-      final EntityModelLayer babyModelLayer;
-      final EquipmentModel.LayerType saddleLayerType;
-      final EntityModelLayer adultSaddleModelLayer;
-      final EntityModelLayer babySaddleModelLayer;
-
-      private Type(final Identifier texture, final EntityModelLayer adultModelLayer, final EntityModelLayer babyModelLayer, final EquipmentModel.LayerType saddleLayerType, final EntityModelLayer adultSaddleModelLayer, final EntityModelLayer babySaddleModelLayer) {
-         this.texture = texture;
-         this.adultModelLayer = adultModelLayer;
-         this.babyModelLayer = babyModelLayer;
-         this.saddleLayerType = saddleLayerType;
-         this.adultSaddleModelLayer = adultSaddleModelLayer;
-         this.babySaddleModelLayer = babySaddleModelLayer;
-      }
-
-      // $FF: synthetic method
-      private static Type[] method_66849() {
-         return new Type[]{DONKEY, MULE};
-      }
-   }
+    public /* synthetic */ EntityRenderState createRenderState() {
+        return this.createRenderState();
+    }
 }
+

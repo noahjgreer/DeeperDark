@@ -1,3 +1,12 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.google.gson.annotations.SerializedName
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.realms.dto.ValueObject
+ */
 package net.minecraft.client.realms.dto;
 
 import com.google.gson.annotations.SerializedName;
@@ -6,34 +15,34 @@ import java.lang.reflect.Modifier;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
-@Environment(EnvType.CLIENT)
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
 public abstract class ValueObject {
-   public String toString() {
-      StringBuilder stringBuilder = new StringBuilder("{");
-      Field[] var2 = this.getClass().getFields();
-      int var3 = var2.length;
-
-      for(int var4 = 0; var4 < var3; ++var4) {
-         Field field = var2[var4];
-         if (!isStatic(field)) {
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder("{");
+        for (Field field : this.getClass().getFields()) {
+            if (ValueObject.isStatic((Field)field)) continue;
             try {
-               stringBuilder.append(getName(field)).append("=").append(field.get(this)).append(" ");
-            } catch (IllegalAccessException var7) {
+                stringBuilder.append(ValueObject.getName((Field)field)).append("=").append(field.get(this)).append(" ");
             }
-         }
-      }
+            catch (IllegalAccessException illegalAccessException) {
+                // empty catch block
+            }
+        }
+        stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+        stringBuilder.append('}');
+        return stringBuilder.toString();
+    }
 
-      stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-      stringBuilder.append('}');
-      return stringBuilder.toString();
-   }
+    private static String getName(Field f) {
+        SerializedName serializedName = f.getAnnotation(SerializedName.class);
+        return serializedName != null ? serializedName.value() : f.getName();
+    }
 
-   private static String getName(Field f) {
-      SerializedName serializedName = (SerializedName)f.getAnnotation(SerializedName.class);
-      return serializedName != null ? serializedName.value() : f.getName();
-   }
-
-   private static boolean isStatic(Field f) {
-      return Modifier.isStatic(f.getModifiers());
-   }
+    private static boolean isStatic(Field f) {
+        return Modifier.isStatic(f.getModifiers());
+    }
 }
+

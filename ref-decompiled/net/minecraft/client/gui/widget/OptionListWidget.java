@@ -1,177 +1,133 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.MinecraftClient
+ *  net.minecraft.client.gui.Updatable
+ *  net.minecraft.client.gui.screen.Screen
+ *  net.minecraft.client.gui.screen.option.GameOptionsScreen
+ *  net.minecraft.client.gui.widget.ClickableWidget
+ *  net.minecraft.client.gui.widget.ElementListWidget
+ *  net.minecraft.client.gui.widget.EntryListWidget$Entry
+ *  net.minecraft.client.gui.widget.OptionListWidget
+ *  net.minecraft.client.gui.widget.OptionListWidget$Component
+ *  net.minecraft.client.gui.widget.OptionListWidget$Header
+ *  net.minecraft.client.gui.widget.OptionListWidget$OptionAssociatedWidget
+ *  net.minecraft.client.gui.widget.OptionListWidget$WidgetEntry
+ *  net.minecraft.client.option.GameOptions
+ *  net.minecraft.client.option.SimpleOption
+ *  net.minecraft.client.option.SimpleOption$OptionSliderWidgetImpl
+ *  net.minecraft.text.Text
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.gui.widget;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.Objects;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Element;
+import net.minecraft.client.gui.Updatable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.option.GameOptionsScreen;
+import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.client.gui.widget.ElementListWidget;
+import net.minecraft.client.gui.widget.EntryListWidget;
+import net.minecraft.client.gui.widget.OptionListWidget;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.SimpleOption;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.text.Text;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
-public class OptionListWidget extends ElementListWidget {
-   private static final int field_49481 = 310;
-   private static final int field_49482 = 25;
-   private final GameOptionsScreen optionsScreen;
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
+public class OptionListWidget
+extends ElementListWidget<Component> {
+    private static final int field_49481 = 310;
+    private static final int field_49482 = 25;
+    private final GameOptionsScreen optionsScreen;
 
-   public OptionListWidget(MinecraftClient client, int width, GameOptionsScreen optionsScreen) {
-      super(client, width, optionsScreen.layout.getContentHeight(), optionsScreen.layout.getHeaderHeight(), 25);
-      this.centerListVertically = false;
-      this.optionsScreen = optionsScreen;
-   }
+    public OptionListWidget(MinecraftClient client, int width, GameOptionsScreen optionsScreen) {
+        super(client, width, optionsScreen.layout.getContentHeight(), optionsScreen.layout.getHeaderHeight(), 25);
+        this.centerListVertically = false;
+        this.optionsScreen = optionsScreen;
+    }
 
-   public void addSingleOptionEntry(SimpleOption option) {
-      this.addEntry(OptionListWidget.OptionWidgetEntry.create(this.client.options, option, this.optionsScreen));
-   }
+    public void addSingleOptionEntry(SimpleOption<?> option) {
+        this.addEntry((EntryListWidget.Entry)WidgetEntry.create((GameOptions)this.client.options, option, (Screen)this.optionsScreen));
+    }
 
-   public void addAll(SimpleOption... options) {
-      for(int i = 0; i < options.length; i += 2) {
-         SimpleOption simpleOption = i < options.length - 1 ? options[i + 1] : null;
-         this.addEntry(OptionListWidget.OptionWidgetEntry.create(this.client.options, options[i], simpleOption, this.optionsScreen));
-      }
+    public void addAll(SimpleOption<?> ... options) {
+        for (int i = 0; i < options.length; i += 2) {
+            SimpleOption<?> simpleOption = i < options.length - 1 ? options[i + 1] : null;
+            this.addEntry((EntryListWidget.Entry)WidgetEntry.create((GameOptions)this.client.options, options[i], simpleOption, (GameOptionsScreen)this.optionsScreen));
+        }
+    }
 
-   }
+    public void addAll(List<ClickableWidget> widgets) {
+        for (int i = 0; i < widgets.size(); i += 2) {
+            this.addWidgetEntry(widgets.get(i), i < widgets.size() - 1 ? widgets.get(i + 1) : null);
+        }
+    }
 
-   public void addAll(List widgets) {
-      for(int i = 0; i < widgets.size(); i += 2) {
-         this.addWidgetEntry((ClickableWidget)widgets.get(i), i < widgets.size() - 1 ? (ClickableWidget)widgets.get(i + 1) : null);
-      }
+    public void addWidgetEntry(ClickableWidget firstWidget, @Nullable ClickableWidget secondWidget) {
+        this.addEntry((EntryListWidget.Entry)WidgetEntry.create((ClickableWidget)firstWidget, (ClickableWidget)secondWidget, (Screen)this.optionsScreen));
+    }
 
-   }
+    public void addWidgetEntry(ClickableWidget firstWidget, SimpleOption<?> option, @Nullable ClickableWidget secondWidget) {
+        this.addEntry((EntryListWidget.Entry)WidgetEntry.create((ClickableWidget)firstWidget, option, (ClickableWidget)secondWidget, (Screen)this.optionsScreen));
+    }
 
-   public void addWidgetEntry(ClickableWidget firstWidget, @Nullable ClickableWidget secondWidget) {
-      this.addEntry(OptionListWidget.WidgetEntry.create(firstWidget, secondWidget, this.optionsScreen));
-   }
+    public void addHeader(Text title) {
+        Objects.requireNonNull(this.client.textRenderer);
+        int i = 9;
+        int j = this.children().isEmpty() ? 0 : i * 2;
+        this.addEntry((EntryListWidget.Entry)new Header((Screen)this.optionsScreen, title, j), j + i + 4);
+    }
 
-   public int getRowWidth() {
-      return 310;
-   }
+    public int getRowWidth() {
+        return 310;
+    }
 
-   @Nullable
-   public ClickableWidget getWidgetFor(SimpleOption option) {
-      Iterator var2 = this.children().iterator();
+    public @Nullable ClickableWidget getWidgetFor(SimpleOption<?> option) {
+        for (Component component : this.children()) {
+            WidgetEntry widgetEntry;
+            ClickableWidget clickableWidget;
+            if (!(component instanceof WidgetEntry) || (clickableWidget = (widgetEntry = (WidgetEntry)component).getWidgetFor(option)) == null) continue;
+            return clickableWidget;
+        }
+        return null;
+    }
 
-      while(var2.hasNext()) {
-         WidgetEntry widgetEntry = (WidgetEntry)var2.next();
-         if (widgetEntry instanceof OptionWidgetEntry optionWidgetEntry) {
-            ClickableWidget clickableWidget = (ClickableWidget)optionWidgetEntry.optionWidgets.get(option);
-            if (clickableWidget != null) {
-               return clickableWidget;
+    public void applyAllPendingValues() {
+        for (Component component : this.children()) {
+            if (!(component instanceof WidgetEntry)) continue;
+            WidgetEntry widgetEntry = (WidgetEntry)component;
+            for (OptionAssociatedWidget optionAssociatedWidget : widgetEntry.widgets) {
+                ClickableWidget clickableWidget;
+                if (optionAssociatedWidget.optionInstance() == null || !((clickableWidget = optionAssociatedWidget.widget()) instanceof SimpleOption.OptionSliderWidgetImpl)) continue;
+                SimpleOption.OptionSliderWidgetImpl optionSliderWidgetImpl = (SimpleOption.OptionSliderWidgetImpl)clickableWidget;
+                optionSliderWidgetImpl.applyPendingValue();
             }
-         }
-      }
+        }
+    }
 
-      return null;
-   }
-
-   public void applyAllPendingValues() {
-      Iterator var1 = this.children().iterator();
-
-      while(true) {
-         WidgetEntry widgetEntry;
-         do {
-            if (!var1.hasNext()) {
-               return;
+    public void update(SimpleOption<?> simpleOption) {
+        for (Component component : this.children()) {
+            if (!(component instanceof WidgetEntry)) continue;
+            WidgetEntry widgetEntry = (WidgetEntry)component;
+            for (OptionAssociatedWidget optionAssociatedWidget : widgetEntry.widgets) {
+                ClickableWidget clickableWidget;
+                if (optionAssociatedWidget.optionInstance() != simpleOption || !((clickableWidget = optionAssociatedWidget.widget()) instanceof Updatable)) continue;
+                Updatable updatable = (Updatable)clickableWidget;
+                updatable.update();
+                return;
             }
-
-            widgetEntry = (WidgetEntry)var1.next();
-         } while(!(widgetEntry instanceof OptionWidgetEntry));
-
-         OptionWidgetEntry optionWidgetEntry = (OptionWidgetEntry)widgetEntry;
-         Iterator var4 = optionWidgetEntry.optionWidgets.values().iterator();
-
-         while(var4.hasNext()) {
-            ClickableWidget clickableWidget = (ClickableWidget)var4.next();
-            if (clickableWidget instanceof SimpleOption.OptionSliderWidgetImpl optionSliderWidgetImpl) {
-               optionSliderWidgetImpl.applyPendingValue();
-            }
-         }
-      }
-   }
-
-   public Optional getHoveredWidget(double mouseX, double mouseY) {
-      Iterator var5 = this.children().iterator();
-
-      while(var5.hasNext()) {
-         WidgetEntry widgetEntry = (WidgetEntry)var5.next();
-         Iterator var7 = widgetEntry.children().iterator();
-
-         while(var7.hasNext()) {
-            Element element = (Element)var7.next();
-            if (element.isMouseOver(mouseX, mouseY)) {
-               return Optional.of(element);
-            }
-         }
-      }
-
-      return Optional.empty();
-   }
-
-   @Environment(EnvType.CLIENT)
-   protected static class OptionWidgetEntry extends WidgetEntry {
-      final Map optionWidgets;
-
-      private OptionWidgetEntry(Map widgets, GameOptionsScreen optionsScreen) {
-         super(ImmutableList.copyOf(widgets.values()), optionsScreen);
-         this.optionWidgets = widgets;
-      }
-
-      public static OptionWidgetEntry create(GameOptions gameOptions, SimpleOption option, GameOptionsScreen optionsScreen) {
-         return new OptionWidgetEntry(ImmutableMap.of(option, option.createWidget(gameOptions, 0, 0, 310)), optionsScreen);
-      }
-
-      public static OptionWidgetEntry create(GameOptions gameOptions, SimpleOption firstOption, @Nullable SimpleOption secondOption, GameOptionsScreen optionsScreen) {
-         ClickableWidget clickableWidget = firstOption.createWidget(gameOptions);
-         return secondOption == null ? new OptionWidgetEntry(ImmutableMap.of(firstOption, clickableWidget), optionsScreen) : new OptionWidgetEntry(ImmutableMap.of(firstOption, clickableWidget, secondOption, secondOption.createWidget(gameOptions)), optionsScreen);
-      }
-   }
-
-   @Environment(EnvType.CLIENT)
-   protected static class WidgetEntry extends ElementListWidget.Entry {
-      private final List widgets;
-      private final Screen screen;
-      private static final int WIDGET_X_SPACING = 160;
-
-      WidgetEntry(List widgets, Screen screen) {
-         this.widgets = ImmutableList.copyOf(widgets);
-         this.screen = screen;
-      }
-
-      public static WidgetEntry create(List widgets, Screen screen) {
-         return new WidgetEntry(widgets, screen);
-      }
-
-      public static WidgetEntry create(ClickableWidget firstWidget, @Nullable ClickableWidget secondWidget, Screen screen) {
-         return secondWidget == null ? new WidgetEntry(ImmutableList.of(firstWidget), screen) : new WidgetEntry(ImmutableList.of(firstWidget, secondWidget), screen);
-      }
-
-      public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickProgress) {
-         int i = 0;
-         int j = this.screen.width / 2 - 155;
-
-         for(Iterator var13 = this.widgets.iterator(); var13.hasNext(); i += 160) {
-            ClickableWidget clickableWidget = (ClickableWidget)var13.next();
-            clickableWidget.setPosition(j + i, y);
-            clickableWidget.render(context, mouseX, mouseY, tickProgress);
-         }
-
-      }
-
-      public List children() {
-         return this.widgets;
-      }
-
-      public List selectableChildren() {
-         return this.widgets;
-      }
-   }
+        }
+    }
 }
+

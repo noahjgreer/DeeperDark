@@ -1,61 +1,67 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.gui.screen.ingame.HorseScreen
+ *  net.minecraft.client.gui.screen.ingame.MountScreen
+ *  net.minecraft.entity.EquipmentSlot
+ *  net.minecraft.entity.LivingEntity
+ *  net.minecraft.entity.passive.AbstractHorseEntity
+ *  net.minecraft.entity.passive.LlamaEntity
+ *  net.minecraft.entity.player.PlayerInventory
+ *  net.minecraft.registry.tag.EntityTypeTags
+ *  net.minecraft.screen.HorseScreenHandler
+ *  net.minecraft.screen.MountScreenHandler
+ *  net.minecraft.util.Identifier
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.gui.screen.ingame;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.ingame.MountScreen;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.AbstractHorseEntity;
 import net.minecraft.entity.passive.LlamaEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.registry.tag.EntityTypeTags;
 import net.minecraft.screen.HorseScreenHandler;
+import net.minecraft.screen.MountScreenHandler;
 import net.minecraft.util.Identifier;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
-public class HorseScreen extends HandledScreen {
-   private static final Identifier SLOT_TEXTURE = Identifier.ofVanilla("container/slot");
-   private static final Identifier CHEST_SLOTS_TEXTURE = Identifier.ofVanilla("container/horse/chest_slots");
-   private static final Identifier TEXTURE = Identifier.ofVanilla("textures/gui/container/horse.png");
-   private final AbstractHorseEntity entity;
-   private final int slotColumnCount;
-   private float mouseX;
-   private float mouseY;
+@Environment(value=EnvType.CLIENT)
+public class HorseScreen
+extends MountScreen<HorseScreenHandler> {
+    private static final Identifier SLOT_TEXTURE = Identifier.ofVanilla((String)"container/slot");
+    private static final Identifier CHEST_SLOTS_TEXTURE = Identifier.ofVanilla((String)"container/horse/chest_slots");
+    private static final Identifier TEXTURE = Identifier.ofVanilla((String)"textures/gui/container/horse.png");
 
-   public HorseScreen(HorseScreenHandler handler, PlayerInventory inventory, AbstractHorseEntity entity, int slotColumnCount) {
-      super(handler, inventory, entity.getDisplayName());
-      this.entity = entity;
-      this.slotColumnCount = slotColumnCount;
-   }
+    public HorseScreen(HorseScreenHandler handler, PlayerInventory inventory, AbstractHorseEntity entity, int slotColumnCount) {
+        super((MountScreenHandler)handler, inventory, entity.getDisplayName(), slotColumnCount, (LivingEntity)entity);
+    }
 
-   protected void drawBackground(DrawContext context, float deltaTicks, int mouseX, int mouseY) {
-      int i = (this.width - this.backgroundWidth) / 2;
-      int j = (this.height - this.backgroundHeight) / 2;
-      context.drawTexture(RenderPipelines.GUI_TEXTURED, TEXTURE, i, j, 0.0F, 0.0F, this.backgroundWidth, this.backgroundHeight, 256, 256);
-      if (this.slotColumnCount > 0) {
-         context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, CHEST_SLOTS_TEXTURE, 90, 54, 0, 0, i + 79, j + 17, this.slotColumnCount * 18, 54);
-      }
+    protected Identifier getTexture() {
+        return TEXTURE;
+    }
 
-      if (this.entity.canUseSlot(EquipmentSlot.SADDLE) && this.entity.getType().isIn(EntityTypeTags.CAN_EQUIP_SADDLE)) {
-         this.drawSlot(context, i + 7, j + 35 - 18);
-      }
+    protected Identifier getSlotTexture() {
+        return SLOT_TEXTURE;
+    }
 
-      boolean bl = this.entity instanceof LlamaEntity;
-      if (this.entity.canUseSlot(EquipmentSlot.BODY) && (this.entity.getType().isIn(EntityTypeTags.CAN_WEAR_HORSE_ARMOR) || bl)) {
-         this.drawSlot(context, i + 7, j + 35);
-      }
+    protected @Nullable Identifier getChestSlotsTexture() {
+        return CHEST_SLOTS_TEXTURE;
+    }
 
-      InventoryScreen.drawEntity(context, i + 26, j + 18, i + 78, j + 70, 17, 0.25F, this.mouseX, this.mouseY, this.entity);
-   }
+    protected boolean canEquipSaddle() {
+        return this.mount.canUseSlot(EquipmentSlot.SADDLE) && this.mount.getType().isIn(EntityTypeTags.CAN_EQUIP_SADDLE);
+    }
 
-   private void drawSlot(DrawContext context, int x, int y) {
-      context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, SLOT_TEXTURE, x, y, 18, 18);
-   }
-
-   public void render(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
-      this.mouseX = (float)mouseX;
-      this.mouseY = (float)mouseY;
-      super.render(context, mouseX, mouseY, deltaTicks);
-      this.drawMouseoverTooltip(context, mouseX, mouseY);
-   }
+    protected boolean canEquipArmor() {
+        return this.mount.canUseSlot(EquipmentSlot.BODY) && (this.mount.getType().isIn(EntityTypeTags.CAN_WEAR_HORSE_ARMOR) || this.mount instanceof LlamaEntity);
+    }
 }
+

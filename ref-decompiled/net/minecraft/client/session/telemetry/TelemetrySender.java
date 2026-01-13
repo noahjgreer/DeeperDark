@@ -1,23 +1,33 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.session.telemetry.PropertyMap$Builder
+ *  net.minecraft.client.session.telemetry.TelemetryEventType
+ *  net.minecraft.client.session.telemetry.TelemetrySender
+ */
 package net.minecraft.client.session.telemetry;
 
 import java.util.function.Consumer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.session.telemetry.PropertyMap;
+import net.minecraft.client.session.telemetry.TelemetryEventType;
 
 @FunctionalInterface
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 public interface TelemetrySender {
-   TelemetrySender NOOP = (eventType, propertyAdder) -> {
-   };
+    public static final TelemetrySender NOOP = (eventType, propertyAdder) -> {};
 
-   default TelemetrySender decorate(Consumer decorationAdder) {
-      return (eventType, propertyAdder) -> {
-         this.send(eventType, (builder) -> {
+    default public TelemetrySender decorate(Consumer<PropertyMap.Builder> decorationAdder) {
+        return (eventType, propertyAdder) -> this.send(eventType, builder -> {
             propertyAdder.accept(builder);
-            decorationAdder.accept(builder);
-         });
-      };
-   }
+            decorationAdder.accept((PropertyMap.Builder)builder);
+        });
+    }
 
-   void send(TelemetryEventType eventType, Consumer propertyAdder);
+    public void send(TelemetryEventType var1, Consumer<PropertyMap.Builder> var2);
 }
+

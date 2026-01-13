@@ -1,3 +1,13 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.particle.SpriteProvider
+ *  net.minecraft.client.texture.Sprite
+ *  net.minecraft.util.math.random.Random
+ */
 package net.minecraft.client.particle;
 
 import net.fabricmc.api.EnvType;
@@ -5,9 +15,12 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.util.math.random.Random;
 
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 public interface SpriteProvider {
-   Sprite getSprite(int age, int maxAge);
+    public Sprite getSprite(int var1, int var2);
 
-   Sprite getSprite(Random random);
+    public Sprite getSprite(Random var1);
+
+    public Sprite getFirst();
 }
+

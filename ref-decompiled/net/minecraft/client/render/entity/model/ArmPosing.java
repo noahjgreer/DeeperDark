@@ -1,78 +1,100 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.model.ModelPart
+ *  net.minecraft.client.render.entity.model.ArmPosing
+ *  net.minecraft.client.render.entity.state.LancerEntityRenderState
+ *  net.minecraft.util.Arm
+ *  net.minecraft.util.SwingAnimationType
+ *  net.minecraft.util.math.MathHelper
+ */
 package net.minecraft.client.render.entity.model;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.model.ModelPart;
+import net.minecraft.client.render.entity.state.LancerEntityRenderState;
 import net.minecraft.util.Arm;
+import net.minecraft.util.SwingAnimationType;
 import net.minecraft.util.math.MathHelper;
 
-@Environment(EnvType.CLIENT)
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
 public class ArmPosing {
-   public static void hold(ModelPart holdingArm, ModelPart otherArm, ModelPart head, boolean rightArm) {
-      ModelPart modelPart = rightArm ? holdingArm : otherArm;
-      ModelPart modelPart2 = rightArm ? otherArm : holdingArm;
-      modelPart.yaw = (rightArm ? -0.3F : 0.3F) + head.yaw;
-      modelPart2.yaw = (rightArm ? 0.6F : -0.6F) + head.yaw;
-      modelPart.pitch = -1.5707964F + head.pitch + 0.1F;
-      modelPart2.pitch = -1.5F + head.pitch;
-   }
+    public static void hold(ModelPart holdingArm, ModelPart otherArm, ModelPart head, boolean rightArm) {
+        ModelPart modelPart = rightArm ? holdingArm : otherArm;
+        ModelPart modelPart2 = rightArm ? otherArm : holdingArm;
+        modelPart.yaw = (rightArm ? -0.3f : 0.3f) + head.yaw;
+        modelPart2.yaw = (rightArm ? 0.6f : -0.6f) + head.yaw;
+        modelPart.pitch = -1.5707964f + head.pitch + 0.1f;
+        modelPart2.pitch = -1.5f + head.pitch;
+    }
 
-   public static void charge(ModelPart holdingArm, ModelPart pullingArm, float crossbowPullTime, int itemUseTime, boolean rightArm) {
-      ModelPart modelPart = rightArm ? holdingArm : pullingArm;
-      ModelPart modelPart2 = rightArm ? pullingArm : holdingArm;
-      modelPart.yaw = rightArm ? -0.8F : 0.8F;
-      modelPart.pitch = -0.97079635F;
-      modelPart2.pitch = modelPart.pitch;
-      float f = MathHelper.clamp((float)itemUseTime, 0.0F, crossbowPullTime);
-      float g = f / crossbowPullTime;
-      modelPart2.yaw = MathHelper.lerp(g, 0.4F, 0.85F) * (float)(rightArm ? 1 : -1);
-      modelPart2.pitch = MathHelper.lerp(g, modelPart2.pitch, -1.5707964F);
-   }
+    public static void charge(ModelPart holdingArm, ModelPart pullingArm, float crossbowPullTime, float f, boolean rightArm) {
+        ModelPart modelPart = rightArm ? holdingArm : pullingArm;
+        ModelPart modelPart2 = rightArm ? pullingArm : holdingArm;
+        modelPart.yaw = rightArm ? -0.8f : 0.8f;
+        modelPart2.pitch = modelPart.pitch = -0.97079635f;
+        float g = MathHelper.clamp((float)f, (float)0.0f, (float)crossbowPullTime);
+        float h = g / crossbowPullTime;
+        modelPart2.yaw = MathHelper.lerp((float)h, (float)0.4f, (float)0.85f) * (float)(rightArm ? 1 : -1);
+        modelPart2.pitch = MathHelper.lerp((float)h, (float)modelPart2.pitch, (float)-1.5707964f);
+    }
 
-   public static void meleeAttack(ModelPart rightArm, ModelPart leftArm, Arm mainArm, float swingProgress, float animationProgress) {
-      float f = MathHelper.sin(swingProgress * 3.1415927F);
-      float g = MathHelper.sin((1.0F - (1.0F - swingProgress) * (1.0F - swingProgress)) * 3.1415927F);
-      rightArm.roll = 0.0F;
-      leftArm.roll = 0.0F;
-      rightArm.yaw = 0.15707964F;
-      leftArm.yaw = -0.15707964F;
-      if (mainArm == Arm.RIGHT) {
-         rightArm.pitch = -1.8849558F + MathHelper.cos(animationProgress * 0.09F) * 0.15F;
-         leftArm.pitch = -0.0F + MathHelper.cos(animationProgress * 0.19F) * 0.5F;
-         rightArm.pitch += f * 2.2F - g * 0.4F;
-         leftArm.pitch += f * 1.2F - g * 0.4F;
-      } else {
-         rightArm.pitch = -0.0F + MathHelper.cos(animationProgress * 0.19F) * 0.5F;
-         leftArm.pitch = -1.8849558F + MathHelper.cos(animationProgress * 0.09F) * 0.15F;
-         rightArm.pitch += f * 1.2F - g * 0.4F;
-         leftArm.pitch += f * 2.2F - g * 0.4F;
-      }
+    public static void meleeAttack(ModelPart rightArm, ModelPart leftArm, Arm mainArm, float swingProgress, float animationProgress) {
+        float f = MathHelper.sin((double)(swingProgress * (float)Math.PI));
+        float g = MathHelper.sin((double)((1.0f - (1.0f - swingProgress) * (1.0f - swingProgress)) * (float)Math.PI));
+        rightArm.roll = 0.0f;
+        leftArm.roll = 0.0f;
+        rightArm.yaw = 0.15707964f;
+        leftArm.yaw = -0.15707964f;
+        if (mainArm == Arm.RIGHT) {
+            rightArm.pitch = -1.8849558f + MathHelper.cos((double)(animationProgress * 0.09f)) * 0.15f;
+            leftArm.pitch = -0.0f + MathHelper.cos((double)(animationProgress * 0.19f)) * 0.5f;
+            rightArm.pitch += f * 2.2f - g * 0.4f;
+            leftArm.pitch += f * 1.2f - g * 0.4f;
+        } else {
+            rightArm.pitch = -0.0f + MathHelper.cos((double)(animationProgress * 0.19f)) * 0.5f;
+            leftArm.pitch = -1.8849558f + MathHelper.cos((double)(animationProgress * 0.09f)) * 0.15f;
+            rightArm.pitch += f * 1.2f - g * 0.4f;
+            leftArm.pitch += f * 2.2f - g * 0.4f;
+        }
+        ArmPosing.swingArms((ModelPart)rightArm, (ModelPart)leftArm, (float)animationProgress);
+    }
 
-      swingArms(rightArm, leftArm, animationProgress);
-   }
+    public static void swingArm(ModelPart arm, float animationProgress, float sigma) {
+        arm.roll += sigma * (MathHelper.cos((double)(animationProgress * 0.09f)) * 0.05f + 0.05f);
+        arm.pitch += sigma * (MathHelper.sin((double)(animationProgress * 0.067f)) * 0.05f);
+    }
 
-   public static void swingArm(ModelPart arm, float animationProgress, float sigma) {
-      arm.roll += sigma * (MathHelper.cos(animationProgress * 0.09F) * 0.05F + 0.05F);
-      arm.pitch += sigma * MathHelper.sin(animationProgress * 0.067F) * 0.05F;
-   }
+    public static void swingArms(ModelPart rightArm, ModelPart leftArm, float animationProgress) {
+        ArmPosing.swingArm((ModelPart)rightArm, (float)animationProgress, (float)1.0f);
+        ArmPosing.swingArm((ModelPart)leftArm, (float)animationProgress, (float)-1.0f);
+    }
 
-   public static void swingArms(ModelPart rightArm, ModelPart leftArm, float animationProgress) {
-      swingArm(rightArm, animationProgress, 1.0F);
-      swingArm(leftArm, animationProgress, -1.0F);
-   }
-
-   public static void zombieArms(ModelPart leftArm, ModelPart rightArm, boolean attacking, float swingProgress, float animationProgress) {
-      float f = MathHelper.sin(swingProgress * 3.1415927F);
-      float g = MathHelper.sin((1.0F - (1.0F - swingProgress) * (1.0F - swingProgress)) * 3.1415927F);
-      rightArm.roll = 0.0F;
-      leftArm.roll = 0.0F;
-      rightArm.yaw = -(0.1F - f * 0.6F);
-      leftArm.yaw = 0.1F - f * 0.6F;
-      float h = -3.1415927F / (attacking ? 1.5F : 2.25F);
-      rightArm.pitch = h;
-      leftArm.pitch = h;
-      rightArm.pitch += f * 1.2F - g * 0.4F;
-      leftArm.pitch += f * 1.2F - g * 0.4F;
-      swingArms(rightArm, leftArm, animationProgress);
-   }
+    public static <T extends LancerEntityRenderState> void zombieArms(ModelPart leftArm, ModelPart rightArm, boolean attacking, T lancerEntityRenderState) {
+        boolean bl;
+        boolean bl2 = bl = lancerEntityRenderState.swingAnimationType != SwingAnimationType.STAB;
+        if (bl) {
+            float f = lancerEntityRenderState.handSwingProgress;
+            float g = (float)(-Math.PI) / (attacking ? 1.5f : 2.25f);
+            float h = MathHelper.sin((double)(f * (float)Math.PI));
+            float i = MathHelper.sin((double)((1.0f - (1.0f - f) * (1.0f - f)) * (float)Math.PI));
+            rightArm.roll = 0.0f;
+            rightArm.yaw = -(0.1f - h * 0.6f);
+            rightArm.pitch = g;
+            rightArm.pitch += h * 1.2f - i * 0.4f;
+            leftArm.roll = 0.0f;
+            leftArm.yaw = 0.1f - h * 0.6f;
+            leftArm.pitch = g;
+            leftArm.pitch += h * 1.2f - i * 0.4f;
+        }
+        ArmPosing.swingArms((ModelPart)rightArm, (ModelPart)leftArm, (float)lancerEntityRenderState.age);
+    }
 }
+

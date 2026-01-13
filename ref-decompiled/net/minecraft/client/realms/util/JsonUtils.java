@@ -1,102 +1,112 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.google.gson.JsonElement
+ *  com.google.gson.JsonObject
+ *  com.mojang.util.UndashedUuid
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.realms.util.JsonUtils
+ *  org.jetbrains.annotations.Contract
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.realms.util;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.util.UndashedUuid;
-import java.util.Date;
+import java.time.Instant;
 import java.util.UUID;
 import java.util.function.Function;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Contract;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
 public class JsonUtils {
-   public static Object get(String key, JsonObject node, Function deserializer) {
-      JsonElement jsonElement = node.get(key);
-      if (jsonElement != null && !jsonElement.isJsonNull()) {
-         if (!jsonElement.isJsonObject()) {
+    public static <T> T get(String key, JsonObject node, Function<JsonObject, T> deserializer) {
+        JsonElement jsonElement = node.get(key);
+        if (jsonElement == null || jsonElement.isJsonNull()) {
+            throw new IllegalStateException("Missing required property: " + key);
+        }
+        if (!jsonElement.isJsonObject()) {
             throw new IllegalStateException("Required property " + key + " was not a JsonObject as espected");
-         } else {
-            return deserializer.apply(jsonElement.getAsJsonObject());
-         }
-      } else {
-         throw new IllegalStateException("Missing required property: " + key);
-      }
-   }
+        }
+        return deserializer.apply(jsonElement.getAsJsonObject());
+    }
 
-   @Nullable
-   public static Object getNullable(String key, JsonObject node, Function deserializer) {
-      JsonElement jsonElement = node.get(key);
-      if (jsonElement != null && !jsonElement.isJsonNull()) {
-         if (!jsonElement.isJsonObject()) {
+    public static <T> @Nullable T getNullable(String key, JsonObject node, Function<JsonObject, T> deserializer) {
+        JsonElement jsonElement = node.get(key);
+        if (jsonElement == null || jsonElement.isJsonNull()) {
+            return null;
+        }
+        if (!jsonElement.isJsonObject()) {
             throw new IllegalStateException("Required property " + key + " was not a JsonObject as espected");
-         } else {
-            return deserializer.apply(jsonElement.getAsJsonObject());
-         }
-      } else {
-         return null;
-      }
-   }
+        }
+        return deserializer.apply(jsonElement.getAsJsonObject());
+    }
 
-   public static String getString(String key, JsonObject node) {
-      String string = getNullableStringOr(key, node, (String)null);
-      if (string == null) {
-         throw new IllegalStateException("Missing required property: " + key);
-      } else {
-         return string;
-      }
-   }
+    public static String getString(String key, JsonObject node) {
+        String string = JsonUtils.getNullableStringOr((String)key, (JsonObject)node, null);
+        if (string == null) {
+            throw new IllegalStateException("Missing required property: " + key);
+        }
+        return string;
+    }
 
-   public static String getStringOr(String key, JsonObject node, String defaultValue) {
-      return getNullableStringOr(key, node, defaultValue);
-   }
+    @Contract(value="_,_,!null->!null;_,_,null->_")
+    public static @Nullable String getNullableStringOr(String key, JsonObject node, @Nullable String defaultValue) {
+        JsonElement jsonElement = node.get(key);
+        if (jsonElement != null) {
+            return jsonElement.isJsonNull() ? defaultValue : jsonElement.getAsString();
+        }
+        return defaultValue;
+    }
 
-   @Nullable
-   public static String getNullableStringOr(String key, JsonObject node, @Nullable String defaultValue) {
-      JsonElement jsonElement = node.get(key);
-      if (jsonElement != null) {
-         return jsonElement.isJsonNull() ? defaultValue : jsonElement.getAsString();
-      } else {
-         return defaultValue;
-      }
-   }
+    @Contract(value="_,_,!null->!null;_,_,null->_")
+    public static @Nullable UUID getUuidOr(String key, JsonObject node, @Nullable UUID defaultValue) {
+        String string = JsonUtils.getNullableStringOr((String)key, (JsonObject)node, null);
+        if (string == null) {
+            return defaultValue;
+        }
+        return UndashedUuid.fromStringLenient((String)string);
+    }
 
-   @Nullable
-   public static UUID getUuidOr(String key, JsonObject node, @Nullable UUID defaultValue) {
-      String string = getNullableStringOr(key, node, (String)null);
-      return string == null ? defaultValue : UndashedUuid.fromStringLenient(string);
-   }
+    public static int getIntOr(String key, JsonObject node, int defaultValue) {
+        JsonElement jsonElement = node.get(key);
+        if (jsonElement != null) {
+            return jsonElement.isJsonNull() ? defaultValue : jsonElement.getAsInt();
+        }
+        return defaultValue;
+    }
 
-   public static int getIntOr(String key, JsonObject node, int defaultValue) {
-      JsonElement jsonElement = node.get(key);
-      if (jsonElement != null) {
-         return jsonElement.isJsonNull() ? defaultValue : jsonElement.getAsInt();
-      } else {
-         return defaultValue;
-      }
-   }
+    public static long getLongOr(String key, JsonObject node, long defaultValue) {
+        JsonElement jsonElement = node.get(key);
+        if (jsonElement != null) {
+            return jsonElement.isJsonNull() ? defaultValue : jsonElement.getAsLong();
+        }
+        return defaultValue;
+    }
 
-   public static long getLongOr(String key, JsonObject node, long defaultValue) {
-      JsonElement jsonElement = node.get(key);
-      if (jsonElement != null) {
-         return jsonElement.isJsonNull() ? defaultValue : jsonElement.getAsLong();
-      } else {
-         return defaultValue;
-      }
-   }
+    public static boolean getBooleanOr(String key, JsonObject node, boolean defaultValue) {
+        JsonElement jsonElement = node.get(key);
+        if (jsonElement != null) {
+            return jsonElement.isJsonNull() ? defaultValue : jsonElement.getAsBoolean();
+        }
+        return defaultValue;
+    }
 
-   public static boolean getBooleanOr(String key, JsonObject node, boolean defaultValue) {
-      JsonElement jsonElement = node.get(key);
-      if (jsonElement != null) {
-         return jsonElement.isJsonNull() ? defaultValue : jsonElement.getAsBoolean();
-      } else {
-         return defaultValue;
-      }
-   }
-
-   public static Date getDateOr(String key, JsonObject node) {
-      JsonElement jsonElement = node.get(key);
-      return jsonElement != null ? new Date(Long.parseLong(jsonElement.getAsString())) : new Date();
-   }
+    public static Instant getInstantOr(String key, JsonObject node) {
+        JsonElement jsonElement = node.get(key);
+        if (jsonElement != null) {
+            return Instant.ofEpochMilli(Long.parseLong(jsonElement.getAsString()));
+        }
+        return Instant.EPOCH;
+    }
 }
+

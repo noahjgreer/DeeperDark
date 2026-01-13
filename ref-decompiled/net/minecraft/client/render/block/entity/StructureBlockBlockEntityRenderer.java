@@ -1,6 +1,38 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.block.BlockState
+ *  net.minecraft.block.Blocks
+ *  net.minecraft.block.entity.BlockEntity
+ *  net.minecraft.block.entity.StructureBoxRendering
+ *  net.minecraft.block.entity.StructureBoxRendering$RenderMode
+ *  net.minecraft.block.entity.StructureBoxRendering$StructureBox
+ *  net.minecraft.client.MinecraftClient
+ *  net.minecraft.client.network.ClientPlayerEntity
+ *  net.minecraft.client.render.DrawStyle
+ *  net.minecraft.client.render.block.entity.BlockEntityRenderer
+ *  net.minecraft.client.render.block.entity.StructureBlockBlockEntityRenderer
+ *  net.minecraft.client.render.block.entity.state.BlockEntityRenderState
+ *  net.minecraft.client.render.block.entity.state.StructureBlockBlockEntityRenderState
+ *  net.minecraft.client.render.block.entity.state.StructureBlockBlockEntityRenderState$InvisibleRenderType
+ *  net.minecraft.client.render.command.OrderedRenderCommandQueue
+ *  net.minecraft.client.render.state.CameraRenderState
+ *  net.minecraft.client.util.math.MatrixStack
+ *  net.minecraft.util.math.BlockPos
+ *  net.minecraft.util.math.Box
+ *  net.minecraft.util.math.ColorHelper
+ *  net.minecraft.util.math.Direction
+ *  net.minecraft.util.math.Vec3d
+ *  net.minecraft.util.math.Vec3i
+ *  net.minecraft.util.shape.BitSetVoxelSet
+ *  net.minecraft.world.debug.gizmo.GizmoDrawing
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.render.block.entity;
 
-import java.util.Iterator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
@@ -8,124 +40,180 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.StructureBoxRendering;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.VertexRendering;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.render.DrawStyle;
+import net.minecraft.client.render.block.entity.BlockEntityRenderer;
+import net.minecraft.client.render.block.entity.state.BlockEntityRenderState;
+import net.minecraft.client.render.block.entity.state.StructureBlockBlockEntityRenderState;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
+import net.minecraft.client.render.state.CameraRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.ColorHelper;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.shape.BitSetVoxelSet;
-import net.minecraft.util.shape.VoxelSet;
-import net.minecraft.world.BlockView;
+import net.minecraft.world.debug.gizmo.GizmoDrawing;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
-public class StructureBlockBlockEntityRenderer implements BlockEntityRenderer {
-   public StructureBlockBlockEntityRenderer(BlockEntityRendererFactory.Context ctx) {
-   }
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
+public class StructureBlockBlockEntityRenderer<T extends BlockEntity>
+implements BlockEntityRenderer<T, StructureBlockBlockEntityRenderState> {
+    public static final int field_63584 = ColorHelper.fromFloats((float)0.2f, (float)0.75f, (float)0.75f, (float)1.0f);
 
-   public void render(BlockEntity entity, float tickProgress, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, Vec3d cameraPos) {
-      if (MinecraftClient.getInstance().player.isCreativeLevelTwoOp() || MinecraftClient.getInstance().player.isSpectator()) {
-         StructureBoxRendering.RenderMode renderMode = ((StructureBoxRendering)entity).getRenderMode();
-         if (renderMode != StructureBoxRendering.RenderMode.NONE) {
-            StructureBoxRendering.StructureBox structureBox = ((StructureBoxRendering)entity).getStructureBox();
-            BlockPos blockPos = structureBox.localPos();
-            Vec3i vec3i = structureBox.size();
-            if (vec3i.getX() >= 1 && vec3i.getY() >= 1 && vec3i.getZ() >= 1) {
-               float f = 1.0F;
-               float g = 0.9F;
-               float h = 0.5F;
-               VertexConsumer vertexConsumer = vertexConsumers.getBuffer(RenderLayer.getLines());
-               BlockPos blockPos2 = blockPos.add(vec3i);
-               VertexRendering.drawBox(matrices, vertexConsumer, (double)blockPos.getX(), (double)blockPos.getY(), (double)blockPos.getZ(), (double)blockPos2.getX(), (double)blockPos2.getY(), (double)blockPos2.getZ(), 0.9F, 0.9F, 0.9F, 1.0F, 0.5F, 0.5F, 0.5F);
-               if (renderMode == StructureBoxRendering.RenderMode.BOX_AND_INVISIBLE_BLOCKS && entity.getWorld() != null) {
-                  this.renderInvisibleBlocks(entity, entity.getWorld(), blockPos, vec3i, vertexConsumers, matrices);
-               }
+    public StructureBlockBlockEntityRenderState createRenderState() {
+        return new StructureBlockBlockEntityRenderState();
+    }
 
+    public void updateRenderState(T blockEntity, StructureBlockBlockEntityRenderState structureBlockBlockEntityRenderState, float f, Vec3d vec3d, // Could not load outer class - annotation placement on inner may be incorrect
+     @Nullable ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlayCommand) {
+        super.updateRenderState(blockEntity, (BlockEntityRenderState)structureBlockBlockEntityRenderState, f, vec3d, crumblingOverlayCommand);
+        StructureBlockBlockEntityRenderer.updateStructureBoxRenderState(blockEntity, (StructureBlockBlockEntityRenderState)structureBlockBlockEntityRenderState);
+    }
+
+    public static <T extends BlockEntity> void updateStructureBoxRenderState(T blockEntity, StructureBlockBlockEntityRenderState state) {
+        ClientPlayerEntity clientPlayerEntity = MinecraftClient.getInstance().player;
+        state.visible = clientPlayerEntity.isCreativeLevelTwoOp() || clientPlayerEntity.isSpectator();
+        state.structureBox = ((StructureBoxRendering)blockEntity).getStructureBox();
+        state.renderMode = ((StructureBoxRendering)blockEntity).getRenderMode();
+        BlockPos blockPos = state.structureBox.localPos();
+        Vec3i vec3i = state.structureBox.size();
+        BlockPos blockPos2 = state.pos;
+        BlockPos blockPos3 = blockPos2.add((Vec3i)blockPos);
+        if (state.visible && blockEntity.getWorld() != null && state.renderMode == StructureBoxRendering.RenderMode.BOX_AND_INVISIBLE_BLOCKS) {
+            state.invisibleBlocks = new StructureBlockBlockEntityRenderState.InvisibleRenderType[vec3i.getX() * vec3i.getY() * vec3i.getZ()];
+            for (int i = 0; i < vec3i.getX(); ++i) {
+                for (int j = 0; j < vec3i.getY(); ++j) {
+                    for (int k = 0; k < vec3i.getZ(); ++k) {
+                        int l = k * vec3i.getX() * vec3i.getY() + j * vec3i.getX() + i;
+                        BlockState blockState = blockEntity.getWorld().getBlockState(blockPos3.add(i, j, k));
+                        if (blockState.isAir()) {
+                            state.invisibleBlocks[l] = StructureBlockBlockEntityRenderState.InvisibleRenderType.AIR;
+                            continue;
+                        }
+                        if (blockState.isOf(Blocks.STRUCTURE_VOID)) {
+                            state.invisibleBlocks[l] = StructureBlockBlockEntityRenderState.InvisibleRenderType.STRUCTURE_VOID;
+                            continue;
+                        }
+                        if (blockState.isOf(Blocks.BARRIER)) {
+                            state.invisibleBlocks[l] = StructureBlockBlockEntityRenderState.InvisibleRenderType.BARRIER;
+                            continue;
+                        }
+                        if (!blockState.isOf(Blocks.LIGHT)) continue;
+                        state.invisibleBlocks[l] = StructureBlockBlockEntityRenderState.InvisibleRenderType.LIGHT;
+                    }
+                }
             }
-         }
-      }
-   }
+        } else {
+            state.invisibleBlocks = null;
+        }
+        if (state.visible) {
+            // empty if block
+        }
+        state.field_62682 = null;
+    }
 
-   private void renderInvisibleBlocks(BlockEntity entity, BlockView world, BlockPos pos, Vec3i size, VertexConsumerProvider vertexConsumers, MatrixStack matrices) {
-      VertexConsumer vertexConsumer = vertexConsumers.getBuffer(RenderLayer.getLines());
-      BlockPos blockPos = entity.getPos();
-      BlockPos blockPos2 = blockPos.add(pos);
-      Iterator var10 = BlockPos.iterate(blockPos2, blockPos2.add(size).add(-1, -1, -1)).iterator();
+    public void render(StructureBlockBlockEntityRenderState structureBlockBlockEntityRenderState, MatrixStack matrixStack, OrderedRenderCommandQueue orderedRenderCommandQueue, CameraRenderState cameraRenderState) {
+        if (!structureBlockBlockEntityRenderState.visible) {
+            return;
+        }
+        StructureBoxRendering.RenderMode renderMode = structureBlockBlockEntityRenderState.renderMode;
+        if (renderMode == StructureBoxRendering.RenderMode.NONE) {
+            return;
+        }
+        StructureBoxRendering.StructureBox structureBox = structureBlockBlockEntityRenderState.structureBox;
+        BlockPos blockPos = structureBox.localPos();
+        Vec3i vec3i = structureBox.size();
+        if (vec3i.getX() < 1 || vec3i.getY() < 1 || vec3i.getZ() < 1) {
+            return;
+        }
+        float f = 1.0f;
+        float g = 0.9f;
+        BlockPos blockPos2 = blockPos.add(vec3i);
+        GizmoDrawing.box((Box)new Box((double)blockPos.getX(), (double)blockPos.getY(), (double)blockPos.getZ(), (double)blockPos2.getX(), (double)blockPos2.getY(), (double)blockPos2.getZ()).offset(structureBlockBlockEntityRenderState.pos), (DrawStyle)DrawStyle.stroked((int)ColorHelper.fromFloats((float)1.0f, (float)0.9f, (float)0.9f, (float)0.9f)), (boolean)true);
+        this.renderInvisibleBlocks(structureBlockBlockEntityRenderState, blockPos, vec3i);
+    }
 
-      while(true) {
-         BlockPos blockPos3;
-         boolean bl;
-         boolean bl2;
-         boolean bl3;
-         boolean bl4;
-         boolean bl5;
-         do {
-            if (!var10.hasNext()) {
-               return;
+    private void renderInvisibleBlocks(StructureBlockBlockEntityRenderState state, BlockPos pos, Vec3i size) {
+        if (state.invisibleBlocks == null) {
+            return;
+        }
+        BlockPos blockPos = state.pos;
+        BlockPos blockPos2 = blockPos.add((Vec3i)pos);
+        for (int i = 0; i < size.getX(); ++i) {
+            for (int j = 0; j < size.getY(); ++j) {
+                for (int k = 0; k < size.getZ(); ++k) {
+                    int l = k * size.getX() * size.getY() + j * size.getX() + i;
+                    StructureBlockBlockEntityRenderState.InvisibleRenderType invisibleRenderType = state.invisibleBlocks[l];
+                    if (invisibleRenderType == null) continue;
+                    float f = invisibleRenderType == StructureBlockBlockEntityRenderState.InvisibleRenderType.AIR ? 0.05f : 0.0f;
+                    double d = (float)(blockPos2.getX() + i) + 0.45f - f;
+                    double e = (float)(blockPos2.getY() + j) + 0.45f - f;
+                    double g = (float)(blockPos2.getZ() + k) + 0.45f - f;
+                    double h = (float)(blockPos2.getX() + i) + 0.55f + f;
+                    double m = (float)(blockPos2.getY() + j) + 0.55f + f;
+                    double n = (float)(blockPos2.getZ() + k) + 0.55f + f;
+                    Box box = new Box(d, e, g, h, m, n);
+                    if (invisibleRenderType == StructureBlockBlockEntityRenderState.InvisibleRenderType.AIR) {
+                        GizmoDrawing.box((Box)box, (DrawStyle)DrawStyle.stroked((int)ColorHelper.fromFloats((float)1.0f, (float)0.5f, (float)0.5f, (float)1.0f)));
+                        continue;
+                    }
+                    if (invisibleRenderType == StructureBlockBlockEntityRenderState.InvisibleRenderType.STRUCTURE_VOID) {
+                        GizmoDrawing.box((Box)box, (DrawStyle)DrawStyle.stroked((int)ColorHelper.fromFloats((float)1.0f, (float)1.0f, (float)0.75f, (float)0.75f)));
+                        continue;
+                    }
+                    if (invisibleRenderType == StructureBlockBlockEntityRenderState.InvisibleRenderType.BARRIER) {
+                        GizmoDrawing.box((Box)box, (DrawStyle)DrawStyle.stroked((int)-65536));
+                        continue;
+                    }
+                    if (invisibleRenderType != StructureBlockBlockEntityRenderState.InvisibleRenderType.LIGHT) continue;
+                    GizmoDrawing.box((Box)box, (DrawStyle)DrawStyle.stroked((int)-256));
+                }
             }
+        }
+    }
 
-            blockPos3 = (BlockPos)var10.next();
-            BlockState blockState = world.getBlockState(blockPos3);
-            bl = blockState.isAir();
-            bl2 = blockState.isOf(Blocks.STRUCTURE_VOID);
-            bl3 = blockState.isOf(Blocks.BARRIER);
-            bl4 = blockState.isOf(Blocks.LIGHT);
-            bl5 = bl2 || bl3 || bl4;
-         } while(!bl && !bl5);
-
-         float f = bl ? 0.05F : 0.0F;
-         double d = (double)((float)(blockPos3.getX() - blockPos.getX()) + 0.45F - f);
-         double e = (double)((float)(blockPos3.getY() - blockPos.getY()) + 0.45F - f);
-         double g = (double)((float)(blockPos3.getZ() - blockPos.getZ()) + 0.45F - f);
-         double h = (double)((float)(blockPos3.getX() - blockPos.getX()) + 0.55F + f);
-         double i = (double)((float)(blockPos3.getY() - blockPos.getY()) + 0.55F + f);
-         double j = (double)((float)(blockPos3.getZ() - blockPos.getZ()) + 0.55F + f);
-         if (bl) {
-            VertexRendering.drawBox(matrices, vertexConsumer, d, e, g, h, i, j, 0.5F, 0.5F, 1.0F, 1.0F, 0.5F, 0.5F, 1.0F);
-         } else if (bl2) {
-            VertexRendering.drawBox(matrices, vertexConsumer, d, e, g, h, i, j, 1.0F, 0.75F, 0.75F, 1.0F, 1.0F, 0.75F, 0.75F);
-         } else if (bl3) {
-            VertexRendering.drawBox(matrices, vertexConsumer, d, e, g, h, i, j, 1.0F, 0.0F, 0.0F, 1.0F, 1.0F, 0.0F, 0.0F);
-         } else if (bl4) {
-            VertexRendering.drawBox(matrices, vertexConsumer, d, e, g, h, i, j, 1.0F, 1.0F, 0.0F, 1.0F, 1.0F, 1.0F, 0.0F);
-         }
-      }
-   }
-
-   private void renderStructureVoids(BlockEntity entity, BlockPos pos, Vec3i size, VertexConsumer vertexConsumer, MatrixStack matrices) {
-      BlockView blockView = entity.getWorld();
-      if (blockView != null) {
-         BlockPos blockPos = entity.getPos();
-         VoxelSet voxelSet = new BitSetVoxelSet(size.getX(), size.getY(), size.getZ());
-         Iterator var9 = BlockPos.iterate(pos, pos.add(size).add(-1, -1, -1)).iterator();
-
-         while(var9.hasNext()) {
-            BlockPos blockPos2 = (BlockPos)var9.next();
-            if (blockView.getBlockState(blockPos2).isOf(Blocks.STRUCTURE_VOID)) {
-               voxelSet.set(blockPos2.getX() - pos.getX(), blockPos2.getY() - pos.getY(), blockPos2.getZ() - pos.getZ());
+    private void renderStructureVoids(StructureBlockBlockEntityRenderState state, BlockPos pos, Vec3i size) {
+        if (state.field_62682 == null) {
+            return;
+        }
+        BitSetVoxelSet voxelSet = new BitSetVoxelSet(size.getX(), size.getY(), size.getZ());
+        for (int i2 = 0; i2 < size.getX(); ++i2) {
+            for (int j2 = 0; j2 < size.getY(); ++j2) {
+                for (int k2 = 0; k2 < size.getZ(); ++k2) {
+                    int l = k2 * size.getX() * size.getY() + j2 * size.getX() + i2;
+                    if (!state.field_62682[l]) continue;
+                    voxelSet.set(i2, j2, k2);
+                }
             }
-         }
+        }
+        voxelSet.forEachDirection((direction, i, j, k) -> {
+            float f = 0.48f;
+            float g = (float)(i + pos.getX()) + 0.5f - 0.48f;
+            float h = (float)(j + pos.getY()) + 0.5f - 0.48f;
+            float l = (float)(k + pos.getZ()) + 0.5f - 0.48f;
+            float m = (float)(i + pos.getX()) + 0.5f + 0.48f;
+            float n = (float)(j + pos.getY()) + 0.5f + 0.48f;
+            float o = (float)(k + pos.getZ()) + 0.5f + 0.48f;
+            GizmoDrawing.face((Vec3d)new Vec3d((double)g, (double)h, (double)l), (Vec3d)new Vec3d((double)m, (double)n, (double)o), (Direction)direction, (DrawStyle)DrawStyle.filled((int)field_63584));
+        });
+    }
 
-         voxelSet.forEachDirection((direction, x, y, z) -> {
-            float f = 0.48F;
-            float g = (float)(x + pos.getX() - blockPos.getX()) + 0.5F - 0.48F;
-            float h = (float)(y + pos.getY() - blockPos.getY()) + 0.5F - 0.48F;
-            float i = (float)(z + pos.getZ() - blockPos.getZ()) + 0.5F - 0.48F;
-            float j = (float)(x + pos.getX() - blockPos.getX()) + 0.5F + 0.48F;
-            float k = (float)(y + pos.getY() - blockPos.getY()) + 0.5F + 0.48F;
-            float l = (float)(z + pos.getZ() - blockPos.getZ()) + 0.5F + 0.48F;
-            VertexRendering.drawSide(matrices, vertexConsumer, direction, g, h, i, j, k, l, 0.75F, 0.75F, 1.0F, 0.2F);
-         });
-      }
-   }
+    public boolean rendersOutsideBoundingBox() {
+        return true;
+    }
 
-   public boolean rendersOutsideBoundingBox() {
-      return true;
-   }
+    public int getRenderDistance() {
+        return 96;
+    }
 
-   public int getRenderDistance() {
-      return 96;
-   }
+    public /* synthetic */ BlockEntityRenderState createRenderState() {
+        return this.createRenderState();
+    }
 }
+

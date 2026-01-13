@@ -11,6 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.village.TradeOffer;
@@ -92,7 +93,7 @@ public class ModVillagers {
         }
 
         @Override
-        public TradeOffer create(Entity entity, Random random) {
+        public TradeOffer create(ServerWorld world, Entity entity, Random random) {
             List<RegistryEntry<StatusEffect>> possibleEffects = new ArrayList<>();
             Registries.STATUS_EFFECT.streamEntries().forEach(possibleEffects::add);
 
@@ -165,7 +166,7 @@ public class ModVillagers {
         }
 
         @Override
-        public TradeOffer create(Entity entity, Random random) {
+        public TradeOffer create(ServerWorld world, Entity entity, Random random) {
             int count = net.minecraft.util.math.MathHelper.nextInt(random, this.minCount, this.maxCount);
             return new TradeOffer(new TradedItem(this.item, count), new ItemStack(Items.EMERALD, this.price), this.maxUses, this.experience, 0.05F);
         }
@@ -197,7 +198,7 @@ public class ModVillagers {
         }
 
         @Override
-        public TradeOffer create(Entity entity, Random random) {
+        public TradeOffer create(ServerWorld world, Entity entity, Random random) {
             int price = net.minecraft.util.math.MathHelper.nextInt(random, this.minPrice, this.maxPrice);
             int count = net.minecraft.util.math.MathHelper.nextInt(random, this.minCount, this.maxCount);
             ItemStack stack = this.sell.copy();

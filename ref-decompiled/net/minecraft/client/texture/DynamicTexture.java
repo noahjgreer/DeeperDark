@@ -1,3 +1,12 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.texture.DynamicTexture
+ *  net.minecraft.util.Identifier
+ */
 package net.minecraft.client.texture;
 
 import java.io.IOException;
@@ -6,7 +15,8 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.util.Identifier;
 
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 public interface DynamicTexture {
-   void save(Identifier id, Path path) throws IOException;
+    public void save(Identifier var1, Path var2) throws IOException;
 }
+

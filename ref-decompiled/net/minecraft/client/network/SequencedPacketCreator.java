@@ -1,11 +1,23 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.network.SequencedPacketCreator
+ *  net.minecraft.network.listener.ServerPlayPacketListener
+ *  net.minecraft.network.packet.Packet
+ */
 package net.minecraft.client.network;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.network.listener.ServerPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 
 @FunctionalInterface
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 public interface SequencedPacketCreator {
-   Packet predict(int sequence);
+    public Packet<ServerPlayPacketListener> predict(int var1);
 }
+

@@ -1,15 +1,20 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.render.model.ResolvableModel
+ *  net.minecraft.client.render.model.ResolvableModel$Resolver
+ */
 package net.minecraft.client.render.model;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.render.model.ResolvableModel;
 
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 public interface ResolvableModel {
-   void resolve(Resolver resolver);
-
-   @Environment(EnvType.CLIENT)
-   public interface Resolver {
-      void markDependency(Identifier id);
-   }
+    public void resolve(Resolver var1);
 }
+

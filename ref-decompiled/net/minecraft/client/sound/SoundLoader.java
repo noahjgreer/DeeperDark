@@ -1,3 +1,20 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.google.common.collect.Maps
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.sound.AudioStream
+ *  net.minecraft.client.sound.OggAudioStream
+ *  net.minecraft.client.sound.RepeatingAudioStream
+ *  net.minecraft.client.sound.Sound
+ *  net.minecraft.client.sound.SoundLoader
+ *  net.minecraft.client.sound.StaticSound
+ *  net.minecraft.resource.ResourceFactory
+ *  net.minecraft.util.Identifier
+ *  net.minecraft.util.Util
+ */
 package net.minecraft.client.sound;
 
 import com.google.common.collect.Maps;
@@ -8,92 +25,62 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.Executor;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.sound.AudioStream;
+import net.minecraft.client.sound.OggAudioStream;
+import net.minecraft.client.sound.RepeatingAudioStream;
+import net.minecraft.client.sound.Sound;
+import net.minecraft.client.sound.StaticSound;
 import net.minecraft.resource.ResourceFactory;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 public class SoundLoader {
-   private final ResourceFactory resourceFactory;
-   private final Map loadedSounds = Maps.newHashMap();
+    private final ResourceFactory resourceFactory;
+    private final Map<Identifier, CompletableFuture<StaticSound>> loadedSounds = Maps.newHashMap();
 
-   public SoundLoader(ResourceFactory resourceFactory) {
-      this.resourceFactory = resourceFactory;
-   }
+    public SoundLoader(ResourceFactory resourceFactory) {
+        this.resourceFactory = resourceFactory;
+    }
 
-   public CompletableFuture loadStatic(Identifier id) {
-      return (CompletableFuture)this.loadedSounds.computeIfAbsent(id, (id2) -> {
-         return CompletableFuture.supplyAsync(() -> {
-            try {
-               InputStream inputStream = this.resourceFactory.open(id2);
-
-               StaticSound var5;
-               try {
-                  NonRepeatingAudioStream nonRepeatingAudioStream = new OggAudioStream(inputStream);
-
-                  try {
-                     ByteBuffer byteBuffer = nonRepeatingAudioStream.readAll();
-                     var5 = new StaticSound(byteBuffer, nonRepeatingAudioStream.getFormat());
-                  } catch (Throwable var8) {
-                     try {
-                        nonRepeatingAudioStream.close();
-                     } catch (Throwable var7) {
-                        var8.addSuppressed(var7);
-                     }
-
-                     throw var8;
-                  }
-
-                  nonRepeatingAudioStream.close();
-               } catch (Throwable var9) {
-                  if (inputStream != null) {
-                     try {
-                        inputStream.close();
-                     } catch (Throwable var6) {
-                        var9.addSuppressed(var6);
-                     }
-                  }
-
-                  throw var9;
-               }
-
-               if (inputStream != null) {
-                  inputStream.close();
-               }
-
-               return var5;
-            } catch (IOException var10) {
-               throw new CompletionException(var10);
+    public CompletableFuture<StaticSound> loadStatic(Identifier id) {
+        return this.loadedSounds.computeIfAbsent(id, id2 -> CompletableFuture.supplyAsync(() -> {
+            try (InputStream inputStream = this.resourceFactory.open(id2);){
+                StaticSound staticSound;
+                try (OggAudioStream nonRepeatingAudioStream = new OggAudioStream(inputStream);){
+                    ByteBuffer byteBuffer = nonRepeatingAudioStream.readAll();
+                    staticSound = new StaticSound(byteBuffer, nonRepeatingAudioStream.getFormat());
+                }
+                return staticSound;
             }
-         }, Util.getDownloadWorkerExecutor());
-      });
-   }
+            catch (IOException iOException) {
+                throw new CompletionException(iOException);
+            }
+        }, (Executor)Util.getDownloadWorkerExecutor()));
+    }
 
-   public CompletableFuture loadStreamed(Identifier id, boolean repeatInstantly) {
-      return CompletableFuture.supplyAsync(() -> {
-         try {
-            InputStream inputStream = this.resourceFactory.open(id);
-            return (AudioStream)(repeatInstantly ? new RepeatingAudioStream(OggAudioStream::new, inputStream) : new OggAudioStream(inputStream));
-         } catch (IOException var4) {
-            throw new CompletionException(var4);
-         }
-      }, Util.getDownloadWorkerExecutor());
-   }
+    public CompletableFuture<AudioStream> loadStreamed(Identifier id, boolean repeatInstantly) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                InputStream inputStream = this.resourceFactory.open(id);
+                return repeatInstantly ? new RepeatingAudioStream(OggAudioStream::new, inputStream) : new OggAudioStream(inputStream);
+            }
+            catch (IOException iOException) {
+                throw new CompletionException(iOException);
+            }
+        }, (Executor)Util.getDownloadWorkerExecutor());
+    }
 
-   public void close() {
-      this.loadedSounds.values().forEach((soundFuture) -> {
-         soundFuture.thenAccept(StaticSound::close);
-      });
-      this.loadedSounds.clear();
-   }
+    public void close() {
+        this.loadedSounds.values().forEach(soundFuture -> soundFuture.thenAccept(StaticSound::close));
+        this.loadedSounds.clear();
+    }
 
-   public CompletableFuture loadStatic(Collection sounds) {
-      return CompletableFuture.allOf((CompletableFuture[])sounds.stream().map((sound) -> {
-         return this.loadStatic(sound.getLocation());
-      }).toArray((i) -> {
-         return new CompletableFuture[i];
-      }));
-   }
+    public CompletableFuture<?> loadStatic(Collection<Sound> sounds) {
+        return CompletableFuture.allOf((CompletableFuture[])sounds.stream().map(sound -> this.loadStatic(sound.getLocation())).toArray(CompletableFuture[]::new));
+    }
 }
+

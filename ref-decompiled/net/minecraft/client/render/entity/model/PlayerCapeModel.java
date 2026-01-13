@@ -1,3 +1,21 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.model.Dilation
+ *  net.minecraft.client.model.ModelData
+ *  net.minecraft.client.model.ModelPart
+ *  net.minecraft.client.model.ModelPartBuilder
+ *  net.minecraft.client.model.ModelPartData
+ *  net.minecraft.client.model.ModelTransform
+ *  net.minecraft.client.model.TexturedModelData
+ *  net.minecraft.client.render.entity.model.PlayerCapeModel
+ *  net.minecraft.client.render.entity.model.PlayerEntityModel
+ *  net.minecraft.client.render.entity.state.PlayerEntityRenderState
+ *  org.joml.Quaternionf
+ */
 package net.minecraft.client.render.entity.model;
 
 import net.fabricmc.api.EnvType;
@@ -9,36 +27,32 @@ import net.minecraft.client.model.ModelPartBuilder;
 import net.minecraft.client.model.ModelPartData;
 import net.minecraft.client.model.ModelTransform;
 import net.minecraft.client.model.TexturedModelData;
-import net.minecraft.client.render.entity.state.BipedEntityRenderState;
+import net.minecraft.client.render.entity.model.PlayerEntityModel;
 import net.minecraft.client.render.entity.state.PlayerEntityRenderState;
 import org.joml.Quaternionf;
 
-@Environment(EnvType.CLIENT)
-public class PlayerCapeModel extends BipedEntityModel {
-   private static final String CAPE = "cape";
-   private final ModelPart cape;
+@Environment(value=EnvType.CLIENT)
+public class PlayerCapeModel
+extends PlayerEntityModel {
+    private static final String CAPE = "cape";
+    private final ModelPart cape;
 
-   public PlayerCapeModel(ModelPart modelPart) {
-      super(modelPart);
-      this.cape = this.body.getChild("cape");
-   }
+    public PlayerCapeModel(ModelPart modelPart) {
+        super(modelPart, false);
+        this.cape = this.body.getChild(CAPE);
+    }
 
-   public static TexturedModelData getTexturedModelData() {
-      ModelData modelData = BipedEntityModel.getModelData(Dilation.NONE, 0.0F);
-      ModelPartData modelPartData = modelData.getRoot();
-      ModelPartData modelPartData2 = modelPartData.addChild("head");
-      modelPartData2.addChild("hat");
-      ModelPartData modelPartData3 = modelPartData.addChild("body");
-      modelPartData.addChild("left_arm");
-      modelPartData.addChild("right_arm");
-      modelPartData.addChild("left_leg");
-      modelPartData.addChild("right_leg");
-      modelPartData3.addChild("cape", ModelPartBuilder.create().uv(0, 0).cuboid(-5.0F, 0.0F, -1.0F, 10.0F, 16.0F, 1.0F, Dilation.NONE, 1.0F, 0.5F), ModelTransform.of(0.0F, 0.0F, 2.0F, 0.0F, 3.1415927F, 0.0F));
-      return TexturedModelData.of(modelData, 64, 64);
-   }
+    public static TexturedModelData getTexturedModelData() {
+        ModelData modelData = PlayerEntityModel.getTexturedModelData((Dilation)Dilation.NONE, (boolean)false);
+        ModelPartData modelPartData = modelData.getRoot().resetChildrenParts();
+        ModelPartData modelPartData2 = modelPartData.getChild("body");
+        modelPartData2.addChild(CAPE, ModelPartBuilder.create().uv(0, 0).cuboid(-5.0f, 0.0f, -1.0f, 10.0f, 16.0f, 1.0f, Dilation.NONE, 1.0f, 0.5f), ModelTransform.of((float)0.0f, (float)0.0f, (float)2.0f, (float)0.0f, (float)((float)Math.PI), (float)0.0f));
+        return TexturedModelData.of((ModelData)modelData, (int)64, (int)64);
+    }
 
-   public void setAngles(PlayerEntityRenderState playerEntityRenderState) {
-      super.setAngles((BipedEntityRenderState)playerEntityRenderState);
-      this.cape.rotate((new Quaternionf()).rotateY(-3.1415927F).rotateX((6.0F + playerEntityRenderState.field_53537 / 2.0F + playerEntityRenderState.field_53536) * 0.017453292F).rotateZ(playerEntityRenderState.field_53538 / 2.0F * 0.017453292F).rotateY((180.0F - playerEntityRenderState.field_53538 / 2.0F) * 0.017453292F));
-   }
+    public void setAngles(PlayerEntityRenderState playerEntityRenderState) {
+        super.setAngles(playerEntityRenderState);
+        this.cape.rotate(new Quaternionf().rotateY((float)(-Math.PI)).rotateX((6.0f + playerEntityRenderState.field_53537 / 2.0f + playerEntityRenderState.field_53536) * ((float)Math.PI / 180)).rotateZ(playerEntityRenderState.field_53538 / 2.0f * ((float)Math.PI / 180)).rotateY((180.0f - playerEntityRenderState.field_53538 / 2.0f) * ((float)Math.PI / 180)));
+    }
 }
+

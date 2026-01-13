@@ -1,41 +1,64 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.serialization.Codec
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.option.InactivityFpsLimit
+ *  net.minecraft.text.Text
+ *  net.minecraft.util.StringIdentifiable
+ */
 package net.minecraft.client.option;
 
 import com.mojang.serialization.Codec;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.text.Text;
 import net.minecraft.util.StringIdentifiable;
-import net.minecraft.util.TranslatableOption;
 
-@Environment(EnvType.CLIENT)
-public enum InactivityFpsLimit implements TranslatableOption, StringIdentifiable {
-   MINIMIZED(0, "minimized", "options.inactivityFpsLimit.minimized"),
-   AFK(1, "afk", "options.inactivityFpsLimit.afk");
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
+public final class InactivityFpsLimit
+extends Enum<InactivityFpsLimit>
+implements StringIdentifiable {
+    public static final /* enum */ InactivityFpsLimit MINIMIZED = new InactivityFpsLimit("MINIMIZED", 0, "minimized", "options.inactivityFpsLimit.minimized");
+    public static final /* enum */ InactivityFpsLimit AFK = new InactivityFpsLimit("AFK", 1, "afk", "options.inactivityFpsLimit.afk");
+    public static final Codec<InactivityFpsLimit> CODEC;
+    private final String name;
+    private final Text text;
+    private static final /* synthetic */ InactivityFpsLimit[] field_52749;
 
-   public static final Codec Codec = StringIdentifiable.createCodec(InactivityFpsLimit::values);
-   private final int ordinal;
-   private final String name;
-   private final String translationKey;
+    public static InactivityFpsLimit[] values() {
+        return (InactivityFpsLimit[])field_52749.clone();
+    }
 
-   private InactivityFpsLimit(final int ordinal, final String name, final String translationKey) {
-      this.ordinal = ordinal;
-      this.name = name;
-      this.translationKey = translationKey;
-   }
+    public static InactivityFpsLimit valueOf(String string) {
+        return Enum.valueOf(InactivityFpsLimit.class, string);
+    }
 
-   public int getId() {
-      return this.ordinal;
-   }
+    private InactivityFpsLimit(String name, String translationKey) {
+        this.name = name;
+        this.text = Text.translatable((String)translationKey);
+    }
 
-   public String getTranslationKey() {
-      return this.translationKey;
-   }
+    public Text getText() {
+        return this.text;
+    }
 
-   public String asString() {
-      return this.name;
-   }
+    public String asString() {
+        return this.name;
+    }
 
-   // $FF: synthetic method
-   private static InactivityFpsLimit[] method_61961() {
-      return new InactivityFpsLimit[]{MINIMIZED, AFK};
-   }
+    private static /* synthetic */ InactivityFpsLimit[] method_61961() {
+        return new InactivityFpsLimit[]{MINIMIZED, AFK};
+    }
+
+    static {
+        field_52749 = InactivityFpsLimit.method_61961();
+        CODEC = StringIdentifiable.createCodec(InactivityFpsLimit::values);
+    }
 }
+

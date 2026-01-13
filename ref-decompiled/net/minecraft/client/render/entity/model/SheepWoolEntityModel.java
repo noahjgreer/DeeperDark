@@ -1,3 +1,21 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.model.Dilation
+ *  net.minecraft.client.model.ModelData
+ *  net.minecraft.client.model.ModelPart
+ *  net.minecraft.client.model.ModelPartBuilder
+ *  net.minecraft.client.model.ModelPartData
+ *  net.minecraft.client.model.ModelTransform
+ *  net.minecraft.client.model.TexturedModelData
+ *  net.minecraft.client.render.entity.model.QuadrupedEntityModel
+ *  net.minecraft.client.render.entity.model.SheepWoolEntityModel
+ *  net.minecraft.client.render.entity.state.LivingEntityRenderState
+ *  net.minecraft.client.render.entity.state.SheepEntityRenderState
+ */
 package net.minecraft.client.render.entity.model;
 
 import net.fabricmc.api.EnvType;
@@ -9,32 +27,34 @@ import net.minecraft.client.model.ModelPartBuilder;
 import net.minecraft.client.model.ModelPartData;
 import net.minecraft.client.model.ModelTransform;
 import net.minecraft.client.model.TexturedModelData;
+import net.minecraft.client.render.entity.model.QuadrupedEntityModel;
 import net.minecraft.client.render.entity.state.LivingEntityRenderState;
 import net.minecraft.client.render.entity.state.SheepEntityRenderState;
 
-@Environment(EnvType.CLIENT)
-public class SheepWoolEntityModel extends QuadrupedEntityModel {
-   public SheepWoolEntityModel(ModelPart root) {
-      super(root);
-   }
+@Environment(value=EnvType.CLIENT)
+public class SheepWoolEntityModel
+extends QuadrupedEntityModel<SheepEntityRenderState> {
+    public SheepWoolEntityModel(ModelPart root) {
+        super(root);
+    }
 
-   public static TexturedModelData getTexturedModelData() {
-      ModelData modelData = new ModelData();
-      ModelPartData modelPartData = modelData.getRoot();
-      modelPartData.addChild("head", ModelPartBuilder.create().uv(0, 0).cuboid(-3.0F, -4.0F, -4.0F, 6.0F, 6.0F, 6.0F, new Dilation(0.6F)), ModelTransform.origin(0.0F, 6.0F, -8.0F));
-      modelPartData.addChild("body", ModelPartBuilder.create().uv(28, 8).cuboid(-4.0F, -10.0F, -7.0F, 8.0F, 16.0F, 6.0F, new Dilation(1.75F)), ModelTransform.of(0.0F, 5.0F, 2.0F, 1.5707964F, 0.0F, 0.0F));
-      ModelPartBuilder modelPartBuilder = ModelPartBuilder.create().uv(0, 16).cuboid(-2.0F, 0.0F, -2.0F, 4.0F, 6.0F, 4.0F, new Dilation(0.5F));
-      modelPartData.addChild("right_hind_leg", modelPartBuilder, ModelTransform.origin(-3.0F, 12.0F, 7.0F));
-      modelPartData.addChild("left_hind_leg", modelPartBuilder, ModelTransform.origin(3.0F, 12.0F, 7.0F));
-      modelPartData.addChild("right_front_leg", modelPartBuilder, ModelTransform.origin(-3.0F, 12.0F, -5.0F));
-      modelPartData.addChild("left_front_leg", modelPartBuilder, ModelTransform.origin(3.0F, 12.0F, -5.0F));
-      return TexturedModelData.of(modelData, 64, 32);
-   }
+    public static TexturedModelData getTexturedModelData() {
+        ModelData modelData = new ModelData();
+        ModelPartData modelPartData = modelData.getRoot();
+        modelPartData.addChild("head", ModelPartBuilder.create().uv(0, 0).cuboid(-3.0f, -4.0f, -4.0f, 6.0f, 6.0f, 6.0f, new Dilation(0.6f)), ModelTransform.origin((float)0.0f, (float)6.0f, (float)-8.0f));
+        modelPartData.addChild("body", ModelPartBuilder.create().uv(28, 8).cuboid(-4.0f, -10.0f, -7.0f, 8.0f, 16.0f, 6.0f, new Dilation(1.75f)), ModelTransform.of((float)0.0f, (float)5.0f, (float)2.0f, (float)1.5707964f, (float)0.0f, (float)0.0f));
+        ModelPartBuilder modelPartBuilder = ModelPartBuilder.create().uv(0, 16).cuboid(-2.0f, 0.0f, -2.0f, 4.0f, 6.0f, 4.0f, new Dilation(0.5f));
+        modelPartData.addChild("right_hind_leg", modelPartBuilder, ModelTransform.origin((float)-3.0f, (float)12.0f, (float)7.0f));
+        modelPartData.addChild("left_hind_leg", modelPartBuilder, ModelTransform.origin((float)3.0f, (float)12.0f, (float)7.0f));
+        modelPartData.addChild("right_front_leg", modelPartBuilder, ModelTransform.origin((float)-3.0f, (float)12.0f, (float)-5.0f));
+        modelPartData.addChild("left_front_leg", modelPartBuilder, ModelTransform.origin((float)3.0f, (float)12.0f, (float)-5.0f));
+        return TexturedModelData.of((ModelData)modelData, (int)64, (int)32);
+    }
 
-   public void setAngles(SheepEntityRenderState sheepEntityRenderState) {
-      super.setAngles((LivingEntityRenderState)sheepEntityRenderState);
-      ModelPart var10000 = this.head;
-      var10000.originY += sheepEntityRenderState.neckAngle * 9.0F * sheepEntityRenderState.ageScale;
-      this.head.pitch = sheepEntityRenderState.headAngle;
-   }
+    public void setAngles(SheepEntityRenderState sheepEntityRenderState) {
+        super.setAngles((LivingEntityRenderState)sheepEntityRenderState);
+        this.head.originY += sheepEntityRenderState.neckAngle * 9.0f * sheepEntityRenderState.ageScale;
+        this.head.pitch = sheepEntityRenderState.headAngle;
+    }
 }
+

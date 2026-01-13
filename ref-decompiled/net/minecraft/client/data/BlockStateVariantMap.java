@@ -1,266 +1,102 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.data.BlockStateVariantMap
+ *  net.minecraft.client.data.BlockStateVariantMap$DoubleProperty
+ *  net.minecraft.client.data.BlockStateVariantMap$QuadrupleProperty
+ *  net.minecraft.client.data.BlockStateVariantMap$QuintupleProperty
+ *  net.minecraft.client.data.BlockStateVariantMap$SingleProperty
+ *  net.minecraft.client.data.BlockStateVariantMap$TripleProperty
+ *  net.minecraft.client.data.PropertiesMap
+ *  net.minecraft.client.render.model.json.ModelVariantOperator
+ *  net.minecraft.client.render.model.json.WeightedVariant
+ *  net.minecraft.state.property.Property
+ */
 package net.minecraft.client.data;
 
-import com.mojang.datafixers.util.Function3;
-import com.mojang.datafixers.util.Function4;
-import com.mojang.datafixers.util.Function5;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.stream.Stream;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.data.BlockStateVariantMap;
+import net.minecraft.client.data.PropertiesMap;
+import net.minecraft.client.render.model.json.ModelVariantOperator;
+import net.minecraft.client.render.model.json.WeightedVariant;
 import net.minecraft.state.property.Property;
 
-@Environment(EnvType.CLIENT)
-public abstract class BlockStateVariantMap {
-   private final Map variants = new HashMap();
+@Environment(value=EnvType.CLIENT)
+public abstract class BlockStateVariantMap<V> {
+    private final Map<PropertiesMap, V> variants = new HashMap();
 
-   protected void register(PropertiesMap properties, Object variant) {
-      Object object = this.variants.put(properties, variant);
-      if (object != null) {
-         throw new IllegalStateException("Value " + String.valueOf(properties) + " is already defined");
-      }
-   }
+    protected void register(PropertiesMap properties, V variant) {
+        V object = this.variants.put(properties, variant);
+        if (object != null) {
+            throw new IllegalStateException("Value " + String.valueOf(properties) + " is already defined");
+        }
+    }
 
-   Map getVariants() {
-      this.validate();
-      return Map.copyOf(this.variants);
-   }
+    Map<PropertiesMap, V> getVariants() {
+        this.validate();
+        return Map.copyOf(this.variants);
+    }
 
-   private void validate() {
-      List list = this.getProperties();
-      Stream stream = Stream.of(PropertiesMap.EMPTY);
+    private void validate() {
+        List list = this.getProperties();
+        Stream<Object> stream = Stream.of(PropertiesMap.EMPTY);
+        for (Property property : list) {
+            stream = stream.flatMap(propertiesMap -> property.stream().map(arg_0 -> ((PropertiesMap)propertiesMap).withValue(arg_0)));
+        }
+        List<PropertiesMap> list2 = stream.filter(propertiesMap -> !this.variants.containsKey(propertiesMap)).toList();
+        if (!list2.isEmpty()) {
+            throw new IllegalStateException("Missing definition for properties: " + String.valueOf(list2));
+        }
+    }
 
-      Property property;
-      for(Iterator var3 = list.iterator(); var3.hasNext(); stream = stream.flatMap((propertiesMap) -> {
-         Stream var10000 = property.stream();
-         Objects.requireNonNull(propertiesMap);
-         return var10000.map(propertiesMap::withValue);
-      })) {
-         property = (Property)var3.next();
-      }
+    abstract List<Property<?>> getProperties();
 
-      List list2 = stream.filter((propertiesMap) -> {
-         return !this.variants.containsKey(propertiesMap);
-      }).toList();
-      if (!list2.isEmpty()) {
-         throw new IllegalStateException("Missing definition for properties: " + String.valueOf(list2));
-      }
-   }
+    public static <T1 extends Comparable<T1>> SingleProperty<WeightedVariant, T1> models(Property<T1> property) {
+        return new SingleProperty(property);
+    }
 
-   abstract List getProperties();
+    public static <T1 extends Comparable<T1>, T2 extends Comparable<T2>> DoubleProperty<WeightedVariant, T1, T2> models(Property<T1> property1, Property<T2> property2) {
+        return new DoubleProperty(property1, property2);
+    }
 
-   public static SingleProperty models(Property property) {
-      return new SingleProperty(property);
-   }
+    public static <T1 extends Comparable<T1>, T2 extends Comparable<T2>, T3 extends Comparable<T3>> TripleProperty<WeightedVariant, T1, T2, T3> models(Property<T1> property1, Property<T2> property2, Property<T3> property3) {
+        return new TripleProperty(property1, property2, property3);
+    }
 
-   public static DoubleProperty models(Property property1, Property property2) {
-      return new DoubleProperty(property1, property2);
-   }
+    public static <T1 extends Comparable<T1>, T2 extends Comparable<T2>, T3 extends Comparable<T3>, T4 extends Comparable<T4>> QuadrupleProperty<WeightedVariant, T1, T2, T3, T4> models(Property<T1> property1, Property<T2> property2, Property<T3> property3, Property<T4> property4) {
+        return new QuadrupleProperty(property1, property2, property3, property4);
+    }
 
-   public static TripleProperty models(Property property1, Property property2, Property property3) {
-      return new TripleProperty(property1, property2, property3);
-   }
+    public static <T1 extends Comparable<T1>, T2 extends Comparable<T2>, T3 extends Comparable<T3>, T4 extends Comparable<T4>, T5 extends Comparable<T5>> QuintupleProperty<WeightedVariant, T1, T2, T3, T4, T5> models(Property<T1> property1, Property<T2> property2, Property<T3> property3, Property<T4> property4, Property<T5> property5) {
+        return new QuintupleProperty(property1, property2, property3, property4, property5);
+    }
 
-   public static QuadrupleProperty models(Property property1, Property property2, Property property3, Property property4) {
-      return new QuadrupleProperty(property1, property2, property3, property4);
-   }
+    public static <T1 extends Comparable<T1>> SingleProperty<ModelVariantOperator, T1> operations(Property<T1> property) {
+        return new SingleProperty(property);
+    }
 
-   public static QuintupleProperty models(Property property1, Property property2, Property property3, Property property4, Property property5) {
-      return new QuintupleProperty(property1, property2, property3, property4, property5);
-   }
+    public static <T1 extends Comparable<T1>, T2 extends Comparable<T2>> DoubleProperty<ModelVariantOperator, T1, T2> operations(Property<T1> property1, Property<T2> property2) {
+        return new DoubleProperty(property1, property2);
+    }
 
-   public static SingleProperty operations(Property property) {
-      return new SingleProperty(property);
-   }
+    public static <T1 extends Comparable<T1>, T2 extends Comparable<T2>, T3 extends Comparable<T3>> TripleProperty<ModelVariantOperator, T1, T2, T3> operations(Property<T1> property1, Property<T2> property2, Property<T3> property3) {
+        return new TripleProperty(property1, property2, property3);
+    }
 
-   public static DoubleProperty operations(Property property1, Property property2) {
-      return new DoubleProperty(property1, property2);
-   }
+    public static <T1 extends Comparable<T1>, T2 extends Comparable<T2>, T3 extends Comparable<T3>, T4 extends Comparable<T4>> QuadrupleProperty<ModelVariantOperator, T1, T2, T3, T4> operations(Property<T1> property1, Property<T2> property2, Property<T3> property3, Property<T4> property4) {
+        return new QuadrupleProperty(property1, property2, property3, property4);
+    }
 
-   public static TripleProperty operations(Property property1, Property property2, Property property3) {
-      return new TripleProperty(property1, property2, property3);
-   }
-
-   public static QuadrupleProperty operations(Property property1, Property property2, Property property3, Property property4) {
-      return new QuadrupleProperty(property1, property2, property3, property4);
-   }
-
-   public static QuintupleProperty operations(Property property1, Property property2, Property property3, Property property4, Property property5) {
-      return new QuintupleProperty(property1, property2, property3, property4, property5);
-   }
-
-   @Environment(EnvType.CLIENT)
-   public static class SingleProperty extends BlockStateVariantMap {
-      private final Property property;
-
-      SingleProperty(Property property) {
-         this.property = property;
-      }
-
-      public List getProperties() {
-         return List.of(this.property);
-      }
-
-      public SingleProperty register(Comparable property, Object variant) {
-         PropertiesMap propertiesMap = PropertiesMap.withValues(this.property.createValue(property));
-         this.register(propertiesMap, variant);
-         return this;
-      }
-
-      public BlockStateVariantMap generate(Function variantFactory) {
-         this.property.getValues().forEach((value) -> {
-            this.register(value, variantFactory.apply(value));
-         });
-         return this;
-      }
-   }
-
-   @Environment(EnvType.CLIENT)
-   public static class DoubleProperty extends BlockStateVariantMap {
-      private final Property first;
-      private final Property second;
-
-      DoubleProperty(Property first, Property second) {
-         this.first = first;
-         this.second = second;
-      }
-
-      public List getProperties() {
-         return List.of(this.first, this.second);
-      }
-
-      public DoubleProperty register(Comparable firstProperty, Comparable secondProperty, Object variant) {
-         PropertiesMap propertiesMap = PropertiesMap.withValues(this.first.createValue(firstProperty), this.second.createValue(secondProperty));
-         this.register(propertiesMap, variant);
-         return this;
-      }
-
-      public BlockStateVariantMap generate(BiFunction variantFactory) {
-         this.first.getValues().forEach((firstValue) -> {
-            this.second.getValues().forEach((secondValue) -> {
-               this.register(firstValue, secondValue, variantFactory.apply(firstValue, secondValue));
-            });
-         });
-         return this;
-      }
-   }
-
-   @Environment(EnvType.CLIENT)
-   public static class TripleProperty extends BlockStateVariantMap {
-      private final Property first;
-      private final Property second;
-      private final Property third;
-
-      TripleProperty(Property first, Property second, Property third) {
-         this.first = first;
-         this.second = second;
-         this.third = third;
-      }
-
-      public List getProperties() {
-         return List.of(this.first, this.second, this.third);
-      }
-
-      public TripleProperty register(Comparable firstProperty, Comparable secondProperty, Comparable thirdProperty, Object variant) {
-         PropertiesMap propertiesMap = PropertiesMap.withValues(this.first.createValue(firstProperty), this.second.createValue(secondProperty), this.third.createValue(thirdProperty));
-         this.register(propertiesMap, variant);
-         return this;
-      }
-
-      public BlockStateVariantMap generate(Function3 variantFactory) {
-         this.first.getValues().forEach((firstValue) -> {
-            this.second.getValues().forEach((secondValue) -> {
-               this.third.getValues().forEach((thirdValue) -> {
-                  this.register(firstValue, secondValue, thirdValue, variantFactory.apply(firstValue, secondValue, thirdValue));
-               });
-            });
-         });
-         return this;
-      }
-   }
-
-   @Environment(EnvType.CLIENT)
-   public static class QuadrupleProperty extends BlockStateVariantMap {
-      private final Property first;
-      private final Property second;
-      private final Property third;
-      private final Property fourth;
-
-      QuadrupleProperty(Property first, Property second, Property third, Property fourth) {
-         this.first = first;
-         this.second = second;
-         this.third = third;
-         this.fourth = fourth;
-      }
-
-      public List getProperties() {
-         return List.of(this.first, this.second, this.third, this.fourth);
-      }
-
-      public QuadrupleProperty register(Comparable firstProperty, Comparable secondProperty, Comparable thirdProperty, Comparable fourthProperty, Object variant) {
-         PropertiesMap propertiesMap = PropertiesMap.withValues(this.first.createValue(firstProperty), this.second.createValue(secondProperty), this.third.createValue(thirdProperty), this.fourth.createValue(fourthProperty));
-         this.register(propertiesMap, variant);
-         return this;
-      }
-
-      public BlockStateVariantMap generate(Function4 variantFactory) {
-         this.first.getValues().forEach((firstValue) -> {
-            this.second.getValues().forEach((secondValue) -> {
-               this.third.getValues().forEach((thirdValue) -> {
-                  this.fourth.getValues().forEach((fourthValue) -> {
-                     this.register(firstValue, secondValue, thirdValue, fourthValue, variantFactory.apply(firstValue, secondValue, thirdValue, fourthValue));
-                  });
-               });
-            });
-         });
-         return this;
-      }
-   }
-
-   @Environment(EnvType.CLIENT)
-   public static class QuintupleProperty extends BlockStateVariantMap {
-      private final Property first;
-      private final Property second;
-      private final Property third;
-      private final Property fourth;
-      private final Property fifth;
-
-      QuintupleProperty(Property first, Property second, Property third, Property fourth, Property fifth) {
-         this.first = first;
-         this.second = second;
-         this.third = third;
-         this.fourth = fourth;
-         this.fifth = fifth;
-      }
-
-      public List getProperties() {
-         return List.of(this.first, this.second, this.third, this.fourth, this.fifth);
-      }
-
-      public QuintupleProperty register(Comparable firstProperty, Comparable secondProperty, Comparable thirdProperty, Comparable fourthProperty, Comparable fifthProperty, Object variant) {
-         PropertiesMap propertiesMap = PropertiesMap.withValues(this.first.createValue(firstProperty), this.second.createValue(secondProperty), this.third.createValue(thirdProperty), this.fourth.createValue(fourthProperty), this.fifth.createValue(fifthProperty));
-         this.register(propertiesMap, variant);
-         return this;
-      }
-
-      public BlockStateVariantMap generate(Function5 variantFactory) {
-         this.first.getValues().forEach((firstValue) -> {
-            this.second.getValues().forEach((secondValue) -> {
-               this.third.getValues().forEach((thirdValue) -> {
-                  this.fourth.getValues().forEach((fourthValue) -> {
-                     this.fifth.getValues().forEach((fifthValue) -> {
-                        this.register(firstValue, secondValue, thirdValue, fourthValue, fifthValue, variantFactory.apply(firstValue, secondValue, thirdValue, fourthValue, fifthValue));
-                     });
-                  });
-               });
-            });
-         });
-         return this;
-      }
-   }
+    public static <T1 extends Comparable<T1>, T2 extends Comparable<T2>, T3 extends Comparable<T3>, T4 extends Comparable<T4>, T5 extends Comparable<T5>> QuintupleProperty<ModelVariantOperator, T1, T2, T3, T4, T5> operations(Property<T1> property1, Property<T2> property2, Property<T3> property3, Property<T4> property4, Property<T5> property5) {
+        return new QuintupleProperty(property1, property2, property3, property4, property5);
+    }
 }
+

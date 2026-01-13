@@ -1,3 +1,15 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.logging.LogUtils
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.network.Address
+ *  net.minecraft.client.network.AddressResolver
+ *  net.minecraft.client.network.ServerAddress
+ *  org.slf4j.Logger
+ */
 package net.minecraft.client.network;
 
 import com.mojang.logging.LogUtils;
@@ -7,21 +19,25 @@ import java.net.UnknownHostException;
 import java.util.Optional;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.network.Address;
+import net.minecraft.client.network.ServerAddress;
 import org.slf4j.Logger;
 
 @FunctionalInterface
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 public interface AddressResolver {
-   Logger LOGGER = LogUtils.getLogger();
-   AddressResolver DEFAULT = (address) -> {
-      try {
-         InetAddress inetAddress = InetAddress.getByName(address.getAddress());
-         return Optional.of(Address.create(new InetSocketAddress(inetAddress, address.getPort())));
-      } catch (UnknownHostException var2) {
-         LOGGER.debug("Couldn't resolve server {} address", address.getAddress(), var2);
-         return Optional.empty();
-      }
-   };
+    public static final Logger LOGGER = LogUtils.getLogger();
+    public static final AddressResolver DEFAULT = address -> {
+        try {
+            InetAddress inetAddress = InetAddress.getByName(address.getAddress());
+            return Optional.of(Address.create((InetSocketAddress)new InetSocketAddress(inetAddress, address.getPort())));
+        }
+        catch (UnknownHostException unknownHostException) {
+            LOGGER.debug("Couldn't resolve server {} address", (Object)address.getAddress(), (Object)unknownHostException);
+            return Optional.empty();
+        }
+    };
 
-   Optional resolve(ServerAddress address);
+    public Optional<Address> resolve(ServerAddress var1);
 }
+

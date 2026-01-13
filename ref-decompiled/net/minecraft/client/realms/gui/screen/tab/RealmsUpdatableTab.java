@@ -1,16 +1,26 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.realms.dto.RealmsServer
+ *  net.minecraft.client.realms.gui.screen.tab.RealmsUpdatableTab
+ */
 package net.minecraft.client.realms.gui.screen.tab;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.realms.dto.RealmsServer;
 
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 public interface RealmsUpdatableTab {
-   void update(RealmsServer server);
+    public void update(RealmsServer var1);
 
-   default void onLoaded(RealmsServer server) {
-   }
+    default public void onLoaded(RealmsServer server) {
+    }
 
-   default void onUnloaded(RealmsServer server) {
-   }
+    default public void onUnloaded(RealmsServer server) {
+    }
 }
+

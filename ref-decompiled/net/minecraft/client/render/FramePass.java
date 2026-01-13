@@ -1,3 +1,13 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.render.FramePass
+ *  net.minecraft.client.util.ClosableFactory
+ *  net.minecraft.client.util.Handle
+ */
 package net.minecraft.client.render;
 
 import net.fabricmc.api.EnvType;
@@ -5,17 +15,18 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.util.ClosableFactory;
 import net.minecraft.client.util.Handle;
 
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 public interface FramePass {
-   Handle addRequiredResource(String name, ClosableFactory factory);
+    public <T> Handle<T> addRequiredResource(String var1, ClosableFactory<T> var2);
 
-   void dependsOn(Handle handle);
+    public <T> void dependsOn(Handle<T> var1);
 
-   Handle transfer(Handle handle);
+    public <T> Handle<T> transfer(Handle<T> var1);
 
-   void addRequired(FramePass pass);
+    public void addRequired(FramePass var1);
 
-   void markToBeVisited();
+    public void markToBeVisited();
 
-   void setRenderer(Runnable renderer);
+    public void setRenderer(Runnable var1);
 }
+

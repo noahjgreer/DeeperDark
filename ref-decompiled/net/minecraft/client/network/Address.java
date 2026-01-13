@@ -1,36 +1,29 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.network.Address
+ */
 package net.minecraft.client.network;
 
 import java.net.InetSocketAddress;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 public interface Address {
-   String getHostName();
+    public String getHostName();
 
-   String getHostAddress();
+    public String getHostAddress();
 
-   int getPort();
+    public int getPort();
 
-   InetSocketAddress getInetSocketAddress();
+    public InetSocketAddress getInetSocketAddress();
 
-   static Address create(final InetSocketAddress address) {
-      return new Address() {
-         public String getHostName() {
-            return address.getAddress().getHostName();
-         }
-
-         public String getHostAddress() {
-            return address.getAddress().getHostAddress();
-         }
-
-         public int getPort() {
-            return address.getPort();
-         }
-
-         public InetSocketAddress getInetSocketAddress() {
-            return address;
-         }
-      };
-   }
+    public static Address create(InetSocketAddress address) {
+        return new /* Unavailable Anonymous Inner Class!! */;
+    }
 }
+

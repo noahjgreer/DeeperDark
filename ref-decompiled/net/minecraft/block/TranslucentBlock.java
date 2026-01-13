@@ -1,20 +1,39 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.serialization.MapCodec
+ *  net.minecraft.block.AbstractBlock$Settings
+ *  net.minecraft.block.Block
+ *  net.minecraft.block.BlockState
+ *  net.minecraft.block.TranslucentBlock
+ *  net.minecraft.util.math.Direction
+ */
 package net.minecraft.block;
 
 import com.mojang.serialization.MapCodec;
+import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.math.Direction;
 
-public class TranslucentBlock extends Block {
-   public static final MapCodec CODEC = createCodec(TranslucentBlock::new);
+public class TranslucentBlock
+extends Block {
+    public static final MapCodec<TranslucentBlock> CODEC = TranslucentBlock.createCodec(TranslucentBlock::new);
 
-   protected MapCodec getCodec() {
-      return CODEC;
-   }
+    protected MapCodec<? extends TranslucentBlock> getCodec() {
+        return CODEC;
+    }
 
-   public TranslucentBlock(AbstractBlock.Settings settings) {
-      super(settings);
-   }
+    public TranslucentBlock(AbstractBlock.Settings settings) {
+        super(settings);
+    }
 
-   protected boolean isSideInvisible(BlockState state, BlockState stateFrom, Direction direction) {
-      return stateFrom.isOf(this) ? true : super.isSideInvisible(state, stateFrom, direction);
-   }
+    protected boolean isSideInvisible(BlockState state, BlockState stateFrom, Direction direction) {
+        if (stateFrom.isOf((Block)this)) {
+            return true;
+        }
+        return super.isSideInvisible(state, stateFrom, direction);
+    }
 }
+

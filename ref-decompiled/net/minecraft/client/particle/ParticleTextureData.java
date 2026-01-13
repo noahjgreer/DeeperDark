@@ -1,8 +1,24 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.google.common.collect.ImmutableList
+ *  com.google.common.collect.Streams
+ *  com.google.gson.JsonArray
+ *  com.google.gson.JsonElement
+ *  com.google.gson.JsonObject
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.particle.ParticleTextureData
+ *  net.minecraft.util.Identifier
+ *  net.minecraft.util.JsonHelper
+ */
 package net.minecraft.client.particle;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import java.util.List;
 import net.fabricmc.api.EnvType;
@@ -10,27 +26,25 @@ import net.fabricmc.api.Environment;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 public class ParticleTextureData {
-   private final List textureList;
+    private final List<Identifier> textureList;
 
-   private ParticleTextureData(List textureList) {
-      this.textureList = textureList;
-   }
+    private ParticleTextureData(List<Identifier> textureList) {
+        this.textureList = textureList;
+    }
 
-   public List getTextureList() {
-      return this.textureList;
-   }
+    public List<Identifier> getTextureList() {
+        return this.textureList;
+    }
 
-   public static ParticleTextureData load(JsonObject json) {
-      JsonArray jsonArray = JsonHelper.getArray(json, "textures", (JsonArray)null);
-      if (jsonArray == null) {
-         return new ParticleTextureData(List.of());
-      } else {
-         List list = (List)Streams.stream(jsonArray).map((texture) -> {
-            return JsonHelper.asString(texture, "texture");
-         }).map(Identifier::of).collect(ImmutableList.toImmutableList());
-         return new ParticleTextureData(list);
-      }
-   }
+    public static ParticleTextureData load(JsonObject json) {
+        JsonArray jsonArray = JsonHelper.getArray((JsonObject)json, (String)"textures", null);
+        if (jsonArray == null) {
+            return new ParticleTextureData(List.of());
+        }
+        List list = (List)Streams.stream((Iterable)jsonArray).map(texture -> JsonHelper.asString((JsonElement)texture, (String)"texture")).map(Identifier::of).collect(ImmutableList.toImmutableList());
+        return new ParticleTextureData(list);
+    }
 }
+

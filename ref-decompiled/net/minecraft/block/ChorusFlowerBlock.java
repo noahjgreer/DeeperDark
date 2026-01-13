@@ -1,14 +1,57 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.MapCodec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
+ *  net.minecraft.block.AbstractBlock$Settings
+ *  net.minecraft.block.Block
+ *  net.minecraft.block.BlockState
+ *  net.minecraft.block.Blocks
+ *  net.minecraft.block.ChorusFlowerBlock
+ *  net.minecraft.block.ChorusPlantBlock
+ *  net.minecraft.entity.Entity
+ *  net.minecraft.entity.projectile.ProjectileEntity
+ *  net.minecraft.registry.Registries
+ *  net.minecraft.server.world.ServerWorld
+ *  net.minecraft.state.StateManager$Builder
+ *  net.minecraft.state.property.IntProperty
+ *  net.minecraft.state.property.Properties
+ *  net.minecraft.state.property.Property
+ *  net.minecraft.util.hit.BlockHitResult
+ *  net.minecraft.util.math.BlockPos
+ *  net.minecraft.util.math.Direction
+ *  net.minecraft.util.math.Direction$Type
+ *  net.minecraft.util.math.random.Random
+ *  net.minecraft.util.shape.VoxelShape
+ *  net.minecraft.world.BlockView
+ *  net.minecraft.world.World
+ *  net.minecraft.world.WorldAccess
+ *  net.minecraft.world.WorldView
+ *  net.minecraft.world.tick.ScheduledTickView
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.block;
 
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import java.util.Iterator;
+import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.ChorusPlantBlock;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.IntProperty;
 import net.minecraft.state.property.Properties;
+import net.minecraft.state.property.Property;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -19,236 +62,201 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 import net.minecraft.world.tick.ScheduledTickView;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-public class ChorusFlowerBlock extends Block {
-   public static final MapCodec CODEC = RecordCodecBuilder.mapCodec((instance) -> {
-      return instance.group(Registries.BLOCK.getCodec().fieldOf("plant").forGetter((block) -> {
-         return block.plantBlock;
-      }), createSettingsCodec()).apply(instance, ChorusFlowerBlock::new);
-   });
-   public static final int MAX_AGE = 5;
-   public static final IntProperty AGE;
-   private static final VoxelShape SHAPE;
-   private final Block plantBlock;
+/*
+ * Exception performing whole class analysis ignored.
+ */
+public class ChorusFlowerBlock
+extends Block {
+    public static final MapCodec<ChorusFlowerBlock> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group((App)Registries.BLOCK.getCodec().fieldOf("plant").forGetter(block -> block.plantBlock), (App)ChorusFlowerBlock.createSettingsCodec()).apply((Applicative)instance, ChorusFlowerBlock::new));
+    public static final int MAX_AGE = 5;
+    public static final IntProperty AGE = Properties.AGE_5;
+    private static final VoxelShape SHAPE = Block.createColumnShape((double)14.0, (double)0.0, (double)15.0);
+    private final Block plantBlock;
 
-   public MapCodec getCodec() {
-      return CODEC;
-   }
+    public MapCodec<ChorusFlowerBlock> getCodec() {
+        return CODEC;
+    }
 
-   public ChorusFlowerBlock(Block plantBlock, AbstractBlock.Settings settings) {
-      super(settings);
-      this.plantBlock = plantBlock;
-      this.setDefaultState((BlockState)((BlockState)this.stateManager.getDefaultState()).with(AGE, 0));
-   }
+    public ChorusFlowerBlock(Block plantBlock, AbstractBlock.Settings settings) {
+        super(settings);
+        this.plantBlock = plantBlock;
+        this.setDefaultState((BlockState)((BlockState)this.stateManager.getDefaultState()).with((Property)AGE, (Comparable)Integer.valueOf(0)));
+    }
 
-   protected void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-      if (!state.canPlaceAt(world, pos)) {
-         world.breakBlock(pos, true);
-      }
+    protected void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        if (!state.canPlaceAt((WorldView)world, pos)) {
+            world.breakBlock(pos, true);
+        }
+    }
 
-   }
+    protected boolean hasRandomTicks(BlockState state) {
+        return (Integer)state.get((Property)AGE) < 5;
+    }
 
-   protected boolean hasRandomTicks(BlockState state) {
-      return (Integer)state.get(AGE) < 5;
-   }
+    public VoxelShape getSidesShape(BlockState state, BlockView world, BlockPos pos) {
+        return SHAPE;
+    }
 
-   public VoxelShape getSidesShape(BlockState state, BlockView world, BlockPos pos) {
-      return SHAPE;
-   }
-
-   protected void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-      BlockPos blockPos = pos.up();
-      if (world.isAir(blockPos) && blockPos.getY() <= world.getTopYInclusive()) {
-         int i = (Integer)state.get(AGE);
-         if (i < 5) {
-            boolean bl = false;
-            boolean bl2 = false;
-            BlockState blockState = world.getBlockState(pos.down());
-            int j;
-            if (blockState.isOf(Blocks.END_STONE)) {
-               bl = true;
-            } else if (blockState.isOf(this.plantBlock)) {
-               j = 1;
-
-               for(int k = 0; k < 4; ++k) {
-                  BlockState blockState2 = world.getBlockState(pos.down(j + 1));
-                  if (!blockState2.isOf(this.plantBlock)) {
-                     if (blockState2.isOf(Blocks.END_STONE)) {
-                        bl2 = true;
-                     }
-                     break;
-                  }
-
-                  ++j;
-               }
-
-               if (j < 2 || j <= random.nextInt(bl2 ? 5 : 4)) {
-                  bl = true;
-               }
-            } else if (blockState.isAir()) {
-               bl = true;
-            }
-
-            if (bl && isSurroundedByAir(world, blockPos, (Direction)null) && world.isAir(pos.up(2))) {
-               world.setBlockState(pos, ChorusPlantBlock.withConnectionProperties(world, pos, this.plantBlock.getDefaultState()), 2);
-               this.grow(world, blockPos, i);
-            } else if (i < 4) {
-               j = random.nextInt(4);
-               if (bl2) {
-                  ++j;
-               }
-
-               boolean bl3 = false;
-
-               for(int l = 0; l < j; ++l) {
-                  Direction direction = Direction.Type.HORIZONTAL.random(random);
-                  BlockPos blockPos2 = pos.offset(direction);
-                  if (world.isAir(blockPos2) && world.isAir(blockPos2.down()) && isSurroundedByAir(world, blockPos2, direction.getOpposite())) {
-                     this.grow(world, blockPos2, i + 1);
-                     bl3 = true;
-                  }
-               }
-
-               if (bl3) {
-                  world.setBlockState(pos, ChorusPlantBlock.withConnectionProperties(world, pos, this.plantBlock.getDefaultState()), 2);
-               } else {
-                  this.die(world, pos);
-               }
-            } else {
-               this.die(world, pos);
-            }
-
-         }
-      }
-   }
-
-   private void grow(World world, BlockPos pos, int age) {
-      world.setBlockState(pos, (BlockState)this.getDefaultState().with(AGE, age), 2);
-      world.syncWorldEvent(1033, pos, 0);
-   }
-
-   private void die(World world, BlockPos pos) {
-      world.setBlockState(pos, (BlockState)this.getDefaultState().with(AGE, 5), 2);
-      world.syncWorldEvent(1034, pos, 0);
-   }
-
-   private static boolean isSurroundedByAir(WorldView world, BlockPos pos, @Nullable Direction exceptDirection) {
-      Iterator var3 = Direction.Type.HORIZONTAL.iterator();
-
-      Direction direction;
-      do {
-         if (!var3.hasNext()) {
-            return true;
-         }
-
-         direction = (Direction)var3.next();
-      } while(direction == exceptDirection || world.isAir(pos.offset(direction)));
-
-      return false;
-   }
-
-   protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
-      if (direction != Direction.UP && !state.canPlaceAt(world, pos)) {
-         tickView.scheduleBlockTick(pos, this, 1);
-      }
-
-      return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
-   }
-
-   protected boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
-      BlockState blockState = world.getBlockState(pos.down());
-      if (!blockState.isOf(this.plantBlock) && !blockState.isOf(Blocks.END_STONE)) {
-         if (!blockState.isAir()) {
-            return false;
-         } else {
-            boolean bl = false;
-            Iterator var6 = Direction.Type.HORIZONTAL.iterator();
-
-            while(var6.hasNext()) {
-               Direction direction = (Direction)var6.next();
-               BlockState blockState2 = world.getBlockState(pos.offset(direction));
-               if (blockState2.isOf(this.plantBlock)) {
-                  if (bl) {
-                     return false;
-                  }
-
-                  bl = true;
-               } else if (!blockState2.isAir()) {
-                  return false;
-               }
-            }
-
-            return bl;
-         }
-      } else {
-         return true;
-      }
-   }
-
-   protected void appendProperties(StateManager.Builder builder) {
-      builder.add(AGE);
-   }
-
-   public static void generate(WorldAccess world, BlockPos pos, Random random, int size) {
-      world.setBlockState(pos, ChorusPlantBlock.withConnectionProperties(world, pos, Blocks.CHORUS_PLANT.getDefaultState()), 2);
-      generate(world, pos, random, pos, size, 0);
-   }
-
-   private static void generate(WorldAccess world, BlockPos pos, Random random, BlockPos rootPos, int size, int layer) {
-      Block block = Blocks.CHORUS_PLANT;
-      int i = random.nextInt(4) + 1;
-      if (layer == 0) {
-         ++i;
-      }
-
-      for(int j = 0; j < i; ++j) {
-         BlockPos blockPos = pos.up(j + 1);
-         if (!isSurroundedByAir(world, blockPos, (Direction)null)) {
+    protected void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        int j;
+        BlockPos blockPos = pos.up();
+        if (!world.isAir(blockPos) || blockPos.getY() > world.getTopYInclusive()) {
             return;
-         }
-
-         world.setBlockState(blockPos, ChorusPlantBlock.withConnectionProperties(world, blockPos, block.getDefaultState()), 2);
-         world.setBlockState(blockPos.down(), ChorusPlantBlock.withConnectionProperties(world, blockPos.down(), block.getDefaultState()), 2);
-      }
-
-      boolean bl = false;
-      if (layer < 4) {
-         int k = random.nextInt(4);
-         if (layer == 0) {
-            ++k;
-         }
-
-         for(int l = 0; l < k; ++l) {
-            Direction direction = Direction.Type.HORIZONTAL.random(random);
-            BlockPos blockPos2 = pos.up(i).offset(direction);
-            if (Math.abs(blockPos2.getX() - rootPos.getX()) < size && Math.abs(blockPos2.getZ() - rootPos.getZ()) < size && world.isAir(blockPos2) && world.isAir(blockPos2.down()) && isSurroundedByAir(world, blockPos2, direction.getOpposite())) {
-               bl = true;
-               world.setBlockState(blockPos2, ChorusPlantBlock.withConnectionProperties(world, blockPos2, block.getDefaultState()), 2);
-               world.setBlockState(blockPos2.offset(direction.getOpposite()), ChorusPlantBlock.withConnectionProperties(world, blockPos2.offset(direction.getOpposite()), block.getDefaultState()), 2);
-               generate(world, blockPos2, random, rootPos, size, layer + 1);
+        }
+        int i = (Integer)state.get((Property)AGE);
+        if (i >= 5) {
+            return;
+        }
+        boolean bl = false;
+        boolean bl2 = false;
+        BlockState blockState = world.getBlockState(pos.down());
+        if (blockState.isOf(Blocks.END_STONE)) {
+            bl = true;
+        } else if (blockState.isOf(this.plantBlock)) {
+            j = 1;
+            for (int k = 0; k < 4; ++k) {
+                BlockState blockState2 = world.getBlockState(pos.down(j + 1));
+                if (blockState2.isOf(this.plantBlock)) {
+                    ++j;
+                    continue;
+                }
+                if (!blockState2.isOf(Blocks.END_STONE)) break;
+                bl2 = true;
+                break;
             }
-         }
-      }
+            if (j < 2 || j <= random.nextInt(bl2 ? 5 : 4)) {
+                bl = true;
+            }
+        } else if (blockState.isAir()) {
+            bl = true;
+        }
+        if (bl && ChorusFlowerBlock.isSurroundedByAir((WorldView)world, (BlockPos)blockPos, null) && world.isAir(pos.up(2))) {
+            world.setBlockState(pos, ChorusPlantBlock.withConnectionProperties((BlockView)world, (BlockPos)pos, (BlockState)this.plantBlock.getDefaultState()), 2);
+            this.grow((World)world, blockPos, i);
+        } else if (i < 4) {
+            j = random.nextInt(4);
+            if (bl2) {
+                ++j;
+            }
+            boolean bl3 = false;
+            for (int l = 0; l < j; ++l) {
+                Direction direction = Direction.Type.HORIZONTAL.random(random);
+                BlockPos blockPos2 = pos.offset(direction);
+                if (!world.isAir(blockPos2) || !world.isAir(blockPos2.down()) || !ChorusFlowerBlock.isSurroundedByAir((WorldView)world, (BlockPos)blockPos2, (Direction)direction.getOpposite())) continue;
+                this.grow((World)world, blockPos2, i + 1);
+                bl3 = true;
+            }
+            if (bl3) {
+                world.setBlockState(pos, ChorusPlantBlock.withConnectionProperties((BlockView)world, (BlockPos)pos, (BlockState)this.plantBlock.getDefaultState()), 2);
+            } else {
+                this.die((World)world, pos);
+            }
+        } else {
+            this.die((World)world, pos);
+        }
+    }
 
-      if (!bl) {
-         world.setBlockState(pos.up(i), (BlockState)Blocks.CHORUS_FLOWER.getDefaultState().with(AGE, 5), 2);
-      }
+    private void grow(World world, BlockPos pos, int age) {
+        world.setBlockState(pos, (BlockState)this.getDefaultState().with((Property)AGE, (Comparable)Integer.valueOf(age)), 2);
+        world.syncWorldEvent(1033, pos, 0);
+    }
 
-   }
+    private void die(World world, BlockPos pos) {
+        world.setBlockState(pos, (BlockState)this.getDefaultState().with((Property)AGE, (Comparable)Integer.valueOf(5)), 2);
+        world.syncWorldEvent(1034, pos, 0);
+    }
 
-   protected void onProjectileHit(World world, BlockState state, BlockHitResult hit, ProjectileEntity projectile) {
-      BlockPos blockPos = hit.getBlockPos();
-      if (world instanceof ServerWorld serverWorld) {
-         if (projectile.canModifyAt(serverWorld, blockPos) && projectile.canBreakBlocks(serverWorld)) {
-            world.breakBlock(blockPos, true, projectile);
-         }
-      }
+    private static boolean isSurroundedByAir(WorldView world, BlockPos pos, @Nullable Direction exceptDirection) {
+        for (Direction direction : Direction.Type.HORIZONTAL) {
+            if (direction == exceptDirection || world.isAir(pos.offset(direction))) continue;
+            return false;
+        }
+        return true;
+    }
 
-   }
+    protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
+        if (direction != Direction.UP && !state.canPlaceAt(world, pos)) {
+            tickView.scheduleBlockTick(pos, (Block)this, 1);
+        }
+        return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
+    }
 
-   static {
-      AGE = Properties.AGE_5;
-      SHAPE = Block.createColumnShape(14.0, 0.0, 15.0);
-   }
+    protected boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
+        BlockState blockState = world.getBlockState(pos.down());
+        if (blockState.isOf(this.plantBlock) || blockState.isOf(Blocks.END_STONE)) {
+            return true;
+        }
+        if (!blockState.isAir()) {
+            return false;
+        }
+        boolean bl = false;
+        for (Direction direction : Direction.Type.HORIZONTAL) {
+            BlockState blockState2 = world.getBlockState(pos.offset(direction));
+            if (blockState2.isOf(this.plantBlock)) {
+                if (bl) {
+                    return false;
+                }
+                bl = true;
+                continue;
+            }
+            if (blockState2.isAir()) continue;
+            return false;
+        }
+        return bl;
+    }
+
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(new Property[]{AGE});
+    }
+
+    public static void generate(WorldAccess world, BlockPos pos, Random random, int size) {
+        world.setBlockState(pos, ChorusPlantBlock.withConnectionProperties((BlockView)world, (BlockPos)pos, (BlockState)Blocks.CHORUS_PLANT.getDefaultState()), 2);
+        ChorusFlowerBlock.generate((WorldAccess)world, (BlockPos)pos, (Random)random, (BlockPos)pos, (int)size, (int)0);
+    }
+
+    private static void generate(WorldAccess world, BlockPos pos, Random random, BlockPos rootPos, int size, int layer) {
+        Block block = Blocks.CHORUS_PLANT;
+        int i = random.nextInt(4) + 1;
+        if (layer == 0) {
+            ++i;
+        }
+        for (int j = 0; j < i; ++j) {
+            BlockPos blockPos = pos.up(j + 1);
+            if (!ChorusFlowerBlock.isSurroundedByAir((WorldView)world, (BlockPos)blockPos, null)) {
+                return;
+            }
+            world.setBlockState(blockPos, ChorusPlantBlock.withConnectionProperties((BlockView)world, (BlockPos)blockPos, (BlockState)block.getDefaultState()), 2);
+            world.setBlockState(blockPos.down(), ChorusPlantBlock.withConnectionProperties((BlockView)world, (BlockPos)blockPos.down(), (BlockState)block.getDefaultState()), 2);
+        }
+        boolean bl = false;
+        if (layer < 4) {
+            int k = random.nextInt(4);
+            if (layer == 0) {
+                ++k;
+            }
+            for (int l = 0; l < k; ++l) {
+                Direction direction = Direction.Type.HORIZONTAL.random(random);
+                BlockPos blockPos2 = pos.up(i).offset(direction);
+                if (Math.abs(blockPos2.getX() - rootPos.getX()) >= size || Math.abs(blockPos2.getZ() - rootPos.getZ()) >= size || !world.isAir(blockPos2) || !world.isAir(blockPos2.down()) || !ChorusFlowerBlock.isSurroundedByAir((WorldView)world, (BlockPos)blockPos2, (Direction)direction.getOpposite())) continue;
+                bl = true;
+                world.setBlockState(blockPos2, ChorusPlantBlock.withConnectionProperties((BlockView)world, (BlockPos)blockPos2, (BlockState)block.getDefaultState()), 2);
+                world.setBlockState(blockPos2.offset(direction.getOpposite()), ChorusPlantBlock.withConnectionProperties((BlockView)world, (BlockPos)blockPos2.offset(direction.getOpposite()), (BlockState)block.getDefaultState()), 2);
+                ChorusFlowerBlock.generate((WorldAccess)world, (BlockPos)blockPos2, (Random)random, (BlockPos)rootPos, (int)size, (int)(layer + 1));
+            }
+        }
+        if (!bl) {
+            world.setBlockState(pos.up(i), (BlockState)Blocks.CHORUS_FLOWER.getDefaultState().with((Property)AGE, (Comparable)Integer.valueOf(5)), 2);
+        }
+    }
+
+    protected void onProjectileHit(World world, BlockState state, BlockHitResult hit, ProjectileEntity projectile) {
+        ServerWorld serverWorld;
+        BlockPos blockPos = hit.getBlockPos();
+        if (world instanceof ServerWorld && projectile.canModifyAt(serverWorld = (ServerWorld)world, blockPos) && projectile.canBreakBlocks(serverWorld)) {
+            world.breakBlock(blockPos, true, (Entity)projectile);
+        }
+    }
 }
+

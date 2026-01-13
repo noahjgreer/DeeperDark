@@ -1,65 +1,137 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.font.TextRenderer
+ *  net.minecraft.client.gui.DrawContext
+ *  net.minecraft.client.gui.screen.narration.NarrationMessageBuilder
+ *  net.minecraft.client.gui.screen.narration.NarrationPart
+ *  net.minecraft.client.gui.widget.MultilineTextWidget
+ *  net.minecraft.client.gui.widget.NarratedMultilineTextWidget
+ *  net.minecraft.client.gui.widget.NarratedMultilineTextWidget$BackgroundRendering
+ *  net.minecraft.client.gui.widget.NarratedMultilineTextWidget$Builder
+ *  net.minecraft.client.sound.SoundManager
+ *  net.minecraft.text.StringVisitable
+ *  net.minecraft.text.Text
+ *  net.minecraft.util.math.ColorHelper
+ */
 package net.minecraft.client.gui.widget;
 
+import java.util.Objects;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.screen.narration.NarrationPart;
+import net.minecraft.client.gui.widget.MultilineTextWidget;
+import net.minecraft.client.gui.widget.NarratedMultilineTextWidget;
 import net.minecraft.client.sound.SoundManager;
+import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.ColorHelper;
 
-@Environment(EnvType.CLIENT)
-public class NarratedMultilineTextWidget extends MultilineTextWidget {
-   public static final int DEFAULT_MARGIN = 4;
-   private final boolean alwaysShowBorders;
-   private final boolean fillBackground;
-   private final int margin;
+@Environment(value=EnvType.CLIENT)
+public class NarratedMultilineTextWidget
+extends MultilineTextWidget {
+    public static final int DEFAULT_MARGIN = 4;
+    private final int margin;
+    private final int customWidth;
+    private final boolean alwaysShowBorders;
+    private final BackgroundRendering backgroundRendering;
 
-   public NarratedMultilineTextWidget(int maxWidth, Text message, TextRenderer textRenderer) {
-      this(maxWidth, message, textRenderer, 4);
-   }
+    NarratedMultilineTextWidget(Text text, TextRenderer textRenderer, int margin, int customWidth, BackgroundRendering backgroundRendering, boolean alwaysShowBorders) {
+        super(text, textRenderer);
+        this.active = true;
+        this.margin = margin;
+        this.customWidth = customWidth;
+        this.alwaysShowBorders = alwaysShowBorders;
+        this.backgroundRendering = backgroundRendering;
+        this.updateWidth();
+        this.updateHeight();
+        this.setCentered(true);
+    }
 
-   public NarratedMultilineTextWidget(int maxWidth, Text message, TextRenderer textRenderer, int margin) {
-      this(maxWidth, message, textRenderer, true, true, margin);
-   }
+    protected void appendClickableNarrations(NarrationMessageBuilder builder) {
+        builder.put(NarrationPart.TITLE, this.getMessage());
+    }
 
-   public NarratedMultilineTextWidget(int maxWidth, Text message, TextRenderer textRenderer, boolean alwaysShowBorders, boolean fillBackground, int margin) {
-      super(message, textRenderer);
-      this.setMaxWidth(maxWidth);
-      this.setCentered(true);
-      this.active = true;
-      this.alwaysShowBorders = alwaysShowBorders;
-      this.fillBackground = fillBackground;
-      this.margin = margin;
-   }
+    public void renderWidget(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
+        int i = this.alwaysShowBorders && !this.isFocused() ? ColorHelper.withAlpha((float)this.alpha, (int)-6250336) : ColorHelper.getWhite((float)this.alpha);
+        switch (this.backgroundRendering.ordinal()) {
+            case 0: {
+                context.fill(this.getX() + 1, this.getY(), this.getRight(), this.getBottom(), ColorHelper.toAlpha((float)this.alpha));
+                break;
+            }
+            case 1: {
+                if (!this.isFocused()) break;
+                context.fill(this.getX() + 1, this.getY(), this.getRight(), this.getBottom(), ColorHelper.toAlpha((float)this.alpha));
+                break;
+            }
+        }
+        if (this.isFocused() || this.alwaysShowBorders) {
+            context.drawStrokedRectangle(this.getX(), this.getY(), this.getWidth(), this.getHeight(), i);
+        }
+        super.renderWidget(context, mouseX, mouseY, deltaTicks);
+    }
 
-   public void initMaxWidth(int baseWidth) {
-      this.setMaxWidth(baseWidth - this.margin * 4);
-   }
+    protected int getTextX() {
+        return this.getX() + this.margin;
+    }
 
-   protected void appendClickableNarrations(NarrationMessageBuilder builder) {
-      builder.put(NarrationPart.TITLE, this.getMessage());
-   }
+    protected int getTextY() {
+        return super.getTextY() + this.margin;
+    }
 
-   public void renderWidget(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
-      int i = this.getX() - this.margin;
-      int j = this.getY() - this.margin;
-      int k = this.getWidth() + this.margin * 2;
-      int l = this.getHeight() + this.margin * 2;
-      int m = ColorHelper.withAlpha(this.alpha, this.alwaysShowBorders ? (this.isFocused() ? -1 : -6250336) : -1);
-      if (this.fillBackground) {
-         context.fill(i + 1, j, i + k, j + l, ColorHelper.withAlpha(this.alpha, -16777216));
-      }
+    public MultilineTextWidget setMaxWidth(int maxWidth) {
+        return super.setMaxWidth(maxWidth - this.margin * 2);
+    }
 
-      if (this.isFocused() || this.alwaysShowBorders) {
-         context.drawBorder(i, j, k, l, m);
-      }
+    public int getWidth() {
+        return this.width;
+    }
 
-      super.renderWidget(context, mouseX, mouseY, deltaTicks);
-   }
+    public int getHeight() {
+        return this.height;
+    }
 
-   public void playDownSound(SoundManager soundManager) {
-   }
+    public int getMargin() {
+        return this.margin;
+    }
+
+    public void updateWidth() {
+        if (this.customWidth != -1) {
+            this.setWidth(this.customWidth);
+            this.setMaxWidth(this.customWidth);
+        } else {
+            this.setWidth(this.getTextRenderer().getWidth((StringVisitable)this.getMessage()) + this.margin * 2);
+        }
+    }
+
+    public void updateHeight() {
+        Objects.requireNonNull(this.getTextRenderer());
+        int i = 9 * this.getTextRenderer().wrapLines((StringVisitable)this.getMessage(), super.getWidth()).size();
+        this.setHeight(i + this.margin * 2);
+    }
+
+    public void setMessage(Text message) {
+        this.message = message;
+        int i = this.customWidth != -1 ? this.customWidth : this.getTextRenderer().getWidth((StringVisitable)message) + this.margin * 2;
+        this.setWidth(i);
+        this.updateHeight();
+    }
+
+    public void playDownSound(SoundManager soundManager) {
+    }
+
+    public static Builder builder(Text text, TextRenderer textRenderer) {
+        return new Builder(text, textRenderer);
+    }
+
+    public static Builder builder(Text text, TextRenderer textRenderer, int margin) {
+        return new Builder(text, textRenderer, margin);
+    }
 }
+

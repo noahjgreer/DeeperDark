@@ -1,185 +1,144 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.logging.LogUtils
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.MinecraftClient
+ *  net.minecraft.client.gui.Element
+ *  net.minecraft.client.gui.screen.Screen
+ *  net.minecraft.client.gui.screen.world.WorldListWidget
+ *  net.minecraft.client.gui.screen.world.WorldListWidget$Builder
+ *  net.minecraft.client.gui.screen.world.WorldListWidget$WorldEntry
+ *  net.minecraft.client.gui.widget.ButtonWidget
+ *  net.minecraft.client.gui.widget.ClickableWidget
+ *  net.minecraft.client.gui.widget.DirectionalLayoutWidget
+ *  net.minecraft.client.gui.widget.TextFieldWidget
+ *  net.minecraft.client.gui.widget.TextWidget
+ *  net.minecraft.client.gui.widget.ThreePartsLayoutWidget
+ *  net.minecraft.client.gui.widget.Widget
+ *  net.minecraft.client.realms.gui.screen.RealmsCreateWorldScreen
+ *  net.minecraft.client.realms.gui.screen.RealmsGenericErrorScreen
+ *  net.minecraft.client.realms.gui.screen.RealmsScreen
+ *  net.minecraft.client.realms.gui.screen.RealmsSelectFileToUploadScreen
+ *  net.minecraft.client.realms.gui.screen.RealmsUploadScreen
+ *  net.minecraft.client.realms.task.WorldCreationTask
+ *  net.minecraft.screen.ScreenTexts
+ *  net.minecraft.text.Text
+ *  net.minecraft.world.level.storage.LevelSummary
+ *  org.jspecify.annotations.Nullable
+ *  org.slf4j.Logger
+ */
 package net.minecraft.client.realms.gui.screen;
 
-import com.google.common.collect.Lists;
 import com.mojang.logging.LogUtils;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
+import net.minecraft.client.gui.Element;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.world.WorldListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.realms.RealmsLabel;
+import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.client.gui.widget.DirectionalLayoutWidget;
+import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.gui.widget.TextWidget;
+import net.minecraft.client.gui.widget.ThreePartsLayoutWidget;
+import net.minecraft.client.gui.widget.Widget;
+import net.minecraft.client.realms.gui.screen.RealmsCreateWorldScreen;
+import net.minecraft.client.realms.gui.screen.RealmsGenericErrorScreen;
+import net.minecraft.client.realms.gui.screen.RealmsScreen;
+import net.minecraft.client.realms.gui.screen.RealmsUploadScreen;
 import net.minecraft.client.realms.task.WorldCreationTask;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
-import net.minecraft.world.level.storage.LevelStorage;
 import net.minecraft.world.level.storage.LevelSummary;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 
-@Environment(EnvType.CLIENT)
-public class RealmsSelectFileToUploadScreen extends RealmsScreen {
-   private static final Logger LOGGER = LogUtils.getLogger();
-   public static final Text TITLE = Text.translatable("mco.upload.select.world.title");
-   private static final Text LOADING_ERROR_TEXT = Text.translatable("selectWorld.unable_to_load");
-   static final Text WORLD_LANG = Text.translatable("selectWorld.world");
-   private static final DateFormat DATE_FORMAT = new SimpleDateFormat();
-   @Nullable
-   private final WorldCreationTask creationTask;
-   private final RealmsCreateWorldScreen parent;
-   private final long worldId;
-   private final int slotId;
-   ButtonWidget uploadButton;
-   List levelList = Lists.newArrayList();
-   int selectedWorld = -1;
-   WorldSelectionList worldSelectionList;
+@Environment(value=EnvType.CLIENT)
+public class RealmsSelectFileToUploadScreen
+extends RealmsScreen {
+    private static final Logger LOGGER = LogUtils.getLogger();
+    public static final Text TITLE = Text.translatable((String)"mco.upload.select.world.title");
+    private static final Text LOADING_ERROR_TEXT = Text.translatable((String)"selectWorld.unable_to_load");
+    private final @Nullable WorldCreationTask creationTask;
+    private final RealmsCreateWorldScreen parent;
+    private final long worldId;
+    private final int slotId;
+    private final ThreePartsLayoutWidget field_62099;
+    protected @Nullable TextFieldWidget field_62100;
+    private @Nullable WorldListWidget worldSelectionList;
+    private @Nullable ButtonWidget uploadButton;
 
-   public RealmsSelectFileToUploadScreen(@Nullable WorldCreationTask creationTask, long worldId, int slotId, RealmsCreateWorldScreen parent) {
-      super(TITLE);
-      this.creationTask = creationTask;
-      this.parent = parent;
-      this.worldId = worldId;
-      this.slotId = slotId;
-   }
+    public RealmsSelectFileToUploadScreen(@Nullable WorldCreationTask creationTask, long worldId, int slotId, RealmsCreateWorldScreen parent) {
+        super(TITLE);
+        Objects.requireNonNull(MinecraftClient.getInstance().textRenderer);
+        this.field_62099 = new ThreePartsLayoutWidget((Screen)this, 8 + 9 + 8 + 20 + 4, 33);
+        this.creationTask = creationTask;
+        this.parent = parent;
+        this.worldId = worldId;
+        this.slotId = slotId;
+    }
 
-   private void loadLevelList() {
-      LevelStorage.LevelList levelList = this.client.getLevelStorage().getLevelList();
-      this.levelList = (List)((List)this.client.getLevelStorage().loadSummaries(levelList).join()).stream().filter(LevelSummary::isImmediatelyLoadable).collect(Collectors.toList());
-      Iterator var2 = this.levelList.iterator();
+    public void init() {
+        DirectionalLayoutWidget directionalLayoutWidget = (DirectionalLayoutWidget)this.field_62099.addHeader((Widget)DirectionalLayoutWidget.vertical().spacing(4));
+        directionalLayoutWidget.getMainPositioner().alignHorizontalCenter();
+        directionalLayoutWidget.add((Widget)new TextWidget(this.title, this.textRenderer));
+        this.field_62100 = (TextFieldWidget)directionalLayoutWidget.add((Widget)new TextFieldWidget(this.textRenderer, this.width / 2 - 100, 22, 200, 20, this.field_62100, (Text)Text.translatable((String)"selectWorld.search")));
+        this.field_62100.setChangedListener(string -> {
+            if (this.worldSelectionList != null) {
+                this.worldSelectionList.setSearch(string);
+            }
+        });
+        try {
+            this.worldSelectionList = (WorldListWidget)this.field_62099.addBody((Widget)new WorldListWidget.Builder(this.client, (Screen)this).width(this.width).height(this.field_62099.getContentHeight()).search(this.field_62100.getText()).predecessor(this.worldSelectionList).uploadWorld().selectionCallback(arg_0 -> this.worldSelected(arg_0)).confirmationCallback(arg_0 -> this.upload(arg_0)).toWidget());
+        }
+        catch (Exception exception) {
+            LOGGER.error("Couldn't load level list", (Throwable)exception);
+            this.client.setScreen((Screen)new RealmsGenericErrorScreen(LOADING_ERROR_TEXT, Text.of((String)exception.getMessage()), (Screen)this.parent));
+            return;
+        }
+        DirectionalLayoutWidget directionalLayoutWidget2 = (DirectionalLayoutWidget)this.field_62099.addFooter((Widget)DirectionalLayoutWidget.horizontal().spacing(8));
+        directionalLayoutWidget2.getMainPositioner().alignHorizontalCenter();
+        this.uploadButton = (ButtonWidget)directionalLayoutWidget2.add((Widget)ButtonWidget.builder((Text)Text.translatable((String)"mco.upload.button.name"), buttonWidget -> this.worldSelectionList.getSelectedAsOptional().ifPresent(arg_0 -> this.upload(arg_0))).build());
+        directionalLayoutWidget2.add((Widget)ButtonWidget.builder((Text)ScreenTexts.BACK, buttonWidget -> this.close()).build());
+        this.worldSelected(null);
+        this.field_62099.forEachChild(element -> {
+            ClickableWidget cfr_ignored_0 = (ClickableWidget)this.addDrawableChild(element);
+        });
+        this.refreshWidgetPositions();
+    }
 
-      while(var2.hasNext()) {
-         LevelSummary levelSummary = (LevelSummary)var2.next();
-         this.worldSelectionList.addEntry(levelSummary);
-      }
+    protected void refreshWidgetPositions() {
+        if (this.worldSelectionList != null) {
+            this.worldSelectionList.position(this.width, this.field_62099);
+        }
+        this.field_62099.refreshPositions();
+    }
 
-   }
+    protected void setInitialFocus() {
+        this.setInitialFocus((Element)this.field_62100);
+    }
 
-   public void init() {
-      this.worldSelectionList = (WorldSelectionList)this.addDrawableChild(new WorldSelectionList());
+    private void worldSelected(@Nullable LevelSummary level) {
+        if (this.worldSelectionList != null && this.uploadButton != null) {
+            this.uploadButton.active = this.worldSelectionList.getSelectedOrNull() != null;
+        }
+    }
 
-      try {
-         this.loadLevelList();
-      } catch (Exception var2) {
-         LOGGER.error("Couldn't load level list", var2);
-         this.client.setScreen(new RealmsGenericErrorScreen(LOADING_ERROR_TEXT, Text.of(var2.getMessage()), this.parent));
-         return;
-      }
+    private void upload(WorldListWidget.WorldEntry worldEntry) {
+        this.client.setScreen((Screen)new RealmsUploadScreen(this.creationTask, this.worldId, this.slotId, this.parent, worldEntry.getLevel()));
+    }
 
-      this.uploadButton = (ButtonWidget)this.addDrawableChild(ButtonWidget.builder(Text.translatable("mco.upload.button.name"), (button) -> {
-         this.upload();
-      }).dimensions(this.width / 2 - 154, this.height - 32, 153, 20).build());
-      this.uploadButton.active = this.selectedWorld >= 0 && this.selectedWorld < this.levelList.size();
-      this.addDrawableChild(ButtonWidget.builder(ScreenTexts.BACK, (button) -> {
-         this.client.setScreen(this.parent);
-      }).dimensions(this.width / 2 + 6, this.height - 32, 153, 20).build());
-      this.addLabel(new RealmsLabel(Text.translatable("mco.upload.select.world.subtitle"), this.width / 2, row(-1), -6250336));
-      if (this.levelList.isEmpty()) {
-         this.addLabel(new RealmsLabel(Text.translatable("mco.upload.select.world.none"), this.width / 2, this.height / 2 - 20, -1));
-      }
+    public Text getNarratedTitle() {
+        return ScreenTexts.joinSentences((Text[])new Text[]{this.getTitle(), this.narrateLabels()});
+    }
 
-   }
-
-   public Text getNarratedTitle() {
-      return ScreenTexts.joinSentences(this.getTitle(), this.narrateLabels());
-   }
-
-   private void upload() {
-      if (this.selectedWorld != -1) {
-         LevelSummary levelSummary = (LevelSummary)this.levelList.get(this.selectedWorld);
-         this.client.setScreen(new RealmsUploadScreen(this.creationTask, this.worldId, this.slotId, this.parent, levelSummary));
-      }
-
-   }
-
-   public void render(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
-      super.render(context, mouseX, mouseY, deltaTicks);
-      context.drawCenteredTextWithShadow(this.textRenderer, (Text)this.title, this.width / 2, 13, -1);
-   }
-
-   public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-      if (keyCode == 256) {
-         this.client.setScreen(this.parent);
-         return true;
-      } else {
-         return super.keyPressed(keyCode, scanCode, modifiers);
-      }
-   }
-
-   static Text getGameModeName(LevelSummary summary) {
-      return summary.getGameMode().getTranslatableName();
-   }
-
-   static String getLastPlayed(LevelSummary summary) {
-      return DATE_FORMAT.format(new Date(summary.getLastPlayed()));
-   }
-
-   @Environment(EnvType.CLIENT)
-   class WorldSelectionList extends AlwaysSelectedEntryListWidget {
-      public WorldSelectionList() {
-         super(MinecraftClient.getInstance(), RealmsSelectFileToUploadScreen.this.width, RealmsSelectFileToUploadScreen.this.height - 40 - RealmsSelectFileToUploadScreen.row(0), RealmsSelectFileToUploadScreen.row(0), 36);
-      }
-
-      public void addEntry(LevelSummary summary) {
-         this.addEntry(RealmsSelectFileToUploadScreen.this.new WorldListEntry(summary));
-      }
-
-      public void setSelected(@Nullable WorldListEntry worldListEntry) {
-         super.setSelected(worldListEntry);
-         RealmsSelectFileToUploadScreen.this.selectedWorld = this.children().indexOf(worldListEntry);
-         RealmsSelectFileToUploadScreen.this.uploadButton.active = RealmsSelectFileToUploadScreen.this.selectedWorld >= 0 && RealmsSelectFileToUploadScreen.this.selectedWorld < this.getEntryCount();
-      }
-
-      public int getRowWidth() {
-         return (int)((double)this.width * 0.6);
-      }
-   }
-
-   @Environment(EnvType.CLIENT)
-   private class WorldListEntry extends AlwaysSelectedEntryListWidget.Entry {
-      private final LevelSummary summary;
-      private final String displayName;
-      private final Text nameAndLastPlayed;
-      private final Text details;
-
-      public WorldListEntry(final LevelSummary summary) {
-         this.summary = summary;
-         this.displayName = summary.getDisplayName();
-         this.nameAndLastPlayed = Text.translatable("mco.upload.entry.id", summary.getName(), RealmsSelectFileToUploadScreen.getLastPlayed(summary));
-         this.details = summary.getDetails();
-      }
-
-      public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickProgress) {
-         this.renderItem(context, index, x, y);
-      }
-
-      public boolean mouseClicked(double mouseX, double mouseY, int button) {
-         RealmsSelectFileToUploadScreen.this.worldSelectionList.setSelected(RealmsSelectFileToUploadScreen.this.levelList.indexOf(this.summary));
-         return super.mouseClicked(mouseX, mouseY, button);
-      }
-
-      protected void renderItem(DrawContext context, int index, int x, int y) {
-         String string;
-         if (this.displayName.isEmpty()) {
-            String var10000 = String.valueOf(RealmsSelectFileToUploadScreen.WORLD_LANG);
-            string = var10000 + " " + (index + 1);
-         } else {
-            string = this.displayName;
-         }
-
-         context.drawTextWithShadow(RealmsSelectFileToUploadScreen.this.textRenderer, (String)string, x + 2, y + 1, -1);
-         context.drawTextWithShadow(RealmsSelectFileToUploadScreen.this.textRenderer, this.nameAndLastPlayed, x + 2, y + 12, -8355712);
-         context.drawTextWithShadow(RealmsSelectFileToUploadScreen.this.textRenderer, this.details, x + 2, y + 12 + 10, -8355712);
-      }
-
-      public Text getNarration() {
-         Text text = ScreenTexts.joinLines(Text.literal(this.summary.getDisplayName()), Text.literal(RealmsSelectFileToUploadScreen.getLastPlayed(this.summary)), RealmsSelectFileToUploadScreen.getGameModeName(this.summary));
-         return Text.translatable("narrator.select", text);
-      }
-   }
+    public void close() {
+        this.client.setScreen((Screen)this.parent);
+    }
 }
+

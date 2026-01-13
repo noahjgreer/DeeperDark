@@ -1,48 +1,77 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  it.unimi.dsi.fastutil.longs.LongOpenHashSet
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.MinecraftClient
+ *  net.minecraft.client.render.Frustum
+ *  net.minecraft.client.render.debug.DebugRenderer$Renderer
+ *  net.minecraft.client.render.debug.SkyLightDebugRenderer
+ *  net.minecraft.client.world.ClientWorld
+ *  net.minecraft.util.math.BlockPos
+ *  net.minecraft.util.math.ChunkSectionPos
+ *  net.minecraft.util.math.ColorHelper
+ *  net.minecraft.util.math.Vec3d
+ *  net.minecraft.util.math.Vec3i
+ *  net.minecraft.world.LightType
+ *  net.minecraft.world.debug.DebugDataStore
+ *  net.minecraft.world.debug.gizmo.GizmoDrawing
+ *  net.minecraft.world.debug.gizmo.TextGizmo$Style
+ */
 package net.minecraft.client.render.debug;
 
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
-import it.unimi.dsi.fastutil.longs.LongSet;
-import java.util.Iterator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.render.Frustum;
+import net.minecraft.client.render.debug.DebugRenderer;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkSectionPos;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.ColorHelper;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.LightType;
-import net.minecraft.world.World;
+import net.minecraft.world.debug.DebugDataStore;
+import net.minecraft.world.debug.gizmo.GizmoDrawing;
+import net.minecraft.world.debug.gizmo.TextGizmo;
 
-@Environment(EnvType.CLIENT)
-public class SkyLightDebugRenderer implements DebugRenderer.Renderer {
-   private final MinecraftClient client;
-   private static final int RANGE = 10;
+@Environment(value=EnvType.CLIENT)
+public class SkyLightDebugRenderer
+implements DebugRenderer.Renderer {
+    private final MinecraftClient client;
+    private final boolean visualizeBlockLightLevels;
+    private final boolean visualizeSkyLightLevels;
+    private static final int RANGE = 10;
 
-   public SkyLightDebugRenderer(MinecraftClient client) {
-      this.client = client;
-   }
+    public SkyLightDebugRenderer(MinecraftClient client, boolean visualizeBlockLightLevels, boolean visualizeSkyLightLevels) {
+        this.client = client;
+        this.visualizeBlockLightLevels = visualizeBlockLightLevels;
+        this.visualizeSkyLightLevels = visualizeSkyLightLevels;
+    }
 
-   public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, double cameraX, double cameraY, double cameraZ) {
-      World world = this.client.world;
-      BlockPos blockPos = BlockPos.ofFloored(cameraX, cameraY, cameraZ);
-      LongSet longSet = new LongOpenHashSet();
-      Iterator var12 = BlockPos.iterate(blockPos.add(-10, -10, -10), blockPos.add(10, 10, 10)).iterator();
-
-      while(var12.hasNext()) {
-         BlockPos blockPos2 = (BlockPos)var12.next();
-         int i = world.getLightLevel(LightType.SKY, blockPos2);
-         float f = (float)(15 - i) / 15.0F * 0.5F + 0.16F;
-         int j = MathHelper.hsvToRgb(f, 0.9F, 0.9F);
-         long l = ChunkSectionPos.fromBlockPos(blockPos2.asLong());
-         if (longSet.add(l)) {
-            DebugRenderer.drawString(matrices, vertexConsumers, world.getChunkManager().getLightingProvider().displaySectionLevel(LightType.SKY, ChunkSectionPos.from(l)), (double)ChunkSectionPos.getOffsetPos(ChunkSectionPos.unpackX(l), 8), (double)ChunkSectionPos.getOffsetPos(ChunkSectionPos.unpackY(l), 8), (double)ChunkSectionPos.getOffsetPos(ChunkSectionPos.unpackZ(l), 8), -65536, 0.3F);
-         }
-
-         if (i != 15) {
-            DebugRenderer.drawString(matrices, vertexConsumers, String.valueOf(i), (double)blockPos2.getX() + 0.5, (double)blockPos2.getY() + 0.25, (double)blockPos2.getZ() + 0.5, j);
-         }
-      }
-
-   }
+    public void render(double cameraX, double cameraY, double cameraZ, DebugDataStore store, Frustum frustum, float tickProgress) {
+        ClientWorld world = this.client.world;
+        BlockPos blockPos = BlockPos.ofFloored((double)cameraX, (double)cameraY, (double)cameraZ);
+        LongOpenHashSet longSet = new LongOpenHashSet();
+        for (BlockPos blockPos2 : BlockPos.iterate((BlockPos)blockPos.add(-10, -10, -10), (BlockPos)blockPos.add(10, 10, 10))) {
+            int j;
+            int i = world.getLightLevel(LightType.SKY, blockPos2);
+            long l = ChunkSectionPos.fromBlockPos((long)blockPos2.asLong());
+            if (longSet.add(l)) {
+                GizmoDrawing.text((String)world.getChunkManager().getLightingProvider().displaySectionLevel(LightType.SKY, ChunkSectionPos.from((long)l)), (Vec3d)new Vec3d((double)ChunkSectionPos.getOffsetPos((int)ChunkSectionPos.unpackX((long)l), (int)8), (double)ChunkSectionPos.getOffsetPos((int)ChunkSectionPos.unpackY((long)l), (int)8), (double)ChunkSectionPos.getOffsetPos((int)ChunkSectionPos.unpackZ((long)l), (int)8)), (TextGizmo.Style)TextGizmo.Style.left((int)-65536).scaled(4.8f));
+            }
+            if (i != 15 && this.visualizeSkyLightLevels) {
+                j = ColorHelper.lerp((float)((float)i / 15.0f), (int)-16776961, (int)-16711681);
+                GizmoDrawing.text((String)String.valueOf(i), (Vec3d)Vec3d.add((Vec3i)blockPos2, (double)0.5, (double)0.25, (double)0.5), (TextGizmo.Style)TextGizmo.Style.left((int)j));
+            }
+            if (!this.visualizeBlockLightLevels || (j = world.getLightLevel(LightType.BLOCK, blockPos2)) == 0) continue;
+            int k = ColorHelper.lerp((float)((float)j / 15.0f), (int)-5636096, (int)-256);
+            GizmoDrawing.text((String)String.valueOf(world.getLightLevel(LightType.BLOCK, blockPos2)), (Vec3d)Vec3d.ofCenter((Vec3i)blockPos2), (TextGizmo.Style)TextGizmo.Style.left((int)k));
+        }
+    }
 }
+

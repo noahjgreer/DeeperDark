@@ -1,3 +1,22 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.model.Dilation
+ *  net.minecraft.client.model.ModelData
+ *  net.minecraft.client.model.ModelPart
+ *  net.minecraft.client.model.ModelPartBuilder
+ *  net.minecraft.client.model.ModelPartData
+ *  net.minecraft.client.model.ModelTransform
+ *  net.minecraft.client.model.TexturedModelData
+ *  net.minecraft.client.render.entity.model.BabyModelTransformer
+ *  net.minecraft.client.render.entity.model.ModelTransformer
+ *  net.minecraft.client.render.entity.model.PigEntityModel
+ *  net.minecraft.client.render.entity.model.QuadrupedEntityModel
+ *  net.minecraft.client.render.entity.state.LivingEntityRenderState
+ */
 package net.minecraft.client.render.entity.model;
 
 import java.util.Set;
@@ -10,23 +29,32 @@ import net.minecraft.client.model.ModelPartBuilder;
 import net.minecraft.client.model.ModelPartData;
 import net.minecraft.client.model.ModelTransform;
 import net.minecraft.client.model.TexturedModelData;
+import net.minecraft.client.render.entity.model.BabyModelTransformer;
+import net.minecraft.client.render.entity.model.ModelTransformer;
+import net.minecraft.client.render.entity.model.QuadrupedEntityModel;
+import net.minecraft.client.render.entity.state.LivingEntityRenderState;
 
-@Environment(EnvType.CLIENT)
-public class PigEntityModel extends QuadrupedEntityModel {
-   public static final ModelTransformer BABY_TRANSFORMER = new BabyModelTransformer(false, 4.0F, 4.0F, Set.of("head"));
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
+public class PigEntityModel
+extends QuadrupedEntityModel<LivingEntityRenderState> {
+    public static final ModelTransformer BABY_TRANSFORMER = new BabyModelTransformer(false, 4.0f, 4.0f, Set.of("head"));
 
-   public PigEntityModel(ModelPart modelPart) {
-      super(modelPart);
-   }
+    public PigEntityModel(ModelPart modelPart) {
+        super(modelPart);
+    }
 
-   public static TexturedModelData getTexturedModelData(Dilation dilation) {
-      return TexturedModelData.of(getModelData(dilation), 64, 64);
-   }
+    public static TexturedModelData getTexturedModelData(Dilation dilation) {
+        return TexturedModelData.of((ModelData)PigEntityModel.getModelData((Dilation)dilation), (int)64, (int)64);
+    }
 
-   protected static ModelData getModelData(Dilation dilation) {
-      ModelData modelData = QuadrupedEntityModel.getModelData(6, true, false, dilation);
-      ModelPartData modelPartData = modelData.getRoot();
-      modelPartData.addChild("head", ModelPartBuilder.create().uv(0, 0).cuboid(-4.0F, -4.0F, -8.0F, 8.0F, 8.0F, 8.0F, dilation).uv(16, 16).cuboid(-2.0F, 0.0F, -9.0F, 4.0F, 3.0F, 1.0F, dilation), ModelTransform.origin(0.0F, 12.0F, -6.0F));
-      return modelData;
-   }
+    protected static ModelData getModelData(Dilation dilation) {
+        ModelData modelData = QuadrupedEntityModel.getModelData((int)6, (boolean)true, (boolean)false, (Dilation)dilation);
+        ModelPartData modelPartData = modelData.getRoot();
+        modelPartData.addChild("head", ModelPartBuilder.create().uv(0, 0).cuboid(-4.0f, -4.0f, -8.0f, 8.0f, 8.0f, 8.0f, dilation).uv(16, 16).cuboid(-2.0f, 0.0f, -9.0f, 4.0f, 3.0f, 1.0f, dilation), ModelTransform.origin((float)0.0f, (float)12.0f, (float)-6.0f));
+        return modelData;
+    }
 }
+

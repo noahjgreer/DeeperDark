@@ -1,10 +1,100 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.google.common.collect.ImmutableMap
+ *  com.google.common.collect.Ordering
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.block.Blocks
+ *  net.minecraft.client.MinecraftClient
+ *  net.minecraft.client.font.TextRenderer
+ *  net.minecraft.client.gl.RenderPipelines
+ *  net.minecraft.client.gui.DrawContext
+ *  net.minecraft.client.gui.hud.BossBarHud
+ *  net.minecraft.client.gui.hud.ChatHud
+ *  net.minecraft.client.gui.hud.DebugHud
+ *  net.minecraft.client.gui.hud.InGameHud
+ *  net.minecraft.client.gui.hud.InGameHud$BarType
+ *  net.minecraft.client.gui.hud.InGameHud$HeartType
+ *  net.minecraft.client.gui.hud.InGameHud$SidebarEntry
+ *  net.minecraft.client.gui.hud.PlayerListHud
+ *  net.minecraft.client.gui.hud.SpectatorHud
+ *  net.minecraft.client.gui.hud.SubtitlesHud
+ *  net.minecraft.client.gui.hud.bar.Bar
+ *  net.minecraft.client.gui.hud.bar.ExperienceBar
+ *  net.minecraft.client.gui.hud.bar.JumpBar
+ *  net.minecraft.client.gui.hud.bar.LocatorBar
+ *  net.minecraft.client.gui.hud.debug.DebugHudEntries
+ *  net.minecraft.client.gui.screen.world.LevelLoadingScreen
+ *  net.minecraft.client.network.ClientPlayerEntity
+ *  net.minecraft.client.option.AttackIndicator
+ *  net.minecraft.client.option.GameOptions
+ *  net.minecraft.client.render.LightmapTextureManager
+ *  net.minecraft.client.render.RenderTickCounter
+ *  net.minecraft.client.texture.MissingSprite
+ *  net.minecraft.client.texture.Sprite
+ *  net.minecraft.client.util.Window
+ *  net.minecraft.client.world.ClientWorld
+ *  net.minecraft.component.DataComponentTypes
+ *  net.minecraft.component.type.AttackRangeComponent
+ *  net.minecraft.component.type.EquippableComponent
+ *  net.minecraft.entity.Entity
+ *  net.minecraft.entity.EquipmentSlot
+ *  net.minecraft.entity.JumpingMount
+ *  net.minecraft.entity.LivingEntity
+ *  net.minecraft.entity.attribute.EntityAttributes
+ *  net.minecraft.entity.effect.StatusEffect
+ *  net.minecraft.entity.effect.StatusEffectInstance
+ *  net.minecraft.entity.effect.StatusEffects
+ *  net.minecraft.entity.player.HungerManager
+ *  net.minecraft.entity.player.PlayerEntity
+ *  net.minecraft.item.ItemStack
+ *  net.minecraft.registry.RegistryKey
+ *  net.minecraft.registry.entry.RegistryEntry
+ *  net.minecraft.registry.tag.FluidTags
+ *  net.minecraft.scoreboard.AbstractTeam
+ *  net.minecraft.scoreboard.Scoreboard
+ *  net.minecraft.scoreboard.ScoreboardDisplaySlot
+ *  net.minecraft.scoreboard.ScoreboardEntry
+ *  net.minecraft.scoreboard.ScoreboardObjective
+ *  net.minecraft.scoreboard.Team
+ *  net.minecraft.scoreboard.number.NumberFormat
+ *  net.minecraft.scoreboard.number.StyledNumberFormat
+ *  net.minecraft.screen.NamedScreenHandlerFactory
+ *  net.minecraft.server.integrated.IntegratedServer
+ *  net.minecraft.sound.SoundEvents
+ *  net.minecraft.text.MutableText
+ *  net.minecraft.text.StringVisitable
+ *  net.minecraft.text.Text
+ *  net.minecraft.util.Arm
+ *  net.minecraft.util.Formatting
+ *  net.minecraft.util.Identifier
+ *  net.minecraft.util.Nullables
+ *  net.minecraft.util.StringHelper
+ *  net.minecraft.util.Util
+ *  net.minecraft.util.hit.BlockHitResult
+ *  net.minecraft.util.hit.EntityHitResult
+ *  net.minecraft.util.hit.HitResult
+ *  net.minecraft.util.hit.HitResult$Type
+ *  net.minecraft.util.math.BlockPos
+ *  net.minecraft.util.math.ColorHelper
+ *  net.minecraft.util.math.MathHelper
+ *  net.minecraft.util.math.random.Random
+ *  net.minecraft.util.profiler.Profilers
+ *  net.minecraft.world.GameMode
+ *  net.minecraft.world.World
+ *  net.minecraft.world.border.WorldBorder
+ *  net.minecraft.world.dimension.DimensionType
+ *  org.apache.commons.lang3.tuple.Pair
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.gui.hud;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Ordering;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -15,21 +105,30 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.hud.BossBarHud;
+import net.minecraft.client.gui.hud.ChatHud;
+import net.minecraft.client.gui.hud.DebugHud;
+import net.minecraft.client.gui.hud.InGameHud;
+import net.minecraft.client.gui.hud.PlayerListHud;
+import net.minecraft.client.gui.hud.SpectatorHud;
+import net.minecraft.client.gui.hud.SubtitlesHud;
 import net.minecraft.client.gui.hud.bar.Bar;
 import net.minecraft.client.gui.hud.bar.ExperienceBar;
 import net.minecraft.client.gui.hud.bar.JumpBar;
 import net.minecraft.client.gui.hud.bar.LocatorBar;
-import net.minecraft.client.gui.screen.DownloadingTerrainScreen;
+import net.minecraft.client.gui.hud.debug.DebugHudEntries;
+import net.minecraft.client.gui.screen.world.LevelLoadingScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.AttackIndicator;
 import net.minecraft.client.option.GameOptions;
-import net.minecraft.client.option.Perspective;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.texture.MissingSprite;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.Window;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.AttackRangeComponent;
 import net.minecraft.component.type.EquippableComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
@@ -45,6 +144,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.FluidTags;
+import net.minecraft.scoreboard.AbstractTeam;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.ScoreboardDisplaySlot;
 import net.minecraft.scoreboard.ScoreboardEntry;
@@ -53,7 +153,7 @@ import net.minecraft.scoreboard.Team;
 import net.minecraft.scoreboard.number.NumberFormat;
 import net.minecraft.scoreboard.number.StyledNumberFormat;
 import net.minecraft.screen.NamedScreenHandlerFactory;
-import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.StringVisitable;
@@ -75,1346 +175,1110 @@ import net.minecraft.util.profiler.Profilers;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
 import net.minecraft.world.border.WorldBorder;
+import net.minecraft.world.dimension.DimensionType;
 import org.apache.commons.lang3.tuple.Pair;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
 public class InGameHud {
-   private static final Identifier CROSSHAIR_TEXTURE = Identifier.ofVanilla("hud/crosshair");
-   private static final Identifier CROSSHAIR_ATTACK_INDICATOR_FULL_TEXTURE = Identifier.ofVanilla("hud/crosshair_attack_indicator_full");
-   private static final Identifier CROSSHAIR_ATTACK_INDICATOR_BACKGROUND_TEXTURE = Identifier.ofVanilla("hud/crosshair_attack_indicator_background");
-   private static final Identifier CROSSHAIR_ATTACK_INDICATOR_PROGRESS_TEXTURE = Identifier.ofVanilla("hud/crosshair_attack_indicator_progress");
-   private static final Identifier EFFECT_BACKGROUND_AMBIENT_TEXTURE = Identifier.ofVanilla("hud/effect_background_ambient");
-   private static final Identifier EFFECT_BACKGROUND_TEXTURE = Identifier.ofVanilla("hud/effect_background");
-   private static final Identifier HOTBAR_TEXTURE = Identifier.ofVanilla("hud/hotbar");
-   private static final Identifier HOTBAR_SELECTION_TEXTURE = Identifier.ofVanilla("hud/hotbar_selection");
-   private static final Identifier HOTBAR_OFFHAND_LEFT_TEXTURE = Identifier.ofVanilla("hud/hotbar_offhand_left");
-   private static final Identifier HOTBAR_OFFHAND_RIGHT_TEXTURE = Identifier.ofVanilla("hud/hotbar_offhand_right");
-   private static final Identifier HOTBAR_ATTACK_INDICATOR_BACKGROUND_TEXTURE = Identifier.ofVanilla("hud/hotbar_attack_indicator_background");
-   private static final Identifier HOTBAR_ATTACK_INDICATOR_PROGRESS_TEXTURE = Identifier.ofVanilla("hud/hotbar_attack_indicator_progress");
-   private static final Identifier ARMOR_EMPTY_TEXTURE = Identifier.ofVanilla("hud/armor_empty");
-   private static final Identifier ARMOR_HALF_TEXTURE = Identifier.ofVanilla("hud/armor_half");
-   private static final Identifier ARMOR_FULL_TEXTURE = Identifier.ofVanilla("hud/armor_full");
-   private static final Identifier FOOD_EMPTY_HUNGER_TEXTURE = Identifier.ofVanilla("hud/food_empty_hunger");
-   private static final Identifier FOOD_HALF_HUNGER_TEXTURE = Identifier.ofVanilla("hud/food_half_hunger");
-   private static final Identifier FOOD_FULL_HUNGER_TEXTURE = Identifier.ofVanilla("hud/food_full_hunger");
-   private static final Identifier FOOD_EMPTY_TEXTURE = Identifier.ofVanilla("hud/food_empty");
-   private static final Identifier FOOD_HALF_TEXTURE = Identifier.ofVanilla("hud/food_half");
-   private static final Identifier FOOD_FULL_TEXTURE = Identifier.ofVanilla("hud/food_full");
-   private static final Identifier AIR_TEXTURE = Identifier.ofVanilla("hud/air");
-   private static final Identifier AIR_BURSTING_TEXTURE = Identifier.ofVanilla("hud/air_bursting");
-   private static final Identifier AIR_EMPTY_TEXTURE = Identifier.ofVanilla("hud/air_empty");
-   private static final Identifier VEHICLE_CONTAINER_HEART_TEXTURE = Identifier.ofVanilla("hud/heart/vehicle_container");
-   private static final Identifier VEHICLE_FULL_HEART_TEXTURE = Identifier.ofVanilla("hud/heart/vehicle_full");
-   private static final Identifier VEHICLE_HALF_HEART_TEXTURE = Identifier.ofVanilla("hud/heart/vehicle_half");
-   private static final Identifier VIGNETTE_TEXTURE = Identifier.ofVanilla("textures/misc/vignette.png");
-   public static final Identifier NAUSEA_TEXTURE = Identifier.ofVanilla("textures/misc/nausea.png");
-   private static final Identifier SPYGLASS_SCOPE = Identifier.ofVanilla("textures/misc/spyglass_scope.png");
-   private static final Identifier POWDER_SNOW_OUTLINE = Identifier.ofVanilla("textures/misc/powder_snow_outline.png");
-   private static final Comparator SCOREBOARD_ENTRY_COMPARATOR;
-   private static final Text DEMO_EXPIRED_MESSAGE;
-   private static final Text SAVING_LEVEL_TEXT;
-   private static final float field_32168 = 5.0F;
-   private static final int field_59816 = 100;
-   private static final int field_32169 = 10;
-   private static final int field_32170 = 10;
-   private static final String SCOREBOARD_JOINER = ": ";
-   private static final float field_32172 = 0.2F;
-   private static final int field_33942 = 9;
-   private static final int field_33943 = 8;
-   private static final int field_54914 = 10;
-   private static final int field_54915 = 9;
-   private static final int field_54916 = 8;
-   private static final int field_54917 = 2;
-   private static final int SUBMERGED_IN_WATER_AIR_BUBBLE_DELAY = 1;
-   private static final float field_54920 = 0.5F;
-   private static final float field_54921 = 0.1F;
-   private static final float field_54922 = 1.0F;
-   private static final float field_54923 = 0.1F;
-   private static final int field_54924 = 3;
-   private static final int field_54925 = 5;
-   private static final float field_35431 = 0.2F;
-   private static final int field_52769 = 5;
-   private static final int field_52770 = 5;
-   private final Random random = Random.create();
-   private final MinecraftClient client;
-   private final ChatHud chatHud;
-   private int ticks;
-   @Nullable
-   private Text overlayMessage;
-   private int overlayRemaining;
-   private boolean overlayTinted;
-   private boolean canShowChatDisabledScreen;
-   public float vignetteDarkness = 1.0F;
-   private int heldItemTooltipFade;
-   private ItemStack currentStack;
-   private final DebugHud debugHud;
-   private final SubtitlesHud subtitlesHud;
-   private final SpectatorHud spectatorHud;
-   private final PlayerListHud playerListHud;
-   private final BossBarHud bossBarHud;
-   private int titleRemainTicks;
-   @Nullable
-   private Text title;
-   @Nullable
-   private Text subtitle;
-   private int titleFadeInTicks;
-   private int titleStayTicks;
-   private int titleFadeOutTicks;
-   private int lastHealthValue;
-   private int renderHealthValue;
-   private long lastHealthCheckTime;
-   private long heartJumpEndTick;
-   private int lastBurstBubble;
-   private float autosaveIndicatorAlpha;
-   private float lastAutosaveIndicatorAlpha;
-   private Pair currentBar;
-   private final Map bars;
-   private float spyglassScale;
+    private static final Identifier CROSSHAIR_TEXTURE = Identifier.ofVanilla((String)"hud/crosshair");
+    private static final Identifier CROSSHAIR_ATTACK_INDICATOR_FULL_TEXTURE = Identifier.ofVanilla((String)"hud/crosshair_attack_indicator_full");
+    private static final Identifier CROSSHAIR_ATTACK_INDICATOR_BACKGROUND_TEXTURE = Identifier.ofVanilla((String)"hud/crosshair_attack_indicator_background");
+    private static final Identifier CROSSHAIR_ATTACK_INDICATOR_PROGRESS_TEXTURE = Identifier.ofVanilla((String)"hud/crosshair_attack_indicator_progress");
+    private static final Identifier EFFECT_BACKGROUND_AMBIENT_TEXTURE = Identifier.ofVanilla((String)"hud/effect_background_ambient");
+    private static final Identifier EFFECT_BACKGROUND_TEXTURE = Identifier.ofVanilla((String)"hud/effect_background");
+    private static final Identifier HOTBAR_TEXTURE = Identifier.ofVanilla((String)"hud/hotbar");
+    private static final Identifier HOTBAR_SELECTION_TEXTURE = Identifier.ofVanilla((String)"hud/hotbar_selection");
+    private static final Identifier HOTBAR_OFFHAND_LEFT_TEXTURE = Identifier.ofVanilla((String)"hud/hotbar_offhand_left");
+    private static final Identifier HOTBAR_OFFHAND_RIGHT_TEXTURE = Identifier.ofVanilla((String)"hud/hotbar_offhand_right");
+    private static final Identifier HOTBAR_ATTACK_INDICATOR_BACKGROUND_TEXTURE = Identifier.ofVanilla((String)"hud/hotbar_attack_indicator_background");
+    private static final Identifier HOTBAR_ATTACK_INDICATOR_PROGRESS_TEXTURE = Identifier.ofVanilla((String)"hud/hotbar_attack_indicator_progress");
+    private static final Identifier ARMOR_EMPTY_TEXTURE = Identifier.ofVanilla((String)"hud/armor_empty");
+    private static final Identifier ARMOR_HALF_TEXTURE = Identifier.ofVanilla((String)"hud/armor_half");
+    private static final Identifier ARMOR_FULL_TEXTURE = Identifier.ofVanilla((String)"hud/armor_full");
+    private static final Identifier FOOD_EMPTY_HUNGER_TEXTURE = Identifier.ofVanilla((String)"hud/food_empty_hunger");
+    private static final Identifier FOOD_HALF_HUNGER_TEXTURE = Identifier.ofVanilla((String)"hud/food_half_hunger");
+    private static final Identifier FOOD_FULL_HUNGER_TEXTURE = Identifier.ofVanilla((String)"hud/food_full_hunger");
+    private static final Identifier FOOD_EMPTY_TEXTURE = Identifier.ofVanilla((String)"hud/food_empty");
+    private static final Identifier FOOD_HALF_TEXTURE = Identifier.ofVanilla((String)"hud/food_half");
+    private static final Identifier FOOD_FULL_TEXTURE = Identifier.ofVanilla((String)"hud/food_full");
+    private static final Identifier AIR_TEXTURE = Identifier.ofVanilla((String)"hud/air");
+    private static final Identifier AIR_BURSTING_TEXTURE = Identifier.ofVanilla((String)"hud/air_bursting");
+    private static final Identifier AIR_EMPTY_TEXTURE = Identifier.ofVanilla((String)"hud/air_empty");
+    private static final Identifier VEHICLE_CONTAINER_HEART_TEXTURE = Identifier.ofVanilla((String)"hud/heart/vehicle_container");
+    private static final Identifier VEHICLE_FULL_HEART_TEXTURE = Identifier.ofVanilla((String)"hud/heart/vehicle_full");
+    private static final Identifier VEHICLE_HALF_HEART_TEXTURE = Identifier.ofVanilla((String)"hud/heart/vehicle_half");
+    private static final Identifier VIGNETTE_TEXTURE = Identifier.ofVanilla((String)"textures/misc/vignette.png");
+    public static final Identifier NAUSEA_TEXTURE = Identifier.ofVanilla((String)"textures/misc/nausea.png");
+    private static final Identifier SPYGLASS_SCOPE = Identifier.ofVanilla((String)"textures/misc/spyglass_scope.png");
+    private static final Identifier POWDER_SNOW_OUTLINE = Identifier.ofVanilla((String)"textures/misc/powder_snow_outline.png");
+    private static final Comparator<ScoreboardEntry> SCOREBOARD_ENTRY_COMPARATOR = Comparator.comparing(ScoreboardEntry::value).reversed().thenComparing(ScoreboardEntry::owner, String.CASE_INSENSITIVE_ORDER);
+    private static final Text DEMO_EXPIRED_MESSAGE = Text.translatable((String)"demo.demoExpired");
+    private static final Text SAVING_LEVEL_TEXT = Text.translatable((String)"menu.savingLevel");
+    private static final float field_32168 = 5.0f;
+    private static final int field_59816 = 100;
+    private static final int field_32169 = 10;
+    private static final int field_32170 = 10;
+    private static final String SCOREBOARD_JOINER = ": ";
+    private static final float field_32172 = 0.2f;
+    private static final int field_33942 = 9;
+    private static final int field_33943 = 8;
+    private static final int field_54914 = 10;
+    private static final int field_54915 = 9;
+    private static final int field_54916 = 8;
+    private static final int field_54917 = 2;
+    private static final int SUBMERGED_IN_WATER_AIR_BUBBLE_DELAY = 1;
+    private static final float field_54920 = 0.5f;
+    private static final float field_54921 = 0.1f;
+    private static final float field_54922 = 1.0f;
+    private static final float field_54923 = 0.1f;
+    private static final int field_54924 = 3;
+    private static final int field_54925 = 5;
+    private static final float field_35431 = 0.2f;
+    private static final int field_52769 = 5;
+    private static final int field_52770 = 5;
+    private final Random random = Random.create();
+    private final MinecraftClient client;
+    private final ChatHud chatHud;
+    private int ticks;
+    private @Nullable Text overlayMessage;
+    private int overlayRemaining;
+    private boolean overlayTinted;
+    private boolean canShowChatDisabledScreen;
+    public float vignetteDarkness = 1.0f;
+    private int heldItemTooltipFade;
+    private ItemStack currentStack = ItemStack.EMPTY;
+    private final DebugHud debugHud;
+    private final SubtitlesHud subtitlesHud;
+    private final SpectatorHud spectatorHud;
+    private final PlayerListHud playerListHud;
+    private final BossBarHud bossBarHud;
+    private int titleRemainTicks;
+    private @Nullable Text title;
+    private @Nullable Text subtitle;
+    private int titleFadeInTicks;
+    private int titleStayTicks;
+    private int titleFadeOutTicks;
+    private int lastHealthValue;
+    private int renderHealthValue;
+    private long lastHealthCheckTime;
+    private long heartJumpEndTick;
+    private int lastBurstBubble;
+    private @Nullable Runnable deferredSubtitleRenderer;
+    private float autosaveIndicatorAlpha;
+    private float lastAutosaveIndicatorAlpha;
+    private Pair<BarType, Bar> currentBar = Pair.of((Object)BarType.EMPTY, (Object)Bar.EMPTY);
+    private final Map<BarType, Supplier<Bar>> bars;
+    private float spyglassScale;
 
-   public InGameHud(MinecraftClient client) {
-      this.currentStack = ItemStack.EMPTY;
-      this.currentBar = Pair.of(InGameHud.BarType.EMPTY, Bar.EMPTY);
-      this.client = client;
-      this.debugHud = new DebugHud(client);
-      this.spectatorHud = new SpectatorHud(client);
-      this.chatHud = new ChatHud(client);
-      this.playerListHud = new PlayerListHud(client, this);
-      this.bossBarHud = new BossBarHud(client);
-      this.subtitlesHud = new SubtitlesHud(client);
-      this.bars = ImmutableMap.of(InGameHud.BarType.EMPTY, () -> {
-         return Bar.EMPTY;
-      }, InGameHud.BarType.EXPERIENCE, () -> {
-         return new ExperienceBar(client);
-      }, InGameHud.BarType.LOCATOR, () -> {
-         return new LocatorBar(client);
-      }, InGameHud.BarType.JUMPABLE_VEHICLE, () -> {
-         return new JumpBar(client);
-      });
-      this.setDefaultTitleFade();
-   }
+    public InGameHud(MinecraftClient client) {
+        this.client = client;
+        this.debugHud = new DebugHud(client);
+        this.spectatorHud = new SpectatorHud(client);
+        this.chatHud = new ChatHud(client);
+        this.playerListHud = new PlayerListHud(client, this);
+        this.bossBarHud = new BossBarHud(client);
+        this.subtitlesHud = new SubtitlesHud(client);
+        this.bars = ImmutableMap.of((Object)BarType.EMPTY, () -> Bar.EMPTY, (Object)BarType.EXPERIENCE, () -> new ExperienceBar(client), (Object)BarType.LOCATOR, () -> new LocatorBar(client), (Object)BarType.JUMPABLE_VEHICLE, () -> new JumpBar(client));
+        this.setDefaultTitleFade();
+    }
 
-   public void setDefaultTitleFade() {
-      this.titleFadeInTicks = 10;
-      this.titleStayTicks = 70;
-      this.titleFadeOutTicks = 20;
-   }
+    public void setDefaultTitleFade() {
+        this.titleFadeInTicks = 10;
+        this.titleStayTicks = 70;
+        this.titleFadeOutTicks = 20;
+    }
 
-   public void render(DrawContext context, RenderTickCounter tickCounter) {
-      if (this.client.currentScreen == null || !(this.client.currentScreen instanceof DownloadingTerrainScreen)) {
-         if (!this.client.options.hudHidden) {
+    public void render(DrawContext context, RenderTickCounter tickCounter) {
+        if (this.client.currentScreen instanceof LevelLoadingScreen) {
+            return;
+        }
+        if (!this.client.options.hudHidden) {
             this.renderMiscOverlays(context, tickCounter);
             this.renderCrosshair(context, tickCounter);
             context.createNewRootLayer();
             this.renderMainHud(context, tickCounter);
             this.renderStatusEffectOverlay(context, tickCounter);
             this.renderBossBarHud(context, tickCounter);
-         }
-
-         this.renderSleepOverlay(context, tickCounter);
-         if (!this.client.options.hudHidden) {
+        }
+        this.renderSleepOverlay(context, tickCounter);
+        if (!this.client.options.hudHidden) {
             this.renderDemoTimer(context, tickCounter);
-            this.renderDebugHud(context, tickCounter);
             this.renderScoreboardSidebar(context, tickCounter);
             this.renderOverlayMessage(context, tickCounter);
             this.renderTitleAndSubtitle(context, tickCounter);
             this.renderChat(context, tickCounter);
             this.renderPlayerList(context, tickCounter);
-            this.renderSubtitlesHud(context, tickCounter);
-         }
+            this.renderSubtitlesHud(context, this.client.currentScreen == null || this.client.currentScreen.deferSubtitles());
+        } else if (this.client.currentScreen != null && this.client.currentScreen.deferSubtitles()) {
+            this.renderSubtitlesHud(context, true);
+        }
+    }
 
-      }
-   }
+    private void renderBossBarHud(DrawContext context, RenderTickCounter tickCounter) {
+        this.bossBarHud.render(context);
+    }
 
-   private void renderBossBarHud(DrawContext context, RenderTickCounter tickCounter) {
-      this.bossBarHud.render(context);
-   }
+    public void renderDebugHud(DrawContext context) {
+        this.debugHud.render(context);
+    }
 
-   private void renderDebugHud(DrawContext context, RenderTickCounter tickCounter) {
-      if (this.debugHud.shouldShowDebugHud()) {
-         context.createNewRootLayer();
-         this.debugHud.render(context);
-      }
+    private void renderSubtitlesHud(DrawContext context, boolean defer) {
+        if (defer) {
+            this.deferredSubtitleRenderer = () -> this.subtitlesHud.render(context);
+        } else {
+            this.deferredSubtitleRenderer = null;
+            this.subtitlesHud.render(context);
+        }
+    }
 
-   }
+    public void renderDeferredSubtitles() {
+        if (this.deferredSubtitleRenderer != null) {
+            this.deferredSubtitleRenderer.run();
+            this.deferredSubtitleRenderer = null;
+        }
+    }
 
-   private void renderSubtitlesHud(DrawContext context, RenderTickCounter tickCounter) {
-      this.subtitlesHud.render(context);
-   }
-
-   private void renderMiscOverlays(DrawContext context, RenderTickCounter tickCounter) {
-      if (MinecraftClient.isFancyGraphicsOrBetter()) {
-         this.renderVignetteOverlay(context, this.client.getCameraEntity());
-      }
-
-      ClientPlayerEntity clientPlayerEntity = this.client.player;
-      float f = tickCounter.getDynamicDeltaTicks();
-      this.spyglassScale = MathHelper.lerp(0.5F * f, this.spyglassScale, 1.125F);
-      if (this.client.options.getPerspective().isFirstPerson()) {
-         if (clientPlayerEntity.isUsingSpyglass()) {
-            this.renderSpyglassOverlay(context, this.spyglassScale);
-         } else {
-            this.spyglassScale = 0.5F;
-            EquipmentSlot[] var5 = EquipmentSlot.values();
-            int var6 = var5.length;
-
-            for(int var7 = 0; var7 < var6; ++var7) {
-               EquipmentSlot equipmentSlot = var5[var7];
-               ItemStack itemStack = clientPlayerEntity.getEquippedStack(equipmentSlot);
-               EquippableComponent equippableComponent = (EquippableComponent)itemStack.get(DataComponentTypes.EQUIPPABLE);
-               if (equippableComponent != null && equippableComponent.slot() == equipmentSlot && equippableComponent.cameraOverlay().isPresent()) {
-                  this.renderOverlay(context, ((Identifier)equippableComponent.cameraOverlay().get()).withPath((overlayTexture) -> {
-                     return "textures/" + overlayTexture + ".png";
-                  }), 1.0F);
-               }
+    private void renderMiscOverlays(DrawContext context, RenderTickCounter tickCounter) {
+        float j;
+        if (((Boolean)this.client.options.getVignette().getValue()).booleanValue()) {
+            this.renderVignetteOverlay(context, this.client.getCameraEntity());
+        }
+        ClientPlayerEntity clientPlayerEntity = this.client.player;
+        float f = tickCounter.getDynamicDeltaTicks();
+        this.spyglassScale = MathHelper.lerp((float)(0.5f * f), (float)this.spyglassScale, (float)1.125f);
+        if (this.client.options.getPerspective().isFirstPerson()) {
+            if (clientPlayerEntity.isUsingSpyglass()) {
+                this.renderSpyglassOverlay(context, this.spyglassScale);
+            } else {
+                this.spyglassScale = 0.5f;
+                for (EquipmentSlot equipmentSlot : EquipmentSlot.values()) {
+                    ItemStack itemStack = clientPlayerEntity.getEquippedStack(equipmentSlot);
+                    EquippableComponent equippableComponent = (EquippableComponent)itemStack.get(DataComponentTypes.EQUIPPABLE);
+                    if (equippableComponent == null || equippableComponent.slot() != equipmentSlot || !equippableComponent.cameraOverlay().isPresent()) continue;
+                    this.renderOverlay(context, ((Identifier)equippableComponent.cameraOverlay().get()).withPath(overlayTexture -> "textures/" + overlayTexture + ".png"), 1.0f);
+                }
             }
-         }
-      }
-
-      if (clientPlayerEntity.getFrozenTicks() > 0) {
-         this.renderOverlay(context, POWDER_SNOW_OUTLINE, clientPlayerEntity.getFreezingScale());
-      }
-
-      float g = tickCounter.getTickProgress(false);
-      float h = MathHelper.lerp(g, clientPlayerEntity.lastNauseaIntensity, clientPlayerEntity.nauseaIntensity);
-      float i = clientPlayerEntity.getEffectFadeFactor(StatusEffects.NAUSEA, g);
-      if (h > 0.0F) {
-         this.renderPortalOverlay(context, h);
-      } else if (i > 0.0F) {
-         float j = ((Double)this.client.options.getDistortionEffectScale().getValue()).floatValue();
-         if (j < 1.0F) {
-            float k = i * (1.0F - j);
+        }
+        if (clientPlayerEntity.getFrozenTicks() > 0) {
+            this.renderOverlay(context, POWDER_SNOW_OUTLINE, clientPlayerEntity.getFreezingScale());
+        }
+        float g = tickCounter.getTickProgress(false);
+        float h = MathHelper.lerp((float)g, (float)clientPlayerEntity.lastNauseaIntensity, (float)clientPlayerEntity.nauseaIntensity);
+        float i = clientPlayerEntity.getEffectFadeFactor(StatusEffects.NAUSEA, g);
+        if (h > 0.0f) {
+            this.renderPortalOverlay(context, h);
+        } else if (i > 0.0f && (j = ((Double)this.client.options.getDistortionEffectScale().getValue()).floatValue()) < 1.0f) {
+            float k = i * (1.0f - j);
             this.renderNauseaOverlay(context, k);
-         }
-      }
+        }
+    }
 
-   }
+    private void renderSleepOverlay(DrawContext context, RenderTickCounter tickCounter) {
+        if (this.client.player.getSleepTimer() <= 0) {
+            return;
+        }
+        Profilers.get().push("sleep");
+        context.createNewRootLayer();
+        float f = this.client.player.getSleepTimer();
+        float g = f / 100.0f;
+        if (g > 1.0f) {
+            g = 1.0f - (f - 100.0f) / 10.0f;
+        }
+        int i = (int)(220.0f * g) << 24 | 0x101020;
+        context.fill(0, 0, context.getScaledWindowWidth(), context.getScaledWindowHeight(), i);
+        Profilers.get().pop();
+    }
 
-   private void renderSleepOverlay(DrawContext context, RenderTickCounter tickCounter) {
-      if (this.client.player.getSleepTimer() > 0) {
-         Profilers.get().push("sleep");
-         context.createNewRootLayer();
-         float f = (float)this.client.player.getSleepTimer();
-         float g = f / 100.0F;
-         if (g > 1.0F) {
-            g = 1.0F - (f - 100.0F) / 10.0F;
-         }
-
-         int i = (int)(220.0F * g) << 24 | 1052704;
-         context.fill(0, 0, context.getScaledWindowWidth(), context.getScaledWindowHeight(), i);
-         Profilers.get().pop();
-      }
-   }
-
-   private void renderOverlayMessage(DrawContext context, RenderTickCounter tickCounter) {
-      TextRenderer textRenderer = this.getTextRenderer();
-      if (this.overlayMessage != null && this.overlayRemaining > 0) {
-         Profilers.get().push("overlayMessage");
-         float f = (float)this.overlayRemaining - tickCounter.getTickProgress(false);
-         int i = (int)(f * 255.0F / 20.0F);
-         if (i > 255) {
+    private void renderOverlayMessage(DrawContext context, RenderTickCounter tickCounter) {
+        TextRenderer textRenderer = this.getTextRenderer();
+        if (this.overlayMessage == null || this.overlayRemaining <= 0) {
+            return;
+        }
+        Profilers.get().push("overlayMessage");
+        float f = (float)this.overlayRemaining - tickCounter.getTickProgress(false);
+        int i = (int)(f * 255.0f / 20.0f);
+        if (i > 255) {
             i = 255;
-         }
-
-         if (i > 0) {
+        }
+        if (i > 0) {
             context.createNewRootLayer();
             context.getMatrices().pushMatrix();
             context.getMatrices().translate((float)(context.getScaledWindowWidth() / 2), (float)(context.getScaledWindowHeight() - 68));
-            int j;
-            if (this.overlayTinted) {
-               j = MathHelper.hsvToArgb(f / 50.0F, 0.7F, 0.6F, i);
-            } else {
-               j = ColorHelper.withAlpha(i, -1);
-            }
-
+            int j = this.overlayTinted ? MathHelper.hsvToArgb((float)(f / 50.0f), (float)0.7f, (float)0.6f, (int)i) : ColorHelper.whiteWithAlpha((int)i);
             int k = textRenderer.getWidth((StringVisitable)this.overlayMessage);
             context.drawTextWithBackground(textRenderer, this.overlayMessage, -k / 2, -4, k, j);
             context.getMatrices().popMatrix();
-         }
+        }
+        Profilers.get().pop();
+    }
 
-         Profilers.get().pop();
-      }
-   }
-
-   private void renderTitleAndSubtitle(DrawContext context, RenderTickCounter tickCounter) {
-      if (this.title != null && this.titleRemainTicks > 0) {
-         TextRenderer textRenderer = this.getTextRenderer();
-         Profilers.get().push("titleAndSubtitle");
-         float f = (float)this.titleRemainTicks - tickCounter.getTickProgress(false);
-         int i = 255;
-         if (this.titleRemainTicks > this.titleFadeOutTicks + this.titleStayTicks) {
+    private void renderTitleAndSubtitle(DrawContext context, RenderTickCounter tickCounter) {
+        if (this.title == null || this.titleRemainTicks <= 0) {
+            return;
+        }
+        TextRenderer textRenderer = this.getTextRenderer();
+        Profilers.get().push("titleAndSubtitle");
+        float f = (float)this.titleRemainTicks - tickCounter.getTickProgress(false);
+        int i = 255;
+        if (this.titleRemainTicks > this.titleFadeOutTicks + this.titleStayTicks) {
             float g = (float)(this.titleFadeInTicks + this.titleStayTicks + this.titleFadeOutTicks) - f;
-            i = (int)(g * 255.0F / (float)this.titleFadeInTicks);
-         }
-
-         if (this.titleRemainTicks <= this.titleFadeOutTicks) {
-            i = (int)(f * 255.0F / (float)this.titleFadeOutTicks);
-         }
-
-         i = MathHelper.clamp(i, 0, 255);
-         if (i > 0) {
+            i = (int)(g * 255.0f / (float)this.titleFadeInTicks);
+        }
+        if (this.titleRemainTicks <= this.titleFadeOutTicks) {
+            i = (int)(f * 255.0f / (float)this.titleFadeOutTicks);
+        }
+        if ((i = MathHelper.clamp((int)i, (int)0, (int)255)) > 0) {
             context.createNewRootLayer();
             context.getMatrices().pushMatrix();
             context.getMatrices().translate((float)(context.getScaledWindowWidth() / 2), (float)(context.getScaledWindowHeight() / 2));
             context.getMatrices().pushMatrix();
-            context.getMatrices().scale(4.0F, 4.0F);
+            context.getMatrices().scale(4.0f, 4.0f);
             int j = textRenderer.getWidth((StringVisitable)this.title);
-            int k = ColorHelper.withAlpha(i, -1);
+            int k = ColorHelper.whiteWithAlpha((int)i);
             context.drawTextWithBackground(textRenderer, this.title, -j / 2, -10, j, k);
             context.getMatrices().popMatrix();
             if (this.subtitle != null) {
-               context.getMatrices().pushMatrix();
-               context.getMatrices().scale(2.0F, 2.0F);
-               int l = textRenderer.getWidth((StringVisitable)this.subtitle);
-               context.drawTextWithBackground(textRenderer, this.subtitle, -l / 2, 5, l, k);
-               context.getMatrices().popMatrix();
+                context.getMatrices().pushMatrix();
+                context.getMatrices().scale(2.0f, 2.0f);
+                int l = textRenderer.getWidth((StringVisitable)this.subtitle);
+                context.drawTextWithBackground(textRenderer, this.subtitle, -l / 2, 5, l, k);
+                context.getMatrices().popMatrix();
             }
-
             context.getMatrices().popMatrix();
-         }
+        }
+        Profilers.get().pop();
+    }
 
-         Profilers.get().pop();
-      }
-   }
+    private void renderChat(DrawContext context, RenderTickCounter tickCounter) {
+        if (!this.chatHud.isChatFocused()) {
+            Window window = this.client.getWindow();
+            int i = MathHelper.floor((double)this.client.mouse.getScaledX(window));
+            int j = MathHelper.floor((double)this.client.mouse.getScaledY(window));
+            context.createNewRootLayer();
+            this.chatHud.render(context, this.getTextRenderer(), this.ticks, i, j, false, false);
+        }
+    }
 
-   private void renderChat(DrawContext context, RenderTickCounter tickCounter) {
-      if (!this.chatHud.isChatFocused()) {
-         Window window = this.client.getWindow();
-         int i = MathHelper.floor(this.client.mouse.getScaledX(window));
-         int j = MathHelper.floor(this.client.mouse.getScaledY(window));
-         context.createNewRootLayer();
-         this.chatHud.render(context, this.ticks, i, j, false);
-      }
-
-   }
-
-   private void renderScoreboardSidebar(DrawContext context, RenderTickCounter tickCounter) {
-      Scoreboard scoreboard = this.client.world.getScoreboard();
-      ScoreboardObjective scoreboardObjective = null;
-      Team team = scoreboard.getScoreHolderTeam(this.client.player.getNameForScoreboard());
-      if (team != null) {
-         ScoreboardDisplaySlot scoreboardDisplaySlot = ScoreboardDisplaySlot.fromFormatting(team.getColor());
-         if (scoreboardDisplaySlot != null) {
+    private void renderScoreboardSidebar(DrawContext context, RenderTickCounter tickCounter) {
+        ScoreboardObjective scoreboardObjective2;
+        ScoreboardDisplaySlot scoreboardDisplaySlot;
+        Scoreboard scoreboard = this.client.world.getScoreboard();
+        ScoreboardObjective scoreboardObjective = null;
+        Team team = scoreboard.getScoreHolderTeam(this.client.player.getNameForScoreboard());
+        if (team != null && (scoreboardDisplaySlot = ScoreboardDisplaySlot.fromFormatting((Formatting)team.getColor())) != null) {
             scoreboardObjective = scoreboard.getObjectiveForSlot(scoreboardDisplaySlot);
-         }
-      }
+        }
+        ScoreboardObjective scoreboardObjective3 = scoreboardObjective2 = scoreboardObjective != null ? scoreboardObjective : scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.SIDEBAR);
+        if (scoreboardObjective2 != null) {
+            context.createNewRootLayer();
+            this.renderScoreboardSidebar(context, scoreboardObjective2);
+        }
+    }
 
-      ScoreboardObjective scoreboardObjective2 = scoreboardObjective != null ? scoreboardObjective : scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.SIDEBAR);
-      if (scoreboardObjective2 != null) {
-         context.createNewRootLayer();
-         this.renderScoreboardSidebar(context, scoreboardObjective2);
-      }
+    private void renderPlayerList(DrawContext context, RenderTickCounter tickCounter) {
+        Scoreboard scoreboard = this.client.world.getScoreboard();
+        ScoreboardObjective scoreboardObjective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.LIST);
+        if (this.client.options.playerListKey.isPressed() && (!this.client.isInSingleplayer() || this.client.player.networkHandler.getListedPlayerListEntries().size() > 1 || scoreboardObjective != null)) {
+            this.playerListHud.setVisible(true);
+            context.createNewRootLayer();
+            this.playerListHud.render(context, context.getScaledWindowWidth(), scoreboard, scoreboardObjective);
+        } else {
+            this.playerListHud.setVisible(false);
+        }
+    }
 
-   }
-
-   private void renderPlayerList(DrawContext context, RenderTickCounter tickCounter) {
-      Scoreboard scoreboard = this.client.world.getScoreboard();
-      ScoreboardObjective scoreboardObjective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.LIST);
-      if (!this.client.options.playerListKey.isPressed() || this.client.isInSingleplayer() && this.client.player.networkHandler.getListedPlayerListEntries().size() <= 1 && scoreboardObjective == null) {
-         this.playerListHud.setVisible(false);
-      } else {
-         this.playerListHud.setVisible(true);
-         context.createNewRootLayer();
-         this.playerListHud.render(context, context.getScaledWindowWidth(), scoreboard, scoreboardObjective);
-      }
-
-   }
-
-   private void renderCrosshair(DrawContext context, RenderTickCounter tickCounter) {
-      GameOptions gameOptions = this.client.options;
-      if (gameOptions.getPerspective().isFirstPerson()) {
-         if (this.client.interactionManager.getCurrentGameMode() != GameMode.SPECTATOR || this.shouldRenderSpectatorCrosshair(this.client.crosshairTarget)) {
-            if (!this.shouldRenderCrosshair()) {
-               context.createNewRootLayer();
-               int i = true;
-               context.drawGuiTexture(RenderPipelines.CROSSHAIR, CROSSHAIR_TEXTURE, (context.getScaledWindowWidth() - 15) / 2, (context.getScaledWindowHeight() - 15) / 2, 15, 15);
-               if (this.client.options.getAttackIndicator().getValue() == AttackIndicator.CROSSHAIR) {
-                  float f = this.client.player.getAttackCooldownProgress(0.0F);
-                  boolean bl = false;
-                  if (this.client.targetedEntity != null && this.client.targetedEntity instanceof LivingEntity && f >= 1.0F) {
-                     bl = this.client.player.getAttackCooldownProgressPerTick() > 5.0F;
-                     bl &= this.client.targetedEntity.isAlive();
-                  }
-
-                  int j = context.getScaledWindowHeight() / 2 - 7 + 16;
-                  int k = context.getScaledWindowWidth() / 2 - 8;
-                  if (bl) {
-                     context.drawGuiTexture(RenderPipelines.CROSSHAIR, CROSSHAIR_ATTACK_INDICATOR_FULL_TEXTURE, k, j, 16, 16);
-                  } else if (f < 1.0F) {
-                     int l = (int)(f * 17.0F);
-                     context.drawGuiTexture(RenderPipelines.CROSSHAIR, CROSSHAIR_ATTACK_INDICATOR_BACKGROUND_TEXTURE, k, j, 16, 4);
-                     context.drawGuiTexture(RenderPipelines.CROSSHAIR, CROSSHAIR_ATTACK_INDICATOR_PROGRESS_TEXTURE, 16, 4, 0, 0, k, j, l, 4);
-                  }
-               }
+    private void renderCrosshair(DrawContext context, RenderTickCounter tickCounter) {
+        GameOptions gameOptions = this.client.options;
+        if (!gameOptions.getPerspective().isFirstPerson()) {
+            return;
+        }
+        if (this.client.interactionManager.getCurrentGameMode() == GameMode.SPECTATOR && !this.shouldRenderSpectatorCrosshair(this.client.crosshairTarget)) {
+            return;
+        }
+        if (!this.client.debugHudEntryList.isEntryVisible(DebugHudEntries.THREE_DIMENSIONAL_CROSSHAIR)) {
+            context.createNewRootLayer();
+            int i = 15;
+            context.drawGuiTexture(RenderPipelines.CROSSHAIR, CROSSHAIR_TEXTURE, (context.getScaledWindowWidth() - 15) / 2, (context.getScaledWindowHeight() - 15) / 2, 15, 15);
+            if (this.client.options.getAttackIndicator().getValue() == AttackIndicator.CROSSHAIR) {
+                float f = this.client.player.getAttackCooldownProgress(0.0f);
+                boolean bl = false;
+                if (this.client.targetedEntity != null && this.client.targetedEntity instanceof LivingEntity && f >= 1.0f) {
+                    bl = this.client.player.getAttackCooldownProgressPerTick() > 5.0f;
+                    bl &= this.client.targetedEntity.isAlive();
+                    AttackRangeComponent attackRangeComponent = (AttackRangeComponent)this.client.player.getActiveOrMainHandStack().get(DataComponentTypes.ATTACK_RANGE);
+                    bl &= attackRangeComponent == null || attackRangeComponent.isWithinRange((LivingEntity)this.client.player, this.client.crosshairTarget.getPos());
+                }
+                int j = context.getScaledWindowHeight() / 2 - 7 + 16;
+                int k = context.getScaledWindowWidth() / 2 - 8;
+                if (bl) {
+                    context.drawGuiTexture(RenderPipelines.CROSSHAIR, CROSSHAIR_ATTACK_INDICATOR_FULL_TEXTURE, k, j, 16, 16);
+                } else if (f < 1.0f) {
+                    int l = (int)(f * 17.0f);
+                    context.drawGuiTexture(RenderPipelines.CROSSHAIR, CROSSHAIR_ATTACK_INDICATOR_BACKGROUND_TEXTURE, k, j, 16, 4);
+                    context.drawGuiTexture(RenderPipelines.CROSSHAIR, CROSSHAIR_ATTACK_INDICATOR_PROGRESS_TEXTURE, 16, 4, 0, 0, k, j, l, 4);
+                }
             }
+        }
+    }
 
-         }
-      }
-   }
+    private boolean shouldRenderSpectatorCrosshair(@Nullable HitResult hitResult) {
+        if (hitResult == null) {
+            return false;
+        }
+        if (hitResult.getType() == HitResult.Type.ENTITY) {
+            return ((EntityHitResult)hitResult).getEntity() instanceof NamedScreenHandlerFactory;
+        }
+        if (hitResult.getType() == HitResult.Type.BLOCK) {
+            ClientWorld world = this.client.world;
+            BlockPos blockPos = ((BlockHitResult)hitResult).getBlockPos();
+            return world.getBlockState(blockPos).createScreenHandlerFactory((World)world, blockPos) != null;
+        }
+        return false;
+    }
 
-   public boolean shouldRenderCrosshair() {
-      return this.debugHud.shouldShowDebugHud() && this.client.options.getPerspective() == Perspective.FIRST_PERSON && !this.client.player.hasReducedDebugInfo() && !(Boolean)this.client.options.getReducedDebugInfo().getValue();
-   }
-
-   private boolean shouldRenderSpectatorCrosshair(@Nullable HitResult hitResult) {
-      if (hitResult == null) {
-         return false;
-      } else if (hitResult.getType() == HitResult.Type.ENTITY) {
-         return ((EntityHitResult)hitResult).getEntity() instanceof NamedScreenHandlerFactory;
-      } else if (hitResult.getType() == HitResult.Type.BLOCK) {
-         BlockPos blockPos = ((BlockHitResult)hitResult).getBlockPos();
-         World world = this.client.world;
-         return world.getBlockState(blockPos).createScreenHandlerFactory(world, blockPos) != null;
-      } else {
-         return false;
-      }
-   }
-
-   private void renderStatusEffectOverlay(DrawContext context, RenderTickCounter tickCounter) {
-      Collection collection = this.client.player.getStatusEffects();
-      if (!collection.isEmpty() && (this.client.currentScreen == null || !this.client.currentScreen.showsStatusEffects())) {
-         int i = 0;
-         int j = 0;
-         Iterator var6 = Ordering.natural().reverse().sortedCopy(collection).iterator();
-
-         while(var6.hasNext()) {
-            StatusEffectInstance statusEffectInstance = (StatusEffectInstance)var6.next();
+    private void renderStatusEffectOverlay(DrawContext context, RenderTickCounter tickCounter) {
+        Collection collection = this.client.player.getStatusEffects();
+        if (collection.isEmpty() || this.client.currentScreen != null && this.client.currentScreen.showsStatusEffects()) {
+            return;
+        }
+        int i = 0;
+        int j = 0;
+        for (StatusEffectInstance statusEffectInstance : Ordering.natural().reverse().sortedCopy((Iterable)collection)) {
             RegistryEntry registryEntry = statusEffectInstance.getEffectType();
-            if (statusEffectInstance.shouldShowIcon()) {
-               int k = context.getScaledWindowWidth();
-               int l = 1;
-               if (this.client.isDemo()) {
-                  l += 15;
-               }
-
-               if (((StatusEffect)registryEntry.value()).isBeneficial()) {
-                  ++i;
-                  k -= 25 * i;
-               } else {
-                  ++j;
-                  k -= 25 * j;
-                  l += 26;
-               }
-
-               float f = 1.0F;
-               if (statusEffectInstance.isAmbient()) {
-                  context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, EFFECT_BACKGROUND_AMBIENT_TEXTURE, k, l, 24, 24);
-               } else {
-                  context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, EFFECT_BACKGROUND_TEXTURE, k, l, 24, 24);
-                  if (statusEffectInstance.isDurationBelow(200)) {
-                     int m = statusEffectInstance.getDuration();
-                     int n = 10 - m / 20;
-                     f = MathHelper.clamp((float)m / 10.0F / 5.0F * 0.5F, 0.0F, 0.5F) + MathHelper.cos((float)m * 3.1415927F / 5.0F) * MathHelper.clamp((float)n / 10.0F * 0.25F, 0.0F, 0.25F);
-                     f = MathHelper.clamp(f, 0.0F, 1.0F);
-                  }
-               }
-
-               context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, getEffectTexture(registryEntry), k + 3, l + 3, 18, 18, ColorHelper.getWhite(f));
+            if (!statusEffectInstance.shouldShowIcon()) continue;
+            int k = context.getScaledWindowWidth();
+            int l = 1;
+            if (this.client.isDemo()) {
+                l += 15;
             }
-         }
-
-      }
-   }
-
-   public static Identifier getEffectTexture(RegistryEntry effect) {
-      return (Identifier)effect.getKey().map(RegistryKey::getValue).map((id) -> {
-         return id.withPrefixedPath("mob_effect/");
-      }).orElseGet(MissingSprite::getMissingSpriteId);
-   }
-
-   private void renderMainHud(DrawContext context, RenderTickCounter tickCounter) {
-      if (this.client.interactionManager.getCurrentGameMode() == GameMode.SPECTATOR) {
-         this.spectatorHud.renderSpectatorMenu(context);
-      } else {
-         this.renderHotbar(context, tickCounter);
-      }
-
-      if (this.client.interactionManager.hasStatusBars()) {
-         this.renderStatusBars(context);
-      }
-
-      this.renderMountHealth(context);
-      BarType barType = this.getCurrentBarType();
-      if (barType != this.currentBar.getKey()) {
-         this.currentBar = Pair.of(barType, (Bar)((Supplier)this.bars.get(barType)).get());
-      }
-
-      ((Bar)this.currentBar.getValue()).renderBar(context, tickCounter);
-      if (this.client.interactionManager.hasExperienceBar() && this.client.player.experienceLevel > 0) {
-         Bar.drawExperienceLevel(context, this.client.textRenderer, this.client.player.experienceLevel);
-      }
-
-      ((Bar)this.currentBar.getValue()).renderAddons(context, tickCounter);
-      if (this.client.interactionManager.getCurrentGameMode() != GameMode.SPECTATOR) {
-         this.renderHeldItemTooltip(context);
-      } else if (this.client.player.isSpectator()) {
-         this.spectatorHud.render(context);
-      }
-
-   }
-
-   private void renderHotbar(DrawContext context, RenderTickCounter tickCounter) {
-      PlayerEntity playerEntity = this.getCameraPlayer();
-      if (playerEntity != null) {
-         ItemStack itemStack = playerEntity.getOffHandStack();
-         Arm arm = playerEntity.getMainArm().getOpposite();
-         int i = context.getScaledWindowWidth() / 2;
-         int j = true;
-         int k = true;
-         context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, HOTBAR_TEXTURE, i - 91, context.getScaledWindowHeight() - 22, 182, 22);
-         context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, HOTBAR_SELECTION_TEXTURE, i - 91 - 1 + playerEntity.getInventory().getSelectedSlot() * 20, context.getScaledWindowHeight() - 22 - 1, 24, 23);
-         if (!itemStack.isEmpty()) {
-            if (arm == Arm.LEFT) {
-               context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, HOTBAR_OFFHAND_LEFT_TEXTURE, i - 91 - 29, context.getScaledWindowHeight() - 23, 29, 24);
+            if (((StatusEffect)registryEntry.value()).isBeneficial()) {
+                k -= 25 * ++i;
             } else {
-               context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, HOTBAR_OFFHAND_RIGHT_TEXTURE, i + 91, context.getScaledWindowHeight() - 23, 29, 24);
+                k -= 25 * ++j;
+                l += 26;
             }
-         }
+            float f = 1.0f;
+            if (statusEffectInstance.isAmbient()) {
+                context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, EFFECT_BACKGROUND_AMBIENT_TEXTURE, k, l, 24, 24);
+            } else {
+                context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, EFFECT_BACKGROUND_TEXTURE, k, l, 24, 24);
+                if (statusEffectInstance.isDurationBelow(200)) {
+                    int m = statusEffectInstance.getDuration();
+                    int n = 10 - m / 20;
+                    f = MathHelper.clamp((float)((float)m / 10.0f / 5.0f * 0.5f), (float)0.0f, (float)0.5f) + MathHelper.cos((double)((float)m * (float)Math.PI / 5.0f)) * MathHelper.clamp((float)((float)n / 10.0f * 0.25f), (float)0.0f, (float)0.25f);
+                    f = MathHelper.clamp((float)f, (float)0.0f, (float)1.0f);
+                }
+            }
+            context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, InGameHud.getEffectTexture((RegistryEntry)registryEntry), k + 3, l + 3, 18, 18, ColorHelper.getWhite((float)f));
+        }
+    }
 
-         int l = 1;
+    public static Identifier getEffectTexture(RegistryEntry<StatusEffect> effect) {
+        return effect.getKey().map(RegistryKey::getValue).map(id -> id.withPrefixedPath("mob_effect/")).orElseGet(MissingSprite::getMissingSpriteId);
+    }
 
-         int m;
-         int n;
-         int o;
-         for(m = 0; m < 9; ++m) {
+    private void renderMainHud(DrawContext context, RenderTickCounter tickCounter) {
+        if (this.client.interactionManager.getCurrentGameMode() == GameMode.SPECTATOR) {
+            this.spectatorHud.renderSpectatorMenu(context);
+        } else {
+            this.renderHotbar(context, tickCounter);
+        }
+        if (this.client.interactionManager.hasStatusBars()) {
+            this.renderStatusBars(context);
+        }
+        this.renderMountHealth(context);
+        BarType barType = this.getCurrentBarType();
+        if (barType != this.currentBar.getKey()) {
+            this.currentBar = Pair.of((Object)barType, (Object)((Bar)((Supplier)this.bars.get(barType)).get()));
+        }
+        ((Bar)this.currentBar.getValue()).renderBar(context, tickCounter);
+        if (this.client.interactionManager.hasExperienceBar() && this.client.player.experienceLevel > 0) {
+            Bar.drawExperienceLevel((DrawContext)context, (TextRenderer)this.client.textRenderer, (int)this.client.player.experienceLevel);
+        }
+        ((Bar)this.currentBar.getValue()).renderAddons(context, tickCounter);
+        if (this.client.interactionManager.getCurrentGameMode() != GameMode.SPECTATOR) {
+            this.renderHeldItemTooltip(context);
+        } else if (this.client.player.isSpectator()) {
+            this.spectatorHud.render(context);
+        }
+    }
+
+    private void renderHotbar(DrawContext context, RenderTickCounter tickCounter) {
+        float f;
+        int o;
+        int n;
+        int m;
+        PlayerEntity playerEntity = this.getCameraPlayer();
+        if (playerEntity == null) {
+            return;
+        }
+        ItemStack itemStack = playerEntity.getOffHandStack();
+        Arm arm = playerEntity.getMainArm().getOpposite();
+        int i = context.getScaledWindowWidth() / 2;
+        int j = 182;
+        int k = 91;
+        context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, HOTBAR_TEXTURE, i - 91, context.getScaledWindowHeight() - 22, 182, 22);
+        context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, HOTBAR_SELECTION_TEXTURE, i - 91 - 1 + playerEntity.getInventory().getSelectedSlot() * 20, context.getScaledWindowHeight() - 22 - 1, 24, 23);
+        if (!itemStack.isEmpty()) {
+            if (arm == Arm.LEFT) {
+                context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, HOTBAR_OFFHAND_LEFT_TEXTURE, i - 91 - 29, context.getScaledWindowHeight() - 23, 29, 24);
+            } else {
+                context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, HOTBAR_OFFHAND_RIGHT_TEXTURE, i + 91, context.getScaledWindowHeight() - 23, 29, 24);
+            }
+        }
+        int l = 1;
+        for (m = 0; m < 9; ++m) {
             n = i - 90 + m * 20 + 2;
             o = context.getScaledWindowHeight() - 16 - 3;
             this.renderHotbarItem(context, n, o, tickCounter, playerEntity, playerEntity.getInventory().getStack(m), l++);
-         }
-
-         if (!itemStack.isEmpty()) {
+        }
+        if (!itemStack.isEmpty()) {
             m = context.getScaledWindowHeight() - 16 - 3;
             if (arm == Arm.LEFT) {
-               this.renderHotbarItem(context, i - 91 - 26, m, tickCounter, playerEntity, itemStack, l++);
+                this.renderHotbarItem(context, i - 91 - 26, m, tickCounter, playerEntity, itemStack, l++);
             } else {
-               this.renderHotbarItem(context, i + 91 + 10, m, tickCounter, playerEntity, itemStack, l++);
+                this.renderHotbarItem(context, i + 91 + 10, m, tickCounter, playerEntity, itemStack, l++);
             }
-         }
-
-         if (this.client.options.getAttackIndicator().getValue() == AttackIndicator.HOTBAR) {
-            float f = this.client.player.getAttackCooldownProgress(0.0F);
-            if (f < 1.0F) {
-               n = context.getScaledWindowHeight() - 20;
-               o = i + 91 + 6;
-               if (arm == Arm.RIGHT) {
-                  o = i - 91 - 22;
-               }
-
-               int p = (int)(f * 19.0F);
-               context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, HOTBAR_ATTACK_INDICATOR_BACKGROUND_TEXTURE, o, n, 18, 18);
-               context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, HOTBAR_ATTACK_INDICATOR_PROGRESS_TEXTURE, 18, 18, 0, 18 - p, o, n + 18 - p, 18, p);
+        }
+        if (this.client.options.getAttackIndicator().getValue() == AttackIndicator.HOTBAR && (f = this.client.player.getAttackCooldownProgress(0.0f)) < 1.0f) {
+            n = context.getScaledWindowHeight() - 20;
+            o = i + 91 + 6;
+            if (arm == Arm.RIGHT) {
+                o = i - 91 - 22;
             }
-         }
+            int p = (int)(f * 19.0f);
+            context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, HOTBAR_ATTACK_INDICATOR_BACKGROUND_TEXTURE, o, n, 18, 18);
+            context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, HOTBAR_ATTACK_INDICATOR_PROGRESS_TEXTURE, 18, 18, 0, 18 - p, o, n + 18 - p, 18, p);
+        }
+    }
 
-      }
-   }
-
-   private void renderHeldItemTooltip(DrawContext context) {
-      Profilers.get().push("selectedItemName");
-      if (this.heldItemTooltipFade > 0 && !this.currentStack.isEmpty()) {
-         MutableText mutableText = Text.empty().append(this.currentStack.getName()).formatted(this.currentStack.getRarity().getFormatting());
-         if (this.currentStack.contains(DataComponentTypes.CUSTOM_NAME)) {
-            mutableText.formatted(Formatting.ITALIC);
-         }
-
-         int i = this.getTextRenderer().getWidth((StringVisitable)mutableText);
-         int j = (context.getScaledWindowWidth() - i) / 2;
-         int k = context.getScaledWindowHeight() - 59;
-         if (!this.client.interactionManager.hasStatusBars()) {
-            k += 14;
-         }
-
-         int l = (int)((float)this.heldItemTooltipFade * 256.0F / 10.0F);
-         if (l > 255) {
-            l = 255;
-         }
-
-         if (l > 0) {
-            context.drawTextWithBackground(this.getTextRenderer(), mutableText, j, k, i, ColorHelper.withAlpha(l, -1));
-         }
-      }
-
-      Profilers.get().pop();
-   }
-
-   private void renderDemoTimer(DrawContext context, RenderTickCounter tickCounter) {
-      if (this.client.isDemo()) {
-         Profilers.get().push("demo");
-         context.createNewRootLayer();
-         Object text;
-         if (this.client.world.getTime() >= 120500L) {
-            text = DEMO_EXPIRED_MESSAGE;
-         } else {
-            text = Text.translatable("demo.remainingTime", StringHelper.formatTicks((int)(120500L - this.client.world.getTime()), this.client.world.getTickManager().getTickRate()));
-         }
-
-         int i = this.getTextRenderer().getWidth((StringVisitable)text);
-         int j = context.getScaledWindowWidth() - i - 10;
-         int k = true;
-         context.drawTextWithBackground(this.getTextRenderer(), (Text)text, j, 5, i, -1);
-         Profilers.get().pop();
-      }
-   }
-
-   private void renderScoreboardSidebar(DrawContext context, ScoreboardObjective objective) {
-      Scoreboard scoreboard = objective.getScoreboard();
-      NumberFormat numberFormat = objective.getNumberFormatOr(StyledNumberFormat.RED);
-      SidebarEntry[] sidebarEntrys = (SidebarEntry[])scoreboard.getScoreboardEntries(objective).stream().filter((score) -> {
-         return !score.hidden();
-      }).sorted(SCOREBOARD_ENTRY_COMPARATOR).limit(15L).map((scoreboardEntry) -> {
-         Team team = scoreboard.getScoreHolderTeam(scoreboardEntry.owner());
-         Text text = scoreboardEntry.name();
-         Text text2 = Team.decorateName(team, text);
-         Text text3 = scoreboardEntry.formatted(numberFormat);
-         int i = this.getTextRenderer().getWidth((StringVisitable)text3);
-
-         @Environment(EnvType.CLIENT)
-         record SidebarEntry(Text name, Text score, int scoreWidth) {
-            final Text name;
-            final Text score;
-            final int scoreWidth;
-
-            SidebarEntry(Text text, Text text2, int i) {
-               this.name = text;
-               this.score = text2;
-               this.scoreWidth = i;
+    private void renderHeldItemTooltip(DrawContext context) {
+        Profilers.get().push("selectedItemName");
+        if (this.heldItemTooltipFade > 0 && !this.currentStack.isEmpty()) {
+            int l;
+            MutableText mutableText = Text.empty().append(this.currentStack.getName()).formatted(this.currentStack.getRarity().getFormatting());
+            if (this.currentStack.contains(DataComponentTypes.CUSTOM_NAME)) {
+                mutableText.formatted(Formatting.ITALIC);
             }
-
-            public Text name() {
-               return this.name;
+            int i = this.getTextRenderer().getWidth((StringVisitable)mutableText);
+            int j = (context.getScaledWindowWidth() - i) / 2;
+            int k = context.getScaledWindowHeight() - 59;
+            if (!this.client.interactionManager.hasStatusBars()) {
+                k += 14;
             }
-
-            public Text score() {
-               return this.score;
+            if ((l = (int)((float)this.heldItemTooltipFade * 256.0f / 10.0f)) > 255) {
+                l = 255;
             }
-
-            public int scoreWidth() {
-               return this.scoreWidth;
+            if (l > 0) {
+                context.drawTextWithBackground(this.getTextRenderer(), (Text)mutableText, j, k, i, ColorHelper.whiteWithAlpha((int)l));
             }
-         }
+        }
+        Profilers.get().pop();
+    }
 
-         return new SidebarEntry(text2, text3, i);
-      }).toArray((size) -> {
-         return new SidebarEntry[size];
-      });
-      Text text = objective.getDisplayName();
-      int i = this.getTextRenderer().getWidth((StringVisitable)text);
-      int j = i;
-      int k = this.getTextRenderer().getWidth(": ");
-      SidebarEntry[] var10 = sidebarEntrys;
-      int m = sidebarEntrys.length;
+    private void renderDemoTimer(DrawContext context, RenderTickCounter tickCounter) {
+        if (!this.client.isDemo()) {
+            return;
+        }
+        Profilers.get().push("demo");
+        context.createNewRootLayer();
+        Object text = this.client.world.getTime() >= 120500L ? DEMO_EXPIRED_MESSAGE : Text.translatable((String)"demo.remainingTime", (Object[])new Object[]{StringHelper.formatTicks((int)((int)(120500L - this.client.world.getTime())), (float)this.client.world.getTickManager().getTickRate())});
+        int i = this.getTextRenderer().getWidth((StringVisitable)text);
+        int j = context.getScaledWindowWidth() - i - 10;
+        int k = 5;
+        context.drawTextWithBackground(this.getTextRenderer(), text, j, 5, i, -1);
+        Profilers.get().pop();
+    }
 
-      int n;
-      for(n = 0; n < m; ++n) {
-         SidebarEntry sidebarEntry = var10[n];
-         j = Math.max(j, this.getTextRenderer().getWidth((StringVisitable)sidebarEntry.name) + (sidebarEntry.scoreWidth > 0 ? k + sidebarEntry.scoreWidth : 0));
-      }
+    private void renderScoreboardSidebar(DrawContext context, ScoreboardObjective objective) {
+        int i;
+        Scoreboard scoreboard = objective.getScoreboard();
+        NumberFormat numberFormat = objective.getNumberFormatOr((NumberFormat)StyledNumberFormat.RED);
+        SidebarEntry[] sidebarEntrys = (SidebarEntry[])scoreboard.getScoreboardEntries(objective).stream().filter(score -> !score.hidden()).sorted(SCOREBOARD_ENTRY_COMPARATOR).limit(15L).map(scoreboardEntry -> {
+            Team team = scoreboard.getScoreHolderTeam(scoreboardEntry.owner());
+            Text text = scoreboardEntry.name();
+            MutableText text2 = Team.decorateName((AbstractTeam)team, (Text)text);
+            MutableText text3 = scoreboardEntry.formatted(numberFormat);
+            int i = this.getTextRenderer().getWidth((StringVisitable)text3);
+            return new SidebarEntry((Text)text2, (Text)text3, i);
+        }).toArray(size -> new SidebarEntry[size]);
+        Text text = objective.getDisplayName();
+        int j = i = this.getTextRenderer().getWidth((StringVisitable)text);
+        int k = this.getTextRenderer().getWidth(": ");
+        for (SidebarEntry sidebarEntry : sidebarEntrys) {
+            j = Math.max(j, this.getTextRenderer().getWidth((StringVisitable)sidebarEntry.name) + (sidebarEntry.scoreWidth > 0 ? k + sidebarEntry.scoreWidth : 0));
+        }
+        int l = j;
+        int m = sidebarEntrys.length;
+        Objects.requireNonNull(this.getTextRenderer());
+        int n = m * 9;
+        int o = context.getScaledWindowHeight() / 2 + n / 3;
+        int p = 3;
+        int q = context.getScaledWindowWidth() - l - 3;
+        int r = context.getScaledWindowWidth() - 3 + 2;
+        int s = this.client.options.getTextBackgroundColor(0.3f);
+        int t = this.client.options.getTextBackgroundColor(0.4f);
+        Objects.requireNonNull(this.getTextRenderer());
+        int u = o - m * 9;
+        Objects.requireNonNull(this.getTextRenderer());
+        context.fill(q - 2, u - 9 - 1, r, u - 1, t);
+        context.fill(q - 2, u - 1, r, o, s);
+        TextRenderer textRenderer = this.getTextRenderer();
+        int n2 = q + l / 2 - i / 2;
+        Objects.requireNonNull(this.getTextRenderer());
+        context.drawText(textRenderer, text, n2, u - 9, -1, false);
+        for (int v = 0; v < m; ++v) {
+            SidebarEntry sidebarEntry2 = sidebarEntrys[v];
+            Objects.requireNonNull(this.getTextRenderer());
+            int w = o - (m - v) * 9;
+            context.drawText(this.getTextRenderer(), sidebarEntry2.name, q, w, -1, false);
+            context.drawText(this.getTextRenderer(), sidebarEntry2.score, r - sidebarEntry2.scoreWidth, w, -1, false);
+        }
+    }
 
-      m = sidebarEntrys.length;
-      Objects.requireNonNull(this.getTextRenderer());
-      n = m * 9;
-      int o = context.getScaledWindowHeight() / 2 + n / 3;
-      int p = true;
-      int q = context.getScaledWindowWidth() - j - 3;
-      int r = context.getScaledWindowWidth() - 3 + 2;
-      int s = this.client.options.getTextBackgroundColor(0.3F);
-      int t = this.client.options.getTextBackgroundColor(0.4F);
-      Objects.requireNonNull(this.getTextRenderer());
-      int u = o - m * 9;
-      int var10001 = q - 2;
-      Objects.requireNonNull(this.getTextRenderer());
-      context.fill(var10001, u - 9 - 1, r, u - 1, t);
-      context.fill(q - 2, u - 1, r, o, s);
-      TextRenderer var24 = this.getTextRenderer();
-      int var10003 = q + j / 2 - i / 2;
-      Objects.requireNonNull(this.getTextRenderer());
-      context.drawText(var24, (Text)text, var10003, u - 9, -1, false);
+    private @Nullable PlayerEntity getCameraPlayer() {
+        PlayerEntity playerEntity;
+        Entity entity = this.client.getCameraEntity();
+        return entity instanceof PlayerEntity ? (playerEntity = (PlayerEntity)entity) : null;
+    }
 
-      for(int v = 0; v < m; ++v) {
-         SidebarEntry sidebarEntry2 = sidebarEntrys[v];
-         var10001 = m - v;
-         Objects.requireNonNull(this.getTextRenderer());
-         int w = o - var10001 * 9;
-         context.drawText(this.getTextRenderer(), (Text)sidebarEntry2.name, q, w, -1, false);
-         context.drawText(this.getTextRenderer(), (Text)sidebarEntry2.score, r - sidebarEntry2.scoreWidth, w, -1, false);
-      }
+    private @Nullable LivingEntity getRiddenEntity() {
+        PlayerEntity playerEntity = this.getCameraPlayer();
+        if (playerEntity != null) {
+            Entity entity = playerEntity.getVehicle();
+            if (entity == null) {
+                return null;
+            }
+            if (entity instanceof LivingEntity) {
+                return (LivingEntity)entity;
+            }
+        }
+        return null;
+    }
 
-   }
-
-   @Nullable
-   private PlayerEntity getCameraPlayer() {
-      Entity var2 = this.client.getCameraEntity();
-      PlayerEntity var10000;
-      if (var2 instanceof PlayerEntity playerEntity) {
-         var10000 = playerEntity;
-      } else {
-         var10000 = null;
-      }
-
-      return var10000;
-   }
-
-   @Nullable
-   private LivingEntity getRiddenEntity() {
-      PlayerEntity playerEntity = this.getCameraPlayer();
-      if (playerEntity != null) {
-         Entity entity = playerEntity.getVehicle();
-         if (entity == null) {
-            return null;
-         }
-
-         if (entity instanceof LivingEntity) {
-            return (LivingEntity)entity;
-         }
-      }
-
-      return null;
-   }
-
-   private int getHeartCount(@Nullable LivingEntity entity) {
-      if (entity != null && entity.isLiving()) {
-         float f = entity.getMaxHealth();
-         int i = (int)(f + 0.5F) / 2;
-         if (i > 30) {
+    private int getHeartCount(@Nullable LivingEntity entity) {
+        if (entity == null || !entity.isLiving()) {
+            return 0;
+        }
+        float f = entity.getMaxHealth();
+        int i = (int)(f + 0.5f) / 2;
+        if (i > 30) {
             i = 30;
-         }
+        }
+        return i;
+    }
 
-         return i;
-      } else {
-         return 0;
-      }
-   }
+    private int getHeartRows(int heartCount) {
+        return (int)Math.ceil((double)heartCount / 10.0);
+    }
 
-   private int getHeartRows(int heartCount) {
-      return (int)Math.ceil((double)heartCount / 10.0);
-   }
-
-   private void renderStatusBars(DrawContext context) {
-      PlayerEntity playerEntity = this.getCameraPlayer();
-      if (playerEntity != null) {
-         int i = MathHelper.ceil(playerEntity.getHealth());
-         boolean bl = this.heartJumpEndTick > (long)this.ticks && (this.heartJumpEndTick - (long)this.ticks) / 3L % 2L == 1L;
-         long l = Util.getMeasuringTimeMs();
-         if (i < this.lastHealthValue && playerEntity.timeUntilRegen > 0) {
+    private void renderStatusBars(DrawContext context) {
+        PlayerEntity playerEntity = this.getCameraPlayer();
+        if (playerEntity == null) {
+            return;
+        }
+        int i = MathHelper.ceil((float)playerEntity.getHealth());
+        boolean bl = this.heartJumpEndTick > (long)this.ticks && (this.heartJumpEndTick - (long)this.ticks) / 3L % 2L == 1L;
+        long l = Util.getMeasuringTimeMs();
+        if (i < this.lastHealthValue && playerEntity.timeUntilRegen > 0) {
             this.lastHealthCheckTime = l;
-            this.heartJumpEndTick = (long)(this.ticks + 20);
-         } else if (i > this.lastHealthValue && playerEntity.timeUntilRegen > 0) {
+            this.heartJumpEndTick = this.ticks + 20;
+        } else if (i > this.lastHealthValue && playerEntity.timeUntilRegen > 0) {
             this.lastHealthCheckTime = l;
-            this.heartJumpEndTick = (long)(this.ticks + 10);
-         }
-
-         if (l - this.lastHealthCheckTime > 1000L) {
+            this.heartJumpEndTick = this.ticks + 10;
+        }
+        if (l - this.lastHealthCheckTime > 1000L) {
             this.renderHealthValue = i;
             this.lastHealthCheckTime = l;
-         }
-
-         this.lastHealthValue = i;
-         int j = this.renderHealthValue;
-         this.random.setSeed((long)(this.ticks * 312871));
-         int k = context.getScaledWindowWidth() / 2 - 91;
-         int m = context.getScaledWindowWidth() / 2 + 91;
-         int n = context.getScaledWindowHeight() - 39;
-         float f = Math.max((float)playerEntity.getAttributeValue(EntityAttributes.MAX_HEALTH), (float)Math.max(j, i));
-         int o = MathHelper.ceil(playerEntity.getAbsorptionAmount());
-         int p = MathHelper.ceil((f + (float)o) / 2.0F / 10.0F);
-         int q = Math.max(10 - (p - 2), 3);
-         int r = n - 10;
-         int s = -1;
-         if (playerEntity.hasStatusEffect(StatusEffects.REGENERATION)) {
-            s = this.ticks % MathHelper.ceil(f + 5.0F);
-         }
-
-         Profilers.get().push("armor");
-         renderArmor(context, playerEntity, n, p, q, k);
-         Profilers.get().swap("health");
-         this.renderHealthBar(context, playerEntity, k, n, q, s, f, i, j, o, bl);
-         LivingEntity livingEntity = this.getRiddenEntity();
-         int t = this.getHeartCount(livingEntity);
-         if (t == 0) {
+        }
+        this.lastHealthValue = i;
+        int j = this.renderHealthValue;
+        this.random.setSeed((long)(this.ticks * 312871));
+        int k = context.getScaledWindowWidth() / 2 - 91;
+        int m = context.getScaledWindowWidth() / 2 + 91;
+        int n = context.getScaledWindowHeight() - 39;
+        float f = Math.max((float)playerEntity.getAttributeValue(EntityAttributes.MAX_HEALTH), (float)Math.max(j, i));
+        int o = MathHelper.ceil((float)playerEntity.getAbsorptionAmount());
+        int p = MathHelper.ceil((float)((f + (float)o) / 2.0f / 10.0f));
+        int q = Math.max(10 - (p - 2), 3);
+        int r = n - 10;
+        int s = -1;
+        if (playerEntity.hasStatusEffect(StatusEffects.REGENERATION)) {
+            s = this.ticks % MathHelper.ceil((float)(f + 5.0f));
+        }
+        Profilers.get().push("armor");
+        InGameHud.renderArmor((DrawContext)context, (PlayerEntity)playerEntity, (int)n, (int)p, (int)q, (int)k);
+        Profilers.get().swap("health");
+        this.renderHealthBar(context, playerEntity, k, n, q, s, f, i, j, o, bl);
+        LivingEntity livingEntity = this.getRiddenEntity();
+        int t = this.getHeartCount(livingEntity);
+        if (t == 0) {
             Profilers.get().swap("food");
             this.renderFood(context, playerEntity, n, m);
             r -= 10;
-         }
+        }
+        Profilers.get().swap("air");
+        this.renderAirBubbles(context, playerEntity, t, r, m);
+        Profilers.get().pop();
+    }
 
-         Profilers.get().swap("air");
-         this.renderAirBubbles(context, playerEntity, t, r, m);
-         Profilers.get().pop();
-      }
-   }
+    private static void renderArmor(DrawContext context, PlayerEntity player, int y, int i, int healthBarLines, int x) {
+        int j = player.getArmor();
+        if (j <= 0) {
+            return;
+        }
+        int k = y - (i - 1) * healthBarLines - 10;
+        for (int l = 0; l < 10; ++l) {
+            int m = x + l * 8;
+            if (l * 2 + 1 < j) {
+                context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, ARMOR_FULL_TEXTURE, m, k, 9, 9);
+            }
+            if (l * 2 + 1 == j) {
+                context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, ARMOR_HALF_TEXTURE, m, k, 9, 9);
+            }
+            if (l * 2 + 1 <= j) continue;
+            context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, ARMOR_EMPTY_TEXTURE, m, k, 9, 9);
+        }
+    }
 
-   private static void renderArmor(DrawContext context, PlayerEntity player, int i, int j, int k, int x) {
-      int l = player.getArmor();
-      if (l > 0) {
-         int m = i - (j - 1) * k - 10;
-
-         for(int n = 0; n < 10; ++n) {
+    private void renderHealthBar(DrawContext context, PlayerEntity player, int x, int y, int lines, int regeneratingHeartIndex, float maxHealth, int lastHealth, int health, int absorption, boolean blinking) {
+        HeartType heartType = HeartType.fromPlayerState((PlayerEntity)player);
+        boolean bl = player.getEntityWorld().getLevelProperties().isHardcore();
+        int i = MathHelper.ceil((double)((double)maxHealth / 2.0));
+        int j = MathHelper.ceil((double)((double)absorption / 2.0));
+        int k = i * 2;
+        for (int l = i + j - 1; l >= 0; --l) {
+            boolean bl4;
+            int r;
+            boolean bl2;
+            int m = l / 10;
+            int n = l % 10;
             int o = x + n * 8;
-            if (n * 2 + 1 < l) {
-               context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, ARMOR_FULL_TEXTURE, o, m, 9, 9);
+            int p = y - m * lines;
+            if (lastHealth + absorption <= 4) {
+                p += this.random.nextInt(2);
             }
-
-            if (n * 2 + 1 == l) {
-               context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, ARMOR_HALF_TEXTURE, o, m, 9, 9);
+            if (l < i && l == regeneratingHeartIndex) {
+                p -= 2;
             }
-
-            if (n * 2 + 1 > l) {
-               context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, ARMOR_EMPTY_TEXTURE, o, m, 9, 9);
+            this.drawHeart(context, HeartType.CONTAINER, o, p, bl, blinking, false);
+            int q = l * 2;
+            boolean bl3 = bl2 = l >= i;
+            if (bl2 && (r = q - k) < absorption) {
+                boolean bl32 = r + 1 == absorption;
+                this.drawHeart(context, heartType == HeartType.WITHERED ? heartType : HeartType.ABSORBING, o, p, bl, false, bl32);
             }
-         }
-
-      }
-   }
-
-   private void renderHealthBar(DrawContext context, PlayerEntity player, int x, int y, int lines, int regeneratingHeartIndex, float maxHealth, int lastHealth, int health, int absorption, boolean blinking) {
-      HeartType heartType = InGameHud.HeartType.fromPlayerState(player);
-      boolean bl = player.getWorld().getLevelProperties().isHardcore();
-      int i = MathHelper.ceil((double)maxHealth / 2.0);
-      int j = MathHelper.ceil((double)absorption / 2.0);
-      int k = i * 2;
-
-      for(int l = i + j - 1; l >= 0; --l) {
-         int m = l / 10;
-         int n = l % 10;
-         int o = x + n * 8;
-         int p = y - m * lines;
-         if (lastHealth + absorption <= 4) {
-            p += this.random.nextInt(2);
-         }
-
-         if (l < i && l == regeneratingHeartIndex) {
-            p -= 2;
-         }
-
-         this.drawHeart(context, InGameHud.HeartType.CONTAINER, o, p, bl, blinking, false);
-         int q = l * 2;
-         boolean bl2 = l >= i;
-         if (bl2) {
-            int r = q - k;
-            if (r < absorption) {
-               boolean bl3 = r + 1 == absorption;
-               this.drawHeart(context, heartType == InGameHud.HeartType.WITHERED ? heartType : InGameHud.HeartType.ABSORBING, o, p, bl, false, bl3);
+            if (blinking && q < health) {
+                bl4 = q + 1 == health;
+                this.drawHeart(context, heartType, o, p, bl, true, bl4);
             }
-         }
-
-         boolean bl4;
-         if (blinking && q < health) {
-            bl4 = q + 1 == health;
-            this.drawHeart(context, heartType, o, p, bl, true, bl4);
-         }
-
-         if (q < lastHealth) {
+            if (q >= lastHealth) continue;
             bl4 = q + 1 == lastHealth;
             this.drawHeart(context, heartType, o, p, bl, false, bl4);
-         }
-      }
+        }
+    }
 
-   }
+    private void drawHeart(DrawContext context, HeartType type, int x, int y, boolean hardcore, boolean blinking, boolean half) {
+        context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, type.getTexture(hardcore, half, blinking), x, y, 9, 9);
+    }
 
-   private void drawHeart(DrawContext context, HeartType type, int x, int y, boolean hardcore, boolean blinking, boolean half) {
-      context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, type.getTexture(hardcore, half, blinking), x, y, 9, 9);
-   }
-
-   private void renderAirBubbles(DrawContext context, PlayerEntity player, int heartCount, int top, int left) {
-      int i = player.getMaxAir();
-      int j = Math.clamp((long)player.getAir(), 0, i);
-      boolean bl = player.isSubmergedIn(FluidTags.WATER);
-      if (bl || j < i) {
-         top = this.getAirBubbleY(heartCount, top);
-         int k = getAirBubbles(j, i, -2);
-         int l = getAirBubbles(j, i, 0);
-         int m = 10 - getAirBubbles(j, i, getAirBubbleDelay(j, bl));
-         boolean bl2 = k != l;
-         if (!bl) {
-            this.lastBurstBubble = 0;
-         }
-
-         for(int n = 1; n <= 10; ++n) {
-            int o = left - (n - 1) * 8 - 9;
-            if (n <= k) {
-               context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, AIR_TEXTURE, o, top, 9, 9);
-            } else if (bl2 && n == l && bl) {
-               context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, AIR_BURSTING_TEXTURE, o, top, 9, 9);
-               this.playBurstSound(n, player, m);
-            } else if (n > 10 - m) {
-               int p = m == 10 && this.ticks % 2 == 0 ? this.random.nextInt(2) : 0;
-               context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, AIR_EMPTY_TEXTURE, o, top + p, 9, 9);
+    private void renderAirBubbles(DrawContext context, PlayerEntity player, int heartCount, int top, int left) {
+        int i = player.getMaxAir();
+        int j = Math.clamp((long)player.getAir(), 0, i);
+        boolean bl = player.isSubmergedIn(FluidTags.WATER);
+        if (bl || j < i) {
+            boolean bl2;
+            top = this.getAirBubbleY(heartCount, top);
+            int k = InGameHud.getAirBubbles((int)j, (int)i, (int)-2);
+            int l = InGameHud.getAirBubbles((int)j, (int)i, (int)0);
+            int m = 10 - InGameHud.getAirBubbles((int)j, (int)i, (int)InGameHud.getAirBubbleDelay((int)j, (boolean)bl));
+            boolean bl3 = bl2 = k != l;
+            if (!bl) {
+                this.lastBurstBubble = 0;
             }
-         }
-      }
+            for (int n = 1; n <= 10; ++n) {
+                int o = left - (n - 1) * 8 - 9;
+                if (n <= k) {
+                    context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, AIR_TEXTURE, o, top, 9, 9);
+                    continue;
+                }
+                if (bl2 && n == l && bl) {
+                    context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, AIR_BURSTING_TEXTURE, o, top, 9, 9);
+                    this.playBurstSound(n, player, m);
+                    continue;
+                }
+                if (n <= 10 - m) continue;
+                int p = m == 10 && this.ticks % 2 == 0 ? this.random.nextInt(2) : 0;
+                context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, AIR_EMPTY_TEXTURE, o, top + p, 9, 9);
+            }
+        }
+    }
 
-   }
+    private int getAirBubbleY(int heartCount, int top) {
+        int i = this.getHeartRows(heartCount) - 1;
+        return top -= i * 10;
+    }
 
-   private int getAirBubbleY(int heartCount, int top) {
-      int i = this.getHeartRows(heartCount) - 1;
-      top -= i * 10;
-      return top;
-   }
+    private static int getAirBubbles(int air, int maxAir, int delay) {
+        return MathHelper.ceil((float)((float)((air + delay) * 10) / (float)maxAir));
+    }
 
-   private static int getAirBubbles(int air, int maxAir, int delay) {
-      return MathHelper.ceil((float)((air + delay) * 10) / (float)maxAir);
-   }
+    private static int getAirBubbleDelay(int air, boolean submergedInWater) {
+        return air == 0 || !submergedInWater ? 0 : 1;
+    }
 
-   private static int getAirBubbleDelay(int air, boolean submergedInWater) {
-      return air != 0 && submergedInWater ? 1 : 0;
-   }
+    private void playBurstSound(int bubble, PlayerEntity player, int burstBubbles) {
+        if (this.lastBurstBubble != bubble) {
+            float f = 0.5f + 0.1f * (float)Math.max(0, burstBubbles - 3 + 1);
+            float g = 1.0f + 0.1f * (float)Math.max(0, burstBubbles - 5 + 1);
+            player.playSound(SoundEvents.UI_HUD_BUBBLE_POP, f, g);
+            this.lastBurstBubble = bubble;
+        }
+    }
 
-   private void playBurstSound(int bubble, PlayerEntity player, int burstBubbles) {
-      if (this.lastBurstBubble != bubble) {
-         float f = 0.5F + 0.1F * (float)Math.max(0, burstBubbles - 3 + 1);
-         float g = 1.0F + 0.1F * (float)Math.max(0, burstBubbles - 5 + 1);
-         player.playSound(SoundEvents.UI_HUD_BUBBLE_POP, f, g);
-         this.lastBurstBubble = bubble;
-      }
-
-   }
-
-   private void renderFood(DrawContext context, PlayerEntity player, int top, int right) {
-      HungerManager hungerManager = player.getHungerManager();
-      int i = hungerManager.getFoodLevel();
-
-      for(int j = 0; j < 10; ++j) {
-         int k = top;
-         Identifier identifier;
-         Identifier identifier2;
-         Identifier identifier3;
-         if (player.hasStatusEffect(StatusEffects.HUNGER)) {
-            identifier = FOOD_EMPTY_HUNGER_TEXTURE;
-            identifier2 = FOOD_HALF_HUNGER_TEXTURE;
-            identifier3 = FOOD_FULL_HUNGER_TEXTURE;
-         } else {
-            identifier = FOOD_EMPTY_TEXTURE;
-            identifier2 = FOOD_HALF_TEXTURE;
-            identifier3 = FOOD_FULL_TEXTURE;
-         }
-
-         if (player.getHungerManager().getSaturationLevel() <= 0.0F && this.ticks % (i * 3 + 1) == 0) {
-            k = top + (this.random.nextInt(3) - 1);
-         }
-
-         int l = right - j * 8 - 9;
-         context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, identifier, l, k, 9, 9);
-         if (j * 2 + 1 < i) {
-            context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, identifier3, l, k, 9, 9);
-         }
-
-         if (j * 2 + 1 == i) {
+    private void renderFood(DrawContext context, PlayerEntity player, int top, int right) {
+        HungerManager hungerManager = player.getHungerManager();
+        int i = hungerManager.getFoodLevel();
+        for (int j = 0; j < 10; ++j) {
+            Identifier identifier3;
+            Identifier identifier2;
+            Identifier identifier;
+            int k = top;
+            if (player.hasStatusEffect(StatusEffects.HUNGER)) {
+                identifier = FOOD_EMPTY_HUNGER_TEXTURE;
+                identifier2 = FOOD_HALF_HUNGER_TEXTURE;
+                identifier3 = FOOD_FULL_HUNGER_TEXTURE;
+            } else {
+                identifier = FOOD_EMPTY_TEXTURE;
+                identifier2 = FOOD_HALF_TEXTURE;
+                identifier3 = FOOD_FULL_TEXTURE;
+            }
+            if (player.getHungerManager().getSaturationLevel() <= 0.0f && this.ticks % (i * 3 + 1) == 0) {
+                k += this.random.nextInt(3) - 1;
+            }
+            int l = right - j * 8 - 9;
+            context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, identifier, l, k, 9, 9);
+            if (j * 2 + 1 < i) {
+                context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, identifier3, l, k, 9, 9);
+            }
+            if (j * 2 + 1 != i) continue;
             context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, identifier2, l, k, 9, 9);
-         }
-      }
+        }
+    }
 
-   }
-
-   private void renderMountHealth(DrawContext context) {
-      LivingEntity livingEntity = this.getRiddenEntity();
-      if (livingEntity != null) {
-         int i = this.getHeartCount(livingEntity);
-         if (i != 0) {
-            int j = (int)Math.ceil((double)livingEntity.getHealth());
-            Profilers.get().swap("mountHealth");
-            int k = context.getScaledWindowHeight() - 39;
-            int l = context.getScaledWindowWidth() / 2 + 91;
-            int m = k;
-
-            for(int n = 0; i > 0; n += 20) {
-               int o = Math.min(i, 10);
-               i -= o;
-
-               for(int p = 0; p < o; ++p) {
-                  int q = l - p * 8 - 9;
-                  context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, VEHICLE_CONTAINER_HEART_TEXTURE, q, m, 9, 9);
-                  if (p * 2 + 1 + n < j) {
-                     context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, VEHICLE_FULL_HEART_TEXTURE, q, m, 9, 9);
-                  }
-
-                  if (p * 2 + 1 + n == j) {
-                     context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, VEHICLE_HALF_HEART_TEXTURE, q, m, 9, 9);
-                  }
-               }
-
-               m -= 10;
+    private void renderMountHealth(DrawContext context) {
+        LivingEntity livingEntity = this.getRiddenEntity();
+        if (livingEntity == null) {
+            return;
+        }
+        int i = this.getHeartCount(livingEntity);
+        if (i == 0) {
+            return;
+        }
+        int j = (int)Math.ceil(livingEntity.getHealth());
+        Profilers.get().swap("mountHealth");
+        int k = context.getScaledWindowHeight() - 39;
+        int l = context.getScaledWindowWidth() / 2 + 91;
+        int m = k;
+        int n = 0;
+        while (i > 0) {
+            int o = Math.min(i, 10);
+            i -= o;
+            for (int p = 0; p < o; ++p) {
+                int q = l - p * 8 - 9;
+                context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, VEHICLE_CONTAINER_HEART_TEXTURE, q, m, 9, 9);
+                if (p * 2 + 1 + n < j) {
+                    context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, VEHICLE_FULL_HEART_TEXTURE, q, m, 9, 9);
+                }
+                if (p * 2 + 1 + n != j) continue;
+                context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, VEHICLE_HALF_HEART_TEXTURE, q, m, 9, 9);
             }
+            m -= 10;
+            n += 20;
+        }
+    }
 
-         }
-      }
-   }
+    private void renderOverlay(DrawContext context, Identifier texture, float opacity) {
+        int i = ColorHelper.getWhite((float)opacity);
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, 0, 0, 0.0f, 0.0f, context.getScaledWindowWidth(), context.getScaledWindowHeight(), context.getScaledWindowWidth(), context.getScaledWindowHeight(), i);
+    }
 
-   private void renderOverlay(DrawContext context, Identifier texture, float opacity) {
-      int i = ColorHelper.getWhite(opacity);
-      context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, 0, 0, 0.0F, 0.0F, context.getScaledWindowWidth(), context.getScaledWindowHeight(), context.getScaledWindowWidth(), context.getScaledWindowHeight(), i);
-   }
+    private void renderSpyglassOverlay(DrawContext context, float scale) {
+        float f;
+        float g = f = (float)Math.min(context.getScaledWindowWidth(), context.getScaledWindowHeight());
+        float h = Math.min((float)context.getScaledWindowWidth() / f, (float)context.getScaledWindowHeight() / g) * scale;
+        int i = MathHelper.floor((float)(f * h));
+        int j = MathHelper.floor((float)(g * h));
+        int k = (context.getScaledWindowWidth() - i) / 2;
+        int l = (context.getScaledWindowHeight() - j) / 2;
+        int m = k + i;
+        int n = l + j;
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, SPYGLASS_SCOPE, k, l, 0.0f, 0.0f, i, j, i, j);
+        context.fill(RenderPipelines.GUI, 0, n, context.getScaledWindowWidth(), context.getScaledWindowHeight(), -16777216);
+        context.fill(RenderPipelines.GUI, 0, 0, context.getScaledWindowWidth(), l, -16777216);
+        context.fill(RenderPipelines.GUI, 0, l, k, n, -16777216);
+        context.fill(RenderPipelines.GUI, m, l, context.getScaledWindowWidth(), n, -16777216);
+    }
 
-   private void renderSpyglassOverlay(DrawContext context, float scale) {
-      float f = (float)Math.min(context.getScaledWindowWidth(), context.getScaledWindowHeight());
-      float h = Math.min((float)context.getScaledWindowWidth() / f, (float)context.getScaledWindowHeight() / f) * scale;
-      int i = MathHelper.floor(f * h);
-      int j = MathHelper.floor(f * h);
-      int k = (context.getScaledWindowWidth() - i) / 2;
-      int l = (context.getScaledWindowHeight() - j) / 2;
-      int m = k + i;
-      int n = l + j;
-      context.drawTexture(RenderPipelines.GUI_TEXTURED, SPYGLASS_SCOPE, k, l, 0.0F, 0.0F, i, j, i, j);
-      context.fill(RenderPipelines.GUI, 0, n, context.getScaledWindowWidth(), context.getScaledWindowHeight(), -16777216);
-      context.fill(RenderPipelines.GUI, 0, 0, context.getScaledWindowWidth(), l, -16777216);
-      context.fill(RenderPipelines.GUI, 0, l, k, n, -16777216);
-      context.fill(RenderPipelines.GUI, m, l, context.getScaledWindowWidth(), n, -16777216);
-   }
+    private void updateVignetteDarkness(Entity entity) {
+        BlockPos blockPos = BlockPos.ofFloored((double)entity.getX(), (double)entity.getEyeY(), (double)entity.getZ());
+        float f = LightmapTextureManager.getBrightness((DimensionType)entity.getEntityWorld().getDimension(), (int)entity.getEntityWorld().getLightLevel(blockPos));
+        float g = MathHelper.clamp((float)(1.0f - f), (float)0.0f, (float)1.0f);
+        this.vignetteDarkness += (g - this.vignetteDarkness) * 0.01f;
+    }
 
-   private void updateVignetteDarkness(Entity entity) {
-      BlockPos blockPos = BlockPos.ofFloored(entity.getX(), entity.getEyeY(), entity.getZ());
-      float f = LightmapTextureManager.getBrightness(entity.getWorld().getDimension(), entity.getWorld().getLightLevel(blockPos));
-      float g = MathHelper.clamp(1.0F - f, 0.0F, 1.0F);
-      this.vignetteDarkness += (g - this.vignetteDarkness) * 0.01F;
-   }
+    private void renderVignetteOverlay(DrawContext context, @Nullable Entity entity) {
+        int i;
+        WorldBorder worldBorder = this.client.world.getWorldBorder();
+        float f = 0.0f;
+        if (entity != null) {
+            float g = (float)worldBorder.getDistanceInsideBorder(entity);
+            double d = Math.min(worldBorder.getShrinkingSpeed() * (double)worldBorder.getWarningTime(), Math.abs(worldBorder.getSizeLerpTarget() - worldBorder.getSize()));
+            double e = Math.max((double)worldBorder.getWarningBlocks(), d);
+            if ((double)g < e) {
+                f = 1.0f - (float)((double)g / e);
+            }
+        }
+        if (f > 0.0f) {
+            f = MathHelper.clamp((float)f, (float)0.0f, (float)1.0f);
+            i = ColorHelper.fromFloats((float)1.0f, (float)0.0f, (float)f, (float)f);
+        } else {
+            float h = this.vignetteDarkness;
+            h = MathHelper.clamp((float)h, (float)0.0f, (float)1.0f);
+            i = ColorHelper.fromFloats((float)1.0f, (float)h, (float)h, (float)h);
+        }
+        context.drawTexture(RenderPipelines.VIGNETTE, VIGNETTE_TEXTURE, 0, 0, 0.0f, 0.0f, context.getScaledWindowWidth(), context.getScaledWindowHeight(), context.getScaledWindowWidth(), context.getScaledWindowHeight(), i);
+    }
 
-   private void renderVignetteOverlay(DrawContext context, @Nullable Entity entity) {
-      WorldBorder worldBorder = this.client.world.getWorldBorder();
-      float f = 0.0F;
-      if (entity != null) {
-         float g = (float)worldBorder.getDistanceInsideBorder(entity);
-         double d = Math.min(worldBorder.getShrinkingSpeed() * (double)worldBorder.getWarningTime() * 1000.0, Math.abs(worldBorder.getSizeLerpTarget() - worldBorder.getSize()));
-         double e = Math.max((double)worldBorder.getWarningBlocks(), d);
-         if ((double)g < e) {
-            f = 1.0F - (float)((double)g / e);
-         }
-      }
+    private void renderPortalOverlay(DrawContext context, float nauseaStrength) {
+        if (nauseaStrength < 1.0f) {
+            nauseaStrength *= nauseaStrength;
+            nauseaStrength *= nauseaStrength;
+            nauseaStrength = nauseaStrength * 0.8f + 0.2f;
+        }
+        int i = ColorHelper.getWhite((float)nauseaStrength);
+        Sprite sprite = this.client.getBlockRenderManager().getModels().getModelParticleSprite(Blocks.NETHER_PORTAL.getDefaultState());
+        context.drawSpriteStretched(RenderPipelines.GUI_TEXTURED, sprite, 0, 0, context.getScaledWindowWidth(), context.getScaledWindowHeight(), i);
+    }
 
-      int i;
-      if (f > 0.0F) {
-         f = MathHelper.clamp(f, 0.0F, 1.0F);
-         i = ColorHelper.fromFloats(1.0F, 0.0F, f, f);
-      } else {
-         float h = this.vignetteDarkness;
-         h = MathHelper.clamp(h, 0.0F, 1.0F);
-         i = ColorHelper.fromFloats(1.0F, h, h, h);
-      }
+    private void renderNauseaOverlay(DrawContext context, float nauseaStrength) {
+        int i = context.getScaledWindowWidth();
+        int j = context.getScaledWindowHeight();
+        context.getMatrices().pushMatrix();
+        float f = MathHelper.lerp((float)nauseaStrength, (float)2.0f, (float)1.0f);
+        context.getMatrices().translate((float)i / 2.0f, (float)j / 2.0f);
+        context.getMatrices().scale(f, f);
+        context.getMatrices().translate((float)(-i) / 2.0f, (float)(-j) / 2.0f);
+        float g = 0.2f * nauseaStrength;
+        float h = 0.4f * nauseaStrength;
+        float k = 0.2f * nauseaStrength;
+        context.drawTexture(RenderPipelines.GUI_NAUSEA_OVERLAY, NAUSEA_TEXTURE, 0, 0, 0.0f, 0.0f, i, j, i, j, ColorHelper.fromFloats((float)1.0f, (float)g, (float)h, (float)k));
+        context.getMatrices().popMatrix();
+    }
 
-      context.drawTexture(RenderPipelines.VIGNETTE, VIGNETTE_TEXTURE, 0, 0, 0.0F, 0.0F, context.getScaledWindowWidth(), context.getScaledWindowHeight(), context.getScaledWindowWidth(), context.getScaledWindowHeight(), i);
-   }
-
-   private void renderPortalOverlay(DrawContext context, float nauseaStrength) {
-      if (nauseaStrength < 1.0F) {
-         nauseaStrength *= nauseaStrength;
-         nauseaStrength *= nauseaStrength;
-         nauseaStrength = nauseaStrength * 0.8F + 0.2F;
-      }
-
-      int i = ColorHelper.getWhite(nauseaStrength);
-      Sprite sprite = this.client.getBlockRenderManager().getModels().getModelParticleSprite(Blocks.NETHER_PORTAL.getDefaultState());
-      context.drawSpriteStretched(RenderPipelines.GUI_TEXTURED, sprite, 0, 0, context.getScaledWindowWidth(), context.getScaledWindowHeight(), i);
-   }
-
-   private void renderNauseaOverlay(DrawContext context, float nauseaStrength) {
-      int i = context.getScaledWindowWidth();
-      int j = context.getScaledWindowHeight();
-      context.getMatrices().pushMatrix();
-      float f = MathHelper.lerp(nauseaStrength, 2.0F, 1.0F);
-      context.getMatrices().translate((float)i / 2.0F, (float)j / 2.0F);
-      context.getMatrices().scale(f, f);
-      context.getMatrices().translate((float)(-i) / 2.0F, (float)(-j) / 2.0F);
-      float g = 0.2F * nauseaStrength;
-      float h = 0.4F * nauseaStrength;
-      float k = 0.2F * nauseaStrength;
-      context.drawTexture(RenderPipelines.GUI_NAUSEA_OVERLAY, NAUSEA_TEXTURE, 0, 0, 0.0F, 0.0F, i, j, i, j, ColorHelper.fromFloats(1.0F, g, h, k));
-      context.getMatrices().popMatrix();
-   }
-
-   private void renderHotbarItem(DrawContext context, int x, int y, RenderTickCounter tickCounter, PlayerEntity player, ItemStack stack, int seed) {
-      if (!stack.isEmpty()) {
-         float f = (float)stack.getBobbingAnimationTime() - tickCounter.getTickProgress(false);
-         if (f > 0.0F) {
-            float g = 1.0F + f / 5.0F;
+    private void renderHotbarItem(DrawContext context, int x, int y, RenderTickCounter tickCounter, PlayerEntity player, ItemStack stack, int seed) {
+        if (stack.isEmpty()) {
+            return;
+        }
+        float f = (float)stack.getBobbingAnimationTime() - tickCounter.getTickProgress(false);
+        if (f > 0.0f) {
+            float g = 1.0f + f / 5.0f;
             context.getMatrices().pushMatrix();
             context.getMatrices().translate((float)(x + 8), (float)(y + 12));
-            context.getMatrices().scale(1.0F / g, (g + 1.0F) / 2.0F);
+            context.getMatrices().scale(1.0f / g, (g + 1.0f) / 2.0f);
             context.getMatrices().translate((float)(-(x + 8)), (float)(-(y + 12)));
-         }
-
-         context.drawItem(player, stack, x, y, seed);
-         if (f > 0.0F) {
+        }
+        context.drawItem((LivingEntity)player, stack, x, y, seed);
+        if (f > 0.0f) {
             context.getMatrices().popMatrix();
-         }
+        }
+        context.drawStackOverlay(this.client.textRenderer, stack, x, y);
+    }
 
-         context.drawStackOverlay(this.client.textRenderer, stack, x, y);
-      }
-   }
+    public void tick(boolean paused) {
+        this.tickAutosaveIndicator();
+        if (!paused) {
+            this.tick();
+        }
+    }
 
-   public void tick(boolean paused) {
-      this.tickAutosaveIndicator();
-      if (!paused) {
-         this.tick();
-      }
-
-   }
-
-   private void tick() {
-      if (this.overlayRemaining > 0) {
-         --this.overlayRemaining;
-      }
-
-      if (this.titleRemainTicks > 0) {
-         --this.titleRemainTicks;
-         if (this.titleRemainTicks <= 0) {
-            this.title = null;
-            this.subtitle = null;
-         }
-      }
-
-      ++this.ticks;
-      Entity entity = this.client.getCameraEntity();
-      if (entity != null) {
-         this.updateVignetteDarkness(entity);
-      }
-
-      if (this.client.player != null) {
-         ItemStack itemStack = this.client.player.getInventory().getSelectedStack();
-         if (itemStack.isEmpty()) {
-            this.heldItemTooltipFade = 0;
-         } else if (!this.currentStack.isEmpty() && itemStack.isOf(this.currentStack.getItem()) && itemStack.getName().equals(this.currentStack.getName())) {
-            if (this.heldItemTooltipFade > 0) {
-               --this.heldItemTooltipFade;
+    private void tick() {
+        if (this.overlayRemaining > 0) {
+            --this.overlayRemaining;
+        }
+        if (this.titleRemainTicks > 0) {
+            --this.titleRemainTicks;
+            if (this.titleRemainTicks <= 0) {
+                this.title = null;
+                this.subtitle = null;
             }
-         } else {
-            this.heldItemTooltipFade = (int)(40.0 * (Double)this.client.options.getNotificationDisplayTime().getValue());
-         }
+        }
+        ++this.ticks;
+        Entity entity = this.client.getCameraEntity();
+        if (entity != null) {
+            this.updateVignetteDarkness(entity);
+        }
+        if (this.client.player != null) {
+            ItemStack itemStack = this.client.player.getInventory().getSelectedStack();
+            if (itemStack.isEmpty()) {
+                this.heldItemTooltipFade = 0;
+            } else if (this.currentStack.isEmpty() || !itemStack.isOf(this.currentStack.getItem()) || !itemStack.getName().equals((Object)this.currentStack.getName())) {
+                this.heldItemTooltipFade = (int)(40.0 * (Double)this.client.options.getNotificationDisplayTime().getValue());
+            } else if (this.heldItemTooltipFade > 0) {
+                --this.heldItemTooltipFade;
+            }
+            this.currentStack = itemStack;
+        }
+        this.chatHud.tickRemovalQueueIfExists();
+    }
 
-         this.currentStack = itemStack;
-      }
+    private void tickAutosaveIndicator() {
+        IntegratedServer minecraftServer = this.client.getServer();
+        boolean bl = minecraftServer != null && minecraftServer.isSaving();
+        this.lastAutosaveIndicatorAlpha = this.autosaveIndicatorAlpha;
+        this.autosaveIndicatorAlpha = MathHelper.lerp((float)0.2f, (float)this.autosaveIndicatorAlpha, (float)(bl ? 1.0f : 0.0f));
+    }
 
-      this.chatHud.tickRemovalQueueIfExists();
-   }
+    public void setRecordPlayingOverlay(Text description) {
+        MutableText text = Text.translatable((String)"record.nowPlaying", (Object[])new Object[]{description});
+        this.setOverlayMessage((Text)text, true);
+        this.client.getNarratorManager().narrateSystemImmediately((Text)text);
+    }
 
-   private void tickAutosaveIndicator() {
-      MinecraftServer minecraftServer = this.client.getServer();
-      boolean bl = minecraftServer != null && minecraftServer.isSaving();
-      this.lastAutosaveIndicatorAlpha = this.autosaveIndicatorAlpha;
-      this.autosaveIndicatorAlpha = MathHelper.lerp(0.2F, this.autosaveIndicatorAlpha, bl ? 1.0F : 0.0F);
-   }
+    public void setOverlayMessage(Text message, boolean tinted) {
+        this.setCanShowChatDisabledScreen(false);
+        this.overlayMessage = message;
+        this.overlayRemaining = 60;
+        this.overlayTinted = tinted;
+    }
 
-   public void setRecordPlayingOverlay(Text description) {
-      Text text = Text.translatable("record.nowPlaying", description);
-      this.setOverlayMessage(text, true);
-      this.client.getNarratorManager().narrateSystemImmediately((Text)text);
-   }
+    public void setCanShowChatDisabledScreen(boolean canShowChatDisabledScreen) {
+        this.canShowChatDisabledScreen = canShowChatDisabledScreen;
+    }
 
-   public void setOverlayMessage(Text message, boolean tinted) {
-      this.setCanShowChatDisabledScreen(false);
-      this.overlayMessage = message;
-      this.overlayRemaining = 60;
-      this.overlayTinted = tinted;
-   }
+    public boolean shouldShowChatDisabledScreen() {
+        return this.canShowChatDisabledScreen && this.overlayRemaining > 0;
+    }
 
-   public void setCanShowChatDisabledScreen(boolean canShowChatDisabledScreen) {
-      this.canShowChatDisabledScreen = canShowChatDisabledScreen;
-   }
+    public void setTitleTicks(int fadeInTicks, int stayTicks, int fadeOutTicks) {
+        if (fadeInTicks >= 0) {
+            this.titleFadeInTicks = fadeInTicks;
+        }
+        if (stayTicks >= 0) {
+            this.titleStayTicks = stayTicks;
+        }
+        if (fadeOutTicks >= 0) {
+            this.titleFadeOutTicks = fadeOutTicks;
+        }
+        if (this.titleRemainTicks > 0) {
+            this.titleRemainTicks = this.titleFadeInTicks + this.titleStayTicks + this.titleFadeOutTicks;
+        }
+    }
 
-   public boolean shouldShowChatDisabledScreen() {
-      return this.canShowChatDisabledScreen && this.overlayRemaining > 0;
-   }
+    public void setSubtitle(Text subtitle) {
+        this.subtitle = subtitle;
+    }
 
-   public void setTitleTicks(int fadeInTicks, int stayTicks, int fadeOutTicks) {
-      if (fadeInTicks >= 0) {
-         this.titleFadeInTicks = fadeInTicks;
-      }
+    public void setTitle(Text title) {
+        this.title = title;
+        this.titleRemainTicks = this.titleFadeInTicks + this.titleStayTicks + this.titleFadeOutTicks;
+    }
 
-      if (stayTicks >= 0) {
-         this.titleStayTicks = stayTicks;
-      }
+    public void clearTitle() {
+        this.title = null;
+        this.subtitle = null;
+        this.titleRemainTicks = 0;
+    }
 
-      if (fadeOutTicks >= 0) {
-         this.titleFadeOutTicks = fadeOutTicks;
-      }
+    public ChatHud getChatHud() {
+        return this.chatHud;
+    }
 
-      if (this.titleRemainTicks > 0) {
-         this.titleRemainTicks = this.titleFadeInTicks + this.titleStayTicks + this.titleFadeOutTicks;
-      }
+    public int getTicks() {
+        return this.ticks;
+    }
 
-   }
+    public TextRenderer getTextRenderer() {
+        return this.client.textRenderer;
+    }
 
-   public void setSubtitle(Text subtitle) {
-      this.subtitle = subtitle;
-   }
+    public SpectatorHud getSpectatorHud() {
+        return this.spectatorHud;
+    }
 
-   public void setTitle(Text title) {
-      this.title = title;
-      this.titleRemainTicks = this.titleFadeInTicks + this.titleStayTicks + this.titleFadeOutTicks;
-   }
+    public PlayerListHud getPlayerListHud() {
+        return this.playerListHud;
+    }
 
-   public void clearTitle() {
-      this.title = null;
-      this.subtitle = null;
-      this.titleRemainTicks = 0;
-   }
+    public void clear() {
+        this.playerListHud.clear();
+        this.bossBarHud.clear();
+        this.client.getToastManager().clear();
+        this.debugHud.clear();
+        this.chatHud.clear(true);
+        this.clearTitle();
+        this.setDefaultTitleFade();
+    }
 
-   public ChatHud getChatHud() {
-      return this.chatHud;
-   }
+    public BossBarHud getBossBarHud() {
+        return this.bossBarHud;
+    }
 
-   public int getTicks() {
-      return this.ticks;
-   }
+    public DebugHud getDebugHud() {
+        return this.debugHud;
+    }
 
-   public TextRenderer getTextRenderer() {
-      return this.client.textRenderer;
-   }
+    public void resetDebugHudChunk() {
+        this.debugHud.resetChunk();
+    }
 
-   public SpectatorHud getSpectatorHud() {
-      return this.spectatorHud;
-   }
-
-   public PlayerListHud getPlayerListHud() {
-      return this.playerListHud;
-   }
-
-   public void clear() {
-      this.playerListHud.clear();
-      this.bossBarHud.clear();
-      this.client.getToastManager().clear();
-      this.debugHud.clear();
-      this.chatHud.clear(true);
-      this.clearTitle();
-      this.setDefaultTitleFade();
-   }
-
-   public BossBarHud getBossBarHud() {
-      return this.bossBarHud;
-   }
-
-   public DebugHud getDebugHud() {
-      return this.debugHud;
-   }
-
-   public void resetDebugHudChunk() {
-      this.debugHud.resetChunk();
-   }
-
-   public void renderAutosaveIndicator(DrawContext context, RenderTickCounter tickCounter) {
-      if ((Boolean)this.client.options.getShowAutosaveIndicator().getValue() && (this.autosaveIndicatorAlpha > 0.0F || this.lastAutosaveIndicatorAlpha > 0.0F)) {
-         int i = MathHelper.floor(255.0F * MathHelper.clamp(MathHelper.lerp(tickCounter.getFixedDeltaTicks(), this.lastAutosaveIndicatorAlpha, this.autosaveIndicatorAlpha), 0.0F, 1.0F));
-         if (i > 0) {
+    public void renderAutosaveIndicator(DrawContext context, RenderTickCounter tickCounter) {
+        int i;
+        if (((Boolean)this.client.options.getShowAutosaveIndicator().getValue()).booleanValue() && (this.autosaveIndicatorAlpha > 0.0f || this.lastAutosaveIndicatorAlpha > 0.0f) && (i = MathHelper.floor((float)(255.0f * MathHelper.clamp((float)MathHelper.lerp((float)tickCounter.getFixedDeltaTicks(), (float)this.lastAutosaveIndicatorAlpha, (float)this.autosaveIndicatorAlpha), (float)0.0f, (float)1.0f)))) > 0) {
             TextRenderer textRenderer = this.getTextRenderer();
             int j = textRenderer.getWidth((StringVisitable)SAVING_LEVEL_TEXT);
-            int k = ColorHelper.withAlpha(i, -1);
+            int k = ColorHelper.withAlpha((int)i, (int)-1);
             int l = context.getScaledWindowWidth() - j - 5;
-            int var10000 = context.getScaledWindowHeight();
+            int n = context.getScaledWindowHeight();
             Objects.requireNonNull(textRenderer);
-            int m = var10000 - 9 - 5;
+            int m = n - 9 - 5;
             context.createNewRootLayer();
             context.drawTextWithBackground(textRenderer, SAVING_LEVEL_TEXT, l, m, j, k);
-         }
-      }
+        }
+    }
 
-   }
+    private boolean shouldShowExperienceBar() {
+        return this.client.player.experienceBarDisplayStartTime + 100 > this.client.player.age;
+    }
 
-   private boolean shouldShowExperienceBar() {
-      return this.client.player.experienceBarDisplayStartTime + 100 > this.client.player.age;
-   }
+    private boolean shouldShowJumpBar() {
+        return this.client.player.getMountJumpStrength() > 0.0f || (Integer)Nullables.mapOrElse((Object)this.client.player.getJumpingMount(), JumpingMount::getJumpCooldown, (Object)0) > 0;
+    }
 
-   private boolean shouldShowJumpBar() {
-      return this.client.player.getMountJumpStrength() > 0.0F || (Integer)Nullables.mapOrElse(this.client.player.getJumpingMount(), JumpingMount::getJumpCooldown, 0) > 0;
-   }
-
-   private BarType getCurrentBarType() {
-      boolean bl = this.client.player.networkHandler.getWaypointHandler().hasWaypoint();
-      boolean bl2 = this.client.player.getJumpingMount() != null;
-      boolean bl3 = this.client.interactionManager.hasExperienceBar();
-      if (bl) {
-         if (bl2 && this.shouldShowJumpBar()) {
-            return InGameHud.BarType.JUMPABLE_VEHICLE;
-         } else {
-            return bl3 && this.shouldShowExperienceBar() ? InGameHud.BarType.EXPERIENCE : InGameHud.BarType.LOCATOR;
-         }
-      } else if (bl2) {
-         return InGameHud.BarType.JUMPABLE_VEHICLE;
-      } else {
-         return bl3 ? InGameHud.BarType.EXPERIENCE : InGameHud.BarType.EMPTY;
-      }
-   }
-
-   static {
-      SCOREBOARD_ENTRY_COMPARATOR = Comparator.comparing(ScoreboardEntry::value).reversed().thenComparing(ScoreboardEntry::owner, String.CASE_INSENSITIVE_ORDER);
-      DEMO_EXPIRED_MESSAGE = Text.translatable("demo.demoExpired");
-      SAVING_LEVEL_TEXT = Text.translatable("menu.savingLevel");
-   }
-
-   @Environment(EnvType.CLIENT)
-   static enum BarType {
-      EMPTY,
-      EXPERIENCE,
-      LOCATOR,
-      JUMPABLE_VEHICLE;
-
-      // $FF: synthetic method
-      private static BarType[] method_70844() {
-         return new BarType[]{EMPTY, EXPERIENCE, LOCATOR, JUMPABLE_VEHICLE};
-      }
-   }
-
-   @Environment(EnvType.CLIENT)
-   static enum HeartType {
-      CONTAINER(Identifier.ofVanilla("hud/heart/container"), Identifier.ofVanilla("hud/heart/container_blinking"), Identifier.ofVanilla("hud/heart/container"), Identifier.ofVanilla("hud/heart/container_blinking"), Identifier.ofVanilla("hud/heart/container_hardcore"), Identifier.ofVanilla("hud/heart/container_hardcore_blinking"), Identifier.ofVanilla("hud/heart/container_hardcore"), Identifier.ofVanilla("hud/heart/container_hardcore_blinking")),
-      NORMAL(Identifier.ofVanilla("hud/heart/full"), Identifier.ofVanilla("hud/heart/full_blinking"), Identifier.ofVanilla("hud/heart/half"), Identifier.ofVanilla("hud/heart/half_blinking"), Identifier.ofVanilla("hud/heart/hardcore_full"), Identifier.ofVanilla("hud/heart/hardcore_full_blinking"), Identifier.ofVanilla("hud/heart/hardcore_half"), Identifier.ofVanilla("hud/heart/hardcore_half_blinking")),
-      POISONED(Identifier.ofVanilla("hud/heart/poisoned_full"), Identifier.ofVanilla("hud/heart/poisoned_full_blinking"), Identifier.ofVanilla("hud/heart/poisoned_half"), Identifier.ofVanilla("hud/heart/poisoned_half_blinking"), Identifier.ofVanilla("hud/heart/poisoned_hardcore_full"), Identifier.ofVanilla("hud/heart/poisoned_hardcore_full_blinking"), Identifier.ofVanilla("hud/heart/poisoned_hardcore_half"), Identifier.ofVanilla("hud/heart/poisoned_hardcore_half_blinking")),
-      WITHERED(Identifier.ofVanilla("hud/heart/withered_full"), Identifier.ofVanilla("hud/heart/withered_full_blinking"), Identifier.ofVanilla("hud/heart/withered_half"), Identifier.ofVanilla("hud/heart/withered_half_blinking"), Identifier.ofVanilla("hud/heart/withered_hardcore_full"), Identifier.ofVanilla("hud/heart/withered_hardcore_full_blinking"), Identifier.ofVanilla("hud/heart/withered_hardcore_half"), Identifier.ofVanilla("hud/heart/withered_hardcore_half_blinking")),
-      ABSORBING(Identifier.ofVanilla("hud/heart/absorbing_full"), Identifier.ofVanilla("hud/heart/absorbing_full_blinking"), Identifier.ofVanilla("hud/heart/absorbing_half"), Identifier.ofVanilla("hud/heart/absorbing_half_blinking"), Identifier.ofVanilla("hud/heart/absorbing_hardcore_full"), Identifier.ofVanilla("hud/heart/absorbing_hardcore_full_blinking"), Identifier.ofVanilla("hud/heart/absorbing_hardcore_half"), Identifier.ofVanilla("hud/heart/absorbing_hardcore_half_blinking")),
-      FROZEN(Identifier.ofVanilla("hud/heart/frozen_full"), Identifier.ofVanilla("hud/heart/frozen_full_blinking"), Identifier.ofVanilla("hud/heart/frozen_half"), Identifier.ofVanilla("hud/heart/frozen_half_blinking"), Identifier.ofVanilla("hud/heart/frozen_hardcore_full"), Identifier.ofVanilla("hud/heart/frozen_hardcore_full_blinking"), Identifier.ofVanilla("hud/heart/frozen_hardcore_half"), Identifier.ofVanilla("hud/heart/frozen_hardcore_half_blinking"));
-
-      private final Identifier fullTexture;
-      private final Identifier fullBlinkingTexture;
-      private final Identifier halfTexture;
-      private final Identifier halfBlinkingTexture;
-      private final Identifier hardcoreFullTexture;
-      private final Identifier hardcoreFullBlinkingTexture;
-      private final Identifier hardcoreHalfTexture;
-      private final Identifier hardcoreHalfBlinkingTexture;
-
-      private HeartType(final Identifier fullTexture, final Identifier fullBlinkingTexture, final Identifier halfTexture, final Identifier halfBlinkingTexture, final Identifier hardcoreFullTexture, final Identifier hardcoreFullBlinkingTexture, final Identifier hardcoreHalfTexture, final Identifier hardcoreHalfBlinkingTexture) {
-         this.fullTexture = fullTexture;
-         this.fullBlinkingTexture = fullBlinkingTexture;
-         this.halfTexture = halfTexture;
-         this.halfBlinkingTexture = halfBlinkingTexture;
-         this.hardcoreFullTexture = hardcoreFullTexture;
-         this.hardcoreFullBlinkingTexture = hardcoreFullBlinkingTexture;
-         this.hardcoreHalfTexture = hardcoreHalfTexture;
-         this.hardcoreHalfBlinkingTexture = hardcoreHalfBlinkingTexture;
-      }
-
-      public Identifier getTexture(boolean hardcore, boolean half, boolean blinking) {
-         if (!hardcore) {
-            if (half) {
-               return blinking ? this.halfBlinkingTexture : this.halfTexture;
-            } else {
-               return blinking ? this.fullBlinkingTexture : this.fullTexture;
+    private BarType getCurrentBarType() {
+        boolean bl = this.client.player.networkHandler.getWaypointHandler().hasWaypoint();
+        boolean bl2 = this.client.player.getJumpingMount() != null;
+        boolean bl3 = this.client.interactionManager.hasExperienceBar();
+        if (bl) {
+            if (bl2 && this.shouldShowJumpBar()) {
+                return BarType.JUMPABLE_VEHICLE;
             }
-         } else if (half) {
-            return blinking ? this.hardcoreHalfBlinkingTexture : this.hardcoreHalfTexture;
-         } else {
-            return blinking ? this.hardcoreFullBlinkingTexture : this.hardcoreFullTexture;
-         }
-      }
-
-      static HeartType fromPlayerState(PlayerEntity player) {
-         HeartType heartType;
-         if (player.hasStatusEffect(StatusEffects.POISON)) {
-            heartType = POISONED;
-         } else if (player.hasStatusEffect(StatusEffects.WITHER)) {
-            heartType = WITHERED;
-         } else if (player.isFrozen()) {
-            heartType = FROZEN;
-         } else {
-            heartType = NORMAL;
-         }
-
-         return heartType;
-      }
-
-      // $FF: synthetic method
-      private static HeartType[] method_37300() {
-         return new HeartType[]{CONTAINER, NORMAL, POISONED, WITHERED, ABSORBING, FROZEN};
-      }
-   }
-
-   @Environment(EnvType.CLIENT)
-   public interface Renderable {
-      void render(DrawContext context, RenderTickCounter tickCounter);
-   }
+            if (bl3 && this.shouldShowExperienceBar()) {
+                return BarType.EXPERIENCE;
+            }
+            return BarType.LOCATOR;
+        }
+        if (bl2) {
+            return BarType.JUMPABLE_VEHICLE;
+        }
+        if (bl3) {
+            return BarType.EXPERIENCE;
+        }
+        return BarType.EMPTY;
+    }
 }
+

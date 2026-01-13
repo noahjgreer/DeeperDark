@@ -1,26 +1,36 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.render.MapRenderState
+ *  net.minecraft.client.render.entity.state.EntityRenderState
+ *  net.minecraft.client.render.entity.state.ItemFrameEntityRenderState
+ *  net.minecraft.client.render.item.ItemRenderState
+ *  net.minecraft.component.type.MapIdComponent
+ *  net.minecraft.util.math.Direction
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.render.entity.state;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.render.MapRenderState;
+import net.minecraft.client.render.entity.state.EntityRenderState;
 import net.minecraft.client.render.item.ItemRenderState;
 import net.minecraft.component.type.MapIdComponent;
 import net.minecraft.util.math.Direction;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
-public class ItemFrameEntityRenderState extends EntityRenderState {
-   public Direction facing;
-   public final ItemRenderState itemRenderState;
-   public int rotation;
-   public boolean glow;
-   @Nullable
-   public MapIdComponent mapId;
-   public final MapRenderState mapRenderState;
-
-   public ItemFrameEntityRenderState() {
-      this.facing = Direction.NORTH;
-      this.itemRenderState = new ItemRenderState();
-      this.mapRenderState = new MapRenderState();
-   }
+@Environment(value=EnvType.CLIENT)
+public class ItemFrameEntityRenderState
+extends EntityRenderState {
+    public Direction facing = Direction.NORTH;
+    public final ItemRenderState itemRenderState = new ItemRenderState();
+    public int rotation;
+    public boolean glow;
+    public @Nullable MapIdComponent mapId;
+    public final MapRenderState mapRenderState = new MapRenderState();
 }
+

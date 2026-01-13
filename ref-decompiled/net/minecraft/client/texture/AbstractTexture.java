@@ -1,70 +1,65 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.blaze3d.systems.RenderSystem
+ *  com.mojang.blaze3d.textures.AddressMode
+ *  com.mojang.blaze3d.textures.FilterMode
+ *  com.mojang.blaze3d.textures.GpuTexture
+ *  com.mojang.blaze3d.textures.GpuTextureView
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.gl.GpuSampler
+ *  net.minecraft.client.texture.AbstractTexture
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.texture;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.AddressMode;
 import com.mojang.blaze3d.textures.FilterMode;
 import com.mojang.blaze3d.textures.GpuTexture;
 import com.mojang.blaze3d.textures.GpuTextureView;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.client.gl.GpuSampler;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
-public abstract class AbstractTexture implements AutoCloseable {
-   @Nullable
-   protected GpuTexture glTexture;
-   @Nullable
-   protected GpuTextureView glTextureView;
+@Environment(value=EnvType.CLIENT)
+public abstract class AbstractTexture
+implements AutoCloseable {
+    protected @Nullable GpuTexture glTexture;
+    protected @Nullable GpuTextureView glTextureView;
+    protected GpuSampler sampler = RenderSystem.getSamplerCache().get(AddressMode.REPEAT, AddressMode.REPEAT, FilterMode.NEAREST, FilterMode.LINEAR, false);
 
-   public void setClamp(boolean clamp) {
-      if (this.glTexture == null) {
-         throw new IllegalStateException("Texture does not exist, can't change its clamp before something initializes it");
-      } else {
-         this.glTexture.setAddressMode(clamp ? AddressMode.CLAMP_TO_EDGE : AddressMode.REPEAT);
-      }
-   }
+    @Override
+    public void close() {
+        if (this.glTexture != null) {
+            this.glTexture.close();
+            this.glTexture = null;
+        }
+        if (this.glTextureView != null) {
+            this.glTextureView.close();
+            this.glTextureView = null;
+        }
+    }
 
-   public void setFilter(boolean bilinear, boolean mipmap) {
-      if (this.glTexture == null) {
-         throw new IllegalStateException("Texture does not exist, can't get change its filter before something initializes it");
-      } else {
-         this.glTexture.setTextureFilter(bilinear ? FilterMode.LINEAR : FilterMode.NEAREST, mipmap);
-      }
-   }
+    public GpuTexture getGlTexture() {
+        if (this.glTexture == null) {
+            throw new IllegalStateException("Texture does not exist, can't get it before something initializes it");
+        }
+        return this.glTexture;
+    }
 
-   public void setUseMipmaps(boolean useMipmaps) {
-      if (this.glTexture == null) {
-         throw new IllegalStateException("Texture does not exist, can't get change its filter before something initializes it");
-      } else {
-         this.glTexture.setUseMipmaps(useMipmaps);
-      }
-   }
+    public GpuTextureView getGlTextureView() {
+        if (this.glTextureView == null) {
+            throw new IllegalStateException("Texture view does not exist, can't get it before something initializes it");
+        }
+        return this.glTextureView;
+    }
 
-   public void close() {
-      if (this.glTexture != null) {
-         this.glTexture.close();
-         this.glTexture = null;
-      }
-
-      if (this.glTextureView != null) {
-         this.glTextureView.close();
-         this.glTextureView = null;
-      }
-
-   }
-
-   public GpuTexture getGlTexture() {
-      if (this.glTexture == null) {
-         throw new IllegalStateException("Texture does not exist, can't get it before something initializes it");
-      } else {
-         return this.glTexture;
-      }
-   }
-
-   public GpuTextureView getGlTextureView() {
-      if (this.glTextureView == null) {
-         throw new IllegalStateException("Texture view does not exist, can't get it before something initializes it");
-      } else {
-         return this.glTextureView;
-      }
-   }
+    public GpuSampler getSampler() {
+        return this.sampler;
+    }
 }
+

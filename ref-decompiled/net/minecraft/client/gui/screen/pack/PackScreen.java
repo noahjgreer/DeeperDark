@@ -1,3 +1,51 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.google.common.collect.Maps
+ *  com.google.common.hash.Hashing
+ *  com.mojang.logging.LogUtils
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.MinecraftClient
+ *  net.minecraft.client.gui.Element
+ *  net.minecraft.client.gui.screen.ConfirmScreen
+ *  net.minecraft.client.gui.screen.NoticeScreen
+ *  net.minecraft.client.gui.screen.Screen
+ *  net.minecraft.client.gui.screen.pack.PackListWidget
+ *  net.minecraft.client.gui.screen.pack.PackScreen
+ *  net.minecraft.client.gui.screen.pack.PackScreen$1
+ *  net.minecraft.client.gui.screen.pack.PackScreen$DirectoryWatcher
+ *  net.minecraft.client.gui.screen.pack.ResourcePackOrganizer
+ *  net.minecraft.client.gui.screen.pack.ResourcePackOrganizer$AbstractPack
+ *  net.minecraft.client.gui.screen.pack.ResourcePackOrganizer$Pack
+ *  net.minecraft.client.gui.screen.world.SymlinkWarningScreen
+ *  net.minecraft.client.gui.tooltip.Tooltip
+ *  net.minecraft.client.gui.widget.ButtonWidget
+ *  net.minecraft.client.gui.widget.ClickableWidget
+ *  net.minecraft.client.gui.widget.DirectionalLayoutWidget
+ *  net.minecraft.client.gui.widget.TextFieldWidget
+ *  net.minecraft.client.gui.widget.TextWidget
+ *  net.minecraft.client.gui.widget.ThreePartsLayoutWidget
+ *  net.minecraft.client.gui.widget.Widget
+ *  net.minecraft.client.texture.AbstractTexture
+ *  net.minecraft.client.texture.NativeImage
+ *  net.minecraft.client.texture.NativeImageBackedTexture
+ *  net.minecraft.client.texture.TextureManager
+ *  net.minecraft.client.toast.SystemToast
+ *  net.minecraft.resource.InputSupplier
+ *  net.minecraft.resource.ResourcePack
+ *  net.minecraft.resource.ResourcePackManager
+ *  net.minecraft.resource.ResourcePackProfile
+ *  net.minecraft.screen.ScreenTexts
+ *  net.minecraft.text.Text
+ *  net.minecraft.util.Formatting
+ *  net.minecraft.util.Identifier
+ *  net.minecraft.util.Util
+ *  org.apache.commons.lang3.mutable.MutableBoolean
+ *  org.jspecify.annotations.Nullable
+ *  org.slf4j.Logger
+ */
 package net.minecraft.client.gui.screen.pack;
 
 import com.google.common.collect.Maps;
@@ -5,22 +53,16 @@ import com.google.common.hash.Hashing;
 import com.mojang.logging.LogUtils;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.DirectoryStream;
+import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
-import java.nio.file.LinkOption;
 import java.nio.file.Path;
-import java.nio.file.StandardWatchEventKinds;
-import java.nio.file.WatchEvent;
-import java.nio.file.WatchKey;
-import java.nio.file.WatchService;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -28,19 +70,21 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.ParentElement;
-import net.minecraft.client.gui.navigation.GuiNavigationPath;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.NoticeScreen;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.pack.PackListWidget;
+import net.minecraft.client.gui.screen.pack.PackScreen;
+import net.minecraft.client.gui.screen.pack.ResourcePackOrganizer;
 import net.minecraft.client.gui.screen.world.SymlinkWarningScreen;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.DirectionalLayoutWidget;
-import net.minecraft.client.gui.widget.EntryListWidget;
+import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.TextWidget;
 import net.minecraft.client.gui.widget.ThreePartsLayoutWidget;
+import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.texture.AbstractTexture;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
@@ -49,7 +93,6 @@ import net.minecraft.client.toast.SystemToast;
 import net.minecraft.resource.InputSupplier;
 import net.minecraft.resource.ResourcePack;
 import net.minecraft.resource.ResourcePackManager;
-import net.minecraft.resource.ResourcePackOpener;
 import net.minecraft.resource.ResourcePackProfile;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
@@ -57,421 +100,270 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import org.apache.commons.lang3.mutable.MutableBoolean;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 
-@Environment(EnvType.CLIENT)
-public class PackScreen extends Screen {
-   static final Logger LOGGER = LogUtils.getLogger();
-   private static final Text AVAILABLE_TITLE = Text.translatable("pack.available.title");
-   private static final Text SELECTED_TITLE = Text.translatable("pack.selected.title");
-   private static final Text OPEN_FOLDER = Text.translatable("pack.openFolder");
-   private static final int field_32395 = 200;
-   private static final Text DROP_INFO;
-   private static final Text FOLDER_INFO;
-   private static final int field_32396 = 20;
-   private static final Identifier UNKNOWN_PACK;
-   private final ThreePartsLayoutWidget layout = new ThreePartsLayoutWidget(this);
-   private final ResourcePackOrganizer organizer;
-   @Nullable
-   private DirectoryWatcher directoryWatcher;
-   private long refreshTimeout;
-   private PackListWidget availablePackList;
-   private PackListWidget selectedPackList;
-   private final Path file;
-   private ButtonWidget doneButton;
-   private final Map iconTextures = Maps.newHashMap();
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
+public class PackScreen
+extends Screen {
+    static final Logger LOGGER = LogUtils.getLogger();
+    private static final Text AVAILABLE_TITLE = Text.translatable((String)"pack.available.title");
+    private static final Text SELECTED_TITLE = Text.translatable((String)"pack.selected.title");
+    private static final Text OPEN_FOLDER = Text.translatable((String)"pack.openFolder");
+    private static final Text SEARCH_BOX_PLACEHOLDER = Text.translatable((String)"gui.packSelection.search").fillStyle(TextFieldWidget.SEARCH_STYLE);
+    private static final int field_32395 = 200;
+    private static final int field_62930 = 4;
+    private static final int field_62931 = 15;
+    private static final Text DROP_INFO = Text.translatable((String)"pack.dropInfo").formatted(Formatting.GRAY);
+    private static final Text FOLDER_INFO = Text.translatable((String)"pack.folderInfo");
+    private static final int field_32396 = 20;
+    private static final Identifier UNKNOWN_PACK = Identifier.ofVanilla((String)"textures/misc/unknown_pack.png");
+    private final ThreePartsLayoutWidget layout = new ThreePartsLayoutWidget((Screen)this);
+    private final ResourcePackOrganizer organizer;
+    private // Could not load outer class - annotation placement on inner may be incorrect
+    @Nullable PackScreen.DirectoryWatcher directoryWatcher;
+    private long refreshTimeout;
+    private @Nullable PackListWidget availablePackList;
+    private @Nullable PackListWidget selectedPackList;
+    private @Nullable TextFieldWidget searchBox;
+    private final Path file;
+    private @Nullable ButtonWidget doneButton;
+    private final Map<String, Identifier> iconTextures = Maps.newHashMap();
 
-   public PackScreen(ResourcePackManager resourcePackManager, Consumer applier, Path file, Text title) {
-      super(title);
-      this.organizer = new ResourcePackOrganizer(this::updatePackLists, this::getPackIconTexture, resourcePackManager, applier);
-      this.file = file;
-      this.directoryWatcher = PackScreen.DirectoryWatcher.create(file);
-   }
+    public PackScreen(ResourcePackManager resourcePackManager, Consumer<ResourcePackManager> applier, Path file, Text title) {
+        super(title);
+        this.organizer = new ResourcePackOrganizer(arg_0 -> this.updatePackLists(arg_0), arg_0 -> this.getPackIconTexture(arg_0), resourcePackManager, applier);
+        this.file = file;
+        this.directoryWatcher = DirectoryWatcher.create((Path)file);
+    }
 
-   public void close() {
-      this.organizer.apply();
-      this.closeDirectoryWatcher();
-   }
+    public void close() {
+        this.organizer.apply();
+        this.closeDirectoryWatcher();
+    }
 
-   private void closeDirectoryWatcher() {
-      if (this.directoryWatcher != null) {
-         try {
-            this.directoryWatcher.close();
-            this.directoryWatcher = null;
-         } catch (Exception var2) {
-         }
-      }
-
-   }
-
-   protected void init() {
-      DirectionalLayoutWidget directionalLayoutWidget = (DirectionalLayoutWidget)this.layout.addHeader(DirectionalLayoutWidget.vertical().spacing(5));
-      directionalLayoutWidget.getMainPositioner().alignHorizontalCenter();
-      directionalLayoutWidget.add(new TextWidget(this.getTitle(), this.textRenderer));
-      directionalLayoutWidget.add(new TextWidget(DROP_INFO, this.textRenderer));
-      this.availablePackList = (PackListWidget)this.addDrawableChild(new PackListWidget(this.client, this, 200, this.height - 66, AVAILABLE_TITLE));
-      this.selectedPackList = (PackListWidget)this.addDrawableChild(new PackListWidget(this.client, this, 200, this.height - 66, SELECTED_TITLE));
-      DirectionalLayoutWidget directionalLayoutWidget2 = (DirectionalLayoutWidget)this.layout.addFooter(DirectionalLayoutWidget.horizontal().spacing(8));
-      directionalLayoutWidget2.add(ButtonWidget.builder(OPEN_FOLDER, (button) -> {
-         Util.getOperatingSystem().open(this.file);
-      }).tooltip(Tooltip.of(FOLDER_INFO)).build());
-      this.doneButton = (ButtonWidget)directionalLayoutWidget2.add(ButtonWidget.builder(ScreenTexts.DONE, (button) -> {
-         this.close();
-      }).build());
-      this.refresh();
-      this.layout.forEachChild((element) -> {
-         ClickableWidget var10000 = (ClickableWidget)this.addDrawableChild(element);
-      });
-      this.refreshWidgetPositions();
-   }
-
-   protected void refreshWidgetPositions() {
-      this.layout.refreshPositions();
-      this.availablePackList.position(200, this.layout);
-      this.availablePackList.setX(this.width / 2 - 15 - 200);
-      this.selectedPackList.position(200, this.layout);
-      this.selectedPackList.setX(this.width / 2 + 15);
-   }
-
-   public void tick() {
-      if (this.directoryWatcher != null) {
-         try {
-            if (this.directoryWatcher.pollForChange()) {
-               this.refreshTimeout = 20L;
-            }
-         } catch (IOException var2) {
-            LOGGER.warn("Failed to poll for directory {} changes, stopping", this.file);
-            this.closeDirectoryWatcher();
-         }
-      }
-
-      if (this.refreshTimeout > 0L && --this.refreshTimeout == 0L) {
-         this.refresh();
-      }
-
-   }
-
-   private void updatePackLists() {
-      this.updatePackList(this.selectedPackList, this.organizer.getEnabledPacks());
-      this.updatePackList(this.availablePackList, this.organizer.getDisabledPacks());
-      this.doneButton.active = !this.selectedPackList.children().isEmpty();
-   }
-
-   private void updatePackList(PackListWidget widget, Stream packs) {
-      widget.children().clear();
-      PackListWidget.ResourcePackEntry resourcePackEntry = (PackListWidget.ResourcePackEntry)widget.getSelectedOrNull();
-      String string = resourcePackEntry == null ? "" : resourcePackEntry.getName();
-      widget.setSelected((EntryListWidget.Entry)null);
-      packs.forEach((pack) -> {
-         PackListWidget.ResourcePackEntry resourcePackEntry = new PackListWidget.ResourcePackEntry(this.client, widget, pack);
-         widget.children().add(resourcePackEntry);
-         if (pack.getName().equals(string)) {
-            widget.setSelected(resourcePackEntry);
-         }
-
-      });
-   }
-
-   public void switchFocusedList(PackListWidget listWidget) {
-      PackListWidget packListWidget = this.selectedPackList == listWidget ? this.availablePackList : this.selectedPackList;
-      this.switchFocus(GuiNavigationPath.of((Element)packListWidget.getFirst(), (ParentElement[])(packListWidget, this)));
-   }
-
-   public void clearSelection() {
-      this.selectedPackList.setSelected((EntryListWidget.Entry)null);
-      this.availablePackList.setSelected((EntryListWidget.Entry)null);
-   }
-
-   private void refresh() {
-      this.organizer.refresh();
-      this.updatePackLists();
-      this.refreshTimeout = 0L;
-      this.iconTextures.clear();
-   }
-
-   protected static void copyPacks(MinecraftClient client, List srcPaths, Path destPath) {
-      MutableBoolean mutableBoolean = new MutableBoolean();
-      srcPaths.forEach((src) -> {
-         try {
-            Stream stream = Files.walk(src);
-
+    private void closeDirectoryWatcher() {
+        if (this.directoryWatcher != null) {
             try {
-               stream.forEach((toCopy) -> {
-                  try {
-                     Util.relativeCopy(src.getParent(), destPath, toCopy);
-                  } catch (IOException var5) {
-                     LOGGER.warn("Failed to copy datapack file  from {} to {}", new Object[]{toCopy, destPath, var5});
-                     mutableBoolean.setTrue();
-                  }
-
-               });
-            } catch (Throwable var7) {
-               if (stream != null) {
-                  try {
-                     stream.close();
-                  } catch (Throwable var6) {
-                     var7.addSuppressed(var6);
-                  }
-               }
-
-               throw var7;
+                this.directoryWatcher.close();
+                this.directoryWatcher = null;
             }
-
-            if (stream != null) {
-               stream.close();
+            catch (Exception exception) {
+                // empty catch block
             }
-         } catch (IOException var8) {
-            LOGGER.warn("Failed to copy datapack file from {} to {}", src, destPath);
-            mutableBoolean.setTrue();
-         }
+        }
+    }
 
-      });
-      if (mutableBoolean.isTrue()) {
-         SystemToast.addPackCopyFailure(client, destPath.toString());
-      }
+    protected void init() {
+        Objects.requireNonNull(this.textRenderer);
+        Objects.requireNonNull(this.textRenderer);
+        this.layout.setHeaderHeight(4 + 9 + 4 + 9 + 4 + 15 + 4);
+        DirectionalLayoutWidget directionalLayoutWidget = (DirectionalLayoutWidget)this.layout.addHeader((Widget)DirectionalLayoutWidget.vertical().spacing(4));
+        directionalLayoutWidget.getMainPositioner().alignHorizontalCenter();
+        directionalLayoutWidget.add((Widget)new TextWidget(this.getTitle(), this.textRenderer));
+        directionalLayoutWidget.add((Widget)new TextWidget(DROP_INFO, this.textRenderer));
+        this.searchBox = (TextFieldWidget)directionalLayoutWidget.add((Widget)new TextFieldWidget(this.textRenderer, 0, 0, 200, 15, (Text)Text.empty()));
+        this.searchBox.setPlaceholder(SEARCH_BOX_PLACEHOLDER);
+        this.searchBox.setChangedListener(arg_0 -> this.setSearch(arg_0));
+        this.availablePackList = (PackListWidget)this.layout.addBody((Widget)new PackListWidget(this.client, this, 200, this.height - 66, AVAILABLE_TITLE));
+        this.selectedPackList = (PackListWidget)this.layout.addBody((Widget)new PackListWidget(this.client, this, 200, this.height - 66, SELECTED_TITLE));
+        DirectionalLayoutWidget directionalLayoutWidget2 = (DirectionalLayoutWidget)this.layout.addFooter((Widget)DirectionalLayoutWidget.horizontal().spacing(8));
+        directionalLayoutWidget2.add((Widget)ButtonWidget.builder((Text)OPEN_FOLDER, button -> Util.getOperatingSystem().open(this.file)).tooltip(Tooltip.of((Text)FOLDER_INFO)).build());
+        this.doneButton = (ButtonWidget)directionalLayoutWidget2.add((Widget)ButtonWidget.builder((Text)ScreenTexts.DONE, button -> this.close()).build());
+        this.layout.forEachChild(child -> {
+            ClickableWidget cfr_ignored_0 = (ClickableWidget)this.addDrawableChild(child);
+        });
+        this.refreshWidgetPositions();
+        this.refresh();
+    }
 
-   }
+    protected void setInitialFocus() {
+        if (this.searchBox != null) {
+            this.setInitialFocus((Element)this.searchBox);
+        } else {
+            super.setInitialFocus();
+        }
+    }
 
-   public void onFilesDropped(List paths) {
-      String string = (String)streamFileNames(paths).collect(Collectors.joining(", "));
-      this.client.setScreen(new ConfirmScreen((confirmed) -> {
-         if (confirmed) {
-            List list2 = new ArrayList(paths.size());
-            Set set = new HashSet(paths);
-            ResourcePackOpener resourcePackOpener = new ResourcePackOpener(this, this.client.getSymlinkFinder()) {
-               protected Path openZip(Path path) {
-                  return path;
-               }
+    private void setSearch(String search) {
+        this.filter(search, this.organizer.getEnabledPacks(), this.selectedPackList);
+        this.filter(search, this.organizer.getDisabledPacks(), this.availablePackList);
+    }
 
-               protected Path openDirectory(Path path) {
-                  return path;
-               }
+    private void filter(String search, Stream<ResourcePackOrganizer.Pack> packs, @Nullable PackListWidget listWidget) {
+        if (listWidget == null) {
+            return;
+        }
+        String string = search.toLowerCase(Locale.ROOT);
+        Stream<ResourcePackOrganizer.Pack> stream = packs.filter(pack -> search.isBlank() || pack.getName().toLowerCase(Locale.ROOT).contains(string) || pack.getDisplayName().getString().toLowerCase(Locale.ROOT).contains(string) || pack.getDescription().getString().toLowerCase(Locale.ROOT).contains(string));
+        listWidget.set(stream, null);
+    }
 
-               // $FF: synthetic method
-               protected Object openDirectory(final Path path) throws IOException {
-                  return this.openDirectory(path);
-               }
+    protected void refreshWidgetPositions() {
+        this.layout.refreshPositions();
+        if (this.availablePackList != null) {
+            this.availablePackList.position(200, this.layout.getContentHeight(), this.width / 2 - 15 - 200, this.layout.getHeaderHeight());
+        }
+        if (this.selectedPackList != null) {
+            this.selectedPackList.position(200, this.layout.getContentHeight(), this.width / 2 + 15, this.layout.getHeaderHeight());
+        }
+    }
 
-               // $FF: synthetic method
-               protected Object openZip(final Path path) throws IOException {
-                  return this.openZip(path);
-               }
-            };
-            List list3 = new ArrayList();
-            Iterator var7 = paths.iterator();
-
-            while(var7.hasNext()) {
-               Path path = (Path)var7.next();
-
-               try {
-                  Path path2 = (Path)resourcePackOpener.open(path, list3);
-                  if (path2 == null) {
-                     LOGGER.warn("Path {} does not seem like pack", path);
-                  } else {
-                     list2.add(path2);
-                     set.remove(path2);
-                  }
-               } catch (IOException var10) {
-                  LOGGER.warn("Failed to check {} for packs", path, var10);
-               }
-            }
-
-            if (!list3.isEmpty()) {
-               this.client.setScreen(SymlinkWarningScreen.pack(() -> {
-                  this.client.setScreen(this);
-               }));
-               return;
-            }
-
-            if (!list2.isEmpty()) {
-               copyPacks(this.client, list2, this.file);
-               this.refresh();
-            }
-
-            if (!set.isEmpty()) {
-               String string = (String)streamFileNames(set).collect(Collectors.joining(", "));
-               this.client.setScreen(new NoticeScreen(() -> {
-                  this.client.setScreen(this);
-               }, Text.translatable("pack.dropRejected.title"), Text.translatable("pack.dropRejected.message", string)));
-               return;
-            }
-         }
-
-         this.client.setScreen(this);
-      }, Text.translatable("pack.dropConfirm"), Text.literal(string)));
-   }
-
-   private static Stream streamFileNames(Collection paths) {
-      return paths.stream().map(Path::getFileName).map(Path::toString);
-   }
-
-   private Identifier loadPackIcon(TextureManager textureManager, ResourcePackProfile resourcePackProfile) {
-      try {
-         ResourcePack resourcePack = resourcePackProfile.createResourcePack();
-
-         Identifier var15;
-         label70: {
-            Identifier var9;
+    public void tick() {
+        if (this.directoryWatcher != null) {
             try {
-               InputSupplier inputSupplier = resourcePack.openRoot("pack.png");
-               if (inputSupplier == null) {
-                  var15 = UNKNOWN_PACK;
-                  break label70;
-               }
-
-               String string = resourcePackProfile.getId();
-               String var10000 = Util.replaceInvalidChars(string, Identifier::isPathCharacterValid);
-               Identifier identifier = Identifier.ofVanilla("pack/" + var10000 + "/" + String.valueOf(Hashing.sha1().hashUnencodedChars(string)) + "/icon");
-               InputStream inputStream = (InputStream)inputSupplier.get();
-
-               try {
-                  NativeImage nativeImage = NativeImage.read(inputStream);
-                  Objects.requireNonNull(identifier);
-                  textureManager.registerTexture(identifier, (AbstractTexture)(new NativeImageBackedTexture(identifier::toString, nativeImage)));
-                  var9 = identifier;
-               } catch (Throwable var12) {
-                  if (inputStream != null) {
-                     try {
-                        inputStream.close();
-                     } catch (Throwable var11) {
-                        var12.addSuppressed(var11);
-                     }
-                  }
-
-                  throw var12;
-               }
-
-               if (inputStream != null) {
-                  inputStream.close();
-               }
-            } catch (Throwable var13) {
-               if (resourcePack != null) {
-                  try {
-                     resourcePack.close();
-                  } catch (Throwable var10) {
-                     var13.addSuppressed(var10);
-                  }
-               }
-
-               throw var13;
+                if (this.directoryWatcher.pollForChange()) {
+                    this.refreshTimeout = 20L;
+                }
             }
-
-            if (resourcePack != null) {
-               resourcePack.close();
+            catch (IOException iOException) {
+                LOGGER.warn("Failed to poll for directory {} changes, stopping", (Object)this.file);
+                this.closeDirectoryWatcher();
             }
+        }
+        if (this.refreshTimeout > 0L && --this.refreshTimeout == 0L) {
+            this.refresh();
+        }
+    }
 
-            return var9;
-         }
+    private void updatePackLists(// Could not load outer class - annotation placement on inner may be incorrect
+    @Nullable ResourcePackOrganizer.AbstractPack focused) {
+        if (this.selectedPackList != null) {
+            this.selectedPackList.set(this.organizer.getEnabledPacks(), focused);
+        }
+        if (this.availablePackList != null) {
+            this.availablePackList.set(this.organizer.getDisabledPacks(), focused);
+        }
+        if (this.searchBox != null) {
+            this.setSearch(this.searchBox.getText());
+        }
+        if (this.doneButton != null) {
+            this.doneButton.active = !this.selectedPackList.children().isEmpty();
+        }
+    }
 
-         if (resourcePack != null) {
-            resourcePack.close();
-         }
+    private void refresh() {
+        this.organizer.refresh();
+        this.updatePackLists(null);
+        this.refreshTimeout = 0L;
+        this.iconTextures.clear();
+    }
 
-         return var15;
-      } catch (Exception var14) {
-         LOGGER.warn("Failed to load icon from pack {}", resourcePackProfile.getId(), var14);
-         return UNKNOWN_PACK;
-      }
-   }
-
-   private Identifier getPackIconTexture(ResourcePackProfile resourcePackProfile) {
-      return (Identifier)this.iconTextures.computeIfAbsent(resourcePackProfile.getId(), (profileName) -> {
-         return this.loadPackIcon(this.client.getTextureManager(), resourcePackProfile);
-      });
-   }
-
-   static {
-      DROP_INFO = Text.translatable("pack.dropInfo").formatted(Formatting.GRAY);
-      FOLDER_INFO = Text.translatable("pack.folderInfo");
-      UNKNOWN_PACK = Identifier.ofVanilla("textures/misc/unknown_pack.png");
-   }
-
-   @Environment(EnvType.CLIENT)
-   private static class DirectoryWatcher implements AutoCloseable {
-      private final WatchService watchService;
-      private final Path path;
-
-      public DirectoryWatcher(Path path) throws IOException {
-         this.path = path;
-         this.watchService = path.getFileSystem().newWatchService();
-
-         try {
-            this.watchDirectory(path);
-            DirectoryStream directoryStream = Files.newDirectoryStream(path);
-
-            try {
-               Iterator var3 = directoryStream.iterator();
-
-               while(var3.hasNext()) {
-                  Path path2 = (Path)var3.next();
-                  if (Files.isDirectory(path2, new LinkOption[]{LinkOption.NOFOLLOW_LINKS})) {
-                     this.watchDirectory(path2);
-                  }
-               }
-            } catch (Throwable var6) {
-               if (directoryStream != null) {
-                  try {
-                     directoryStream.close();
-                  } catch (Throwable var5) {
-                     var6.addSuppressed(var5);
-                  }
-               }
-
-               throw var6;
+    protected static void copyPacks(MinecraftClient client, List<Path> srcPaths, Path destPath) {
+        MutableBoolean mutableBoolean = new MutableBoolean();
+        srcPaths.forEach(src -> {
+            try (Stream<Path> stream = Files.walk(src, new FileVisitOption[0]);){
+                stream.forEach(toCopy -> {
+                    try {
+                        Util.relativeCopy((Path)src.getParent(), (Path)destPath, (Path)toCopy);
+                    }
+                    catch (IOException iOException) {
+                        LOGGER.warn("Failed to copy datapack file  from {} to {}", new Object[]{toCopy, destPath, iOException});
+                        mutableBoolean.setTrue();
+                    }
+                });
             }
-
-            if (directoryStream != null) {
-               directoryStream.close();
+            catch (IOException iOException) {
+                LOGGER.warn("Failed to copy datapack file from {} to {}", src, (Object)destPath);
+                mutableBoolean.setTrue();
             }
+        });
+        if (mutableBoolean.isTrue()) {
+            SystemToast.addPackCopyFailure((MinecraftClient)client, (String)destPath.toString());
+        }
+    }
 
-         } catch (Exception var7) {
-            this.watchService.close();
-            throw var7;
-         }
-      }
-
-      @Nullable
-      public static DirectoryWatcher create(Path path) {
-         try {
-            return new DirectoryWatcher(path);
-         } catch (IOException var2) {
-            PackScreen.LOGGER.warn("Failed to initialize pack directory {} monitoring", path, var2);
-            return null;
-         }
-      }
-
-      private void watchDirectory(Path path) throws IOException {
-         path.register(this.watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY);
-      }
-
-      public boolean pollForChange() throws IOException {
-         boolean bl = false;
-
-         WatchKey watchKey;
-         while((watchKey = this.watchService.poll()) != null) {
-            List list = watchKey.pollEvents();
-            Iterator var4 = list.iterator();
-
-            while(var4.hasNext()) {
-               WatchEvent watchEvent = (WatchEvent)var4.next();
-               bl = true;
-               if (watchKey.watchable() == this.path && watchEvent.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
-                  Path path = this.path.resolve((Path)watchEvent.context());
-                  if (Files.isDirectory(path, new LinkOption[]{LinkOption.NOFOLLOW_LINKS})) {
-                     this.watchDirectory(path);
-                  }
-               }
+    public void onFilesDropped(List<Path> paths) {
+        String string = PackScreen.streamFileNames(paths).collect(Collectors.joining(", "));
+        this.client.setScreen((Screen)new ConfirmScreen(confirmed -> {
+            if (confirmed) {
+                ArrayList<Path> list2 = new ArrayList<Path>(paths.size());
+                HashSet set = new HashSet(paths);
+                1 resourcePackOpener = new /* Unavailable Anonymous Inner Class!! */;
+                ArrayList list3 = new ArrayList();
+                for (Path path : paths) {
+                    try {
+                        Path path2 = (Path)resourcePackOpener.open(path, list3);
+                        if (path2 == null) {
+                            LOGGER.warn("Path {} does not seem like pack", (Object)path);
+                            continue;
+                        }
+                        list2.add(path2);
+                        set.remove(path2);
+                    }
+                    catch (IOException iOException) {
+                        LOGGER.warn("Failed to check {} for packs", (Object)path, (Object)iOException);
+                    }
+                }
+                if (!list3.isEmpty()) {
+                    this.client.setScreen(SymlinkWarningScreen.pack(() -> this.client.setScreen((Screen)this)));
+                    return;
+                }
+                if (!list2.isEmpty()) {
+                    PackScreen.copyPacks((MinecraftClient)this.client, list2, (Path)this.file);
+                    this.refresh();
+                }
+                if (!set.isEmpty()) {
+                    String string = PackScreen.streamFileNames(set).collect(Collectors.joining(", "));
+                    this.client.setScreen((Screen)new NoticeScreen(() -> this.client.setScreen((Screen)this), (Text)Text.translatable((String)"pack.dropRejected.title"), (Text)Text.translatable((String)"pack.dropRejected.message", (Object[])new Object[]{string})));
+                    return;
+                }
             }
+            this.client.setScreen((Screen)this);
+        }, (Text)Text.translatable((String)"pack.dropConfirm"), (Text)Text.literal((String)string)));
+    }
 
-            watchKey.reset();
-         }
+    private static Stream<String> streamFileNames(Collection<Path> paths) {
+        return paths.stream().map(Path::getFileName).map(Path::toString);
+    }
 
-         return bl;
-      }
+    /*
+     * Enabled aggressive exception aggregation
+     */
+    private Identifier loadPackIcon(TextureManager textureManager, ResourcePackProfile resourcePackProfile) {
+        try (ResourcePack resourcePack = resourcePackProfile.createResourcePack();){
+            Identifier identifier;
+            block16: {
+                InputSupplier inputSupplier = resourcePack.openRoot(new String[]{"pack.png"});
+                if (inputSupplier == null) {
+                    Identifier identifier2 = UNKNOWN_PACK;
+                    return identifier2;
+                }
+                String string = resourcePackProfile.getId();
+                Identifier identifier3 = Identifier.ofVanilla((String)("pack/" + Util.replaceInvalidChars((String)string, Identifier::isPathCharacterValid) + "/" + String.valueOf(Hashing.sha1().hashUnencodedChars((CharSequence)string)) + "/icon"));
+                InputStream inputStream = (InputStream)inputSupplier.get();
+                try {
+                    NativeImage nativeImage = NativeImage.read((InputStream)inputStream);
+                    textureManager.registerTexture(identifier3, (AbstractTexture)new NativeImageBackedTexture(() -> ((Identifier)identifier3).toString(), nativeImage));
+                    identifier = identifier3;
+                    if (inputStream == null) break block16;
+                }
+                catch (Throwable throwable) {
+                    if (inputStream != null) {
+                        try {
+                            inputStream.close();
+                        }
+                        catch (Throwable throwable2) {
+                            throwable.addSuppressed(throwable2);
+                        }
+                    }
+                    throw throwable;
+                }
+                inputStream.close();
+            }
+            return identifier;
+        }
+        catch (Exception exception) {
+            LOGGER.warn("Failed to load icon from pack {}", (Object)resourcePackProfile.getId(), (Object)exception);
+            return UNKNOWN_PACK;
+        }
+    }
 
-      public void close() throws IOException {
-         this.watchService.close();
-      }
-   }
+    private Identifier getPackIconTexture(ResourcePackProfile resourcePackProfile) {
+        return this.iconTextures.computeIfAbsent(resourcePackProfile.getId(), profileName -> this.loadPackIcon(this.client.getTextureManager(), resourcePackProfile));
+    }
 }
+

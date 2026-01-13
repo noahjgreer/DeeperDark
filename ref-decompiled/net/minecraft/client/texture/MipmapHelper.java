@@ -1,132 +1,185 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.blaze3d.platform.TextureUtil
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.texture.MipmapHelper
+ *  net.minecraft.client.texture.MipmapStrategy
+ *  net.minecraft.client.texture.NativeImage
+ *  net.minecraft.util.Identifier
+ *  net.minecraft.util.math.ColorHelper
+ */
 package net.minecraft.client.texture;
 
+import com.mojang.blaze3d.platform.TextureUtil;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.util.Util;
+import net.minecraft.client.texture.MipmapStrategy;
+import net.minecraft.client.texture.NativeImage;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ColorHelper;
 
-@Environment(EnvType.CLIENT)
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
 public class MipmapHelper {
-   private static final int MIN_ALPHA = 96;
-   private static final float[] COLOR_FRACTIONS = (float[])Util.make(new float[256], (list) -> {
-      for(int i = 0; i < list.length; ++i) {
-         list[i] = (float)Math.pow((double)((float)i / 255.0F), 2.2);
-      }
+    private static final String ITEM_PREFIX = "item/";
+    private static final float DEFAULT_ALPHA_THRESHOLD = 0.5f;
+    private static final float STRICT_CUTOUT_ALPHA_THRESHOLD = 0.3f;
 
-   });
+    private MipmapHelper() {
+    }
 
-   private MipmapHelper() {
-   }
+    private static float getOpacityCoverage(NativeImage image, float alphaThreshold, float alphaMulti) {
+        int i = image.getWidth();
+        int j = image.getHeight();
+        float f = 0.0f;
+        int k = 4;
+        for (int l = 0; l < j - 1; ++l) {
+            for (int m = 0; m < i - 1; ++m) {
+                float g = Math.clamp(ColorHelper.getAlphaFloat((int)image.getColorArgb(m, l)) * alphaMulti, 0.0f, 1.0f);
+                float h = Math.clamp(ColorHelper.getAlphaFloat((int)image.getColorArgb(m + 1, l)) * alphaMulti, 0.0f, 1.0f);
+                float n = Math.clamp(ColorHelper.getAlphaFloat((int)image.getColorArgb(m, l + 1)) * alphaMulti, 0.0f, 1.0f);
+                float o = Math.clamp(ColorHelper.getAlphaFloat((int)image.getColorArgb(m + 1, l + 1)) * alphaMulti, 0.0f, 1.0f);
+                float p = 0.0f;
+                for (int q = 0; q < 4; ++q) {
+                    float r = ((float)q + 0.5f) / 4.0f;
+                    for (int s = 0; s < 4; ++s) {
+                        float t = ((float)s + 0.5f) / 4.0f;
+                        float u = g * (1.0f - t) * (1.0f - r) + h * t * (1.0f - r) + n * (1.0f - t) * r + o * t * r;
+                        if (!(u > alphaThreshold)) continue;
+                        p += 1.0f;
+                    }
+                }
+                f += p / 16.0f;
+            }
+        }
+        return f / (float)((i - 1) * (j - 1));
+    }
 
-   public static NativeImage[] getMipmapLevelsImages(NativeImage[] originals, int mipmap) {
-      if (mipmap + 1 <= originals.length) {
-         return originals;
-      } else {
-         NativeImage[] nativeImages = new NativeImage[mipmap + 1];
-         nativeImages[0] = originals[0];
-         boolean bl = hasAlpha(nativeImages[0]);
-
-         for(int i = 1; i <= mipmap; ++i) {
-            if (i < originals.length) {
-               nativeImages[i] = originals[i];
+    private static void adjustAlphaForTargetCoverage(NativeImage image, float targetCoverage, float alphaThreshold, float cutoffBias) {
+        int m;
+        float f = 0.0f;
+        float g = 4.0f;
+        float h = 1.0f;
+        float i = 1.0f;
+        float j = Float.MAX_VALUE;
+        int k = image.getWidth();
+        int l = image.getHeight();
+        for (m = 0; m < 5; ++m) {
+            float n = MipmapHelper.getOpacityCoverage((NativeImage)image, (float)alphaThreshold, (float)h);
+            float o = Math.abs(n - targetCoverage);
+            if (o < j) {
+                j = o;
+                i = h;
+            }
+            if (n < targetCoverage) {
+                f = h;
             } else {
-               NativeImage nativeImage = nativeImages[i - 1];
-               NativeImage nativeImage2 = new NativeImage(nativeImage.getWidth() >> 1, nativeImage.getHeight() >> 1, false);
-               int j = nativeImage2.getWidth();
-               int k = nativeImage2.getHeight();
-
-               for(int l = 0; l < j; ++l) {
-                  for(int m = 0; m < k; ++m) {
-                     nativeImage2.setColorArgb(l, m, blend(nativeImage.getColorArgb(l * 2 + 0, m * 2 + 0), nativeImage.getColorArgb(l * 2 + 1, m * 2 + 0), nativeImage.getColorArgb(l * 2 + 0, m * 2 + 1), nativeImage.getColorArgb(l * 2 + 1, m * 2 + 1), bl));
-                  }
-               }
-
-               nativeImages[i] = nativeImage2;
+                if (!(n > targetCoverage)) break;
+                g = h;
             }
-         }
-
-         return nativeImages;
-      }
-   }
-
-   private static boolean hasAlpha(NativeImage image) {
-      for(int i = 0; i < image.getWidth(); ++i) {
-         for(int j = 0; j < image.getHeight(); ++j) {
-            if (ColorHelper.getAlpha(image.getColorArgb(i, j)) == 0) {
-               return true;
+            h = (f + g) * 0.5f;
+        }
+        for (m = 0; m < l; ++m) {
+            for (int p = 0; p < k; ++p) {
+                int q = image.getColorArgb(p, m);
+                float r = ColorHelper.getAlphaFloat((int)q);
+                r = r * i + cutoffBias + 0.025f;
+                r = Math.clamp(r, 0.0f, 1.0f);
+                image.setColorArgb(p, m, ColorHelper.withAlpha((float)r, (int)q));
             }
-         }
-      }
+        }
+    }
 
-      return false;
-   }
+    public static NativeImage[] getMipmapLevelsImages(Identifier id, NativeImage[] mipmapLevelImages, int mipmapLevels, MipmapStrategy strategy, float cutoffBias) {
+        if (strategy == MipmapStrategy.AUTO) {
+            MipmapStrategy mipmapStrategy = strategy = MipmapHelper.hasAlpha((NativeImage)mipmapLevelImages[0]) ? MipmapStrategy.CUTOUT : MipmapStrategy.MEAN;
+        }
+        if (mipmapLevelImages.length == 1 && !id.getPath().startsWith("item/")) {
+            if (strategy == MipmapStrategy.CUTOUT || strategy == MipmapStrategy.STRICT_CUTOUT) {
+                TextureUtil.solidify((NativeImage)mipmapLevelImages[0]);
+            } else if (strategy == MipmapStrategy.DARK_CUTOUT) {
+                TextureUtil.fillEmptyAreasWithDarkColor((NativeImage)mipmapLevelImages[0]);
+            }
+        }
+        if (mipmapLevels + 1 <= mipmapLevelImages.length) {
+            return mipmapLevelImages;
+        }
+        NativeImage[] nativeImages = new NativeImage[mipmapLevels + 1];
+        nativeImages[0] = mipmapLevelImages[0];
+        boolean bl = strategy == MipmapStrategy.CUTOUT || strategy == MipmapStrategy.STRICT_CUTOUT || strategy == MipmapStrategy.DARK_CUTOUT;
+        float f = strategy == MipmapStrategy.STRICT_CUTOUT ? 0.3f : 0.5f;
+        float g = bl ? MipmapHelper.getOpacityCoverage((NativeImage)mipmapLevelImages[0], (float)f, (float)1.0f) : 0.0f;
+        for (int i = 1; i <= mipmapLevels; ++i) {
+            if (i < mipmapLevelImages.length) {
+                nativeImages[i] = mipmapLevelImages[i];
+            } else {
+                NativeImage nativeImage = nativeImages[i - 1];
+                NativeImage nativeImage2 = new NativeImage(nativeImage.getWidth() >> 1, nativeImage.getHeight() >> 1, false);
+                int j = nativeImage2.getWidth();
+                int k = nativeImage2.getHeight();
+                for (int l = 0; l < j; ++l) {
+                    for (int m = 0; m < k; ++m) {
+                        int n = nativeImage.getColorArgb(l * 2 + 0, m * 2 + 0);
+                        int o = nativeImage.getColorArgb(l * 2 + 1, m * 2 + 0);
+                        int p = nativeImage.getColorArgb(l * 2 + 0, m * 2 + 1);
+                        int q = nativeImage.getColorArgb(l * 2 + 1, m * 2 + 1);
+                        int r = strategy == MipmapStrategy.DARK_CUTOUT ? MipmapHelper.blendDarkenedCutout((int)n, (int)o, (int)p, (int)q) : ColorHelper.interpolate((int)n, (int)o, (int)p, (int)q);
+                        nativeImage2.setColorArgb(l, m, r);
+                    }
+                }
+                nativeImages[i] = nativeImage2;
+            }
+            if (!bl) continue;
+            MipmapHelper.adjustAlphaForTargetCoverage((NativeImage)nativeImages[i], (float)g, (float)f, (float)cutoffBias);
+        }
+        return nativeImages;
+    }
 
-   private static int blend(int one, int two, int three, int four, boolean checkAlpha) {
-      if (checkAlpha) {
-         float f = 0.0F;
-         float g = 0.0F;
-         float h = 0.0F;
-         float i = 0.0F;
-         if (one >> 24 != 0) {
-            f += getColorFraction(one >> 24);
-            g += getColorFraction(one >> 16);
-            h += getColorFraction(one >> 8);
-            i += getColorFraction(one >> 0);
-         }
+    private static boolean hasAlpha(NativeImage image) {
+        for (int i = 0; i < image.getWidth(); ++i) {
+            for (int j = 0; j < image.getHeight(); ++j) {
+                if (ColorHelper.getAlpha((int)image.getColorArgb(i, j)) != 0) continue;
+                return true;
+            }
+        }
+        return false;
+    }
 
-         if (two >> 24 != 0) {
-            f += getColorFraction(two >> 24);
-            g += getColorFraction(two >> 16);
-            h += getColorFraction(two >> 8);
-            i += getColorFraction(two >> 0);
-         }
-
-         if (three >> 24 != 0) {
-            f += getColorFraction(three >> 24);
-            g += getColorFraction(three >> 16);
-            h += getColorFraction(three >> 8);
-            i += getColorFraction(three >> 0);
-         }
-
-         if (four >> 24 != 0) {
-            f += getColorFraction(four >> 24);
-            g += getColorFraction(four >> 16);
-            h += getColorFraction(four >> 8);
-            i += getColorFraction(four >> 0);
-         }
-
-         f /= 4.0F;
-         g /= 4.0F;
-         h /= 4.0F;
-         i /= 4.0F;
-         int j = (int)(Math.pow((double)f, 0.45454545454545453) * 255.0);
-         int k = (int)(Math.pow((double)g, 0.45454545454545453) * 255.0);
-         int l = (int)(Math.pow((double)h, 0.45454545454545453) * 255.0);
-         int m = (int)(Math.pow((double)i, 0.45454545454545453) * 255.0);
-         if (j < 96) {
-            j = 0;
-         }
-
-         return ColorHelper.getArgb(j, k, l, m);
-      } else {
-         int n = getColorComponent(one, two, three, four, 24);
-         int o = getColorComponent(one, two, three, four, 16);
-         int p = getColorComponent(one, two, three, four, 8);
-         int q = getColorComponent(one, two, three, four, 0);
-         return ColorHelper.getArgb(n, o, p, q);
-      }
-   }
-
-   private static int getColorComponent(int one, int two, int three, int four, int bits) {
-      float f = getColorFraction(one >> bits);
-      float g = getColorFraction(two >> bits);
-      float h = getColorFraction(three >> bits);
-      float i = getColorFraction(four >> bits);
-      float j = (float)((double)((float)Math.pow((double)(f + g + h + i) * 0.25, 0.45454545454545453)));
-      return (int)((double)j * 255.0);
-   }
-
-   private static float getColorFraction(int value) {
-      return COLOR_FRACTIONS[value & 255];
-   }
+    private static int blendDarkenedCutout(int nw, int ne, int sw, int se) {
+        float f = 0.0f;
+        float g = 0.0f;
+        float h = 0.0f;
+        float i = 0.0f;
+        if (ColorHelper.getAlpha((int)nw) != 0) {
+            f += ColorHelper.srgbToLinear((int)ColorHelper.getAlpha((int)nw));
+            g += ColorHelper.srgbToLinear((int)ColorHelper.getRed((int)nw));
+            h += ColorHelper.srgbToLinear((int)ColorHelper.getGreen((int)nw));
+            i += ColorHelper.srgbToLinear((int)ColorHelper.getBlue((int)nw));
+        }
+        if (ColorHelper.getAlpha((int)ne) != 0) {
+            f += ColorHelper.srgbToLinear((int)ColorHelper.getAlpha((int)ne));
+            g += ColorHelper.srgbToLinear((int)ColorHelper.getRed((int)ne));
+            h += ColorHelper.srgbToLinear((int)ColorHelper.getGreen((int)ne));
+            i += ColorHelper.srgbToLinear((int)ColorHelper.getBlue((int)ne));
+        }
+        if (ColorHelper.getAlpha((int)sw) != 0) {
+            f += ColorHelper.srgbToLinear((int)ColorHelper.getAlpha((int)sw));
+            g += ColorHelper.srgbToLinear((int)ColorHelper.getRed((int)sw));
+            h += ColorHelper.srgbToLinear((int)ColorHelper.getGreen((int)sw));
+            i += ColorHelper.srgbToLinear((int)ColorHelper.getBlue((int)sw));
+        }
+        if (ColorHelper.getAlpha((int)se) != 0) {
+            f += ColorHelper.srgbToLinear((int)ColorHelper.getAlpha((int)se));
+            g += ColorHelper.srgbToLinear((int)ColorHelper.getRed((int)se));
+            h += ColorHelper.srgbToLinear((int)ColorHelper.getGreen((int)se));
+            i += ColorHelper.srgbToLinear((int)ColorHelper.getBlue((int)se));
+        }
+        return ColorHelper.getArgb((int)ColorHelper.linearToSrgb((float)(f /= 4.0f)), (int)ColorHelper.linearToSrgb((float)(g /= 4.0f)), (int)ColorHelper.linearToSrgb((float)(h /= 4.0f)), (int)ColorHelper.linearToSrgb((float)(i /= 4.0f)));
+    }
 }
+

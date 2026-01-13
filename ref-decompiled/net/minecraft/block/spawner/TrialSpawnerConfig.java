@@ -1,163 +1,143 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
+ *  net.minecraft.block.spawner.MobSpawnerEntry
+ *  net.minecraft.block.spawner.TrialSpawnerConfig
+ *  net.minecraft.block.spawner.TrialSpawnerConfig$Builder
+ *  net.minecraft.entity.EntityType
+ *  net.minecraft.loot.LootTable
+ *  net.minecraft.nbt.NbtCompound
+ *  net.minecraft.registry.Registries
+ *  net.minecraft.registry.RegistryKey
+ *  net.minecraft.registry.RegistryKeys
+ *  net.minecraft.registry.entry.RegistryElementCodec
+ *  net.minecraft.registry.entry.RegistryEntry
+ *  net.minecraft.util.collection.Pool
+ */
 package net.minecraft.block.spawner;
 
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import java.lang.invoke.MethodHandle;
+import java.lang.runtime.ObjectMethods;
 import java.util.Optional;
+import net.minecraft.block.spawner.MobSpawnerEntry;
+import net.minecraft.block.spawner.TrialSpawnerConfig;
 import net.minecraft.entity.EntityType;
 import net.minecraft.loot.LootTable;
-import net.minecraft.loot.LootTables;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryElementCodec;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.collection.Pool;
 
-public record TrialSpawnerConfig(int spawnRange, float totalMobs, float simultaneousMobs, float totalMobsAddedPerPlayer, float simultaneousMobsAddedPerPlayer, int ticksBetweenSpawn, Pool spawnPotentials, Pool lootTablesToEject, RegistryKey itemsToDropWhenOminous) {
-   public static final TrialSpawnerConfig DEFAULT = builder().build();
-   public static final Codec CODEC = RecordCodecBuilder.create((instance) -> {
-      return instance.group(Codec.intRange(1, 128).optionalFieldOf("spawn_range", DEFAULT.spawnRange).forGetter(TrialSpawnerConfig::spawnRange), Codec.floatRange(0.0F, Float.MAX_VALUE).optionalFieldOf("total_mobs", DEFAULT.totalMobs).forGetter(TrialSpawnerConfig::totalMobs), Codec.floatRange(0.0F, Float.MAX_VALUE).optionalFieldOf("simultaneous_mobs", DEFAULT.simultaneousMobs).forGetter(TrialSpawnerConfig::simultaneousMobs), Codec.floatRange(0.0F, Float.MAX_VALUE).optionalFieldOf("total_mobs_added_per_player", DEFAULT.totalMobsAddedPerPlayer).forGetter(TrialSpawnerConfig::totalMobsAddedPerPlayer), Codec.floatRange(0.0F, Float.MAX_VALUE).optionalFieldOf("simultaneous_mobs_added_per_player", DEFAULT.simultaneousMobsAddedPerPlayer).forGetter(TrialSpawnerConfig::simultaneousMobsAddedPerPlayer), Codec.intRange(0, Integer.MAX_VALUE).optionalFieldOf("ticks_between_spawn", DEFAULT.ticksBetweenSpawn).forGetter(TrialSpawnerConfig::ticksBetweenSpawn), MobSpawnerEntry.DATA_POOL_CODEC.optionalFieldOf("spawn_potentials", Pool.empty()).forGetter(TrialSpawnerConfig::spawnPotentials), Pool.createCodec(LootTable.TABLE_KEY).optionalFieldOf("loot_tables_to_eject", DEFAULT.lootTablesToEject).forGetter(TrialSpawnerConfig::lootTablesToEject), LootTable.TABLE_KEY.optionalFieldOf("items_to_drop_when_ominous", DEFAULT.itemsToDropWhenOminous).forGetter(TrialSpawnerConfig::itemsToDropWhenOminous)).apply(instance, TrialSpawnerConfig::new);
-   });
-   public static final Codec ENTRY_CODEC;
+public record TrialSpawnerConfig(int spawnRange, float totalMobs, float simultaneousMobs, float totalMobsAddedPerPlayer, float simultaneousMobsAddedPerPlayer, int ticksBetweenSpawn, Pool<MobSpawnerEntry> spawnPotentials, Pool<RegistryKey<LootTable>> lootTablesToEject, RegistryKey<LootTable> itemsToDropWhenOminous) {
+    private final int spawnRange;
+    private final float totalMobs;
+    private final float simultaneousMobs;
+    private final float totalMobsAddedPerPlayer;
+    private final float simultaneousMobsAddedPerPlayer;
+    private final int ticksBetweenSpawn;
+    private final Pool<MobSpawnerEntry> spawnPotentials;
+    private final Pool<RegistryKey<LootTable>> lootTablesToEject;
+    private final RegistryKey<LootTable> itemsToDropWhenOminous;
+    public static final TrialSpawnerConfig DEFAULT = TrialSpawnerConfig.builder().build();
+    public static final Codec<TrialSpawnerConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Codec.intRange((int)1, (int)128).optionalFieldOf("spawn_range", (Object)TrialSpawnerConfig.DEFAULT.spawnRange).forGetter(TrialSpawnerConfig::spawnRange), (App)Codec.floatRange((float)0.0f, (float)Float.MAX_VALUE).optionalFieldOf("total_mobs", (Object)Float.valueOf(TrialSpawnerConfig.DEFAULT.totalMobs)).forGetter(TrialSpawnerConfig::totalMobs), (App)Codec.floatRange((float)0.0f, (float)Float.MAX_VALUE).optionalFieldOf("simultaneous_mobs", (Object)Float.valueOf(TrialSpawnerConfig.DEFAULT.simultaneousMobs)).forGetter(TrialSpawnerConfig::simultaneousMobs), (App)Codec.floatRange((float)0.0f, (float)Float.MAX_VALUE).optionalFieldOf("total_mobs_added_per_player", (Object)Float.valueOf(TrialSpawnerConfig.DEFAULT.totalMobsAddedPerPlayer)).forGetter(TrialSpawnerConfig::totalMobsAddedPerPlayer), (App)Codec.floatRange((float)0.0f, (float)Float.MAX_VALUE).optionalFieldOf("simultaneous_mobs_added_per_player", (Object)Float.valueOf(TrialSpawnerConfig.DEFAULT.simultaneousMobsAddedPerPlayer)).forGetter(TrialSpawnerConfig::simultaneousMobsAddedPerPlayer), (App)Codec.intRange((int)0, (int)Integer.MAX_VALUE).optionalFieldOf("ticks_between_spawn", (Object)TrialSpawnerConfig.DEFAULT.ticksBetweenSpawn).forGetter(TrialSpawnerConfig::ticksBetweenSpawn), (App)MobSpawnerEntry.DATA_POOL_CODEC.optionalFieldOf("spawn_potentials", (Object)Pool.empty()).forGetter(TrialSpawnerConfig::spawnPotentials), (App)Pool.createCodec((Codec)LootTable.TABLE_KEY).optionalFieldOf("loot_tables_to_eject", (Object)TrialSpawnerConfig.DEFAULT.lootTablesToEject).forGetter(TrialSpawnerConfig::lootTablesToEject), (App)LootTable.TABLE_KEY.optionalFieldOf("items_to_drop_when_ominous", (Object)TrialSpawnerConfig.DEFAULT.itemsToDropWhenOminous).forGetter(TrialSpawnerConfig::itemsToDropWhenOminous)).apply((Applicative)instance, TrialSpawnerConfig::new));
+    public static final Codec<RegistryEntry<TrialSpawnerConfig>> ENTRY_CODEC = RegistryElementCodec.of((RegistryKey)RegistryKeys.TRIAL_SPAWNER, (Codec)CODEC);
 
-   public TrialSpawnerConfig(int i, float f, float g, float h, float j, int k, Pool pool, Pool pool2, RegistryKey registryKey) {
-      this.spawnRange = i;
-      this.totalMobs = f;
-      this.simultaneousMobs = g;
-      this.totalMobsAddedPerPlayer = h;
-      this.simultaneousMobsAddedPerPlayer = j;
-      this.ticksBetweenSpawn = k;
-      this.spawnPotentials = pool;
-      this.lootTablesToEject = pool2;
-      this.itemsToDropWhenOminous = registryKey;
-   }
+    public TrialSpawnerConfig(int spawnRange, float totalMobs, float simultaneousMobs, float totalMobsAddedPerPlayer, float simultaneousMobsAddedPerPlayer, int ticksBetweenSpawn, Pool<MobSpawnerEntry> spawnPotentials, Pool<RegistryKey<LootTable>> lootTablesToEject, RegistryKey<LootTable> itemsToDropWhenOminous) {
+        this.spawnRange = spawnRange;
+        this.totalMobs = totalMobs;
+        this.simultaneousMobs = simultaneousMobs;
+        this.totalMobsAddedPerPlayer = totalMobsAddedPerPlayer;
+        this.simultaneousMobsAddedPerPlayer = simultaneousMobsAddedPerPlayer;
+        this.ticksBetweenSpawn = ticksBetweenSpawn;
+        this.spawnPotentials = spawnPotentials;
+        this.lootTablesToEject = lootTablesToEject;
+        this.itemsToDropWhenOminous = itemsToDropWhenOminous;
+    }
 
-   public int getTotalMobs(int additionalPlayers) {
-      return (int)Math.floor((double)(this.totalMobs + this.totalMobsAddedPerPlayer * (float)additionalPlayers));
-   }
+    public int getTotalMobs(int additionalPlayers) {
+        return (int)Math.floor(this.totalMobs + this.totalMobsAddedPerPlayer * (float)additionalPlayers);
+    }
 
-   public int getSimultaneousMobs(int additionalPlayers) {
-      return (int)Math.floor((double)(this.simultaneousMobs + this.simultaneousMobsAddedPerPlayer * (float)additionalPlayers));
-   }
+    public int getSimultaneousMobs(int additionalPlayers) {
+        return (int)Math.floor(this.simultaneousMobs + this.simultaneousMobsAddedPerPlayer * (float)additionalPlayers);
+    }
 
-   public long getCooldownLength() {
-      return 160L;
-   }
+    public long getCooldownLength() {
+        return 160L;
+    }
 
-   public static Builder builder() {
-      return new Builder();
-   }
+    public static Builder builder() {
+        return new Builder();
+    }
 
-   public TrialSpawnerConfig withSpawnPotential(EntityType entityType) {
-      NbtCompound nbtCompound = new NbtCompound();
-      nbtCompound.putString("id", Registries.ENTITY_TYPE.getId(entityType).toString());
-      MobSpawnerEntry mobSpawnerEntry = new MobSpawnerEntry(nbtCompound, Optional.empty(), Optional.empty());
-      return new TrialSpawnerConfig(this.spawnRange, this.totalMobs, this.simultaneousMobs, this.totalMobsAddedPerPlayer, this.simultaneousMobsAddedPerPlayer, this.ticksBetweenSpawn, Pool.of((Object)mobSpawnerEntry), this.lootTablesToEject, this.itemsToDropWhenOminous);
-   }
+    public TrialSpawnerConfig withSpawnPotential(EntityType<?> entityType) {
+        NbtCompound nbtCompound = new NbtCompound();
+        nbtCompound.putString("id", Registries.ENTITY_TYPE.getId(entityType).toString());
+        MobSpawnerEntry mobSpawnerEntry = new MobSpawnerEntry(nbtCompound, Optional.empty(), Optional.empty());
+        return new TrialSpawnerConfig(this.spawnRange, this.totalMobs, this.simultaneousMobs, this.totalMobsAddedPerPlayer, this.simultaneousMobsAddedPerPlayer, this.ticksBetweenSpawn, Pool.of((Object)mobSpawnerEntry), this.lootTablesToEject, this.itemsToDropWhenOminous);
+    }
 
-   public int spawnRange() {
-      return this.spawnRange;
-   }
+    @Override
+    public final String toString() {
+        return ObjectMethods.bootstrap("toString", new MethodHandle[]{TrialSpawnerConfig.class, "spawnRange;totalMobs;simultaneousMobs;totalMobsAddedPerPlayer;simultaneousMobsAddedPerPlayer;ticksBetweenSpawn;spawnPotentialsDefinition;lootTablesToEject;itemsToDropWhenOminous", "spawnRange", "totalMobs", "simultaneousMobs", "totalMobsAddedPerPlayer", "simultaneousMobsAddedPerPlayer", "ticksBetweenSpawn", "spawnPotentials", "lootTablesToEject", "itemsToDropWhenOminous"}, this);
+    }
 
-   public float totalMobs() {
-      return this.totalMobs;
-   }
+    @Override
+    public final int hashCode() {
+        return (int)ObjectMethods.bootstrap("hashCode", new MethodHandle[]{TrialSpawnerConfig.class, "spawnRange;totalMobs;simultaneousMobs;totalMobsAddedPerPlayer;simultaneousMobsAddedPerPlayer;ticksBetweenSpawn;spawnPotentialsDefinition;lootTablesToEject;itemsToDropWhenOminous", "spawnRange", "totalMobs", "simultaneousMobs", "totalMobsAddedPerPlayer", "simultaneousMobsAddedPerPlayer", "ticksBetweenSpawn", "spawnPotentials", "lootTablesToEject", "itemsToDropWhenOminous"}, this);
+    }
 
-   public float simultaneousMobs() {
-      return this.simultaneousMobs;
-   }
+    @Override
+    public final boolean equals(Object object) {
+        return (boolean)ObjectMethods.bootstrap("equals", new MethodHandle[]{TrialSpawnerConfig.class, "spawnRange;totalMobs;simultaneousMobs;totalMobsAddedPerPlayer;simultaneousMobsAddedPerPlayer;ticksBetweenSpawn;spawnPotentialsDefinition;lootTablesToEject;itemsToDropWhenOminous", "spawnRange", "totalMobs", "simultaneousMobs", "totalMobsAddedPerPlayer", "simultaneousMobsAddedPerPlayer", "ticksBetweenSpawn", "spawnPotentials", "lootTablesToEject", "itemsToDropWhenOminous"}, this, object);
+    }
 
-   public float totalMobsAddedPerPlayer() {
-      return this.totalMobsAddedPerPlayer;
-   }
+    public int spawnRange() {
+        return this.spawnRange;
+    }
 
-   public float simultaneousMobsAddedPerPlayer() {
-      return this.simultaneousMobsAddedPerPlayer;
-   }
+    public float totalMobs() {
+        return this.totalMobs;
+    }
 
-   public int ticksBetweenSpawn() {
-      return this.ticksBetweenSpawn;
-   }
+    public float simultaneousMobs() {
+        return this.simultaneousMobs;
+    }
 
-   public Pool spawnPotentials() {
-      return this.spawnPotentials;
-   }
+    public float totalMobsAddedPerPlayer() {
+        return this.totalMobsAddedPerPlayer;
+    }
 
-   public Pool lootTablesToEject() {
-      return this.lootTablesToEject;
-   }
+    public float simultaneousMobsAddedPerPlayer() {
+        return this.simultaneousMobsAddedPerPlayer;
+    }
 
-   public RegistryKey itemsToDropWhenOminous() {
-      return this.itemsToDropWhenOminous;
-   }
+    public int ticksBetweenSpawn() {
+        return this.ticksBetweenSpawn;
+    }
 
-   static {
-      ENTRY_CODEC = RegistryElementCodec.of(RegistryKeys.TRIAL_SPAWNER, CODEC);
-   }
+    public Pool<MobSpawnerEntry> spawnPotentials() {
+        return this.spawnPotentials;
+    }
 
-   public static class Builder {
-      private int spawnRange = 4;
-      private float totalMobs = 6.0F;
-      private float simultaneousMobs = 2.0F;
-      private float totalMobsAddedPerPlayer = 2.0F;
-      private float simultaneousMobsAddedPerPlayer = 1.0F;
-      private int ticksBetweenSpawn = 40;
-      private Pool spawnPotentials = Pool.empty();
-      private Pool lootTablesToEject;
-      private RegistryKey itemsToDropWhenOminous;
+    public Pool<RegistryKey<LootTable>> lootTablesToEject() {
+        return this.lootTablesToEject;
+    }
 
-      public Builder() {
-         this.lootTablesToEject = Pool.builder().add(LootTables.TRIAL_CHAMBER_CONSUMABLES_SPAWNER).add(LootTables.TRIAL_CHAMBER_KEY_SPAWNER).build();
-         this.itemsToDropWhenOminous = LootTables.TRIAL_CHAMBER_ITEMS_TO_DROP_WHEN_OMINOUS_SPAWNER;
-      }
-
-      public Builder spawnRange(int spawnRange) {
-         this.spawnRange = spawnRange;
-         return this;
-      }
-
-      public Builder totalMobs(float totalMobs) {
-         this.totalMobs = totalMobs;
-         return this;
-      }
-
-      public Builder simultaneousMobs(float simultaneousMobs) {
-         this.simultaneousMobs = simultaneousMobs;
-         return this;
-      }
-
-      public Builder totalMobsAddedPerPlayer(float totalMobsAddedPerPlayer) {
-         this.totalMobsAddedPerPlayer = totalMobsAddedPerPlayer;
-         return this;
-      }
-
-      public Builder simultaneousMobsAddedPerPlayer(float simultaneousMobsAddedPerPlayer) {
-         this.simultaneousMobsAddedPerPlayer = simultaneousMobsAddedPerPlayer;
-         return this;
-      }
-
-      public Builder ticksBetweenSpawn(int ticksBetweenSpawn) {
-         this.ticksBetweenSpawn = ticksBetweenSpawn;
-         return this;
-      }
-
-      public Builder spawnPotentials(Pool spawnPotentials) {
-         this.spawnPotentials = spawnPotentials;
-         return this;
-      }
-
-      public Builder lootTablesToEject(Pool lootTablesToEject) {
-         this.lootTablesToEject = lootTablesToEject;
-         return this;
-      }
-
-      public Builder itemsToDropWhenOminous(RegistryKey itemsToDropWhenOminous) {
-         this.itemsToDropWhenOminous = itemsToDropWhenOminous;
-         return this;
-      }
-
-      public TrialSpawnerConfig build() {
-         return new TrialSpawnerConfig(this.spawnRange, this.totalMobs, this.simultaneousMobs, this.totalMobsAddedPerPlayer, this.simultaneousMobsAddedPerPlayer, this.ticksBetweenSpawn, this.spawnPotentials, this.lootTablesToEject, this.itemsToDropWhenOminous);
-      }
-   }
+    public RegistryKey<LootTable> itemsToDropWhenOminous() {
+        return this.itemsToDropWhenOminous;
+    }
 }
+

@@ -1,20 +1,39 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.google.common.collect.Lists
+ *  com.mojang.logging.LogUtils
+ *  io.netty.bootstrap.Bootstrap
+ *  io.netty.channel.ChannelHandler
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.gui.screen.multiplayer.ConnectScreen
+ *  net.minecraft.client.network.Address
+ *  net.minecraft.client.network.AllowedAddressResolver
+ *  net.minecraft.client.network.MultiplayerServerListPinger
+ *  net.minecraft.client.network.MultiplayerServerListPinger$1
+ *  net.minecraft.client.network.ServerAddress
+ *  net.minecraft.client.network.ServerInfo
+ *  net.minecraft.network.ClientConnection
+ *  net.minecraft.network.NetworkingBackend
+ *  net.minecraft.network.listener.ClientQueryPacketListener
+ *  net.minecraft.network.packet.Packet
+ *  net.minecraft.network.packet.c2s.query.QueryRequestC2SPacket
+ *  net.minecraft.screen.ScreenTexts
+ *  net.minecraft.text.MutableText
+ *  net.minecraft.text.Text
+ *  net.minecraft.util.Formatting
+ *  org.slf4j.Logger
+ */
 package net.minecraft.client.network;
 
 import com.google.common.collect.Lists;
-import com.mojang.authlib.GameProfile;
 import com.mojang.logging.LogUtils;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelException;
 import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.socket.nio.NioSocketChannel;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -22,185 +41,99 @@ import java.util.Optional;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.screen.multiplayer.ConnectScreen;
+import net.minecraft.client.network.Address;
+import net.minecraft.client.network.AllowedAddressResolver;
+import net.minecraft.client.network.MultiplayerServerListPinger;
+import net.minecraft.client.network.ServerAddress;
+import net.minecraft.client.network.ServerInfo;
 import net.minecraft.network.ClientConnection;
-import net.minecraft.network.DisconnectionInfo;
+import net.minecraft.network.NetworkingBackend;
 import net.minecraft.network.listener.ClientQueryPacketListener;
-import net.minecraft.network.packet.c2s.query.QueryPingC2SPacket;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.query.QueryRequestC2SPacket;
-import net.minecraft.network.packet.s2c.query.PingResultS2CPacket;
-import net.minecraft.network.packet.s2c.query.QueryResponseS2CPacket;
 import net.minecraft.screen.ScreenTexts;
-import net.minecraft.server.ServerMetadata;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Util;
-import net.minecraft.util.profiler.MultiValueDebugSampleLogImpl;
 import org.slf4j.Logger;
 
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 public class MultiplayerServerListPinger {
-   private static final Logger LOGGER = LogUtils.getLogger();
-   private static final Text CANNOT_CONNECT_TEXT = Text.translatable("multiplayer.status.cannot_connect").withColor(-65536);
-   private final List clientConnections = Collections.synchronizedList(Lists.newArrayList());
+    private static final Logger LOGGER = LogUtils.getLogger();
+    private static final Text CANNOT_CONNECT_TEXT = Text.translatable((String)"multiplayer.status.cannot_connect").withColor(-65536);
+    private final List<ClientConnection> clientConnections = Collections.synchronizedList(Lists.newArrayList());
 
-   public void add(final ServerInfo entry, final Runnable saver, final Runnable pingCallback) throws UnknownHostException {
-      final ServerAddress serverAddress = ServerAddress.parse(entry.address);
-      Optional optional = AllowedAddressResolver.DEFAULT.resolve(serverAddress).map(Address::getInetSocketAddress);
-      if (optional.isEmpty()) {
-         this.showError(ConnectScreen.UNKNOWN_HOST_TEXT, entry);
-      } else {
-         final InetSocketAddress inetSocketAddress = (InetSocketAddress)optional.get();
-         final ClientConnection clientConnection = ClientConnection.connect(inetSocketAddress, false, (MultiValueDebugSampleLogImpl)null);
-         this.clientConnections.add(clientConnection);
-         entry.label = Text.translatable("multiplayer.status.pinging");
-         entry.playerListSummary = Collections.emptyList();
-         ClientQueryPacketListener clientQueryPacketListener = new ClientQueryPacketListener() {
-            private boolean sentQuery;
-            private boolean received;
-            private long startTime;
+    public void add(ServerInfo entry, Runnable saver, Runnable pingCallback, NetworkingBackend backend) throws UnknownHostException {
+        ServerAddress serverAddress = ServerAddress.parse((String)entry.address);
+        Optional<InetSocketAddress> optional = AllowedAddressResolver.DEFAULT.resolve(serverAddress).map(Address::getInetSocketAddress);
+        if (optional.isEmpty()) {
+            this.showError(ConnectScreen.UNKNOWN_HOST_TEXT, entry);
+            return;
+        }
+        InetSocketAddress inetSocketAddress = optional.get();
+        ClientConnection clientConnection = ClientConnection.connect((InetSocketAddress)inetSocketAddress, (NetworkingBackend)backend, null);
+        this.clientConnections.add(clientConnection);
+        entry.label = Text.translatable((String)"multiplayer.status.pinging");
+        entry.playerListSummary = Collections.emptyList();
+        1 clientQueryPacketListener = new /* Unavailable Anonymous Inner Class!! */;
+        try {
+            clientConnection.connect(serverAddress.getAddress(), serverAddress.getPort(), (ClientQueryPacketListener)clientQueryPacketListener);
+            clientConnection.send((Packet)QueryRequestC2SPacket.INSTANCE);
+        }
+        catch (Throwable throwable) {
+            LOGGER.error("Failed to ping server {}", (Object)serverAddress, (Object)throwable);
+        }
+    }
 
-            public void onResponse(QueryResponseS2CPacket packet) {
-               if (this.received) {
-                  clientConnection.disconnect((Text)Text.translatable("multiplayer.status.unrequested"));
-               } else {
-                  this.received = true;
-                  ServerMetadata serverMetadata = packet.metadata();
-                  entry.label = serverMetadata.description();
-                  serverMetadata.version().ifPresentOrElse((version) -> {
-                     entry.version = Text.literal(version.gameVersion());
-                     entry.protocolVersion = version.protocolVersion();
-                  }, () -> {
-                     entry.version = Text.translatable("multiplayer.status.old");
-                     entry.protocolVersion = 0;
-                  });
-                  serverMetadata.players().ifPresentOrElse((players) -> {
-                     entry.playerCountLabel = MultiplayerServerListPinger.createPlayerCountText(players.online(), players.max());
-                     entry.players = players;
-                     if (!players.sample().isEmpty()) {
-                        List list = new ArrayList(players.sample().size());
-                        Iterator var3 = players.sample().iterator();
+    void showError(Text error, ServerInfo info) {
+        LOGGER.error("Can't ping {}: {}", (Object)info.address, (Object)error.getString());
+        info.label = CANNOT_CONNECT_TEXT;
+        info.playerCountLabel = ScreenTexts.EMPTY;
+    }
 
-                        while(var3.hasNext()) {
-                           GameProfile gameProfile = (GameProfile)var3.next();
-                           list.add(Text.literal(gameProfile.getName()));
-                        }
+    void ping(InetSocketAddress socketAddress, ServerAddress address, ServerInfo serverInfo, NetworkingBackend backend) {
+        ((Bootstrap)((Bootstrap)((Bootstrap)new Bootstrap().group(backend.getEventLoopGroup())).handler((ChannelHandler)new /* Unavailable Anonymous Inner Class!! */)).channel(backend.getChannelClass())).connect(socketAddress.getAddress(), socketAddress.getPort());
+    }
 
-                        if (players.sample().size() < players.online()) {
-                           list.add(Text.translatable("multiplayer.status.and_more", players.online() - players.sample().size()));
-                        }
+    public static Text createPlayerCountText(int current, int max) {
+        MutableText text = Text.literal((String)Integer.toString(current)).formatted(Formatting.GRAY);
+        MutableText text2 = Text.literal((String)Integer.toString(max)).formatted(Formatting.GRAY);
+        return Text.translatable((String)"multiplayer.status.player_count", (Object[])new Object[]{text, text2}).formatted(Formatting.DARK_GRAY);
+    }
 
-                        entry.playerListSummary = list;
-                     } else {
-                        entry.playerListSummary = List.of();
-                     }
-
-                  }, () -> {
-                     entry.playerCountLabel = Text.translatable("multiplayer.status.unknown").formatted(Formatting.DARK_GRAY);
-                  });
-                  serverMetadata.favicon().ifPresent((favicon) -> {
-                     if (!Arrays.equals(favicon.iconBytes(), entry.getFavicon())) {
-                        entry.setFavicon(ServerInfo.validateFavicon(favicon.iconBytes()));
-                        saver.run();
-                     }
-
-                  });
-                  this.startTime = Util.getMeasuringTimeMs();
-                  clientConnection.send(new QueryPingC2SPacket(this.startTime));
-                  this.sentQuery = true;
-               }
+    /*
+     * WARNING - Removed try catching itself - possible behaviour change.
+     */
+    public void tick() {
+        List list = this.clientConnections;
+        synchronized (list) {
+            Iterator iterator = this.clientConnections.iterator();
+            while (iterator.hasNext()) {
+                ClientConnection clientConnection = (ClientConnection)iterator.next();
+                if (clientConnection.isOpen()) {
+                    clientConnection.tick();
+                    continue;
+                }
+                iterator.remove();
+                clientConnection.handleDisconnection();
             }
+        }
+    }
 
-            public void onPingResult(PingResultS2CPacket packet) {
-               long l = this.startTime;
-               long m = Util.getMeasuringTimeMs();
-               entry.ping = m - l;
-               clientConnection.disconnect((Text)Text.translatable("multiplayer.status.finished"));
-               pingCallback.run();
+    /*
+     * WARNING - Removed try catching itself - possible behaviour change.
+     */
+    public void cancel() {
+        List list = this.clientConnections;
+        synchronized (list) {
+            Iterator iterator = this.clientConnections.iterator();
+            while (iterator.hasNext()) {
+                ClientConnection clientConnection = (ClientConnection)iterator.next();
+                if (!clientConnection.isOpen()) continue;
+                iterator.remove();
+                clientConnection.disconnect((Text)Text.translatable((String)"multiplayer.status.cancelled"));
             }
-
-            public void onDisconnected(DisconnectionInfo info) {
-               if (!this.sentQuery) {
-                  MultiplayerServerListPinger.this.showError(info.reason(), entry);
-                  MultiplayerServerListPinger.this.ping(inetSocketAddress, serverAddress, entry);
-               }
-
-            }
-
-            public boolean isConnectionOpen() {
-               return clientConnection.isOpen();
-            }
-         };
-
-         try {
-            clientConnection.connect(serverAddress.getAddress(), serverAddress.getPort(), clientQueryPacketListener);
-            clientConnection.send(QueryRequestC2SPacket.INSTANCE);
-         } catch (Throwable var10) {
-            LOGGER.error("Failed to ping server {}", serverAddress, var10);
-         }
-
-      }
-   }
-
-   void showError(Text error, ServerInfo info) {
-      LOGGER.error("Can't ping {}: {}", info.address, error.getString());
-      info.label = CANNOT_CONNECT_TEXT;
-      info.playerCountLabel = ScreenTexts.EMPTY;
-   }
-
-   void ping(InetSocketAddress socketAddress, final ServerAddress address, final ServerInfo serverInfo) {
-      ((Bootstrap)((Bootstrap)((Bootstrap)(new Bootstrap()).group((EventLoopGroup)ClientConnection.CLIENT_IO_GROUP.get())).handler(new ChannelInitializer(this) {
-         protected void initChannel(Channel channel) {
-            try {
-               channel.config().setOption(ChannelOption.TCP_NODELAY, true);
-            } catch (ChannelException var3) {
-            }
-
-            channel.pipeline().addLast(new ChannelHandler[]{new LegacyServerPinger(address, (protocolVersion, version, label, currentPlayers, maxPlayers) -> {
-               serverInfo.setStatus(ServerInfo.Status.INCOMPATIBLE);
-               serverInfo.version = Text.literal(version);
-               serverInfo.label = Text.literal(label);
-               serverInfo.playerCountLabel = MultiplayerServerListPinger.createPlayerCountText(currentPlayers, maxPlayers);
-               serverInfo.players = new ServerMetadata.Players(maxPlayers, currentPlayers, List.of());
-            })});
-         }
-      })).channel(NioSocketChannel.class)).connect(socketAddress.getAddress(), socketAddress.getPort());
-   }
-
-   public static Text createPlayerCountText(int current, int max) {
-      Text text = Text.literal(Integer.toString(current)).formatted(Formatting.GRAY);
-      Text text2 = Text.literal(Integer.toString(max)).formatted(Formatting.GRAY);
-      return Text.translatable("multiplayer.status.player_count", text, text2).formatted(Formatting.DARK_GRAY);
-   }
-
-   public void tick() {
-      synchronized(this.clientConnections) {
-         Iterator iterator = this.clientConnections.iterator();
-
-         while(iterator.hasNext()) {
-            ClientConnection clientConnection = (ClientConnection)iterator.next();
-            if (clientConnection.isOpen()) {
-               clientConnection.tick();
-            } else {
-               iterator.remove();
-               clientConnection.handleDisconnection();
-            }
-         }
-
-      }
-   }
-
-   public void cancel() {
-      synchronized(this.clientConnections) {
-         Iterator iterator = this.clientConnections.iterator();
-
-         while(iterator.hasNext()) {
-            ClientConnection clientConnection = (ClientConnection)iterator.next();
-            if (clientConnection.isOpen()) {
-               iterator.remove();
-               clientConnection.disconnect((Text)Text.translatable("multiplayer.status.cancelled"));
-            }
-         }
-
-      }
-   }
+        }
+    }
 }
+

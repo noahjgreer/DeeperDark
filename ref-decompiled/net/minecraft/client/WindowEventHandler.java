@@ -1,13 +1,22 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.WindowEventHandler
+ */
 package net.minecraft.client;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 public interface WindowEventHandler {
-   void onWindowFocusChanged(boolean focused);
+    public void onWindowFocusChanged(boolean var1);
 
-   void onResolutionChanged();
+    public void onResolutionChanged();
 
-   void onCursorEnterChanged();
+    public void onCursorEnterChanged();
 }
+

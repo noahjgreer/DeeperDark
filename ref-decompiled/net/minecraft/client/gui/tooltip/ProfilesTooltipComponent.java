@@ -1,63 +1,70 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.font.TextRenderer
+ *  net.minecraft.client.gui.DrawContext
+ *  net.minecraft.client.gui.PlayerSkinDrawer
+ *  net.minecraft.client.gui.tooltip.ProfilesTooltipComponent
+ *  net.minecraft.client.gui.tooltip.ProfilesTooltipComponent$ProfilesData
+ *  net.minecraft.client.gui.tooltip.TooltipComponent
+ *  net.minecraft.client.texture.PlayerSkinCache$Entry
+ *  net.minecraft.entity.player.SkinTextures
+ */
 package net.minecraft.client.gui.tooltip;
 
-import com.mojang.authlib.yggdrasil.ProfileResult;
-import java.util.Iterator;
 import java.util.List;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.PlayerSkinDrawer;
-import net.minecraft.item.tooltip.TooltipData;
+import net.minecraft.client.gui.tooltip.ProfilesTooltipComponent;
+import net.minecraft.client.gui.tooltip.TooltipComponent;
+import net.minecraft.client.texture.PlayerSkinCache;
+import net.minecraft.entity.player.SkinTextures;
 
-@Environment(EnvType.CLIENT)
-public class ProfilesTooltipComponent implements TooltipComponent {
-   private static final int field_52140 = 10;
-   private static final int field_52141 = 2;
-   private final List profiles;
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
+public class ProfilesTooltipComponent
+implements TooltipComponent {
+    private static final int field_52140 = 10;
+    private static final int field_52141 = 2;
+    private final List<PlayerSkinCache.Entry> profiles;
 
-   public ProfilesTooltipComponent(ProfilesData data) {
-      this.profiles = data.profiles();
-   }
+    public ProfilesTooltipComponent(ProfilesData data) {
+        this.profiles = data.profiles();
+    }
 
-   public int getHeight(TextRenderer textRenderer) {
-      return this.profiles.size() * 12 + 2;
-   }
+    public int getHeight(TextRenderer textRenderer) {
+        return this.profiles.size() * 12 + 2;
+    }
 
-   public int getWidth(TextRenderer textRenderer) {
-      int i = 0;
-      Iterator var3 = this.profiles.iterator();
+    private static String getName(PlayerSkinCache.Entry entry) {
+        return entry.getProfile().name();
+    }
 
-      while(var3.hasNext()) {
-         ProfileResult profileResult = (ProfileResult)var3.next();
-         int j = textRenderer.getWidth(profileResult.profile().getName());
-         if (j > i) {
+    public int getWidth(TextRenderer textRenderer) {
+        int i = 0;
+        for (PlayerSkinCache.Entry entry : this.profiles) {
+            int j = textRenderer.getWidth(ProfilesTooltipComponent.getName((PlayerSkinCache.Entry)entry));
+            if (j <= i) continue;
             i = j;
-         }
-      }
+        }
+        return i + 10 + 6;
+    }
 
-      return i + 10 + 6;
-   }
-
-   public void drawItems(TextRenderer textRenderer, int x, int y, int width, int height, DrawContext context) {
-      for(int i = 0; i < this.profiles.size(); ++i) {
-         ProfileResult profileResult = (ProfileResult)this.profiles.get(i);
-         int j = y + 2 + i * 12;
-         PlayerSkinDrawer.draw(context, MinecraftClient.getInstance().getSkinProvider().getSkinTextures(profileResult.profile()), x + 2, j, 10);
-         context.drawTextWithShadow(textRenderer, (String)profileResult.profile().getName(), x + 10 + 4, j + 2, -1);
-      }
-
-   }
-
-   @Environment(EnvType.CLIENT)
-   public static record ProfilesData(List profiles) implements TooltipData {
-      public ProfilesData(List list) {
-         this.profiles = list;
-      }
-
-      public List profiles() {
-         return this.profiles;
-      }
-   }
+    public void drawItems(TextRenderer textRenderer, int x, int y, int width, int height, DrawContext context) {
+        for (int i = 0; i < this.profiles.size(); ++i) {
+            PlayerSkinCache.Entry entry = (PlayerSkinCache.Entry)this.profiles.get(i);
+            int j = y + 2 + i * 12;
+            PlayerSkinDrawer.draw((DrawContext)context, (SkinTextures)entry.getTextures(), (int)(x + 2), (int)j, (int)10);
+            context.drawTextWithShadow(textRenderer, ProfilesTooltipComponent.getName((PlayerSkinCache.Entry)entry), x + 10 + 4, j + 2, -1);
+        }
+    }
 }
+

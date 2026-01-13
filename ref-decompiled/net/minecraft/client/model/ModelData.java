@@ -1,32 +1,48 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.google.common.collect.ImmutableList
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.model.ModelData
+ *  net.minecraft.client.model.ModelPartData
+ *  net.minecraft.client.model.ModelTransform
+ *  net.minecraft.client.render.entity.model.ModelTransformer
+ */
 package net.minecraft.client.model;
 
 import com.google.common.collect.ImmutableList;
+import java.util.List;
 import java.util.function.UnaryOperator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.model.ModelPartData;
+import net.minecraft.client.model.ModelTransform;
 import net.minecraft.client.render.entity.model.ModelTransformer;
 
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 public class ModelData {
-   private final ModelPartData data;
+    private final ModelPartData data;
 
-   public ModelData() {
-      this(new ModelPartData(ImmutableList.of(), ModelTransform.NONE));
-   }
+    public ModelData() {
+        this(new ModelPartData((List)ImmutableList.of(), ModelTransform.NONE));
+    }
 
-   private ModelData(ModelPartData data) {
-      this.data = data;
-   }
+    private ModelData(ModelPartData data) {
+        this.data = data;
+    }
 
-   public ModelPartData getRoot() {
-      return this.data;
-   }
+    public ModelPartData getRoot() {
+        return this.data;
+    }
 
-   public ModelData transform(UnaryOperator transformer) {
-      return new ModelData(this.data.applyTransformer(transformer));
-   }
+    public ModelData transform(UnaryOperator<ModelTransform> transformer) {
+        return new ModelData(this.data.applyTransformer(transformer));
+    }
 
-   public ModelData transform(ModelTransformer transformer) {
-      return transformer.apply(this);
-   }
+    public ModelData transform(ModelTransformer transformer) {
+        return transformer.apply(this);
+    }
 }
+

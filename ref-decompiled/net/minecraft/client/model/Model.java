@@ -1,61 +1,71 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.fabricmc.fabric.api.client.rendering.v1.FabricModel
+ *  net.minecraft.client.model.Model
+ *  net.minecraft.client.model.ModelPart
+ *  net.minecraft.client.render.RenderLayer
+ *  net.minecraft.client.render.VertexConsumer
+ *  net.minecraft.client.util.math.MatrixStack
+ *  net.minecraft.util.Identifier
+ */
 package net.minecraft.client.model;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.function.Function;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.rendering.v1.FabricModel;
+import net.minecraft.client.model.ModelPart;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 
-@Environment(EnvType.CLIENT)
-public abstract class Model {
-   protected final ModelPart root;
-   protected final Function layerFactory;
-   private final List parts;
+@Environment(value=EnvType.CLIENT)
+public abstract class Model<S>
+implements FabricModel<S> {
+    protected final ModelPart root;
+    protected final Function<Identifier, RenderLayer> layerFactory;
+    private final List<ModelPart> parts;
 
-   public Model(ModelPart root, Function layerFactory) {
-      this.root = root;
-      this.layerFactory = layerFactory;
-      this.parts = root.traverse();
-   }
+    public Model(ModelPart root, Function<Identifier, RenderLayer> layerFactory) {
+        this.root = root;
+        this.layerFactory = layerFactory;
+        this.parts = root.traverse();
+    }
 
-   public final RenderLayer getLayer(Identifier texture) {
-      return (RenderLayer)this.layerFactory.apply(texture);
-   }
+    public final RenderLayer getLayer(Identifier texture) {
+        return (RenderLayer)this.layerFactory.apply(texture);
+    }
 
-   public final void render(MatrixStack matrices, VertexConsumer vertices, int light, int overlay, int color) {
-      this.getRootPart().render(matrices, vertices, light, overlay, color);
-   }
+    public final void render(MatrixStack matrices, VertexConsumer vertices, int light, int overlay, int color) {
+        this.getRootPart().render(matrices, vertices, light, overlay, color);
+    }
 
-   public final void render(MatrixStack matrices, VertexConsumer vertices, int light, int overlay) {
-      this.render(matrices, vertices, light, overlay, -1);
-   }
+    public final void render(MatrixStack matrices, VertexConsumer vertices, int light, int overlay) {
+        this.render(matrices, vertices, light, overlay, -1);
+    }
 
-   public final ModelPart getRootPart() {
-      return this.root;
-   }
+    public final ModelPart getRootPart() {
+        return this.root;
+    }
 
-   public final List getParts() {
-      return this.parts;
-   }
+    public final List<ModelPart> getParts() {
+        return this.parts;
+    }
 
-   public final void resetTransforms() {
-      Iterator var1 = this.parts.iterator();
+    public void setAngles(S state) {
+        this.resetTransforms();
+    }
 
-      while(var1.hasNext()) {
-         ModelPart modelPart = (ModelPart)var1.next();
-         modelPart.resetTransform();
-      }
-
-   }
-
-   @Environment(EnvType.CLIENT)
-   public static class SinglePartModel extends Model {
-      public SinglePartModel(ModelPart part, Function layerFactory) {
-         super(part, layerFactory);
-      }
-   }
+    public final void resetTransforms() {
+        for (ModelPart modelPart : this.parts) {
+            modelPart.resetTransform();
+        }
+    }
 }
+

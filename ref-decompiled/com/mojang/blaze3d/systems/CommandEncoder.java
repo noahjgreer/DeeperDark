@@ -1,12 +1,33 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.blaze3d.buffers.GpuBuffer
+ *  com.mojang.blaze3d.buffers.GpuBuffer$MappedView
+ *  com.mojang.blaze3d.buffers.GpuBufferSlice
+ *  com.mojang.blaze3d.buffers.GpuFence
+ *  com.mojang.blaze3d.systems.CommandEncoder
+ *  com.mojang.blaze3d.systems.GpuQuery
+ *  com.mojang.blaze3d.systems.RenderPass
+ *  com.mojang.blaze3d.textures.GpuTexture
+ *  com.mojang.blaze3d.textures.GpuTextureView
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.texture.NativeImage
+ *  net.minecraft.client.texture.NativeImage$Format
+ *  net.minecraft.util.annotation.DeobfuscateClass
+ *  org.jspecify.annotations.Nullable
+ */
 package com.mojang.blaze3d.systems;
 
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.buffers.GpuFence;
+import com.mojang.blaze3d.systems.GpuQuery;
+import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.textures.GpuTexture;
 import com.mojang.blaze3d.textures.GpuTextureView;
 import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.function.Supplier;
@@ -14,44 +35,49 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.util.annotation.DeobfuscateClass;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 @DeobfuscateClass
 public interface CommandEncoder {
-   RenderPass createRenderPass(Supplier labelGetter, GpuTextureView colorAttachment, OptionalInt clearColor);
+    public RenderPass createRenderPass(Supplier<String> var1, GpuTextureView var2, OptionalInt var3);
 
-   RenderPass createRenderPass(Supplier labelGetter, GpuTextureView colorAttachment, OptionalInt clearColor, @Nullable GpuTextureView depthAttachment, OptionalDouble clearDepth);
+    public RenderPass createRenderPass(Supplier<String> var1, GpuTextureView var2, OptionalInt var3, @Nullable GpuTextureView var4, OptionalDouble var5);
 
-   void clearColorTexture(GpuTexture texture, int color);
+    public void clearColorTexture(GpuTexture var1, int var2);
 
-   void clearColorAndDepthTextures(GpuTexture colorAttachment, int color, GpuTexture depthAttachment, double depth);
+    public void clearColorAndDepthTextures(GpuTexture var1, int var2, GpuTexture var3, double var4);
 
-   void clearColorAndDepthTextures(GpuTexture colorAttachment, int color, GpuTexture depthAttachment, double depth, int scissorX, int scissorY, int scissorWidth, int scissorHeight);
+    public void clearColorAndDepthTextures(GpuTexture var1, int var2, GpuTexture var3, double var4, int var6, int var7, int var8, int var9);
 
-   void clearDepthTexture(GpuTexture texture, double depth);
+    public void clearDepthTexture(GpuTexture var1, double var2);
 
-   void writeToBuffer(GpuBufferSlice slice, ByteBuffer source);
+    public void writeToBuffer(GpuBufferSlice var1, ByteBuffer var2);
 
-   GpuBuffer.MappedView mapBuffer(GpuBuffer buffer, boolean read, boolean write);
+    public GpuBuffer.MappedView mapBuffer(GpuBuffer var1, boolean var2, boolean var3);
 
-   GpuBuffer.MappedView mapBuffer(GpuBufferSlice slice, boolean read, boolean write);
+    public GpuBuffer.MappedView mapBuffer(GpuBufferSlice var1, boolean var2, boolean var3);
 
-   void copyToBuffer(GpuBufferSlice gpuBufferSlice, GpuBufferSlice gpuBufferSlice2);
+    public void copyToBuffer(GpuBufferSlice var1, GpuBufferSlice var2);
 
-   void writeToTexture(GpuTexture target, NativeImage source);
+    public void writeToTexture(GpuTexture var1, NativeImage var2);
 
-   void writeToTexture(GpuTexture target, NativeImage source, int mipLevel, int depth, int offsetX, int offsetY, int width, int height, int skipPixels, int skipRows);
+    public void writeToTexture(GpuTexture var1, NativeImage var2, int var3, int var4, int var5, int var6, int var7, int var8, int var9, int var10);
 
-   void writeToTexture(GpuTexture target, IntBuffer source, NativeImage.Format format, int mipLevel, int depth, int offsetX, int offsetY, int width, int height);
+    public void writeToTexture(GpuTexture var1, ByteBuffer var2, NativeImage.Format var3, int var4, int var5, int var6, int var7, int var8, int var9);
 
-   void copyTextureToBuffer(GpuTexture source, GpuBuffer target, int offset, Runnable dataUploadedCallback, int mipLevel);
+    public void copyTextureToBuffer(GpuTexture var1, GpuBuffer var2, long var3, Runnable var5, int var6);
 
-   void copyTextureToBuffer(GpuTexture source, GpuBuffer target, int offset, Runnable dataUploadedCallback, int mipLevel, int intoX, int intoY, int width, int height);
+    public void copyTextureToBuffer(GpuTexture var1, GpuBuffer var2, long var3, Runnable var5, int var6, int var7, int var8, int var9, int var10);
 
-   void copyTextureToTexture(GpuTexture source, GpuTexture target, int mipLevel, int intoX, int intoY, int sourceX, int sourceY, int width, int height);
+    public void copyTextureToTexture(GpuTexture var1, GpuTexture var2, int var3, int var4, int var5, int var6, int var7, int var8, int var9);
 
-   void presentTexture(GpuTextureView texture);
+    public void presentTexture(GpuTextureView var1);
 
-   GpuFence createFence();
+    public GpuFence createFence();
+
+    public GpuQuery timerQueryBegin();
+
+    public void timerQueryEnd(GpuQuery var1);
 }
+

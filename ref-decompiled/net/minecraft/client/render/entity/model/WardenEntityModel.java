@@ -1,7 +1,26 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.model.ModelData
+ *  net.minecraft.client.model.ModelPart
+ *  net.minecraft.client.model.ModelPartBuilder
+ *  net.minecraft.client.model.ModelPartData
+ *  net.minecraft.client.model.ModelTransform
+ *  net.minecraft.client.model.TexturedModelData
+ *  net.minecraft.client.render.RenderLayers
+ *  net.minecraft.client.render.entity.animation.Animation
+ *  net.minecraft.client.render.entity.animation.WardenAnimations
+ *  net.minecraft.client.render.entity.model.EntityModel
+ *  net.minecraft.client.render.entity.model.WardenEntityModel
+ *  net.minecraft.client.render.entity.state.WardenEntityRenderState
+ *  net.minecraft.util.math.MathHelper
+ */
 package net.minecraft.client.render.entity.model;
 
-import com.google.common.collect.ImmutableList;
-import java.util.List;
+import java.util.Set;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.model.ModelData;
@@ -10,164 +29,168 @@ import net.minecraft.client.model.ModelPartBuilder;
 import net.minecraft.client.model.ModelPartData;
 import net.minecraft.client.model.ModelTransform;
 import net.minecraft.client.model.TexturedModelData;
-import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.RenderLayers;
 import net.minecraft.client.render.entity.animation.Animation;
 import net.minecraft.client.render.entity.animation.WardenAnimations;
+import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.render.entity.state.WardenEntityRenderState;
 import net.minecraft.util.math.MathHelper;
 
-@Environment(EnvType.CLIENT)
-public class WardenEntityModel extends EntityModel {
-   private static final float field_38324 = 13.0F;
-   private static final float field_38325 = 1.0F;
-   protected final ModelPart bone;
-   protected final ModelPart body;
-   protected final ModelPart head;
-   protected final ModelPart rightTendril;
-   protected final ModelPart leftTendril;
-   protected final ModelPart leftLeg;
-   protected final ModelPart leftArm;
-   protected final ModelPart leftRibcage;
-   protected final ModelPart rightArm;
-   protected final ModelPart rightLeg;
-   protected final ModelPart rightRibcage;
-   private final List tendrils;
-   private final List justBody;
-   private final List headAndLimbs;
-   private final List bodyHeadAndLimbs;
-   private final Animation attackingAnimation;
-   private final Animation chargingSonicBoomAnimation;
-   private final Animation diggingAnimation;
-   private final Animation emergingAnimation;
-   private final Animation roaringAnimation;
-   private final Animation sniffingAnimation;
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
+public class WardenEntityModel
+extends EntityModel<WardenEntityRenderState> {
+    private static final float field_38324 = 13.0f;
+    private static final float field_38325 = 1.0f;
+    protected final ModelPart bone;
+    protected final ModelPart body;
+    protected final ModelPart head;
+    protected final ModelPart rightTendril;
+    protected final ModelPart leftTendril;
+    protected final ModelPart leftLeg;
+    protected final ModelPart leftArm;
+    protected final ModelPart leftRibcage;
+    protected final ModelPart rightArm;
+    protected final ModelPart rightLeg;
+    protected final ModelPart rightRibcage;
+    private final Animation attackingAnimation;
+    private final Animation chargingSonicBoomAnimation;
+    private final Animation diggingAnimation;
+    private final Animation emergingAnimation;
+    private final Animation roaringAnimation;
+    private final Animation sniffingAnimation;
 
-   public WardenEntityModel(ModelPart modelPart) {
-      super(modelPart, RenderLayer::getEntityCutoutNoCull);
-      this.bone = modelPart.getChild("bone");
-      this.body = this.bone.getChild("body");
-      this.head = this.body.getChild("head");
-      this.rightLeg = this.bone.getChild("right_leg");
-      this.leftLeg = this.bone.getChild("left_leg");
-      this.rightArm = this.body.getChild("right_arm");
-      this.leftArm = this.body.getChild("left_arm");
-      this.rightTendril = this.head.getChild("right_tendril");
-      this.leftTendril = this.head.getChild("left_tendril");
-      this.rightRibcage = this.body.getChild("right_ribcage");
-      this.leftRibcage = this.body.getChild("left_ribcage");
-      this.tendrils = ImmutableList.of(this.leftTendril, this.rightTendril);
-      this.justBody = ImmutableList.of(this.body);
-      this.headAndLimbs = ImmutableList.of(this.head, this.leftArm, this.rightArm, this.leftLeg, this.rightLeg);
-      this.bodyHeadAndLimbs = ImmutableList.of(this.body, this.head, this.leftArm, this.rightArm, this.leftLeg, this.rightLeg);
-      this.attackingAnimation = WardenAnimations.ATTACKING.createAnimation(modelPart);
-      this.chargingSonicBoomAnimation = WardenAnimations.CHARGING_SONIC_BOOM.createAnimation(modelPart);
-      this.diggingAnimation = WardenAnimations.DIGGING.createAnimation(modelPart);
-      this.emergingAnimation = WardenAnimations.EMERGING.createAnimation(modelPart);
-      this.roaringAnimation = WardenAnimations.ROARING.createAnimation(modelPart);
-      this.sniffingAnimation = WardenAnimations.SNIFFING.createAnimation(modelPart);
-   }
+    public WardenEntityModel(ModelPart modelPart) {
+        super(modelPart, RenderLayers::entityCutoutNoCull);
+        this.bone = modelPart.getChild("bone");
+        this.body = this.bone.getChild("body");
+        this.head = this.body.getChild("head");
+        this.rightLeg = this.bone.getChild("right_leg");
+        this.leftLeg = this.bone.getChild("left_leg");
+        this.rightArm = this.body.getChild("right_arm");
+        this.leftArm = this.body.getChild("left_arm");
+        this.rightTendril = this.head.getChild("right_tendril");
+        this.leftTendril = this.head.getChild("left_tendril");
+        this.rightRibcage = this.body.getChild("right_ribcage");
+        this.leftRibcage = this.body.getChild("left_ribcage");
+        this.attackingAnimation = WardenAnimations.ATTACKING.createAnimation(modelPart);
+        this.chargingSonicBoomAnimation = WardenAnimations.CHARGING_SONIC_BOOM.createAnimation(modelPart);
+        this.diggingAnimation = WardenAnimations.DIGGING.createAnimation(modelPart);
+        this.emergingAnimation = WardenAnimations.EMERGING.createAnimation(modelPart);
+        this.roaringAnimation = WardenAnimations.ROARING.createAnimation(modelPart);
+        this.sniffingAnimation = WardenAnimations.SNIFFING.createAnimation(modelPart);
+    }
 
-   public static TexturedModelData getTexturedModelData() {
-      ModelData modelData = new ModelData();
-      ModelPartData modelPartData = modelData.getRoot();
-      ModelPartData modelPartData2 = modelPartData.addChild("bone", ModelPartBuilder.create(), ModelTransform.origin(0.0F, 24.0F, 0.0F));
-      ModelPartData modelPartData3 = modelPartData2.addChild("body", ModelPartBuilder.create().uv(0, 0).cuboid(-9.0F, -13.0F, -4.0F, 18.0F, 21.0F, 11.0F), ModelTransform.origin(0.0F, -21.0F, 0.0F));
-      modelPartData3.addChild("right_ribcage", ModelPartBuilder.create().uv(90, 11).cuboid(-2.0F, -11.0F, -0.1F, 9.0F, 21.0F, 0.0F), ModelTransform.origin(-7.0F, -2.0F, -4.0F));
-      modelPartData3.addChild("left_ribcage", ModelPartBuilder.create().uv(90, 11).mirrored().cuboid(-7.0F, -11.0F, -0.1F, 9.0F, 21.0F, 0.0F).mirrored(false), ModelTransform.origin(7.0F, -2.0F, -4.0F));
-      ModelPartData modelPartData4 = modelPartData3.addChild("head", ModelPartBuilder.create().uv(0, 32).cuboid(-8.0F, -16.0F, -5.0F, 16.0F, 16.0F, 10.0F), ModelTransform.origin(0.0F, -13.0F, 0.0F));
-      modelPartData4.addChild("right_tendril", ModelPartBuilder.create().uv(52, 32).cuboid(-16.0F, -13.0F, 0.0F, 16.0F, 16.0F, 0.0F), ModelTransform.origin(-8.0F, -12.0F, 0.0F));
-      modelPartData4.addChild("left_tendril", ModelPartBuilder.create().uv(58, 0).cuboid(0.0F, -13.0F, 0.0F, 16.0F, 16.0F, 0.0F), ModelTransform.origin(8.0F, -12.0F, 0.0F));
-      modelPartData3.addChild("right_arm", ModelPartBuilder.create().uv(44, 50).cuboid(-4.0F, 0.0F, -4.0F, 8.0F, 28.0F, 8.0F), ModelTransform.origin(-13.0F, -13.0F, 1.0F));
-      modelPartData3.addChild("left_arm", ModelPartBuilder.create().uv(0, 58).cuboid(-4.0F, 0.0F, -4.0F, 8.0F, 28.0F, 8.0F), ModelTransform.origin(13.0F, -13.0F, 1.0F));
-      modelPartData2.addChild("right_leg", ModelPartBuilder.create().uv(76, 48).cuboid(-3.1F, 0.0F, -3.0F, 6.0F, 13.0F, 6.0F), ModelTransform.origin(-5.9F, -13.0F, 0.0F));
-      modelPartData2.addChild("left_leg", ModelPartBuilder.create().uv(76, 76).cuboid(-2.9F, 0.0F, -3.0F, 6.0F, 13.0F, 6.0F), ModelTransform.origin(5.9F, -13.0F, 0.0F));
-      return TexturedModelData.of(modelData, 128, 128);
-   }
+    public static TexturedModelData getTexturedModelData() {
+        ModelData modelData = new ModelData();
+        ModelPartData modelPartData = modelData.getRoot();
+        ModelPartData modelPartData2 = modelPartData.addChild("bone", ModelPartBuilder.create(), ModelTransform.origin((float)0.0f, (float)24.0f, (float)0.0f));
+        ModelPartData modelPartData3 = modelPartData2.addChild("body", ModelPartBuilder.create().uv(0, 0).cuboid(-9.0f, -13.0f, -4.0f, 18.0f, 21.0f, 11.0f), ModelTransform.origin((float)0.0f, (float)-21.0f, (float)0.0f));
+        modelPartData3.addChild("right_ribcage", ModelPartBuilder.create().uv(90, 11).cuboid(-2.0f, -11.0f, -0.1f, 9.0f, 21.0f, 0.0f), ModelTransform.origin((float)-7.0f, (float)-2.0f, (float)-4.0f));
+        modelPartData3.addChild("left_ribcage", ModelPartBuilder.create().uv(90, 11).mirrored().cuboid(-7.0f, -11.0f, -0.1f, 9.0f, 21.0f, 0.0f).mirrored(false), ModelTransform.origin((float)7.0f, (float)-2.0f, (float)-4.0f));
+        ModelPartData modelPartData4 = modelPartData3.addChild("head", ModelPartBuilder.create().uv(0, 32).cuboid(-8.0f, -16.0f, -5.0f, 16.0f, 16.0f, 10.0f), ModelTransform.origin((float)0.0f, (float)-13.0f, (float)0.0f));
+        modelPartData4.addChild("right_tendril", ModelPartBuilder.create().uv(52, 32).cuboid(-16.0f, -13.0f, 0.0f, 16.0f, 16.0f, 0.0f), ModelTransform.origin((float)-8.0f, (float)-12.0f, (float)0.0f));
+        modelPartData4.addChild("left_tendril", ModelPartBuilder.create().uv(58, 0).cuboid(0.0f, -13.0f, 0.0f, 16.0f, 16.0f, 0.0f), ModelTransform.origin((float)8.0f, (float)-12.0f, (float)0.0f));
+        modelPartData3.addChild("right_arm", ModelPartBuilder.create().uv(44, 50).cuboid(-4.0f, 0.0f, -4.0f, 8.0f, 28.0f, 8.0f), ModelTransform.origin((float)-13.0f, (float)-13.0f, (float)1.0f));
+        modelPartData3.addChild("left_arm", ModelPartBuilder.create().uv(0, 58).cuboid(-4.0f, 0.0f, -4.0f, 8.0f, 28.0f, 8.0f), ModelTransform.origin((float)13.0f, (float)-13.0f, (float)1.0f));
+        modelPartData2.addChild("right_leg", ModelPartBuilder.create().uv(76, 48).cuboid(-3.1f, 0.0f, -3.0f, 6.0f, 13.0f, 6.0f), ModelTransform.origin((float)-5.9f, (float)-13.0f, (float)0.0f));
+        modelPartData2.addChild("left_leg", ModelPartBuilder.create().uv(76, 76).cuboid(-2.9f, 0.0f, -3.0f, 6.0f, 13.0f, 6.0f), ModelTransform.origin((float)5.9f, (float)-13.0f, (float)0.0f));
+        return TexturedModelData.of((ModelData)modelData, (int)128, (int)128);
+    }
 
-   public void setAngles(WardenEntityRenderState wardenEntityRenderState) {
-      super.setAngles(wardenEntityRenderState);
-      this.setHeadAngle(wardenEntityRenderState.relativeHeadYaw, wardenEntityRenderState.pitch);
-      this.setLimbAngles(wardenEntityRenderState.limbSwingAnimationProgress, wardenEntityRenderState.limbSwingAmplitude);
-      this.setHeadAndBodyAngles(wardenEntityRenderState.age);
-      this.setTendrilPitches(wardenEntityRenderState, wardenEntityRenderState.age);
-      this.attackingAnimation.apply(wardenEntityRenderState.attackingAnimationState, wardenEntityRenderState.age);
-      this.chargingSonicBoomAnimation.apply(wardenEntityRenderState.chargingSonicBoomAnimationState, wardenEntityRenderState.age);
-      this.diggingAnimation.apply(wardenEntityRenderState.diggingAnimationState, wardenEntityRenderState.age);
-      this.emergingAnimation.apply(wardenEntityRenderState.emergingAnimationState, wardenEntityRenderState.age);
-      this.roaringAnimation.apply(wardenEntityRenderState.roaringAnimationState, wardenEntityRenderState.age);
-      this.sniffingAnimation.apply(wardenEntityRenderState.sniffingAnimationState, wardenEntityRenderState.age);
-   }
+    public static TexturedModelData getTendrilsTexturedModelData() {
+        return WardenEntityModel.getTexturedModelData().transform(modelData -> {
+            modelData.getRoot().resetChildrenExceptExact(Set.of("left_tendril", "right_tendril"));
+            return modelData;
+        });
+    }
 
-   private void setHeadAngle(float yaw, float pitch) {
-      this.head.pitch = pitch * 0.017453292F;
-      this.head.yaw = yaw * 0.017453292F;
-   }
+    public static TexturedModelData getHeartTexturedModelData() {
+        return WardenEntityModel.getTexturedModelData().transform(modelData -> {
+            modelData.getRoot().resetChildrenExceptExact(Set.of("body"));
+            return modelData;
+        });
+    }
 
-   private void setHeadAndBodyAngles(float animationProgress) {
-      float f = animationProgress * 0.1F;
-      float g = MathHelper.cos(f);
-      float h = MathHelper.sin(f);
-      ModelPart var10000 = this.head;
-      var10000.roll += 0.06F * g;
-      var10000 = this.head;
-      var10000.pitch += 0.06F * h;
-      var10000 = this.body;
-      var10000.roll += 0.025F * h;
-      var10000 = this.body;
-      var10000.pitch += 0.025F * g;
-   }
+    public static TexturedModelData getBioluminescentTexturedModelData() {
+        return WardenEntityModel.getTexturedModelData().transform(modelData -> {
+            modelData.getRoot().resetChildrenExceptExact(Set.of("head", "left_arm", "right_arm", "left_leg", "right_leg"));
+            return modelData;
+        });
+    }
 
-   private void setLimbAngles(float angle, float distance) {
-      float f = Math.min(0.5F, 3.0F * distance);
-      float g = angle * 0.8662F;
-      float h = MathHelper.cos(g);
-      float i = MathHelper.sin(g);
-      float j = Math.min(0.35F, f);
-      ModelPart var10000 = this.head;
-      var10000.roll += 0.3F * i * f;
-      var10000 = this.head;
-      var10000.pitch += 1.2F * MathHelper.cos(g + 1.5707964F) * j;
-      this.body.roll = 0.1F * i * f;
-      this.body.pitch = 1.0F * h * j;
-      this.leftLeg.pitch = 1.0F * h * f;
-      this.rightLeg.pitch = 1.0F * MathHelper.cos(g + 3.1415927F) * f;
-      this.leftArm.pitch = -(0.8F * h * f);
-      this.leftArm.roll = 0.0F;
-      this.rightArm.pitch = -(0.8F * i * f);
-      this.rightArm.roll = 0.0F;
-      this.setArmPivots();
-   }
+    public static TexturedModelData getPulsatingSpotsTexturedModelData() {
+        return WardenEntityModel.getTexturedModelData().transform(modelData -> {
+            modelData.getRoot().resetChildrenExceptExact(Set.of("body", "head", "left_arm", "right_arm", "left_leg", "right_leg"));
+            return modelData;
+        });
+    }
 
-   private void setArmPivots() {
-      this.leftArm.yaw = 0.0F;
-      this.leftArm.originZ = 1.0F;
-      this.leftArm.originX = 13.0F;
-      this.leftArm.originY = -13.0F;
-      this.rightArm.yaw = 0.0F;
-      this.rightArm.originZ = 1.0F;
-      this.rightArm.originX = -13.0F;
-      this.rightArm.originY = -13.0F;
-   }
+    public void setAngles(WardenEntityRenderState wardenEntityRenderState) {
+        super.setAngles((Object)wardenEntityRenderState);
+        this.setHeadAngle(wardenEntityRenderState.relativeHeadYaw, wardenEntityRenderState.pitch);
+        this.setLimbAngles(wardenEntityRenderState.limbSwingAnimationProgress, wardenEntityRenderState.limbSwingAmplitude);
+        this.setHeadAndBodyAngles(wardenEntityRenderState.age);
+        this.setTendrilPitches(wardenEntityRenderState, wardenEntityRenderState.age);
+        this.attackingAnimation.apply(wardenEntityRenderState.attackingAnimationState, wardenEntityRenderState.age);
+        this.chargingSonicBoomAnimation.apply(wardenEntityRenderState.chargingSonicBoomAnimationState, wardenEntityRenderState.age);
+        this.diggingAnimation.apply(wardenEntityRenderState.diggingAnimationState, wardenEntityRenderState.age);
+        this.emergingAnimation.apply(wardenEntityRenderState.emergingAnimationState, wardenEntityRenderState.age);
+        this.roaringAnimation.apply(wardenEntityRenderState.roaringAnimationState, wardenEntityRenderState.age);
+        this.sniffingAnimation.apply(wardenEntityRenderState.sniffingAnimationState, wardenEntityRenderState.age);
+    }
 
-   private void setTendrilPitches(WardenEntityRenderState state, float animationProgress) {
-      float f = state.tendrilAlpha * (float)(Math.cos((double)animationProgress * 2.25) * Math.PI * 0.10000000149011612);
-      this.leftTendril.pitch = f;
-      this.rightTendril.pitch = -f;
-   }
+    private void setHeadAngle(float yaw, float pitch) {
+        this.head.pitch = pitch * ((float)Math.PI / 180);
+        this.head.yaw = yaw * ((float)Math.PI / 180);
+    }
 
-   public List getTendrils(WardenEntityRenderState state) {
-      return this.tendrils;
-   }
+    private void setHeadAndBodyAngles(float animationProgress) {
+        float f = animationProgress * 0.1f;
+        float g = MathHelper.cos((double)f);
+        float h = MathHelper.sin((double)f);
+        this.head.roll += 0.06f * g;
+        this.head.pitch += 0.06f * h;
+        this.body.roll += 0.025f * h;
+        this.body.pitch += 0.025f * g;
+    }
 
-   public List getBody(WardenEntityRenderState state) {
-      return this.justBody;
-   }
+    private void setLimbAngles(float angle, float distance) {
+        float f = Math.min(0.5f, 3.0f * distance);
+        float g = angle * 0.8662f;
+        float h = MathHelper.cos((double)g);
+        float i = MathHelper.sin((double)g);
+        float j = Math.min(0.35f, f);
+        this.head.roll += 0.3f * i * f;
+        this.head.pitch += 1.2f * MathHelper.cos((double)(g + 1.5707964f)) * j;
+        this.body.roll = 0.1f * i * f;
+        this.body.pitch = 1.0f * h * j;
+        this.leftLeg.pitch = 1.0f * h * f;
+        this.rightLeg.pitch = 1.0f * MathHelper.cos((double)(g + (float)Math.PI)) * f;
+        this.leftArm.pitch = -(0.8f * h * f);
+        this.leftArm.roll = 0.0f;
+        this.rightArm.pitch = -(0.8f * i * f);
+        this.rightArm.roll = 0.0f;
+        this.setArmPivots();
+    }
 
-   public List getHeadAndLimbs(WardenEntityRenderState state) {
-      return this.headAndLimbs;
-   }
+    private void setArmPivots() {
+        this.leftArm.yaw = 0.0f;
+        this.leftArm.originZ = 1.0f;
+        this.leftArm.originX = 13.0f;
+        this.leftArm.originY = -13.0f;
+        this.rightArm.yaw = 0.0f;
+        this.rightArm.originZ = 1.0f;
+        this.rightArm.originX = -13.0f;
+        this.rightArm.originY = -13.0f;
+    }
 
-   public List getBodyHeadAndLimbs(WardenEntityRenderState state) {
-      return this.bodyHeadAndLimbs;
-   }
+    private void setTendrilPitches(WardenEntityRenderState state, float animationProgress) {
+        float f;
+        this.leftTendril.pitch = f = state.tendrilAlpha * (float)(Math.cos((double)animationProgress * 2.25) * Math.PI * (double)0.1f);
+        this.rightTendril.pitch = -f;
+    }
 }
+

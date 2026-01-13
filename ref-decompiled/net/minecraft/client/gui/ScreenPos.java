@@ -1,76 +1,64 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.gui.ScreenPos
+ *  net.minecraft.client.gui.ScreenPos$1
+ *  net.minecraft.client.gui.navigation.NavigationAxis
+ *  net.minecraft.client.gui.navigation.NavigationDirection
+ */
 package net.minecraft.client.gui;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.gui.ScreenPos;
 import net.minecraft.client.gui.navigation.NavigationAxis;
 import net.minecraft.client.gui.navigation.NavigationDirection;
 
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 public record ScreenPos(int x, int y) {
-   public ScreenPos(int i, int j) {
-      this.x = i;
-      this.y = j;
-   }
+    private final int x;
+    private final int y;
 
-   public static ScreenPos of(NavigationAxis axis, int sameAxis, int otherAxis) {
-      ScreenPos var10000;
-      switch (axis) {
-         case HORIZONTAL:
-            var10000 = new ScreenPos(sameAxis, otherAxis);
-            break;
-         case VERTICAL:
-            var10000 = new ScreenPos(otherAxis, sameAxis);
-            break;
-         default:
-            throw new MatchException((String)null, (Throwable)null);
-      }
+    public ScreenPos(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
 
-      return var10000;
-   }
+    public static ScreenPos of(NavigationAxis axis, int sameAxis, int otherAxis) {
+        return switch (1.field_41833[axis.ordinal()]) {
+            default -> throw new MatchException(null, null);
+            case 1 -> new ScreenPos(sameAxis, otherAxis);
+            case 2 -> new ScreenPos(otherAxis, sameAxis);
+        };
+    }
 
-   public ScreenPos add(NavigationDirection direction) {
-      ScreenPos var10000;
-      switch (direction) {
-         case DOWN:
-            var10000 = new ScreenPos(this.x, this.y + 1);
-            break;
-         case UP:
-            var10000 = new ScreenPos(this.x, this.y - 1);
-            break;
-         case LEFT:
-            var10000 = new ScreenPos(this.x - 1, this.y);
-            break;
-         case RIGHT:
-            var10000 = new ScreenPos(this.x + 1, this.y);
-            break;
-         default:
-            throw new MatchException((String)null, (Throwable)null);
-      }
+    public ScreenPos add(NavigationDirection direction) {
+        return switch (1.field_41834[direction.ordinal()]) {
+            default -> throw new MatchException(null, null);
+            case 1 -> new ScreenPos(this.x, this.y + 1);
+            case 2 -> new ScreenPos(this.x, this.y - 1);
+            case 3 -> new ScreenPos(this.x - 1, this.y);
+            case 4 -> new ScreenPos(this.x + 1, this.y);
+        };
+    }
 
-      return var10000;
-   }
+    public int getComponent(NavigationAxis axis) {
+        return switch (1.field_41833[axis.ordinal()]) {
+            default -> throw new MatchException(null, null);
+            case 1 -> this.x;
+            case 2 -> this.y;
+        };
+    }
 
-   public int getComponent(NavigationAxis axis) {
-      int var10000;
-      switch (axis) {
-         case HORIZONTAL:
-            var10000 = this.x;
-            break;
-         case VERTICAL:
-            var10000 = this.y;
-            break;
-         default:
-            throw new MatchException((String)null, (Throwable)null);
-      }
+    public int x() {
+        return this.x;
+    }
 
-      return var10000;
-   }
-
-   public int x() {
-      return this.x;
-   }
-
-   public int y() {
-      return this.y;
-   }
+    public int y() {
+        return this.y;
+    }
 }
+

@@ -1,3 +1,27 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.MinecraftClient
+ *  net.minecraft.client.gui.ScreenRect
+ *  net.minecraft.client.gui.render.OversizedItemGuiElementRenderer
+ *  net.minecraft.client.gui.render.SpecialGuiElementRenderer
+ *  net.minecraft.client.gui.render.state.GuiRenderState
+ *  net.minecraft.client.gui.render.state.ItemGuiElementRenderState
+ *  net.minecraft.client.gui.render.state.special.OversizedItemGuiElementRenderState
+ *  net.minecraft.client.gui.render.state.special.SpecialGuiElementRenderState
+ *  net.minecraft.client.render.DiffuseLighting$Type
+ *  net.minecraft.client.render.OverlayTexture
+ *  net.minecraft.client.render.VertexConsumerProvider$Immediate
+ *  net.minecraft.client.render.command.OrderedRenderCommandQueue
+ *  net.minecraft.client.render.command.OrderedRenderCommandQueueImpl
+ *  net.minecraft.client.render.command.RenderDispatcher
+ *  net.minecraft.client.render.item.KeyedItemRenderState
+ *  net.minecraft.client.util.math.MatrixStack
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.gui.render;
 
 import java.util.Objects;
@@ -5,79 +29,88 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.ScreenRect;
+import net.minecraft.client.gui.render.SpecialGuiElementRenderer;
 import net.minecraft.client.gui.render.state.GuiRenderState;
 import net.minecraft.client.gui.render.state.ItemGuiElementRenderState;
 import net.minecraft.client.gui.render.state.special.OversizedItemGuiElementRenderState;
+import net.minecraft.client.gui.render.state.special.SpecialGuiElementRenderState;
 import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
+import net.minecraft.client.render.command.OrderedRenderCommandQueueImpl;
+import net.minecraft.client.render.command.RenderDispatcher;
 import net.minecraft.client.render.item.KeyedItemRenderState;
 import net.minecraft.client.util.math.MatrixStack;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
-public class OversizedItemGuiElementRenderer extends SpecialGuiElementRenderer {
-   private boolean oversized;
-   @Nullable
-   private Object modelKey;
+@Environment(value=EnvType.CLIENT)
+public class OversizedItemGuiElementRenderer
+extends SpecialGuiElementRenderer<OversizedItemGuiElementRenderState> {
+    private boolean oversized;
+    private @Nullable Object modelKey;
 
-   public OversizedItemGuiElementRenderer(VertexConsumerProvider.Immediate immediate) {
-      super(immediate);
-   }
+    public OversizedItemGuiElementRenderer(VertexConsumerProvider.Immediate immediate) {
+        super(immediate);
+    }
 
-   public boolean isOversized() {
-      return this.oversized;
-   }
+    public boolean isOversized() {
+        return this.oversized;
+    }
 
-   public void clearOversized() {
-      this.oversized = false;
-   }
+    public void clearOversized() {
+        this.oversized = false;
+    }
 
-   public void clearModel() {
-      this.modelKey = null;
-   }
+    public void clearModel() {
+        this.modelKey = null;
+    }
 
-   public Class getElementClass() {
-      return OversizedItemGuiElementRenderState.class;
-   }
+    public Class<OversizedItemGuiElementRenderState> getElementClass() {
+        return OversizedItemGuiElementRenderState.class;
+    }
 
-   protected void render(OversizedItemGuiElementRenderState oversizedItemGuiElementRenderState, MatrixStack matrixStack) {
-      matrixStack.scale(1.0F, -1.0F, -1.0F);
-      ItemGuiElementRenderState itemGuiElementRenderState = oversizedItemGuiElementRenderState.guiItemRenderState();
-      ScreenRect screenRect = itemGuiElementRenderState.oversizedBounds();
-      Objects.requireNonNull(screenRect);
-      float f = (float)(screenRect.getLeft() + screenRect.getRight()) / 2.0F;
-      float g = (float)(screenRect.getTop() + screenRect.getBottom()) / 2.0F;
-      float h = (float)itemGuiElementRenderState.x() + 8.0F;
-      float i = (float)itemGuiElementRenderState.y() + 8.0F;
-      matrixStack.translate((h - f) / 16.0F, (g - i) / 16.0F, 0.0F);
-      KeyedItemRenderState keyedItemRenderState = itemGuiElementRenderState.state();
-      boolean bl = !keyedItemRenderState.isSideLit();
-      if (bl) {
-         MinecraftClient.getInstance().gameRenderer.getDiffuseLighting().setShaderLights(DiffuseLighting.Type.ITEMS_FLAT);
-      } else {
-         MinecraftClient.getInstance().gameRenderer.getDiffuseLighting().setShaderLights(DiffuseLighting.Type.ITEMS_3D);
-      }
+    protected void render(OversizedItemGuiElementRenderState oversizedItemGuiElementRenderState, MatrixStack matrixStack) {
+        boolean bl;
+        matrixStack.scale(1.0f, -1.0f, -1.0f);
+        ItemGuiElementRenderState itemGuiElementRenderState = oversizedItemGuiElementRenderState.guiItemRenderState();
+        ScreenRect screenRect = itemGuiElementRenderState.oversizedBounds();
+        Objects.requireNonNull(screenRect);
+        float f = (float)(screenRect.getLeft() + screenRect.getRight()) / 2.0f;
+        float g = (float)(screenRect.getTop() + screenRect.getBottom()) / 2.0f;
+        float h = (float)itemGuiElementRenderState.x() + 8.0f;
+        float i = (float)itemGuiElementRenderState.y() + 8.0f;
+        matrixStack.translate((h - f) / 16.0f, (g - i) / 16.0f, 0.0f);
+        KeyedItemRenderState keyedItemRenderState = itemGuiElementRenderState.state();
+        boolean bl2 = bl = !keyedItemRenderState.isSideLit();
+        if (bl) {
+            MinecraftClient.getInstance().gameRenderer.getDiffuseLighting().setShaderLights(DiffuseLighting.Type.ITEMS_FLAT);
+        } else {
+            MinecraftClient.getInstance().gameRenderer.getDiffuseLighting().setShaderLights(DiffuseLighting.Type.ITEMS_3D);
+        }
+        RenderDispatcher renderDispatcher = MinecraftClient.getInstance().gameRenderer.getEntityRenderDispatcher();
+        OrderedRenderCommandQueueImpl orderedRenderCommandQueueImpl = renderDispatcher.getQueue();
+        keyedItemRenderState.render(matrixStack, (OrderedRenderCommandQueue)orderedRenderCommandQueueImpl, 0xF000F0, OverlayTexture.DEFAULT_UV, 0);
+        renderDispatcher.render();
+        this.modelKey = keyedItemRenderState.getModelKey();
+    }
 
-      keyedItemRenderState.render(matrixStack, this.vertexConsumers, 15728880, OverlayTexture.DEFAULT_UV);
-      this.modelKey = keyedItemRenderState.getModelKey();
-   }
+    public void renderElement(OversizedItemGuiElementRenderState oversizedItemGuiElementRenderState, GuiRenderState guiRenderState) {
+        super.renderElement((SpecialGuiElementRenderState)oversizedItemGuiElementRenderState, guiRenderState);
+        this.oversized = true;
+    }
 
-   public void renderElement(OversizedItemGuiElementRenderState oversizedItemGuiElementRenderState, GuiRenderState guiRenderState) {
-      super.renderElement(oversizedItemGuiElementRenderState, guiRenderState);
-      this.oversized = true;
-   }
+    public boolean shouldBypassScaling(OversizedItemGuiElementRenderState oversizedItemGuiElementRenderState) {
+        KeyedItemRenderState keyedItemRenderState = oversizedItemGuiElementRenderState.guiItemRenderState().state();
+        return !keyedItemRenderState.isAnimated() && keyedItemRenderState.getModelKey().equals(this.modelKey);
+    }
 
-   public boolean shouldBypassScaling(OversizedItemGuiElementRenderState oversizedItemGuiElementRenderState) {
-      KeyedItemRenderState keyedItemRenderState = oversizedItemGuiElementRenderState.guiItemRenderState().state();
-      return !keyedItemRenderState.isAnimated() && keyedItemRenderState.getModelKey().equals(this.modelKey);
-   }
+    protected float getYOffset(int height, int windowScaleFactor) {
+        return (float)height / 2.0f;
+    }
 
-   protected float getYOffset(int height, int windowScaleFactor) {
-      return (float)height / 2.0F;
-   }
-
-   protected String getName() {
-      return "oversized_item";
-   }
+    protected String getName() {
+        return "oversized_item";
+    }
 }
+

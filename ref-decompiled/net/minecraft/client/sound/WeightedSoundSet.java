@@ -1,79 +1,96 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.google.common.collect.Lists
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.SharedConstants
+ *  net.minecraft.client.sound.Sound
+ *  net.minecraft.client.sound.SoundContainer
+ *  net.minecraft.client.sound.SoundManager
+ *  net.minecraft.client.sound.SoundSystem
+ *  net.minecraft.client.sound.WeightedSoundSet
+ *  net.minecraft.text.MutableText
+ *  net.minecraft.text.Text
+ *  net.minecraft.util.Formatting
+ *  net.minecraft.util.Identifier
+ *  net.minecraft.util.math.random.Random
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.sound;
 
 import com.google.common.collect.Lists;
-import java.util.Iterator;
 import java.util.List;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.SharedConstants;
+import net.minecraft.client.sound.Sound;
+import net.minecraft.client.sound.SoundContainer;
+import net.minecraft.client.sound.SoundManager;
+import net.minecraft.client.sound.SoundSystem;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.random.Random;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
-public class WeightedSoundSet implements SoundContainer {
-   private final List sounds = Lists.newArrayList();
-   @Nullable
-   private final Text subtitle;
+@Environment(value=EnvType.CLIENT)
+public class WeightedSoundSet
+implements SoundContainer<Sound> {
+    private final List<SoundContainer<Sound>> sounds = Lists.newArrayList();
+    private final @Nullable Text subtitle;
 
-   public WeightedSoundSet(Identifier id, @Nullable String subtitle) {
-      this.subtitle = subtitle == null ? null : Text.translatable(subtitle);
-   }
-
-   public int getWeight() {
-      int i = 0;
-
-      SoundContainer soundContainer;
-      for(Iterator var2 = this.sounds.iterator(); var2.hasNext(); i += soundContainer.getWeight()) {
-         soundContainer = (SoundContainer)var2.next();
-      }
-
-      return i;
-   }
-
-   public Sound getSound(Random random) {
-      int i = this.getWeight();
-      if (!this.sounds.isEmpty() && i != 0) {
-         int j = random.nextInt(i);
-         Iterator var4 = this.sounds.iterator();
-
-         SoundContainer soundContainer;
-         do {
-            if (!var4.hasNext()) {
-               return SoundManager.MISSING_SOUND;
+    public WeightedSoundSet(Identifier id, @Nullable String subtitle) {
+        if (SharedConstants.SUBTITLES) {
+            MutableText mutableText = Text.literal((String)id.getPath());
+            if ("FOR THE DEBUG!".equals(subtitle)) {
+                mutableText = mutableText.append((Text)Text.literal((String)" missing").formatted(Formatting.RED));
             }
+            this.subtitle = mutableText;
+        } else {
+            this.subtitle = subtitle == null ? null : Text.translatable((String)subtitle);
+        }
+    }
 
-            soundContainer = (SoundContainer)var4.next();
-            j -= soundContainer.getWeight();
-         } while(j >= 0);
+    public int getWeight() {
+        int i = 0;
+        for (SoundContainer soundContainer : this.sounds) {
+            i += soundContainer.getWeight();
+        }
+        return i;
+    }
 
-         return (Sound)soundContainer.getSound(random);
-      } else {
-         return SoundManager.MISSING_SOUND;
-      }
-   }
+    public Sound getSound(Random random) {
+        int i = this.getWeight();
+        if (this.sounds.isEmpty() || i == 0) {
+            return SoundManager.MISSING_SOUND;
+        }
+        int j = random.nextInt(i);
+        for (SoundContainer soundContainer : this.sounds) {
+            if ((j -= soundContainer.getWeight()) >= 0) continue;
+            return (Sound)soundContainer.getSound(random);
+        }
+        return SoundManager.MISSING_SOUND;
+    }
 
-   public void add(SoundContainer container) {
-      this.sounds.add(container);
-   }
+    public void add(SoundContainer<Sound> container) {
+        this.sounds.add(container);
+    }
 
-   @Nullable
-   public Text getSubtitle() {
-      return this.subtitle;
-   }
+    public @Nullable Text getSubtitle() {
+        return this.subtitle;
+    }
 
-   public void preload(SoundSystem soundSystem) {
-      Iterator var2 = this.sounds.iterator();
+    public void preload(SoundSystem soundSystem) {
+        for (SoundContainer soundContainer : this.sounds) {
+            soundContainer.preload(soundSystem);
+        }
+    }
 
-      while(var2.hasNext()) {
-         SoundContainer soundContainer = (SoundContainer)var2.next();
-         soundContainer.preload(soundSystem);
-      }
-
-   }
-
-   // $FF: synthetic method
-   public Object getSound(final Random random) {
-      return this.getSound(random);
-   }
+    public /* synthetic */ Object getSound(Random random) {
+        return this.getSound(random);
+    }
 }
+

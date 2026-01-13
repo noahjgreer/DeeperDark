@@ -1,88 +1,53 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.render.DrawStyle
+ *  net.minecraft.client.render.Frustum
+ *  net.minecraft.client.render.debug.DebugRenderer$Renderer
+ *  net.minecraft.client.render.debug.StructureDebugRenderer
+ *  net.minecraft.util.math.BlockBox
+ *  net.minecraft.util.math.Box
+ *  net.minecraft.util.math.ColorHelper
+ *  net.minecraft.world.debug.DebugDataStore
+ *  net.minecraft.world.debug.DebugSubscriptionTypes
+ *  net.minecraft.world.debug.data.StructureDebugData
+ *  net.minecraft.world.debug.data.StructureDebugData$Piece
+ *  net.minecraft.world.debug.gizmo.GizmoDrawing
+ */
 package net.minecraft.client.render.debug;
 
-import com.google.common.collect.Maps;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.VertexRendering;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.network.packet.s2c.custom.DebugStructuresCustomPayload;
-import net.minecraft.registry.RegistryKey;
+import net.minecraft.client.render.DrawStyle;
+import net.minecraft.client.render.Frustum;
+import net.minecraft.client.render.debug.DebugRenderer;
 import net.minecraft.util.math.BlockBox;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.ColorHelper;
+import net.minecraft.world.debug.DebugDataStore;
+import net.minecraft.world.debug.DebugSubscriptionTypes;
+import net.minecraft.world.debug.data.StructureDebugData;
+import net.minecraft.world.debug.gizmo.GizmoDrawing;
 
-@Environment(EnvType.CLIENT)
-public class StructureDebugRenderer implements DebugRenderer.Renderer {
-   private final MinecraftClient client;
-   private final Map structureBoundingBoxes = Maps.newIdentityHashMap();
-   private final Map structurePiecesBoundingBoxes = Maps.newIdentityHashMap();
-   private static final int RANGE = 500;
-
-   public StructureDebugRenderer(MinecraftClient client) {
-      this.client = client;
-   }
-
-   public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, double cameraX, double cameraY, double cameraZ) {
-      Camera camera = this.client.gameRenderer.getCamera();
-      RegistryKey registryKey = this.client.world.getRegistryKey();
-      BlockPos blockPos = BlockPos.ofFloored(camera.getPos().x, 0.0, camera.getPos().z);
-      VertexConsumer vertexConsumer = vertexConsumers.getBuffer(RenderLayer.getLines());
-      if (this.structureBoundingBoxes.containsKey(registryKey)) {
-         Iterator var13 = ((Map)this.structureBoundingBoxes.get(registryKey)).values().iterator();
-
-         while(var13.hasNext()) {
-            BlockBox blockBox = (BlockBox)var13.next();
-            if (blockPos.isWithinDistance(blockBox.getCenter(), 500.0)) {
-               VertexRendering.drawBox(matrices, vertexConsumer, (double)blockBox.getMinX() - cameraX, (double)blockBox.getMinY() - cameraY, (double)blockBox.getMinZ() - cameraZ, (double)(blockBox.getMaxX() + 1) - cameraX, (double)(blockBox.getMaxY() + 1) - cameraY, (double)(blockBox.getMaxZ() + 1) - cameraZ, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F);
+@Environment(value=EnvType.CLIENT)
+public class StructureDebugRenderer
+implements DebugRenderer.Renderer {
+    public void render(double cameraX, double cameraY, double cameraZ, DebugDataStore store, Frustum frustum, float tickProgress) {
+        store.forEachChunkData(DebugSubscriptionTypes.STRUCTURES, (chunkPos, structures) -> {
+            for (StructureDebugData structureDebugData : structures) {
+                GizmoDrawing.box((Box)Box.from((BlockBox)structureDebugData.boundingBox()), (DrawStyle)DrawStyle.stroked((int)ColorHelper.fromFloats((float)1.0f, (float)1.0f, (float)1.0f, (float)1.0f)));
+                for (StructureDebugData.Piece piece : structureDebugData.pieces()) {
+                    if (piece.isStart()) {
+                        GizmoDrawing.box((Box)Box.from((BlockBox)piece.boundingBox()), (DrawStyle)DrawStyle.stroked((int)ColorHelper.fromFloats((float)1.0f, (float)0.0f, (float)1.0f, (float)0.0f)));
+                        continue;
+                    }
+                    GizmoDrawing.box((Box)Box.from((BlockBox)piece.boundingBox()), (DrawStyle)DrawStyle.stroked((int)ColorHelper.fromFloats((float)1.0f, (float)0.0f, (float)0.0f, (float)1.0f)));
+                }
             }
-         }
-      }
-
-      Map map = (Map)this.structurePiecesBoundingBoxes.get(registryKey);
-      if (map != null) {
-         Iterator var18 = map.values().iterator();
-
-         while(var18.hasNext()) {
-            DebugStructuresCustomPayload.Piece piece = (DebugStructuresCustomPayload.Piece)var18.next();
-            BlockBox blockBox2 = piece.boundingBox();
-            if (blockPos.isWithinDistance(blockBox2.getCenter(), 500.0)) {
-               if (piece.isStart()) {
-                  VertexRendering.drawBox(matrices, vertexConsumer, (double)blockBox2.getMinX() - cameraX, (double)blockBox2.getMinY() - cameraY, (double)blockBox2.getMinZ() - cameraZ, (double)(blockBox2.getMaxX() + 1) - cameraX, (double)(blockBox2.getMaxY() + 1) - cameraY, (double)(blockBox2.getMaxZ() + 1) - cameraZ, 0.0F, 1.0F, 0.0F, 1.0F, 0.0F, 1.0F, 0.0F);
-               } else {
-                  VertexRendering.drawBox(matrices, vertexConsumer, (double)blockBox2.getMinX() - cameraX, (double)blockBox2.getMinY() - cameraY, (double)blockBox2.getMinZ() - cameraZ, (double)(blockBox2.getMaxX() + 1) - cameraX, (double)(blockBox2.getMaxY() + 1) - cameraY, (double)(blockBox2.getMaxZ() + 1) - cameraZ, 0.0F, 0.0F, 1.0F, 1.0F, 0.0F, 0.0F, 1.0F);
-               }
-            }
-         }
-      }
-
-   }
-
-   public void addStructure(BlockBox boundingBox, List pieces, RegistryKey dimensionKey) {
-      ((Map)this.structureBoundingBoxes.computeIfAbsent(dimensionKey, (dimension) -> {
-         return new HashMap();
-      })).put(boundingBox.toString(), boundingBox);
-      Map map = (Map)this.structurePiecesBoundingBoxes.computeIfAbsent(dimensionKey, (dimension) -> {
-         return new HashMap();
-      });
-      Iterator var5 = pieces.iterator();
-
-      while(var5.hasNext()) {
-         DebugStructuresCustomPayload.Piece piece = (DebugStructuresCustomPayload.Piece)var5.next();
-         map.put(piece.boundingBox().toString(), piece);
-      }
-
-   }
-
-   public void clear() {
-      this.structureBoundingBoxes.clear();
-      this.structurePiecesBoundingBoxes.clear();
-   }
+        });
+    }
 }
+

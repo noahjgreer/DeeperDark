@@ -1,43 +1,57 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.block.enums.ChestType
+ *  net.minecraft.util.StringIdentifiable
+ */
 package net.minecraft.block.enums;
 
 import net.minecraft.util.StringIdentifiable;
 
-public enum ChestType implements StringIdentifiable {
-   SINGLE("single"),
-   LEFT("left"),
-   RIGHT("right");
+/*
+ * Exception performing whole class analysis ignored.
+ */
+public final class ChestType
+extends Enum<ChestType>
+implements StringIdentifiable {
+    public static final /* enum */ ChestType SINGLE = new ChestType("SINGLE", 0, "single");
+    public static final /* enum */ ChestType LEFT = new ChestType("LEFT", 1, "left");
+    public static final /* enum */ ChestType RIGHT = new ChestType("RIGHT", 2, "right");
+    private final String name;
+    private static final /* synthetic */ ChestType[] field_12573;
 
-   private final String name;
+    public static ChestType[] values() {
+        return (ChestType[])field_12573.clone();
+    }
 
-   private ChestType(final String name) {
-      this.name = name;
-   }
+    public static ChestType valueOf(String string) {
+        return Enum.valueOf(ChestType.class, string);
+    }
 
-   public String asString() {
-      return this.name;
-   }
+    private ChestType(String name) {
+        this.name = name;
+    }
 
-   public ChestType getOpposite() {
-      ChestType var10000;
-      switch (this.ordinal()) {
-         case 0:
-            var10000 = SINGLE;
-            break;
-         case 1:
-            var10000 = RIGHT;
-            break;
-         case 2:
-            var10000 = LEFT;
-            break;
-         default:
-            throw new MatchException((String)null, (Throwable)null);
-      }
+    public String asString() {
+        return this.name;
+    }
 
-      return var10000;
-   }
+    public ChestType getOpposite() {
+        return switch (this.ordinal()) {
+            default -> throw new MatchException(null, null);
+            case 0 -> SINGLE;
+            case 1 -> RIGHT;
+            case 2 -> LEFT;
+        };
+    }
 
-   // $FF: synthetic method
-   private static ChestType[] method_36724() {
-      return new ChestType[]{SINGLE, LEFT, RIGHT};
-   }
+    private static /* synthetic */ ChestType[] method_36724() {
+        return new ChestType[]{SINGLE, LEFT, RIGHT};
+    }
+
+    static {
+        field_12573 = ChestType.method_36724();
+    }
 }
+

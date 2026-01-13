@@ -1,54 +1,81 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.blaze3d.pipeline.RenderPipeline
+ *  com.mojang.blaze3d.systems.RenderSystem
+ *  com.mojang.blaze3d.textures.FilterMode
+ *  com.mojang.blaze3d.textures.GpuTextureView
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.font.TextDrawable
+ *  net.minecraft.client.gl.GpuSampler
+ *  net.minecraft.client.gui.ScreenRect
+ *  net.minecraft.client.gui.render.state.GlyphGuiElementRenderState
+ *  net.minecraft.client.gui.render.state.SimpleGuiElementRenderState
+ *  net.minecraft.client.render.VertexConsumer
+ *  net.minecraft.client.texture.TextureSetup
+ *  org.joml.Matrix3x2fc
+ *  org.joml.Matrix4f
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.gui.render.state;
 
 import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.textures.FilterMode;
 import com.mojang.blaze3d.textures.GpuTextureView;
-import java.util.Objects;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.font.BakedGlyph;
+import net.minecraft.client.font.TextDrawable;
+import net.minecraft.client.gl.GpuSampler;
 import net.minecraft.client.gui.ScreenRect;
+import net.minecraft.client.gui.render.state.SimpleGuiElementRenderState;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.texture.TextureSetup;
-import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix3x2f;
+import org.joml.Matrix3x2fc;
 import org.joml.Matrix4f;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
-public record GlyphGuiElementRenderState(Matrix3x2f pose, BakedGlyph.DrawnGlyph instance, @Nullable ScreenRect scissorArea) implements SimpleGuiElementRenderState {
-   public GlyphGuiElementRenderState(Matrix3x2f matrix3x2f, BakedGlyph.DrawnGlyph drawnGlyph, @Nullable ScreenRect screenRect) {
-      this.pose = matrix3x2f;
-      this.instance = drawnGlyph;
-      this.scissorArea = screenRect;
-   }
+@Environment(value=EnvType.CLIENT)
+public record GlyphGuiElementRenderState(Matrix3x2fc pose, TextDrawable renderable, @Nullable ScreenRect scissorArea) implements SimpleGuiElementRenderState
+{
+    private final Matrix3x2fc pose;
+    private final TextDrawable renderable;
+    private final @Nullable ScreenRect scissorArea;
 
-   public void setupVertices(VertexConsumer vertices, float depth) {
-      Matrix4f matrix4f = (new Matrix4f()).mul(this.pose).translate(0.0F, 0.0F, depth);
-      this.instance.glyph().draw(this.instance, matrix4f, vertices, 15728880, true);
-   }
+    public GlyphGuiElementRenderState(Matrix3x2fc pose, TextDrawable renderable, @Nullable ScreenRect scissorArea) {
+        this.pose = pose;
+        this.renderable = renderable;
+        this.scissorArea = scissorArea;
+    }
 
-   public RenderPipeline pipeline() {
-      return this.instance.glyph().getPipeline();
-   }
+    public void setupVertices(VertexConsumer vertices) {
+        this.renderable.render(new Matrix4f().mul(this.pose), vertices, 0xF000F0, true);
+    }
 
-   public TextureSetup textureSetup() {
-      return TextureSetup.of((GpuTextureView)Objects.requireNonNull(this.instance.glyph().getTexture()));
-   }
+    public RenderPipeline pipeline() {
+        return this.renderable.getPipeline();
+    }
 
-   @Nullable
-   public ScreenRect bounds() {
-      return null;
-   }
+    public TextureSetup textureSetup() {
+        return TextureSetup.withLightmap((GpuTextureView)this.renderable.textureView(), (GpuSampler)RenderSystem.getSamplerCache().get(FilterMode.NEAREST));
+    }
 
-   public Matrix3x2f pose() {
-      return this.pose;
-   }
+    public @Nullable ScreenRect bounds() {
+        return null;
+    }
 
-   public BakedGlyph.DrawnGlyph instance() {
-      return this.instance;
-   }
+    public Matrix3x2fc pose() {
+        return this.pose;
+    }
 
-   @Nullable
-   public ScreenRect scissorArea() {
-      return this.scissorArea;
-   }
+    public TextDrawable renderable() {
+        return this.renderable;
+    }
+
+    public @Nullable ScreenRect scissorArea() {
+        return this.scissorArea;
+    }
 }
+

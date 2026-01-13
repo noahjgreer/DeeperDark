@@ -1,3 +1,19 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.model.ModelData
+ *  net.minecraft.client.model.ModelPart
+ *  net.minecraft.client.model.ModelPartBuilder
+ *  net.minecraft.client.model.ModelPartData
+ *  net.minecraft.client.model.ModelTransform
+ *  net.minecraft.client.model.TexturedModelData
+ *  net.minecraft.client.render.block.entity.SkullBlockEntityModel
+ *  net.minecraft.client.render.block.entity.SkullBlockEntityModel$SkullModelState
+ *  net.minecraft.client.render.entity.model.DragonHeadEntityModel
+ */
 package net.minecraft.client.render.entity.model;
 
 import net.fabricmc.api.EnvType;
@@ -10,29 +26,32 @@ import net.minecraft.client.model.ModelTransform;
 import net.minecraft.client.model.TexturedModelData;
 import net.minecraft.client.render.block.entity.SkullBlockEntityModel;
 
-@Environment(EnvType.CLIENT)
-public class DragonHeadEntityModel extends SkullBlockEntityModel {
-   private final ModelPart head;
-   private final ModelPart jaw;
+@Environment(value=EnvType.CLIENT)
+public class DragonHeadEntityModel
+extends SkullBlockEntityModel {
+    private final ModelPart head;
+    private final ModelPart jaw;
 
-   public DragonHeadEntityModel(ModelPart modelPart) {
-      super(modelPart);
-      this.head = modelPart.getChild("head");
-      this.jaw = this.head.getChild("jaw");
-   }
+    public DragonHeadEntityModel(ModelPart modelPart) {
+        super(modelPart);
+        this.head = modelPart.getChild("head");
+        this.jaw = this.head.getChild("jaw");
+    }
 
-   public static TexturedModelData getTexturedModelData() {
-      ModelData modelData = new ModelData();
-      ModelPartData modelPartData = modelData.getRoot();
-      float f = -16.0F;
-      ModelPartData modelPartData2 = modelPartData.addChild("head", ModelPartBuilder.create().cuboid("upper_lip", -6.0F, -1.0F, -24.0F, 12, 5, 16, 176, 44).cuboid("upper_head", -8.0F, -8.0F, -10.0F, 16, 16, 16, 112, 30).mirrored(true).cuboid("scale", -5.0F, -12.0F, -4.0F, 2, 4, 6, 0, 0).cuboid("nostril", -5.0F, -3.0F, -22.0F, 2, 2, 4, 112, 0).mirrored(false).cuboid("scale", 3.0F, -12.0F, -4.0F, 2, 4, 6, 0, 0).cuboid("nostril", 3.0F, -3.0F, -22.0F, 2, 2, 4, 112, 0), ModelTransform.origin(0.0F, -7.986666F, 0.0F).scaled(0.75F));
-      modelPartData2.addChild("jaw", ModelPartBuilder.create().uv(176, 65).cuboid("jaw", -6.0F, 0.0F, -16.0F, 12.0F, 4.0F, 16.0F), ModelTransform.origin(0.0F, 4.0F, -8.0F));
-      return TexturedModelData.of(modelData, 256, 256);
-   }
+    public static TexturedModelData getTexturedModelData() {
+        ModelData modelData = new ModelData();
+        ModelPartData modelPartData = modelData.getRoot();
+        float f = -16.0f;
+        ModelPartData modelPartData2 = modelPartData.addChild("head", ModelPartBuilder.create().cuboid("upper_lip", -6.0f, -1.0f, -24.0f, 12, 5, 16, 176, 44).cuboid("upper_head", -8.0f, -8.0f, -10.0f, 16, 16, 16, 112, 30).mirrored(true).cuboid("scale", -5.0f, -12.0f, -4.0f, 2, 4, 6, 0, 0).cuboid("nostril", -5.0f, -3.0f, -22.0f, 2, 2, 4, 112, 0).mirrored(false).cuboid("scale", 3.0f, -12.0f, -4.0f, 2, 4, 6, 0, 0).cuboid("nostril", 3.0f, -3.0f, -22.0f, 2, 2, 4, 112, 0), ModelTransform.origin((float)0.0f, (float)-7.986666f, (float)0.0f).scaled(0.75f));
+        modelPartData2.addChild("jaw", ModelPartBuilder.create().uv(176, 65).cuboid("jaw", -6.0f, 0.0f, -16.0f, 12.0f, 4.0f, 16.0f), ModelTransform.origin((float)0.0f, (float)4.0f, (float)-8.0f));
+        return TexturedModelData.of((ModelData)modelData, (int)256, (int)256);
+    }
 
-   public void setHeadRotation(float animationProgress, float yaw, float pitch) {
-      this.jaw.pitch = (float)(Math.sin((double)(animationProgress * 3.1415927F * 0.2F)) + 1.0) * 0.2F;
-      this.head.yaw = yaw * 0.017453292F;
-      this.head.pitch = pitch * 0.017453292F;
-   }
+    public void setAngles(SkullBlockEntityModel.SkullModelState skullModelState) {
+        super.setAngles((Object)skullModelState);
+        this.jaw.pitch = (float)(Math.sin(skullModelState.poweredTicks * (float)Math.PI * 0.2f) + 1.0) * 0.2f;
+        this.head.yaw = skullModelState.yaw * ((float)Math.PI / 180);
+        this.head.pitch = skullModelState.pitch * ((float)Math.PI / 180);
+    }
 }
+

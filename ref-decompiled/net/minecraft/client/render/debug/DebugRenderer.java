@@ -1,278 +1,243 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.SharedConstants
+ *  net.minecraft.client.MinecraftClient
+ *  net.minecraft.client.gui.hud.debug.DebugHudEntries
+ *  net.minecraft.client.render.Frustum
+ *  net.minecraft.client.render.debug.BeeDebugRenderer
+ *  net.minecraft.client.render.debug.BlockOutlineDebugRenderer
+ *  net.minecraft.client.render.debug.BrainDebugRenderer
+ *  net.minecraft.client.render.debug.BreezeDebugRenderer
+ *  net.minecraft.client.render.debug.ChunkBorderDebugRenderer
+ *  net.minecraft.client.render.debug.ChunkDebugRenderer
+ *  net.minecraft.client.render.debug.ChunkLoadingDebugRenderer
+ *  net.minecraft.client.render.debug.CollisionDebugRenderer
+ *  net.minecraft.client.render.debug.DebugRenderer
+ *  net.minecraft.client.render.debug.DebugRenderer$Renderer
+ *  net.minecraft.client.render.debug.EntityBlockIntersectionsDebugRenderer
+ *  net.minecraft.client.render.debug.EntityHitboxDebugRenderer
+ *  net.minecraft.client.render.debug.GameEventDebugRenderer
+ *  net.minecraft.client.render.debug.GoalSelectorDebugRenderer
+ *  net.minecraft.client.render.debug.HeightmapDebugRenderer
+ *  net.minecraft.client.render.debug.LightDebugRenderer
+ *  net.minecraft.client.render.debug.NeighborUpdateDebugRenderer
+ *  net.minecraft.client.render.debug.OctreeDebugRenderer
+ *  net.minecraft.client.render.debug.PathfindingDebugRenderer
+ *  net.minecraft.client.render.debug.PoiDebugRenderer
+ *  net.minecraft.client.render.debug.RaidCenterDebugRenderer
+ *  net.minecraft.client.render.debug.RedstoneUpdateOrderDebugRenderer
+ *  net.minecraft.client.render.debug.SkyLightDebugRenderer
+ *  net.minecraft.client.render.debug.StructureDebugRenderer
+ *  net.minecraft.client.render.debug.SupportingBlockDebugRenderer
+ *  net.minecraft.client.render.debug.VillageSectionsDebugRenderer
+ *  net.minecraft.client.render.debug.WaterDebugRenderer
+ *  net.minecraft.entity.Entity
+ *  net.minecraft.entity.projectile.ProjectileUtil
+ *  net.minecraft.predicate.entity.EntityPredicates
+ *  net.minecraft.util.hit.EntityHitResult
+ *  net.minecraft.util.math.Box
+ *  net.minecraft.util.math.MathHelper
+ *  net.minecraft.util.math.Vec3d
+ *  net.minecraft.world.LightType
+ *  net.minecraft.world.debug.DebugDataStore
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.render.debug;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.SharedConstants;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.render.Camera;
+import net.minecraft.client.gui.hud.debug.DebugHudEntries;
 import net.minecraft.client.render.Frustum;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.VertexRendering;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.render.debug.BeeDebugRenderer;
+import net.minecraft.client.render.debug.BlockOutlineDebugRenderer;
+import net.minecraft.client.render.debug.BrainDebugRenderer;
+import net.minecraft.client.render.debug.BreezeDebugRenderer;
+import net.minecraft.client.render.debug.ChunkBorderDebugRenderer;
+import net.minecraft.client.render.debug.ChunkDebugRenderer;
+import net.minecraft.client.render.debug.ChunkLoadingDebugRenderer;
+import net.minecraft.client.render.debug.CollisionDebugRenderer;
+import net.minecraft.client.render.debug.DebugRenderer;
+import net.minecraft.client.render.debug.EntityBlockIntersectionsDebugRenderer;
+import net.minecraft.client.render.debug.EntityHitboxDebugRenderer;
+import net.minecraft.client.render.debug.GameEventDebugRenderer;
+import net.minecraft.client.render.debug.GoalSelectorDebugRenderer;
+import net.minecraft.client.render.debug.HeightmapDebugRenderer;
+import net.minecraft.client.render.debug.LightDebugRenderer;
+import net.minecraft.client.render.debug.NeighborUpdateDebugRenderer;
+import net.minecraft.client.render.debug.OctreeDebugRenderer;
+import net.minecraft.client.render.debug.PathfindingDebugRenderer;
+import net.minecraft.client.render.debug.PoiDebugRenderer;
+import net.minecraft.client.render.debug.RaidCenterDebugRenderer;
+import net.minecraft.client.render.debug.RedstoneUpdateOrderDebugRenderer;
+import net.minecraft.client.render.debug.SkyLightDebugRenderer;
+import net.minecraft.client.render.debug.StructureDebugRenderer;
+import net.minecraft.client.render.debug.SupportingBlockDebugRenderer;
+import net.minecraft.client.render.debug.VillageSectionsDebugRenderer;
+import net.minecraft.client.render.debug.WaterDebugRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.LightType;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.world.debug.DebugDataStore;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
 public class DebugRenderer {
-   public final PathfindingDebugRenderer pathfindingDebugRenderer = new PathfindingDebugRenderer();
-   public final Renderer waterDebugRenderer;
-   public final Renderer chunkBorderDebugRenderer;
-   public final Renderer heightmapDebugRenderer;
-   public final Renderer collisionDebugRenderer;
-   public final Renderer supportingBlockDebugRenderer;
-   public final NeighborUpdateDebugRenderer neighborUpdateDebugRenderer;
-   public final RedstoneUpdateOrderDebugRenderer redstoneUpdateOrderDebugRenderer;
-   public final StructureDebugRenderer structureDebugRenderer;
-   public final Renderer skyLightDebugRenderer;
-   public final Renderer worldGenAttemptDebugRenderer;
-   public final Renderer blockOutlineDebugRenderer;
-   public final Renderer chunkLoadingDebugRenderer;
-   public final VillageDebugRenderer villageDebugRenderer;
-   public final VillageSectionsDebugRenderer villageSectionsDebugRenderer;
-   public final BeeDebugRenderer beeDebugRenderer;
-   public final RaidCenterDebugRenderer raidCenterDebugRenderer;
-   public final GoalSelectorDebugRenderer goalSelectorDebugRenderer;
-   public final GameTestDebugRenderer gameTestDebugRenderer;
-   public final GameEventDebugRenderer gameEventDebugRenderer;
-   public final LightDebugRenderer lightDebugRenderer;
-   public final BreezeDebugRenderer breezeDebugRenderer;
-   public final ChunkDebugRenderer chunkDebugRenderer;
-   public final OctreeDebugRenderer octreeDebugRenderer;
-   private boolean showChunkBorder;
-   private boolean showOctree;
+    private final List<Renderer> renderers = new ArrayList();
+    private long currentVersion;
 
-   public DebugRenderer(MinecraftClient client) {
-      this.waterDebugRenderer = new WaterDebugRenderer(client);
-      this.chunkBorderDebugRenderer = new ChunkBorderDebugRenderer(client);
-      this.heightmapDebugRenderer = new HeightmapDebugRenderer(client);
-      this.collisionDebugRenderer = new CollisionDebugRenderer(client);
-      this.supportingBlockDebugRenderer = new SupportingBlockDebugRenderer(client);
-      this.neighborUpdateDebugRenderer = new NeighborUpdateDebugRenderer(client);
-      this.redstoneUpdateOrderDebugRenderer = new RedstoneUpdateOrderDebugRenderer(client);
-      this.structureDebugRenderer = new StructureDebugRenderer(client);
-      this.skyLightDebugRenderer = new SkyLightDebugRenderer(client);
-      this.worldGenAttemptDebugRenderer = new WorldGenAttemptDebugRenderer();
-      this.blockOutlineDebugRenderer = new BlockOutlineDebugRenderer(client);
-      this.chunkLoadingDebugRenderer = new ChunkLoadingDebugRenderer(client);
-      this.villageDebugRenderer = new VillageDebugRenderer(client);
-      this.villageSectionsDebugRenderer = new VillageSectionsDebugRenderer();
-      this.beeDebugRenderer = new BeeDebugRenderer(client);
-      this.raidCenterDebugRenderer = new RaidCenterDebugRenderer(client);
-      this.goalSelectorDebugRenderer = new GoalSelectorDebugRenderer(client);
-      this.gameTestDebugRenderer = new GameTestDebugRenderer();
-      this.gameEventDebugRenderer = new GameEventDebugRenderer(client);
-      this.lightDebugRenderer = new LightDebugRenderer(client, LightType.SKY);
-      this.breezeDebugRenderer = new BreezeDebugRenderer(client);
-      this.chunkDebugRenderer = new ChunkDebugRenderer(client);
-      this.octreeDebugRenderer = new OctreeDebugRenderer(client);
-   }
+    public DebugRenderer() {
+        this.initRenderers();
+    }
 
-   public void reset() {
-      this.pathfindingDebugRenderer.clear();
-      this.waterDebugRenderer.clear();
-      this.chunkBorderDebugRenderer.clear();
-      this.heightmapDebugRenderer.clear();
-      this.collisionDebugRenderer.clear();
-      this.supportingBlockDebugRenderer.clear();
-      this.neighborUpdateDebugRenderer.clear();
-      this.structureDebugRenderer.clear();
-      this.skyLightDebugRenderer.clear();
-      this.worldGenAttemptDebugRenderer.clear();
-      this.blockOutlineDebugRenderer.clear();
-      this.chunkLoadingDebugRenderer.clear();
-      this.villageDebugRenderer.clear();
-      this.villageSectionsDebugRenderer.clear();
-      this.beeDebugRenderer.clear();
-      this.raidCenterDebugRenderer.clear();
-      this.goalSelectorDebugRenderer.clear();
-      this.gameTestDebugRenderer.clear();
-      this.gameEventDebugRenderer.clear();
-      this.lightDebugRenderer.clear();
-      this.breezeDebugRenderer.clear();
-      this.chunkDebugRenderer.clear();
-   }
+    public void initRenderers() {
+        MinecraftClient minecraftClient = MinecraftClient.getInstance();
+        this.renderers.clear();
+        if (minecraftClient.debugHudEntryList.isEntryVisible(DebugHudEntries.CHUNK_BORDERS)) {
+            this.renderers.add(new ChunkBorderDebugRenderer(minecraftClient));
+        }
+        if (minecraftClient.debugHudEntryList.isEntryVisible(DebugHudEntries.CHUNK_SECTION_OCTREE)) {
+            this.renderers.add(new OctreeDebugRenderer(minecraftClient));
+        }
+        if (SharedConstants.PATHFINDING) {
+            this.renderers.add(new PathfindingDebugRenderer());
+        }
+        if (minecraftClient.debugHudEntryList.isEntryVisible(DebugHudEntries.VISUALIZE_WATER_LEVELS)) {
+            this.renderers.add(new WaterDebugRenderer(minecraftClient));
+        }
+        if (minecraftClient.debugHudEntryList.isEntryVisible(DebugHudEntries.VISUALIZE_HEIGHTMAP)) {
+            this.renderers.add(new HeightmapDebugRenderer(minecraftClient));
+        }
+        if (minecraftClient.debugHudEntryList.isEntryVisible(DebugHudEntries.VISUALIZE_COLLISION_BOXES)) {
+            this.renderers.add(new CollisionDebugRenderer(minecraftClient));
+        }
+        if (minecraftClient.debugHudEntryList.isEntryVisible(DebugHudEntries.VISUALIZE_ENTITY_SUPPORTING_BLOCKS)) {
+            this.renderers.add(new SupportingBlockDebugRenderer(minecraftClient));
+        }
+        if (SharedConstants.NEIGHBORSUPDATE) {
+            this.renderers.add(new NeighborUpdateDebugRenderer());
+        }
+        if (SharedConstants.EXPERIMENTAL_REDSTONEWIRE_UPDATE_ORDER) {
+            this.renderers.add(new RedstoneUpdateOrderDebugRenderer());
+        }
+        if (SharedConstants.STRUCTURES) {
+            this.renderers.add(new StructureDebugRenderer());
+        }
+        if (minecraftClient.debugHudEntryList.isEntryVisible(DebugHudEntries.VISUALIZE_BLOCK_LIGHT_LEVELS) || minecraftClient.debugHudEntryList.isEntryVisible(DebugHudEntries.VISUALIZE_SKY_LIGHT_LEVELS)) {
+            this.renderers.add(new SkyLightDebugRenderer(minecraftClient, minecraftClient.debugHudEntryList.isEntryVisible(DebugHudEntries.VISUALIZE_BLOCK_LIGHT_LEVELS), minecraftClient.debugHudEntryList.isEntryVisible(DebugHudEntries.VISUALIZE_SKY_LIGHT_LEVELS)));
+        }
+        if (minecraftClient.debugHudEntryList.isEntryVisible(DebugHudEntries.VISUALIZE_SOLID_FACES)) {
+            this.renderers.add(new BlockOutlineDebugRenderer(minecraftClient));
+        }
+        if (SharedConstants.VILLAGE_SECTIONS) {
+            this.renderers.add(new VillageSectionsDebugRenderer());
+        }
+        if (SharedConstants.BRAIN) {
+            this.renderers.add(new BrainDebugRenderer(minecraftClient));
+        }
+        if (SharedConstants.POI) {
+            this.renderers.add(new PoiDebugRenderer(new BrainDebugRenderer(minecraftClient)));
+        }
+        if (SharedConstants.BEES) {
+            this.renderers.add(new BeeDebugRenderer(minecraftClient));
+        }
+        if (SharedConstants.RAIDS) {
+            this.renderers.add(new RaidCenterDebugRenderer(minecraftClient));
+        }
+        if (SharedConstants.GOAL_SELECTOR) {
+            this.renderers.add(new GoalSelectorDebugRenderer(minecraftClient));
+        }
+        if (minecraftClient.debugHudEntryList.isEntryVisible(DebugHudEntries.VISUALIZE_CHUNKS_ON_SERVER)) {
+            this.renderers.add(new ChunkLoadingDebugRenderer(minecraftClient));
+        }
+        if (SharedConstants.GAME_EVENT_LISTENERS) {
+            this.renderers.add(new GameEventDebugRenderer());
+        }
+        if (minecraftClient.debugHudEntryList.isEntryVisible(DebugHudEntries.VISUALIZE_SKY_LIGHT_SECTIONS)) {
+            this.renderers.add(new LightDebugRenderer(minecraftClient, LightType.SKY));
+        }
+        if (SharedConstants.BREEZE_MOB) {
+            this.renderers.add(new BreezeDebugRenderer(minecraftClient));
+        }
+        if (SharedConstants.ENTITY_BLOCK_INTERSECTION) {
+            this.renderers.add(new EntityBlockIntersectionsDebugRenderer());
+        }
+        if (minecraftClient.debugHudEntryList.isEntryVisible(DebugHudEntries.ENTITY_HITBOXES)) {
+            this.renderers.add(new EntityHitboxDebugRenderer(minecraftClient));
+        }
+        this.renderers.add(new ChunkDebugRenderer(minecraftClient));
+    }
 
-   public boolean toggleShowChunkBorder() {
-      this.showChunkBorder = !this.showChunkBorder;
-      return this.showChunkBorder;
-   }
+    public void render(Frustum frustum, double cameraX, double cameraY, double cameraZ, float tickProgress) {
+        MinecraftClient minecraftClient = MinecraftClient.getInstance();
+        DebugDataStore debugDataStore = minecraftClient.getNetworkHandler().getDebugDataStore();
+        if (minecraftClient.debugHudEntryList.getVersion() != this.currentVersion) {
+            this.currentVersion = minecraftClient.debugHudEntryList.getVersion();
+            this.initRenderers();
+        }
+        for (Renderer renderer : this.renderers) {
+            renderer.render(cameraX, cameraY, cameraZ, debugDataStore, frustum, tickProgress);
+        }
+    }
 
-   public boolean toggleShowOctree() {
-      return this.showOctree = !this.showOctree;
-   }
-
-   public void render(MatrixStack matrices, Frustum frustum, VertexConsumerProvider.Immediate vertexConsumers, double cameraX, double cameraY, double cameraZ) {
-      if (this.showChunkBorder && !MinecraftClient.getInstance().hasReducedDebugInfo()) {
-         this.chunkBorderDebugRenderer.render(matrices, vertexConsumers, cameraX, cameraY, cameraZ);
-      }
-
-      if (this.showOctree) {
-         this.octreeDebugRenderer.render(matrices, frustum, vertexConsumers, cameraX, cameraY, cameraZ);
-      }
-
-      this.gameTestDebugRenderer.render(matrices, vertexConsumers, cameraX, cameraY, cameraZ);
-   }
-
-   public void renderLate(MatrixStack matrices, VertexConsumerProvider.Immediate vertexConsumers, double cameraX, double cameraY, double cameraZ) {
-      this.chunkDebugRenderer.render(matrices, vertexConsumers, cameraX, cameraY, cameraZ);
-   }
-
-   public static Optional getTargetedEntity(@Nullable Entity entity, int maxDistance) {
-      if (entity == null) {
-         return Optional.empty();
-      } else {
-         Vec3d vec3d = entity.getEyePos();
-         Vec3d vec3d2 = entity.getRotationVec(1.0F).multiply((double)maxDistance);
-         Vec3d vec3d3 = vec3d.add(vec3d2);
-         Box box = entity.getBoundingBox().stretch(vec3d2).expand(1.0);
-         int i = maxDistance * maxDistance;
-         EntityHitResult entityHitResult = ProjectileUtil.raycast(entity, vec3d, vec3d3, box, EntityPredicates.CAN_HIT, (double)i);
-         if (entityHitResult == null) {
+    public static Optional<Entity> getTargetedEntity(@Nullable Entity entity, int maxDistance) {
+        int i;
+        Box box;
+        Vec3d vec3d2;
+        Vec3d vec3d3;
+        if (entity == null) {
             return Optional.empty();
-         } else {
-            return vec3d.squaredDistanceTo(entityHitResult.getPos()) > (double)i ? Optional.empty() : Optional.of(entityHitResult.getEntity());
-         }
-      }
-   }
+        }
+        Vec3d vec3d = entity.getEyePos();
+        EntityHitResult entityHitResult = ProjectileUtil.raycast((Entity)entity, (Vec3d)vec3d, (Vec3d)(vec3d3 = vec3d.add(vec3d2 = entity.getRotationVec(1.0f).multiply((double)maxDistance))), (Box)(box = entity.getBoundingBox().stretch(vec3d2).expand(1.0)), (Predicate)EntityPredicates.CAN_HIT, (double)(i = maxDistance * maxDistance));
+        if (entityHitResult == null) {
+            return Optional.empty();
+        }
+        if (vec3d.squaredDistanceTo(entityHitResult.getPos()) > (double)i) {
+            return Optional.empty();
+        }
+        return Optional.of(entityHitResult.getEntity());
+    }
 
-   public static void drawBlockBox(MatrixStack matrices, VertexConsumerProvider vertexConsumers, BlockPos pos, float red, float green, float blue, float alpha) {
-      drawBox(matrices, vertexConsumers, pos, pos.add(1, 1, 1), red, green, blue, alpha);
-   }
+    private static Vec3d hueToRgb(float hue) {
+        float f = 5.99999f;
+        int i = (int)(MathHelper.clamp((float)hue, (float)0.0f, (float)1.0f) * 5.99999f);
+        float g = hue * 5.99999f - (float)i;
+        return switch (i) {
+            case 0 -> new Vec3d(1.0, (double)g, 0.0);
+            case 1 -> new Vec3d((double)(1.0f - g), 1.0, 0.0);
+            case 2 -> new Vec3d(0.0, 1.0, (double)g);
+            case 3 -> new Vec3d(0.0, 1.0 - (double)g, 1.0);
+            case 4 -> new Vec3d((double)g, 0.0, 1.0);
+            case 5 -> new Vec3d(1.0, 0.0, 1.0 - (double)g);
+            default -> throw new IllegalStateException("Unexpected value: " + i);
+        };
+    }
 
-   public static void drawBox(MatrixStack matrices, VertexConsumerProvider vertexConsumers, BlockPos pos1, BlockPos pos2, float red, float green, float blue, float alpha) {
-      Camera camera = MinecraftClient.getInstance().gameRenderer.getCamera();
-      if (camera.isReady()) {
-         Vec3d vec3d = camera.getPos().negate();
-         Box box = Box.enclosing(pos1, pos2).offset(vec3d);
-         drawBox(matrices, vertexConsumers, box, red, green, blue, alpha);
-      }
-   }
-
-   public static void drawBox(MatrixStack matrices, VertexConsumerProvider vertexConsumers, BlockPos pos, float expand, float red, float green, float blue, float alpha) {
-      Camera camera = MinecraftClient.getInstance().gameRenderer.getCamera();
-      if (camera.isReady()) {
-         Vec3d vec3d = camera.getPos().negate();
-         Box box = (new Box(pos)).offset(vec3d).expand((double)expand);
-         drawBox(matrices, vertexConsumers, box, red, green, blue, alpha);
-      }
-   }
-
-   public static void drawBox(MatrixStack matrices, VertexConsumerProvider vertexConsumers, Box box, float red, float green, float blue, float alpha) {
-      drawBox(matrices, vertexConsumers, box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ, red, green, blue, alpha);
-   }
-
-   public static void drawBox(MatrixStack matrices, VertexConsumerProvider vertexConsumers, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float red, float green, float blue, float alpha) {
-      VertexConsumer vertexConsumer = vertexConsumers.getBuffer(RenderLayer.getDebugFilledBox());
-      VertexRendering.drawFilledBox(matrices, vertexConsumer, minX, minY, minZ, maxX, maxY, maxZ, red, green, blue, alpha);
-   }
-
-   public static void drawString(MatrixStack matrices, VertexConsumerProvider vertexConsumers, String string, int x, int y, int z, int color) {
-      drawString(matrices, vertexConsumers, string, (double)x + 0.5, (double)y + 0.5, (double)z + 0.5, color);
-   }
-
-   public static void drawString(MatrixStack matrices, VertexConsumerProvider vertexConsumers, String string, double x, double y, double z, int color) {
-      drawString(matrices, vertexConsumers, string, x, y, z, color, 0.02F);
-   }
-
-   public static void drawString(MatrixStack matrices, VertexConsumerProvider vertexConsumers, String string, double x, double y, double z, int color, float size) {
-      drawString(matrices, vertexConsumers, string, x, y, z, color, size, true, 0.0F, false);
-   }
-
-   public static void drawString(MatrixStack matrices, VertexConsumerProvider vertexConsumers, String string, double x, double y, double z, int color, float size, boolean center, float offset, boolean visibleThroughObjects) {
-      MinecraftClient minecraftClient = MinecraftClient.getInstance();
-      Camera camera = minecraftClient.gameRenderer.getCamera();
-      if (camera.isReady() && minecraftClient.getEntityRenderDispatcher().gameOptions != null) {
-         TextRenderer textRenderer = minecraftClient.textRenderer;
-         double d = camera.getPos().x;
-         double e = camera.getPos().y;
-         double f = camera.getPos().z;
-         matrices.push();
-         matrices.translate((float)(x - d), (float)(y - e) + 0.07F, (float)(z - f));
-         matrices.multiply(camera.getRotation());
-         matrices.scale(size, -size, size);
-         float g = center ? (float)(-textRenderer.getWidth(string)) / 2.0F : 0.0F;
-         g -= offset / size;
-         textRenderer.draw((String)string, g, 0.0F, color, false, matrices.peek().getPositionMatrix(), vertexConsumers, visibleThroughObjects ? TextRenderer.TextLayerType.SEE_THROUGH : TextRenderer.TextLayerType.NORMAL, 0, 15728880);
-         matrices.pop();
-      }
-   }
-
-   private static Vec3d hueToRgb(float hue) {
-      float f = 5.99999F;
-      int i = (int)(MathHelper.clamp(hue, 0.0F, 1.0F) * 5.99999F);
-      float g = hue * 5.99999F - (float)i;
-      Vec3d var10000;
-      switch (i) {
-         case 0:
-            var10000 = new Vec3d(1.0, (double)g, 0.0);
-            break;
-         case 1:
-            var10000 = new Vec3d((double)(1.0F - g), 1.0, 0.0);
-            break;
-         case 2:
-            var10000 = new Vec3d(0.0, 1.0, (double)g);
-            break;
-         case 3:
-            var10000 = new Vec3d(0.0, 1.0 - (double)g, 1.0);
-            break;
-         case 4:
-            var10000 = new Vec3d((double)g, 0.0, 1.0);
-            break;
-         case 5:
-            var10000 = new Vec3d(1.0, 0.0, 1.0 - (double)g);
-            break;
-         default:
-            throw new IllegalStateException("Unexpected value: " + i);
-      }
-
-      return var10000;
-   }
-
-   private static Vec3d shiftHue(float r, float g, float b, float dHue) {
-      Vec3d vec3d = hueToRgb(dHue).multiply((double)r);
-      Vec3d vec3d2 = hueToRgb((dHue + 0.33333334F) % 1.0F).multiply((double)g);
-      Vec3d vec3d3 = hueToRgb((dHue + 0.6666667F) % 1.0F).multiply((double)b);
-      Vec3d vec3d4 = vec3d.add(vec3d2).add(vec3d3);
-      double d = Math.max(Math.max(1.0, vec3d4.x), Math.max(vec3d4.y, vec3d4.z));
-      return new Vec3d(vec3d4.x / d, vec3d4.y / d, vec3d4.z / d);
-   }
-
-   public static void drawVoxelShapeOutlines(MatrixStack matrices, VertexConsumer vertexConsumer, VoxelShape shape, double offsetX, double offsetY, double offsetZ, float red, float green, float blue, float alpha, boolean bl) {
-      List list = shape.getBoundingBoxes();
-      if (!list.isEmpty()) {
-         int i = bl ? list.size() : list.size() * 8;
-         VertexRendering.drawOutline(matrices, vertexConsumer, VoxelShapes.cuboid((Box)list.get(0)), offsetX, offsetY, offsetZ, ColorHelper.fromFloats(alpha, red, green, blue));
-
-         for(int j = 1; j < list.size(); ++j) {
-            Box box = (Box)list.get(j);
-            float f = (float)j / (float)i;
-            Vec3d vec3d = shiftHue(red, green, blue, f);
-            VertexRendering.drawOutline(matrices, vertexConsumer, VoxelShapes.cuboid(box), offsetX, offsetY, offsetZ, ColorHelper.fromFloats(alpha, (float)vec3d.x, (float)vec3d.y, (float)vec3d.z));
-         }
-
-      }
-   }
-
-   @Environment(EnvType.CLIENT)
-   public interface Renderer {
-      void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, double cameraX, double cameraY, double cameraZ);
-
-      default void clear() {
-      }
-   }
+    private static Vec3d shiftHue(float r, float g, float b, float dHue) {
+        Vec3d vec3d = DebugRenderer.hueToRgb((float)dHue).multiply((double)r);
+        Vec3d vec3d2 = DebugRenderer.hueToRgb((float)((dHue + 0.33333334f) % 1.0f)).multiply((double)g);
+        Vec3d vec3d3 = DebugRenderer.hueToRgb((float)((dHue + 0.6666667f) % 1.0f)).multiply((double)b);
+        Vec3d vec3d4 = vec3d.add(vec3d2).add(vec3d3);
+        double d = Math.max(Math.max(1.0, vec3d4.x), Math.max(vec3d4.y, vec3d4.z));
+        return new Vec3d(vec3d4.x / d, vec3d4.y / d, vec3d4.z / d);
+    }
 }
+

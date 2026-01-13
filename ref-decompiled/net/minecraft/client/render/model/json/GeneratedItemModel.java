@@ -1,301 +1,215 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.render.model.BakedGeometry
+ *  net.minecraft.client.render.model.Baker
+ *  net.minecraft.client.render.model.Geometry
+ *  net.minecraft.client.render.model.ModelBakeSettings
+ *  net.minecraft.client.render.model.ModelTextures
+ *  net.minecraft.client.render.model.ModelTextures$Textures
+ *  net.minecraft.client.render.model.ModelTextures$Textures$Builder
+ *  net.minecraft.client.render.model.SimpleModel
+ *  net.minecraft.client.render.model.UnbakedGeometry
+ *  net.minecraft.client.render.model.UnbakedModel
+ *  net.minecraft.client.render.model.UnbakedModel$GuiLight
+ *  net.minecraft.client.render.model.json.GeneratedItemModel
+ *  net.minecraft.client.render.model.json.GeneratedItemModel$Side
+ *  net.minecraft.client.render.model.json.GeneratedItemModel$class_12295
+ *  net.minecraft.client.render.model.json.ModelElement
+ *  net.minecraft.client.render.model.json.ModelElementFace
+ *  net.minecraft.client.render.model.json.ModelElementFace$UV
+ *  net.minecraft.client.texture.SpriteContents
+ *  net.minecraft.client.util.SpriteIdentifier
+ *  net.minecraft.util.Identifier
+ *  net.minecraft.util.math.AxisRotation
+ *  net.minecraft.util.math.Direction
+ *  org.joml.Vector3f
+ *  org.joml.Vector3fc
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.render.model.json;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.render.model.BakedGeometry;
 import net.minecraft.client.render.model.Baker;
-import net.minecraft.client.render.model.ErrorCollectingSpriteGetter;
 import net.minecraft.client.render.model.Geometry;
 import net.minecraft.client.render.model.ModelBakeSettings;
 import net.minecraft.client.render.model.ModelTextures;
 import net.minecraft.client.render.model.SimpleModel;
 import net.minecraft.client.render.model.UnbakedGeometry;
 import net.minecraft.client.render.model.UnbakedModel;
+import net.minecraft.client.render.model.json.GeneratedItemModel;
+import net.minecraft.client.render.model.json.ModelElement;
+import net.minecraft.client.render.model.json.ModelElementFace;
 import net.minecraft.client.texture.SpriteContents;
 import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.AxisRotation;
 import net.minecraft.util.math.Direction;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
-public class GeneratedItemModel implements UnbakedModel {
-   public static final Identifier GENERATED = Identifier.ofVanilla("builtin/generated");
-   public static final List LAYERS = List.of("layer0", "layer1", "layer2", "layer3", "layer4");
-   private static final float field_32806 = 7.5F;
-   private static final float field_32807 = 8.5F;
-   private static final ModelTextures.Textures TEXTURES = (new ModelTextures.Textures.Builder()).addTextureReference("particle", "layer0").build();
-   private static final ModelElementFace.UV FACING_SOUTH_UV = new ModelElementFace.UV(0.0F, 0.0F, 16.0F, 16.0F);
-   private static final ModelElementFace.UV FACING_NORTH_UV = new ModelElementFace.UV(16.0F, 0.0F, 0.0F, 16.0F);
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
+public class GeneratedItemModel
+implements UnbakedModel {
+    public static final Identifier GENERATED = Identifier.ofVanilla((String)"builtin/generated");
+    public static final List<String> LAYERS = List.of("layer0", "layer1", "layer2", "layer3", "layer4");
+    private static final float field_32806 = 7.5f;
+    private static final float field_32807 = 8.5f;
+    private static final ModelTextures.Textures TEXTURES = new ModelTextures.Textures.Builder().addTextureReference("particle", "layer0").build();
+    private static final ModelElementFace.UV FACING_SOUTH_UV = new ModelElementFace.UV(0.0f, 0.0f, 16.0f, 16.0f);
+    private static final ModelElementFace.UV FACING_NORTH_UV = new ModelElementFace.UV(16.0f, 0.0f, 0.0f, 16.0f);
+    private static final float field_64230 = 0.1f;
 
-   public ModelTextures.Textures textures() {
-      return TEXTURES;
-   }
+    public ModelTextures.Textures textures() {
+        return TEXTURES;
+    }
 
-   public Geometry geometry() {
-      return GeneratedItemModel::bakeGeometry;
-   }
+    public Geometry geometry() {
+        return GeneratedItemModel::bakeGeometry;
+    }
 
-   @Nullable
-   public UnbakedModel.GuiLight guiLight() {
-      return UnbakedModel.GuiLight.ITEM;
-   }
+    public // Could not load outer class - annotation placement on inner may be incorrect
+    @Nullable UnbakedModel.GuiLight guiLight() {
+        return UnbakedModel.GuiLight.ITEM;
+    }
 
-   private static BakedGeometry bakeGeometry(ModelTextures textures, Baker baker, ModelBakeSettings settings, SimpleModel model) {
-      return bakeGeometry(textures, baker.getSpriteGetter(), settings, model);
-   }
+    private static BakedGeometry bakeGeometry(ModelTextures textures, Baker baker, ModelBakeSettings settings, SimpleModel model) {
+        String string;
+        SpriteIdentifier spriteIdentifier;
+        ArrayList list = new ArrayList();
+        for (int i = 0; i < LAYERS.size() && (spriteIdentifier = textures.get(string = (String)LAYERS.get(i))) != null; ++i) {
+            SpriteContents spriteContents = baker.getSpriteGetter().get(spriteIdentifier, model).getContents();
+            list.addAll(GeneratedItemModel.addLayerElements((int)i, (String)string, (SpriteContents)spriteContents));
+        }
+        return UnbakedGeometry.bakeGeometry(list, (ModelTextures)textures, (Baker)baker, (ModelBakeSettings)settings, (SimpleModel)model);
+    }
 
-   private static BakedGeometry bakeGeometry(ModelTextures textures, ErrorCollectingSpriteGetter errorCollectingSpriteGetter, ModelBakeSettings settings, SimpleModel model) {
-      List list = new ArrayList();
+    private static List<ModelElement> addLayerElements(int tintIndex, String name, SpriteContents spriteContents) {
+        Map<Direction, ModelElementFace> map = Map.of(Direction.SOUTH, new ModelElementFace(null, tintIndex, name, FACING_SOUTH_UV, AxisRotation.R0), Direction.NORTH, new ModelElementFace(null, tintIndex, name, FACING_NORTH_UV, AxisRotation.R0));
+        ArrayList<ModelElement> list = new ArrayList<ModelElement>();
+        list.add(new ModelElement((Vector3fc)new Vector3f(0.0f, 0.0f, 7.5f), (Vector3fc)new Vector3f(16.0f, 16.0f, 8.5f), map));
+        list.addAll(GeneratedItemModel.addSubComponents((SpriteContents)spriteContents, (String)name, (int)tintIndex));
+        return list;
+    }
 
-      for(int i = 0; i < LAYERS.size(); ++i) {
-         String string = (String)LAYERS.get(i);
-         SpriteIdentifier spriteIdentifier = textures.get(string);
-         if (spriteIdentifier == null) {
-            break;
-         }
-
-         SpriteContents spriteContents = errorCollectingSpriteGetter.get(spriteIdentifier, model).getContents();
-         list.addAll(addLayerElements(i, string, spriteContents));
-      }
-
-      return UnbakedGeometry.bakeGeometry(list, textures, errorCollectingSpriteGetter, settings, model);
-   }
-
-   private static List addLayerElements(int tintIndex, String name, SpriteContents spriteContents) {
-      Map map = Map.of(Direction.SOUTH, new ModelElementFace((Direction)null, tintIndex, name, FACING_SOUTH_UV, AxisRotation.R0), Direction.NORTH, new ModelElementFace((Direction)null, tintIndex, name, FACING_NORTH_UV, AxisRotation.R0));
-      List list = new ArrayList();
-      list.add(new ModelElement(new Vector3f(0.0F, 0.0F, 7.5F), new Vector3f(16.0F, 16.0F, 8.5F), map));
-      list.addAll(addSubComponents(spriteContents, name, tintIndex));
-      return list;
-   }
-
-   private static List addSubComponents(SpriteContents spriteContents, String string, int i) {
-      float f = (float)spriteContents.getWidth();
-      float g = (float)spriteContents.getHeight();
-      List list = new ArrayList();
-      Iterator var6 = getFrames(spriteContents).iterator();
-
-      while(var6.hasNext()) {
-         Frame frame = (Frame)var6.next();
-         float h = 0.0F;
-         float j = 0.0F;
-         float k = 0.0F;
-         float l = 0.0F;
-         float m = 0.0F;
-         float n = 0.0F;
-         float o = 0.0F;
-         float p = 0.0F;
-         float q = 16.0F / f;
-         float r = 16.0F / g;
-         float s = (float)frame.getMin();
-         float t = (float)frame.getMax();
-         float u = (float)frame.getLevel();
-         Side side = frame.getSide();
-         switch (side.ordinal()) {
-            case 0:
-               m = s;
-               h = s;
-               k = n = t + 1.0F;
-               o = u;
-               j = u;
-               l = u;
-               p = u + 1.0F;
-               break;
-            case 1:
-               o = u;
-               p = u + 1.0F;
-               m = s;
-               h = s;
-               k = n = t + 1.0F;
-               j = u + 1.0F;
-               l = u + 1.0F;
-               break;
-            case 2:
-               m = u;
-               h = u;
-               k = u;
-               n = u + 1.0F;
-               p = s;
-               j = s;
-               l = o = t + 1.0F;
-               break;
-            case 3:
-               m = u;
-               n = u + 1.0F;
-               h = u + 1.0F;
-               k = u + 1.0F;
-               p = s;
-               j = s;
-               l = o = t + 1.0F;
-         }
-
-         h *= q;
-         k *= q;
-         j *= r;
-         l *= r;
-         j = 16.0F - j;
-         l = 16.0F - l;
-         m *= q;
-         n *= q;
-         o *= r;
-         p *= r;
-         Map map = Map.of(side.getDirection(), new ModelElementFace((Direction)null, i, string, new ModelElementFace.UV(m, o, n, p), AxisRotation.R0));
-         switch (side.ordinal()) {
-            case 0:
-               list.add(new ModelElement(new Vector3f(h, j, 7.5F), new Vector3f(k, j, 8.5F), map));
-               break;
-            case 1:
-               list.add(new ModelElement(new Vector3f(h, l, 7.5F), new Vector3f(k, l, 8.5F), map));
-               break;
-            case 2:
-               list.add(new ModelElement(new Vector3f(h, j, 7.5F), new Vector3f(h, l, 8.5F), map));
-               break;
-            case 3:
-               list.add(new ModelElement(new Vector3f(k, j, 7.5F), new Vector3f(k, l, 8.5F), map));
-         }
-      }
-
-      return list;
-   }
-
-   private static List getFrames(SpriteContents spriteContents) {
-      int i = spriteContents.getWidth();
-      int j = spriteContents.getHeight();
-      List list = new ArrayList();
-      spriteContents.getDistinctFrameCount().forEach((k) -> {
-         for(int l = 0; l < j; ++l) {
-            for(int m = 0; m < i; ++m) {
-               boolean bl = !isPixelTransparent(spriteContents, k, m, l, i, j);
-               buildCube(GeneratedItemModel.Side.UP, list, spriteContents, k, m, l, i, j, bl);
-               buildCube(GeneratedItemModel.Side.DOWN, list, spriteContents, k, m, l, i, j, bl);
-               buildCube(GeneratedItemModel.Side.LEFT, list, spriteContents, k, m, l, i, j, bl);
-               buildCube(GeneratedItemModel.Side.RIGHT, list, spriteContents, k, m, l, i, j, bl);
+    private static List<ModelElement> addSubComponents(SpriteContents sprite, String textureId, int tintIndex) {
+        float f = 16.0f / (float)sprite.getWidth();
+        float g = 16.0f / (float)sprite.getHeight();
+        ArrayList<ModelElement> list = new ArrayList<ModelElement>();
+        for (class_12295 lv : GeneratedItemModel.getFrames((SpriteContents)sprite)) {
+            float m;
+            float l;
+            float h = lv.x();
+            float i = lv.y();
+            Side side = lv.facing();
+            float j = h + 0.1f;
+            float k = h + 1.0f - 0.1f;
+            if (side.isVertical()) {
+                l = i + 0.1f;
+                m = i + 1.0f - 0.1f;
+            } else {
+                l = i + 1.0f - 0.1f;
+                m = i + 0.1f;
             }
-         }
-
-      });
-      return list;
-   }
-
-   private static void buildCube(Side side, List list, SpriteContents spriteContents, int i, int j, int k, int l, int m, boolean bl) {
-      boolean bl2 = isPixelTransparent(spriteContents, i, j + side.getOffsetX(), k + side.getOffsetY(), l, m) && bl;
-      if (bl2) {
-         buildCube(list, side, j, k);
-      }
-
-   }
-
-   private static void buildCube(List list, Side side, int i, int j) {
-      Frame frame = null;
-      Iterator var5 = list.iterator();
-
-      while(var5.hasNext()) {
-         Frame frame2 = (Frame)var5.next();
-         if (frame2.getSide() == side) {
-            int k = side.isVertical() ? j : i;
-            if (frame2.getLevel() == k) {
-               frame = frame2;
-               break;
+            float n = h;
+            float o = i;
+            float p = h;
+            float q = i;
+            switch (side.ordinal()) {
+                case 0: {
+                    p += 1.0f;
+                    break;
+                }
+                case 1: {
+                    p += 1.0f;
+                    o += 1.0f;
+                    q += 1.0f;
+                    break;
+                }
+                case 2: {
+                    q += 1.0f;
+                    break;
+                }
+                case 3: {
+                    n += 1.0f;
+                    p += 1.0f;
+                    q += 1.0f;
+                }
             }
-         }
-      }
+            n *= f;
+            p *= f;
+            o *= g;
+            q *= g;
+            o = 16.0f - o;
+            q = 16.0f - q;
+            Map<Direction, ModelElementFace> map = Map.of(side.getDirection(), new ModelElementFace(null, tintIndex, textureId, new ModelElementFace.UV(j * f, l * f, k * g, m * g), AxisRotation.R0));
+            switch (side.ordinal()) {
+                case 0: {
+                    list.add(new ModelElement((Vector3fc)new Vector3f(n, o, 7.5f), (Vector3fc)new Vector3f(p, o, 8.5f), map));
+                    break;
+                }
+                case 1: {
+                    list.add(new ModelElement((Vector3fc)new Vector3f(n, q, 7.5f), (Vector3fc)new Vector3f(p, q, 8.5f), map));
+                    break;
+                }
+                case 2: {
+                    list.add(new ModelElement((Vector3fc)new Vector3f(n, o, 7.5f), (Vector3fc)new Vector3f(n, q, 8.5f), map));
+                    break;
+                }
+                case 3: {
+                    list.add(new ModelElement((Vector3fc)new Vector3f(p, o, 7.5f), (Vector3fc)new Vector3f(p, q, 8.5f), map));
+                }
+            }
+        }
+        return list;
+    }
 
-      int l = side.isVertical() ? j : i;
-      int m = side.isVertical() ? i : j;
-      if (frame == null) {
-         list.add(new Frame(side, m, l));
-      } else {
-         frame.expand(m);
-      }
+    private static Collection<class_12295> getFrames(SpriteContents spriteContents) {
+        int i = spriteContents.getWidth();
+        int j = spriteContents.getHeight();
+        HashSet<class_12295> set = new HashSet<class_12295>();
+        spriteContents.getDistinctFrameCount().forEach(k -> {
+            for (int l = 0; l < j; ++l) {
+                for (int m = 0; m < i; ++m) {
+                    boolean bl;
+                    boolean bl2 = bl = !GeneratedItemModel.isPixelTransparent((SpriteContents)spriteContents, (int)k, (int)m, (int)l, (int)i, (int)j);
+                    if (!bl) continue;
+                    GeneratedItemModel.buildCube((Side)Side.UP, (Set)set, (SpriteContents)spriteContents, (int)k, (int)m, (int)l, (int)i, (int)j);
+                    GeneratedItemModel.buildCube((Side)Side.DOWN, (Set)set, (SpriteContents)spriteContents, (int)k, (int)m, (int)l, (int)i, (int)j);
+                    GeneratedItemModel.buildCube((Side)Side.LEFT, (Set)set, (SpriteContents)spriteContents, (int)k, (int)m, (int)l, (int)i, (int)j);
+                    GeneratedItemModel.buildCube((Side)Side.RIGHT, (Set)set, (SpriteContents)spriteContents, (int)k, (int)m, (int)l, (int)i, (int)j);
+                }
+            }
+        });
+        return set;
+    }
 
-   }
+    private static void buildCube(Side side, Set<class_12295> set, SpriteContents spriteContents, int i, int j, int k, int l, int m) {
+        if (GeneratedItemModel.isPixelTransparent((SpriteContents)spriteContents, (int)i, (int)(j - side.direction.getOffsetX()), (int)(k - side.direction.getOffsetY()), (int)l, (int)m)) {
+            set.add(new class_12295(side, j, k));
+        }
+    }
 
-   private static boolean isPixelTransparent(SpriteContents spriteContents, int i, int j, int k, int l, int m) {
-      return j >= 0 && k >= 0 && j < l && k < m ? spriteContents.isPixelTransparent(i, j, k) : true;
-   }
-
-   @Environment(EnvType.CLIENT)
-   private static class Frame {
-      private final Side side;
-      private int min;
-      private int max;
-      private final int level;
-
-      public Frame(Side side, int width, int depth) {
-         this.side = side;
-         this.min = width;
-         this.max = width;
-         this.level = depth;
-      }
-
-      public void expand(int newValue) {
-         if (newValue < this.min) {
-            this.min = newValue;
-         } else if (newValue > this.max) {
-            this.max = newValue;
-         }
-
-      }
-
-      public Side getSide() {
-         return this.side;
-      }
-
-      public int getMin() {
-         return this.min;
-      }
-
-      public int getMax() {
-         return this.max;
-      }
-
-      public int getLevel() {
-         return this.level;
-      }
-   }
-
-   @Environment(EnvType.CLIENT)
-   static enum Side {
-      UP(Direction.UP, 0, -1),
-      DOWN(Direction.DOWN, 0, 1),
-      LEFT(Direction.EAST, -1, 0),
-      RIGHT(Direction.WEST, 1, 0);
-
-      private final Direction direction;
-      private final int offsetX;
-      private final int offsetY;
-
-      private Side(final Direction direction, final int offsetX, final int offsetY) {
-         this.direction = direction;
-         this.offsetX = offsetX;
-         this.offsetY = offsetY;
-      }
-
-      public Direction getDirection() {
-         return this.direction;
-      }
-
-      public int getOffsetX() {
-         return this.offsetX;
-      }
-
-      public int getOffsetY() {
-         return this.offsetY;
-      }
-
-      boolean isVertical() {
-         return this == DOWN || this == UP;
-      }
-
-      // $FF: synthetic method
-      private static Side[] method_36921() {
-         return new Side[]{UP, DOWN, LEFT, RIGHT};
-      }
-   }
+    private static boolean isPixelTransparent(SpriteContents spriteContents, int i, int j, int k, int l, int m) {
+        if (j < 0 || k < 0 || j >= l || k >= m) {
+            return true;
+        }
+        return spriteContents.isPixelTransparent(i, j, k);
+    }
 }
+

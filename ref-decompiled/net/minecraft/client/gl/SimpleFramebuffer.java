@@ -1,15 +1,29 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.blaze3d.systems.RenderSystem
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.gl.Framebuffer
+ *  net.minecraft.client.gl.SimpleFramebuffer
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.gl;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.client.gl.Framebuffer;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
-public class SimpleFramebuffer extends Framebuffer {
-   public SimpleFramebuffer(@Nullable String name, int width, int height, boolean useDepthAttachment) {
-      super(name, useDepthAttachment);
-      RenderSystem.assertOnRenderThread();
-      this.resize(width, height);
-   }
+@Environment(value=EnvType.CLIENT)
+public class SimpleFramebuffer
+extends Framebuffer {
+    public SimpleFramebuffer(@Nullable String name, int width, int height, boolean useDepthAttachment) {
+        super(name, useDepthAttachment);
+        RenderSystem.assertOnRenderThread();
+        this.resize(width, height);
+    }
 }
+

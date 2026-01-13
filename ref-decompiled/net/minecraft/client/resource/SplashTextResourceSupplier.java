@@ -1,14 +1,30 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.MinecraftClient
+ *  net.minecraft.client.gui.screen.SplashTextRenderer
+ *  net.minecraft.client.resource.SplashTextResourceSupplier
+ *  net.minecraft.client.session.Session
+ *  net.minecraft.resource.ResourceManager
+ *  net.minecraft.resource.SinglePreparationResourceReloader
+ *  net.minecraft.text.Style
+ *  net.minecraft.text.Text
+ *  net.minecraft.util.Holidays
+ *  net.minecraft.util.Identifier
+ *  net.minecraft.util.math.random.Random
+ *  net.minecraft.util.profiler.Profiler
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.resource;
 
-import com.google.common.collect.Lists;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
+import java.time.MonthDay;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -16,80 +32,92 @@ import net.minecraft.client.gui.screen.SplashTextRenderer;
 import net.minecraft.client.session.Session;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.SinglePreparationResourceReloader;
+import net.minecraft.text.Style;
+import net.minecraft.text.Text;
+import net.minecraft.util.Holidays;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.util.profiler.Profiler;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
-public class SplashTextResourceSupplier extends SinglePreparationResourceReloader {
-   private static final Identifier RESOURCE_ID = Identifier.ofVanilla("texts/splashes.txt");
-   private static final Random RANDOM = Random.create();
-   private final List splashTexts = Lists.newArrayList();
-   private final Session session;
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
+public class SplashTextResourceSupplier
+extends SinglePreparationResourceReloader<List<Text>> {
+    private static final Style SPLASH_TEXT_STYLE = Style.EMPTY.withColor(-256);
+    public static final Text MERRY_X_MAS_ = SplashTextResourceSupplier.create((String)"Merry X-mas!");
+    public static final Text HAPPY_NEW_YEAR_ = SplashTextResourceSupplier.create((String)"Happy new year!");
+    public static final Text OOOOO_O_O_OOOOO__SPOOKY_ = SplashTextResourceSupplier.create((String)"OOoooOOOoooo! Spooky!");
+    private static final Identifier RESOURCE_ID = Identifier.ofVanilla((String)"texts/splashes.txt");
+    private static final Random RANDOM = Random.create();
+    private List<Text> splashTexts = List.of();
+    private final Session session;
 
-   public SplashTextResourceSupplier(Session session) {
-      this.session = session;
-   }
+    public SplashTextResourceSupplier(Session session) {
+        this.session = session;
+    }
 
-   protected List prepare(ResourceManager resourceManager, Profiler profiler) {
-      try {
-         BufferedReader bufferedReader = MinecraftClient.getInstance().getResourceManager().openAsReader(RESOURCE_ID);
+    private static Text create(String text) {
+        return Text.literal((String)text).setStyle(SPLASH_TEXT_STYLE);
+    }
 
-         List var4;
-         try {
-            var4 = (List)bufferedReader.lines().map(String::trim).filter((splashText) -> {
-               return splashText.hashCode() != 125780783;
-            }).collect(Collectors.toList());
-         } catch (Throwable var7) {
-            if (bufferedReader != null) {
-               try {
-                  bufferedReader.close();
-               } catch (Throwable var6) {
-                  var7.addSuppressed(var6);
-               }
+    protected List<Text> prepare(ResourceManager resourceManager, Profiler profiler) {
+        List<Text> list;
+        block8: {
+            BufferedReader bufferedReader = MinecraftClient.getInstance().getResourceManager().openAsReader(RESOURCE_ID);
+            try {
+                list = bufferedReader.lines().map(String::trim).filter(splashText -> splashText.hashCode() != 125780783).map(SplashTextResourceSupplier::create).toList();
+                if (bufferedReader == null) break block8;
             }
-
-            throw var7;
-         }
-
-         if (bufferedReader != null) {
+            catch (Throwable throwable) {
+                try {
+                    if (bufferedReader != null) {
+                        try {
+                            bufferedReader.close();
+                        }
+                        catch (Throwable throwable2) {
+                            throwable.addSuppressed(throwable2);
+                        }
+                    }
+                    throw throwable;
+                }
+                catch (IOException iOException) {
+                    return List.of();
+                }
+            }
             bufferedReader.close();
-         }
+        }
+        return list;
+    }
 
-         return var4;
-      } catch (IOException var8) {
-         return Collections.emptyList();
-      }
-   }
+    protected void apply(List<Text> list, ResourceManager resourceManager, Profiler profiler) {
+        this.splashTexts = List.copyOf(list);
+    }
 
-   protected void apply(List list, ResourceManager resourceManager, Profiler profiler) {
-      this.splashTexts.clear();
-      this.splashTexts.addAll(list);
-   }
+    public @Nullable SplashTextRenderer get() {
+        MonthDay monthDay = Holidays.now();
+        if (monthDay.equals(Holidays.CHRISTMAS_EVE)) {
+            return SplashTextRenderer.MERRY_X_MAS;
+        }
+        if (monthDay.equals(Holidays.NEW_YEARS_DAY)) {
+            return SplashTextRenderer.HAPPY_NEW_YEAR;
+        }
+        if (monthDay.equals(Holidays.HALLOWEEN)) {
+            return SplashTextRenderer.OOOOO_O_O_OOOOO__SPOOKY;
+        }
+        if (this.splashTexts.isEmpty()) {
+            return null;
+        }
+        if (this.session != null && RANDOM.nextInt(this.splashTexts.size()) == 42) {
+            return new SplashTextRenderer(SplashTextResourceSupplier.create((String)(this.session.getUsername().toUpperCase(Locale.ROOT) + " IS YOU")));
+        }
+        return new SplashTextRenderer((Text)this.splashTexts.get(RANDOM.nextInt(this.splashTexts.size())));
+    }
 
-   @Nullable
-   public SplashTextRenderer get() {
-      Calendar calendar = Calendar.getInstance();
-      calendar.setTime(new Date());
-      if (calendar.get(2) + 1 == 12 && calendar.get(5) == 24) {
-         return SplashTextRenderer.MERRY_X_MAS_;
-      } else if (calendar.get(2) + 1 == 1 && calendar.get(5) == 1) {
-         return SplashTextRenderer.HAPPY_NEW_YEAR_;
-      } else if (calendar.get(2) + 1 == 10 && calendar.get(5) == 31) {
-         return SplashTextRenderer.OOOOO_O_O_OOOOO__SPOOKY_;
-      } else if (this.splashTexts.isEmpty()) {
-         return null;
-      } else if (this.session != null && RANDOM.nextInt(this.splashTexts.size()) == 42) {
-         String var10002 = this.session.getUsername();
-         return new SplashTextRenderer(var10002.toUpperCase(Locale.ROOT) + " IS YOU");
-      } else {
-         return new SplashTextRenderer((String)this.splashTexts.get(RANDOM.nextInt(this.splashTexts.size())));
-      }
-   }
-
-   // $FF: synthetic method
-   protected Object prepare(final ResourceManager manager, final Profiler profiler) {
-      return this.prepare(manager, profiler);
-   }
+    protected /* synthetic */ Object prepare(ResourceManager manager, Profiler profiler) {
+        return this.prepare(manager, profiler);
+    }
 }
+

@@ -1,3 +1,15 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.blaze3d.shaders.ShaderType
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.resource.ResourceFinder
+ *  net.minecraft.util.Identifier
+ *  net.minecraft.util.annotation.DeobfuscateClass
+ *  org.jspecify.annotations.Nullable
+ */
 package com.mojang.blaze3d.shaders;
 
 import net.fabricmc.api.EnvType;
@@ -5,48 +17,44 @@ import net.fabricmc.api.Environment;
 import net.minecraft.resource.ResourceFinder;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.annotation.DeobfuscateClass;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
 @DeobfuscateClass
 public enum ShaderType {
-   VERTEX("vertex", ".vsh"),
-   FRAGMENT("fragment", ".fsh");
+    VERTEX("vertex", ".vsh"),
+    FRAGMENT("fragment", ".fsh");
 
-   private static final ShaderType[] TYPES = values();
-   private final String name;
-   private final String extension;
+    private static final ShaderType[] TYPES;
+    private final String name;
+    private final String extension;
 
-   private ShaderType(final String name, final String extension) {
-      this.name = name;
-      this.extension = extension;
-   }
+    private ShaderType(String name, String extension) {
+        this.name = name;
+        this.extension = extension;
+    }
 
-   @Nullable
-   public static ShaderType byLocation(Identifier id) {
-      ShaderType[] var1 = TYPES;
-      int var2 = var1.length;
-
-      for(int var3 = 0; var3 < var2; ++var3) {
-         ShaderType shaderType = var1[var3];
-         if (id.getPath().endsWith(shaderType.extension)) {
+    public static @Nullable ShaderType byLocation(Identifier id) {
+        for (ShaderType shaderType : TYPES) {
+            if (!id.getPath().endsWith(shaderType.extension)) continue;
             return shaderType;
-         }
-      }
+        }
+        return null;
+    }
 
-      return null;
-   }
+    public String getName() {
+        return this.name;
+    }
 
-   public String getName() {
-      return this.name;
-   }
+    public ResourceFinder idConverter() {
+        return new ResourceFinder("shaders", this.extension);
+    }
 
-   public ResourceFinder idConverter() {
-      return new ResourceFinder("shaders", this.extension);
-   }
-
-   // $FF: synthetic method
-   private static ShaderType[] $values() {
-      return new ShaderType[]{VERTEX, FRAGMENT};
-   }
+    static {
+        TYPES = ShaderType.values();
+    }
 }
+

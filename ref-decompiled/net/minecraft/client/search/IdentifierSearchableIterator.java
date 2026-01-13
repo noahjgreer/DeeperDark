@@ -1,3 +1,14 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.google.common.collect.AbstractIterator
+ *  com.google.common.collect.Iterators
+ *  com.google.common.collect.PeekingIterator
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.search.IdentifierSearchableIterator
+ */
 package net.minecraft.client.search;
 
 import com.google.common.collect.AbstractIterator;
@@ -8,33 +19,33 @@ import java.util.Iterator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
-@Environment(EnvType.CLIENT)
-public class IdentifierSearchableIterator extends AbstractIterator {
-   private final PeekingIterator namespacesIterator;
-   private final PeekingIterator pathsIterator;
-   private final Comparator lastIndexComparator;
+@Environment(value=EnvType.CLIENT)
+public class IdentifierSearchableIterator<T>
+extends AbstractIterator<T> {
+    private final PeekingIterator<T> namespacesIterator;
+    private final PeekingIterator<T> pathsIterator;
+    private final Comparator<T> lastIndexComparator;
 
-   public IdentifierSearchableIterator(Iterator namespacesIterator, Iterator pathsIterator, Comparator lastIndexComparator) {
-      this.namespacesIterator = Iterators.peekingIterator(namespacesIterator);
-      this.pathsIterator = Iterators.peekingIterator(pathsIterator);
-      this.lastIndexComparator = lastIndexComparator;
-   }
+    public IdentifierSearchableIterator(Iterator<T> namespacesIterator, Iterator<T> pathsIterator, Comparator<T> lastIndexComparator) {
+        this.namespacesIterator = Iterators.peekingIterator(namespacesIterator);
+        this.pathsIterator = Iterators.peekingIterator(pathsIterator);
+        this.lastIndexComparator = lastIndexComparator;
+    }
 
-   protected Object computeNext() {
-      while(this.namespacesIterator.hasNext() && this.pathsIterator.hasNext()) {
-         int i = this.lastIndexComparator.compare(this.namespacesIterator.peek(), this.pathsIterator.peek());
-         if (i == 0) {
+    protected T computeNext() {
+        while (this.namespacesIterator.hasNext() && this.pathsIterator.hasNext()) {
+            int i = this.lastIndexComparator.compare(this.namespacesIterator.peek(), this.pathsIterator.peek());
+            if (i == 0) {
+                this.pathsIterator.next();
+                return (T)this.namespacesIterator.next();
+            }
+            if (i < 0) {
+                this.namespacesIterator.next();
+                continue;
+            }
             this.pathsIterator.next();
-            return this.namespacesIterator.next();
-         }
-
-         if (i < 0) {
-            this.namespacesIterator.next();
-         } else {
-            this.pathsIterator.next();
-         }
-      }
-
-      return this.endOfData();
-   }
+        }
+        return (T)this.endOfData();
+    }
 }
+

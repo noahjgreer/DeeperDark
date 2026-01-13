@@ -1,304 +1,166 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.google.common.collect.Lists
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.block.entity.BeaconBlockEntity
+ *  net.minecraft.client.MinecraftClient
+ *  net.minecraft.client.gl.RenderPipelines
+ *  net.minecraft.client.gui.DrawContext
+ *  net.minecraft.client.gui.screen.ingame.BeaconScreen
+ *  net.minecraft.client.gui.screen.ingame.BeaconScreen$BeaconButtonWidget
+ *  net.minecraft.client.gui.screen.ingame.BeaconScreen$CancelButtonWidget
+ *  net.minecraft.client.gui.screen.ingame.BeaconScreen$DoneButtonWidget
+ *  net.minecraft.client.gui.screen.ingame.BeaconScreen$EffectButtonWidget
+ *  net.minecraft.client.gui.screen.ingame.BeaconScreen$LevelTwoEffectButtonWidget
+ *  net.minecraft.client.gui.screen.ingame.HandledScreen
+ *  net.minecraft.client.gui.widget.ClickableWidget
+ *  net.minecraft.entity.effect.StatusEffect
+ *  net.minecraft.entity.player.PlayerInventory
+ *  net.minecraft.item.ItemConvertible
+ *  net.minecraft.item.ItemStack
+ *  net.minecraft.item.Items
+ *  net.minecraft.registry.entry.RegistryEntry
+ *  net.minecraft.screen.BeaconScreenHandler
+ *  net.minecraft.screen.ScreenHandler
+ *  net.minecraft.screen.ScreenHandlerListener
+ *  net.minecraft.text.Text
+ *  net.minecraft.util.Identifier
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.gui.screen.ingame;
 
 import com.google.common.collect.Lists;
 import java.util.List;
-import java.util.Optional;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.entity.BeaconBlockEntity;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.hud.InGameHud;
-import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
-import net.minecraft.client.gui.tooltip.Tooltip;
+import net.minecraft.client.gui.screen.ingame.BeaconScreen;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.gui.widget.PressableWidget;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.UpdateBeaconC2SPacket;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.BeaconScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerListener;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
-public class BeaconScreen extends HandledScreen {
-   private static final Identifier TEXTURE = Identifier.ofVanilla("textures/gui/container/beacon.png");
-   static final Identifier BUTTON_DISABLED_TEXTURE = Identifier.ofVanilla("container/beacon/button_disabled");
-   static final Identifier BUTTON_SELECTED_TEXTURE = Identifier.ofVanilla("container/beacon/button_selected");
-   static final Identifier BUTTON_HIGHLIGHTED_TEXTURE = Identifier.ofVanilla("container/beacon/button_highlighted");
-   static final Identifier BUTTON_TEXTURE = Identifier.ofVanilla("container/beacon/button");
-   static final Identifier CONFIRM_TEXTURE = Identifier.ofVanilla("container/beacon/confirm");
-   static final Identifier CANCEL_TEXTURE = Identifier.ofVanilla("container/beacon/cancel");
-   private static final Text PRIMARY_POWER_TEXT = Text.translatable("block.minecraft.beacon.primary");
-   private static final Text SECONDARY_POWER_TEXT = Text.translatable("block.minecraft.beacon.secondary");
-   private final List buttons = Lists.newArrayList();
-   @Nullable
-   RegistryEntry primaryEffect;
-   @Nullable
-   RegistryEntry secondaryEffect;
+@Environment(value=EnvType.CLIENT)
+public class BeaconScreen
+extends HandledScreen<BeaconScreenHandler> {
+    private static final Identifier TEXTURE = Identifier.ofVanilla((String)"textures/gui/container/beacon.png");
+    static final Identifier BUTTON_DISABLED_TEXTURE = Identifier.ofVanilla((String)"container/beacon/button_disabled");
+    static final Identifier BUTTON_SELECTED_TEXTURE = Identifier.ofVanilla((String)"container/beacon/button_selected");
+    static final Identifier BUTTON_HIGHLIGHTED_TEXTURE = Identifier.ofVanilla((String)"container/beacon/button_highlighted");
+    static final Identifier BUTTON_TEXTURE = Identifier.ofVanilla((String)"container/beacon/button");
+    static final Identifier CONFIRM_TEXTURE = Identifier.ofVanilla((String)"container/beacon/confirm");
+    static final Identifier CANCEL_TEXTURE = Identifier.ofVanilla((String)"container/beacon/cancel");
+    private static final Text PRIMARY_POWER_TEXT = Text.translatable((String)"block.minecraft.beacon.primary");
+    private static final Text SECONDARY_POWER_TEXT = Text.translatable((String)"block.minecraft.beacon.secondary");
+    private final List<BeaconButtonWidget> buttons = Lists.newArrayList();
+    @Nullable RegistryEntry<StatusEffect> primaryEffect;
+    @Nullable RegistryEntry<StatusEffect> secondaryEffect;
 
-   public BeaconScreen(final BeaconScreenHandler handler, PlayerInventory inventory, Text title) {
-      super(handler, inventory, title);
-      this.backgroundWidth = 230;
-      this.backgroundHeight = 219;
-      handler.addListener(new ScreenHandlerListener() {
-         public void onSlotUpdate(ScreenHandler handlerx, int slotId, ItemStack stack) {
-         }
+    public BeaconScreen(BeaconScreenHandler handler, PlayerInventory inventory, Text title) {
+        super((ScreenHandler)handler, inventory, title);
+        this.backgroundWidth = 230;
+        this.backgroundHeight = 219;
+        handler.addListener((ScreenHandlerListener)new /* Unavailable Anonymous Inner Class!! */);
+    }
 
-         public void onPropertyUpdate(ScreenHandler handlerx, int property, int value) {
-            BeaconScreen.this.primaryEffect = handler.getPrimaryEffect();
-            BeaconScreen.this.secondaryEffect = handler.getSecondaryEffect();
-         }
-      });
-   }
+    private <T extends ClickableWidget> void addButton(T button) {
+        this.addDrawableChild(button);
+        this.buttons.add((BeaconButtonWidget)button);
+    }
 
-   private void addButton(ClickableWidget button) {
-      this.addDrawableChild(button);
-      this.buttons.add((BeaconButtonWidget)button);
-   }
-
-   protected void init() {
-      super.init();
-      this.buttons.clear();
-      this.addButton(new DoneButtonWidget(this.x + 164, this.y + 107));
-      this.addButton(new CancelButtonWidget(this.x + 190, this.y + 107));
-
-      int j;
-      int k;
-      int l;
-      RegistryEntry registryEntry;
-      EffectButtonWidget effectButtonWidget;
-      for(int i = 0; i <= 2; ++i) {
-         j = ((List)BeaconBlockEntity.EFFECTS_BY_LEVEL.get(i)).size();
-         k = j * 22 + (j - 1) * 2;
-
-         for(l = 0; l < j; ++l) {
-            registryEntry = (RegistryEntry)((List)BeaconBlockEntity.EFFECTS_BY_LEVEL.get(i)).get(l);
-            effectButtonWidget = new EffectButtonWidget(this.x + 76 + l * 24 - k / 2, this.y + 22 + i * 25, registryEntry, true, i);
-            effectButtonWidget.active = false;
-            this.addButton(effectButtonWidget);
-         }
-      }
-
-      int i = true;
-      j = ((List)BeaconBlockEntity.EFFECTS_BY_LEVEL.get(3)).size() + 1;
-      k = j * 22 + (j - 1) * 2;
-
-      for(l = 0; l < j - 1; ++l) {
-         registryEntry = (RegistryEntry)((List)BeaconBlockEntity.EFFECTS_BY_LEVEL.get(3)).get(l);
-         effectButtonWidget = new EffectButtonWidget(this.x + 167 + l * 24 - k / 2, this.y + 47, registryEntry, false, 3);
-         effectButtonWidget.active = false;
-         this.addButton(effectButtonWidget);
-      }
-
-      RegistryEntry registryEntry2 = (RegistryEntry)((List)BeaconBlockEntity.EFFECTS_BY_LEVEL.get(0)).get(0);
-      EffectButtonWidget effectButtonWidget2 = new LevelTwoEffectButtonWidget(this.x + 167 + (j - 1) * 24 - k / 2, this.y + 47, registryEntry2);
-      effectButtonWidget2.visible = false;
-      this.addButton(effectButtonWidget2);
-   }
-
-   public void handledScreenTick() {
-      super.handledScreenTick();
-      this.tickButtons();
-   }
-
-   void tickButtons() {
-      int i = ((BeaconScreenHandler)this.handler).getProperties();
-      this.buttons.forEach((button) -> {
-         button.tick(i);
-      });
-   }
-
-   protected void drawForeground(DrawContext context, int mouseX, int mouseY) {
-      context.drawCenteredTextWithShadow(this.textRenderer, (Text)PRIMARY_POWER_TEXT, 62, 10, -2039584);
-      context.drawCenteredTextWithShadow(this.textRenderer, (Text)SECONDARY_POWER_TEXT, 169, 10, -2039584);
-   }
-
-   protected void drawBackground(DrawContext context, float deltaTicks, int mouseX, int mouseY) {
-      int i = (this.width - this.backgroundWidth) / 2;
-      int j = (this.height - this.backgroundHeight) / 2;
-      context.drawTexture(RenderPipelines.GUI_TEXTURED, TEXTURE, i, j, 0.0F, 0.0F, this.backgroundWidth, this.backgroundHeight, 256, 256);
-      context.drawItem(new ItemStack(Items.NETHERITE_INGOT), i + 20, j + 109);
-      context.drawItem(new ItemStack(Items.EMERALD), i + 41, j + 109);
-      context.drawItem(new ItemStack(Items.DIAMOND), i + 41 + 22, j + 109);
-      context.drawItem(new ItemStack(Items.GOLD_INGOT), i + 42 + 44, j + 109);
-      context.drawItem(new ItemStack(Items.IRON_INGOT), i + 42 + 66, j + 109);
-   }
-
-   public void render(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
-      super.render(context, mouseX, mouseY, deltaTicks);
-      this.drawMouseoverTooltip(context, mouseX, mouseY);
-   }
-
-   @Environment(EnvType.CLIENT)
-   private interface BeaconButtonWidget {
-      void tick(int level);
-   }
-
-   @Environment(EnvType.CLIENT)
-   private class DoneButtonWidget extends IconButtonWidget {
-      public DoneButtonWidget(final int x, final int y) {
-         super(x, y, BeaconScreen.CONFIRM_TEXTURE, ScreenTexts.DONE);
-      }
-
-      public void onPress() {
-         BeaconScreen.this.client.getNetworkHandler().sendPacket(new UpdateBeaconC2SPacket(Optional.ofNullable(BeaconScreen.this.primaryEffect), Optional.ofNullable(BeaconScreen.this.secondaryEffect)));
-         BeaconScreen.this.client.player.closeHandledScreen();
-      }
-
-      public void tick(int level) {
-         this.active = ((BeaconScreenHandler)BeaconScreen.this.handler).hasPayment() && BeaconScreen.this.primaryEffect != null;
-      }
-   }
-
-   @Environment(EnvType.CLIENT)
-   private class CancelButtonWidget extends IconButtonWidget {
-      public CancelButtonWidget(final int x, final int y) {
-         super(x, y, BeaconScreen.CANCEL_TEXTURE, ScreenTexts.CANCEL);
-      }
-
-      public void onPress() {
-         BeaconScreen.this.client.player.closeHandledScreen();
-      }
-
-      public void tick(int level) {
-      }
-   }
-
-   @Environment(EnvType.CLIENT)
-   private class EffectButtonWidget extends BaseButtonWidget {
-      private final boolean primary;
-      protected final int level;
-      private RegistryEntry effect;
-      private Identifier sprite;
-
-      public EffectButtonWidget(final int x, final int y, final RegistryEntry effect, final boolean primary, final int level) {
-         super(x, y);
-         this.primary = primary;
-         this.level = level;
-         this.init(effect);
-      }
-
-      protected void init(RegistryEntry effect) {
-         this.effect = effect;
-         this.sprite = InGameHud.getEffectTexture(effect);
-         this.setTooltip(Tooltip.of(this.getEffectName(effect), (Text)null));
-      }
-
-      protected MutableText getEffectName(RegistryEntry effect) {
-         return Text.translatable(((StatusEffect)effect.value()).getTranslationKey());
-      }
-
-      public void onPress() {
-         if (!this.isDisabled()) {
-            if (this.primary) {
-               BeaconScreen.this.primaryEffect = this.effect;
-            } else {
-               BeaconScreen.this.secondaryEffect = this.effect;
+    protected void init() {
+        EffectButtonWidget effectButtonWidget;
+        RegistryEntry registryEntry;
+        int l;
+        int k;
+        int j;
+        int i;
+        super.init();
+        this.buttons.clear();
+        for (i = 0; i <= 2; ++i) {
+            j = ((List)BeaconBlockEntity.EFFECTS_BY_LEVEL.get(i)).size();
+            k = j * 22 + (j - 1) * 2;
+            for (l = 0; l < j; ++l) {
+                registryEntry = (RegistryEntry)((List)BeaconBlockEntity.EFFECTS_BY_LEVEL.get(i)).get(l);
+                effectButtonWidget = new EffectButtonWidget(this, this.x + 76 + l * 24 - k / 2, this.y + 22 + i * 25, registryEntry, true, i);
+                effectButtonWidget.active = false;
+                this.addButton((ClickableWidget)effectButtonWidget);
             }
+        }
+        i = 3;
+        j = ((List)BeaconBlockEntity.EFFECTS_BY_LEVEL.get(3)).size() + 1;
+        k = j * 22 + (j - 1) * 2;
+        for (l = 0; l < j - 1; ++l) {
+            registryEntry = (RegistryEntry)((List)BeaconBlockEntity.EFFECTS_BY_LEVEL.get(3)).get(l);
+            effectButtonWidget = new EffectButtonWidget(this, this.x + 167 + l * 24 - k / 2, this.y + 47, registryEntry, false, 3);
+            effectButtonWidget.active = false;
+            this.addButton((ClickableWidget)effectButtonWidget);
+        }
+        RegistryEntry registryEntry2 = (RegistryEntry)((List)BeaconBlockEntity.EFFECTS_BY_LEVEL.get(0)).get(0);
+        LevelTwoEffectButtonWidget effectButtonWidget2 = new LevelTwoEffectButtonWidget(this, this.x + 167 + (j - 1) * 24 - k / 2, this.y + 47, registryEntry2);
+        effectButtonWidget2.visible = false;
+        this.addButton((ClickableWidget)effectButtonWidget2);
+        this.addButton((ClickableWidget)new DoneButtonWidget(this, this.x + 164, this.y + 107));
+        this.addButton((ClickableWidget)new CancelButtonWidget(this, this.x + 190, this.y + 107));
+    }
 
-            BeaconScreen.this.tickButtons();
-         }
-      }
+    public void handledScreenTick() {
+        super.handledScreenTick();
+        this.tickButtons();
+    }
 
-      protected void renderExtra(DrawContext context) {
-         context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, this.sprite, this.getX() + 2, this.getY() + 2, 18, 18);
-      }
+    void tickButtons() {
+        int i = ((BeaconScreenHandler)this.handler).getProperties();
+        this.buttons.forEach(button -> button.tick(i));
+    }
 
-      public void tick(int level) {
-         this.active = this.level < level;
-         this.setDisabled(this.effect.equals(this.primary ? BeaconScreen.this.primaryEffect : BeaconScreen.this.secondaryEffect));
-      }
+    protected void drawForeground(DrawContext context, int mouseX, int mouseY) {
+        context.drawCenteredTextWithShadow(this.textRenderer, PRIMARY_POWER_TEXT, 62, 10, -2039584);
+        context.drawCenteredTextWithShadow(this.textRenderer, SECONDARY_POWER_TEXT, 169, 10, -2039584);
+    }
 
-      protected MutableText getNarrationMessage() {
-         return this.getEffectName(this.effect);
-      }
-   }
+    protected void drawBackground(DrawContext context, float deltaTicks, int mouseX, int mouseY) {
+        int i = (this.width - this.backgroundWidth) / 2;
+        int j = (this.height - this.backgroundHeight) / 2;
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, TEXTURE, i, j, 0.0f, 0.0f, this.backgroundWidth, this.backgroundHeight, 256, 256);
+        context.drawItem(new ItemStack((ItemConvertible)Items.NETHERITE_INGOT), i + 20, j + 109);
+        context.drawItem(new ItemStack((ItemConvertible)Items.EMERALD), i + 41, j + 109);
+        context.drawItem(new ItemStack((ItemConvertible)Items.DIAMOND), i + 41 + 22, j + 109);
+        context.drawItem(new ItemStack((ItemConvertible)Items.GOLD_INGOT), i + 42 + 44, j + 109);
+        context.drawItem(new ItemStack((ItemConvertible)Items.IRON_INGOT), i + 42 + 66, j + 109);
+    }
 
-   @Environment(EnvType.CLIENT)
-   class LevelTwoEffectButtonWidget extends EffectButtonWidget {
-      public LevelTwoEffectButtonWidget(final int x, final int y, final RegistryEntry effect) {
-         super(x, y, effect, false, 3);
-      }
+    public void render(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
+        super.render(context, mouseX, mouseY, deltaTicks);
+        this.drawMouseoverTooltip(context, mouseX, mouseY);
+    }
 
-      protected MutableText getEffectName(RegistryEntry effect) {
-         return Text.translatable(((StatusEffect)effect.value()).getTranslationKey()).append(" II");
-      }
+    static /* synthetic */ MinecraftClient method_47418(BeaconScreen beaconScreen) {
+        return beaconScreen.client;
+    }
 
-      public void tick(int level) {
-         if (BeaconScreen.this.primaryEffect != null) {
-            this.visible = true;
-            this.init(BeaconScreen.this.primaryEffect);
-            super.tick(level);
-         } else {
-            this.visible = false;
-         }
+    static /* synthetic */ MinecraftClient method_2394(BeaconScreen beaconScreen) {
+        return beaconScreen.client;
+    }
 
-      }
-   }
-
-   @Environment(EnvType.CLIENT)
-   private abstract static class IconButtonWidget extends BaseButtonWidget {
-      private final Identifier texture;
-
-      protected IconButtonWidget(int x, int y, Identifier texture, Text message) {
-         super(x, y, message);
-         this.texture = texture;
-      }
-
-      protected void renderExtra(DrawContext context) {
-         context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, this.texture, this.getX() + 2, this.getY() + 2, 18, 18);
-      }
-   }
-
-   @Environment(EnvType.CLIENT)
-   private abstract static class BaseButtonWidget extends PressableWidget implements BeaconButtonWidget {
-      private boolean disabled;
-
-      protected BaseButtonWidget(int x, int y) {
-         super(x, y, 22, 22, ScreenTexts.EMPTY);
-      }
-
-      protected BaseButtonWidget(int x, int y, Text message) {
-         super(x, y, 22, 22, message);
-      }
-
-      public void renderWidget(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
-         Identifier identifier;
-         if (!this.active) {
-            identifier = BeaconScreen.BUTTON_DISABLED_TEXTURE;
-         } else if (this.disabled) {
-            identifier = BeaconScreen.BUTTON_SELECTED_TEXTURE;
-         } else if (this.isSelected()) {
-            identifier = BeaconScreen.BUTTON_HIGHLIGHTED_TEXTURE;
-         } else {
-            identifier = BeaconScreen.BUTTON_TEXTURE;
-         }
-
-         context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, identifier, this.getX(), this.getY(), this.width, this.height);
-         this.renderExtra(context);
-      }
-
-      protected abstract void renderExtra(DrawContext context);
-
-      public boolean isDisabled() {
-         return this.disabled;
-      }
-
-      public void setDisabled(boolean disabled) {
-         this.disabled = disabled;
-      }
-
-      public void appendClickableNarrations(NarrationMessageBuilder builder) {
-         this.appendDefaultNarrations(builder);
-      }
-   }
+    static /* synthetic */ MinecraftClient method_2393(BeaconScreen beaconScreen) {
+        return beaconScreen.client;
+    }
 }
+

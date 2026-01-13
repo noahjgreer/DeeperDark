@@ -1,38 +1,59 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.google.gson.JsonElement
+ *  com.google.gson.JsonObject
+ *  com.mojang.logging.LogUtils
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.realms.dto.PendingInvite
+ *  net.minecraft.client.realms.dto.PendingInvitesList
+ *  net.minecraft.util.LenientJsonParser
+ *  org.slf4j.Logger
+ */
 package net.minecraft.client.realms.dto;
 
-import com.google.common.collect.Lists;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.logging.LogUtils;
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.realms.dto.PendingInvite;
 import net.minecraft.util.LenientJsonParser;
 import org.slf4j.Logger;
 
-@Environment(EnvType.CLIENT)
-public class PendingInvitesList extends ValueObject {
-   private static final Logger LOGGER = LogUtils.getLogger();
-   public List pendingInvites = Lists.newArrayList();
+@Environment(value=EnvType.CLIENT)
+public record PendingInvitesList(List<PendingInvite> pendingInvites) {
+    private final List<PendingInvite> pendingInvites;
+    private static final Logger LOGGER = LogUtils.getLogger();
 
-   public static PendingInvitesList parse(String json) {
-      PendingInvitesList pendingInvitesList = new PendingInvitesList();
+    public PendingInvitesList(List<PendingInvite> pendingInvites) {
+        this.pendingInvites = pendingInvites;
+    }
 
-      try {
-         JsonObject jsonObject = LenientJsonParser.parse(json).getAsJsonObject();
-         if (jsonObject.get("invites").isJsonArray()) {
-            Iterator var3 = jsonObject.get("invites").getAsJsonArray().iterator();
-
-            while(var3.hasNext()) {
-               JsonElement jsonElement = (JsonElement)var3.next();
-               pendingInvitesList.pendingInvites.add(PendingInvite.parse(jsonElement.getAsJsonObject()));
+    public static PendingInvitesList parse(String json) {
+        ArrayList<PendingInvite> list = new ArrayList<PendingInvite>();
+        try {
+            JsonObject jsonObject = LenientJsonParser.parse((String)json).getAsJsonObject();
+            if (jsonObject.get("invites").isJsonArray()) {
+                for (JsonElement jsonElement : jsonObject.get("invites").getAsJsonArray()) {
+                    PendingInvite pendingInvite = PendingInvite.parse((JsonObject)jsonElement.getAsJsonObject());
+                    if (pendingInvite == null) continue;
+                    list.add(pendingInvite);
+                }
             }
-         }
-      } catch (Exception var5) {
-         LOGGER.error("Could not parse PendingInvitesList: {}", var5.getMessage());
-      }
+        }
+        catch (Exception exception) {
+            LOGGER.error("Could not parse PendingInvitesList", (Throwable)exception);
+        }
+        return new PendingInvitesList(list);
+    }
 
-      return pendingInvitesList;
-   }
+    public List<PendingInvite> pendingInvites() {
+        return this.pendingInvites;
+    }
 }
+

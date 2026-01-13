@@ -1,0 +1,126 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.SharedConstants
+ *  net.minecraft.client.MinecraftClient
+ *  net.minecraft.client.option.Perspective
+ *  net.minecraft.client.render.DrawStyle
+ *  net.minecraft.client.render.Frustum
+ *  net.minecraft.client.render.debug.DebugRenderer$Renderer
+ *  net.minecraft.client.render.debug.EntityHitboxDebugRenderer
+ *  net.minecraft.entity.Entity
+ *  net.minecraft.entity.LivingEntity
+ *  net.minecraft.entity.boss.dragon.EnderDragonEntity
+ *  net.minecraft.entity.boss.dragon.EnderDragonPart
+ *  net.minecraft.server.integrated.IntegratedServer
+ *  net.minecraft.server.world.ServerWorld
+ *  net.minecraft.util.math.Box
+ *  net.minecraft.util.math.ColorHelper
+ *  net.minecraft.util.math.Vec3d
+ *  net.minecraft.world.debug.DebugDataStore
+ *  net.minecraft.world.debug.gizmo.GizmoDrawing
+ *  net.minecraft.world.debug.gizmo.TextGizmo$Style
+ *  org.jspecify.annotations.Nullable
+ */
+package net.minecraft.client.render.debug;
+
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.SharedConstants;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.option.Perspective;
+import net.minecraft.client.render.DrawStyle;
+import net.minecraft.client.render.Frustum;
+import net.minecraft.client.render.debug.DebugRenderer;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.boss.dragon.EnderDragonEntity;
+import net.minecraft.entity.boss.dragon.EnderDragonPart;
+import net.minecraft.server.integrated.IntegratedServer;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.ColorHelper;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.debug.DebugDataStore;
+import net.minecraft.world.debug.gizmo.GizmoDrawing;
+import net.minecraft.world.debug.gizmo.TextGizmo;
+import org.jspecify.annotations.Nullable;
+
+@Environment(value=EnvType.CLIENT)
+public class EntityHitboxDebugRenderer
+implements DebugRenderer.Renderer {
+    final MinecraftClient client;
+
+    public EntityHitboxDebugRenderer(MinecraftClient client) {
+        this.client = client;
+    }
+
+    public void render(double cameraX, double cameraY, double cameraZ, DebugDataStore store, Frustum frustum, float tickProgress) {
+        if (this.client.world == null) {
+            return;
+        }
+        for (Entity entity : this.client.world.getEntities()) {
+            if (entity.isInvisible() || !frustum.isVisible(entity.getBoundingBox()) || entity == this.client.getCameraEntity() && this.client.options.getPerspective() == Perspective.FIRST_PERSON) continue;
+            this.drawHitbox(entity, tickProgress, false);
+            if (!SharedConstants.SHOW_LOCAL_SERVER_ENTITY_HIT_BOXES) continue;
+            Entity entity2 = this.getLocalServerEntity(entity);
+            if (entity2 != null) {
+                this.drawHitbox(entity, tickProgress, true);
+                continue;
+            }
+            GizmoDrawing.text((String)"Missing Server Entity", (Vec3d)entity.getLerpedPos(tickProgress).add(0.0, entity.getBoundingBox().getLengthY() + 1.5, 0.0), (TextGizmo.Style)TextGizmo.Style.left((int)-65536));
+        }
+    }
+
+    private @Nullable Entity getLocalServerEntity(Entity entity) {
+        ServerWorld serverWorld;
+        IntegratedServer integratedServer = this.client.getServer();
+        if (integratedServer != null && (serverWorld = integratedServer.getWorld(entity.getEntityWorld().getRegistryKey())) != null) {
+            return serverWorld.getEntityById(entity.getId());
+        }
+        return null;
+    }
+
+    private void drawHitbox(Entity entity, float tickProgress, boolean inLocalServer) {
+        Vec3d vec3d4;
+        float g;
+        Vec3d vec3d = entity.getEntityPos();
+        Vec3d vec3d2 = entity.getLerpedPos(tickProgress);
+        Vec3d vec3d3 = vec3d2.subtract(vec3d);
+        int i = inLocalServer ? -16711936 : -1;
+        GizmoDrawing.box((Box)entity.getBoundingBox().offset(vec3d3), (DrawStyle)DrawStyle.stroked((int)i));
+        GizmoDrawing.point((Vec3d)vec3d2, (int)i, (float)2.0f);
+        Entity entity2 = entity.getVehicle();
+        if (entity2 != null) {
+            float f = Math.min(entity2.getWidth(), entity.getWidth()) / 2.0f;
+            g = 0.0625f;
+            vec3d4 = entity2.getPassengerRidingPos(entity).add(vec3d3);
+            GizmoDrawing.box((Box)new Box(vec3d4.x - (double)f, vec3d4.y, vec3d4.z - (double)f, vec3d4.x + (double)f, vec3d4.y + 0.0625, vec3d4.z + (double)f), (DrawStyle)DrawStyle.stroked((int)-256));
+        }
+        if (entity instanceof LivingEntity) {
+            Box box = entity.getBoundingBox().offset(vec3d3);
+            g = 0.01f;
+            GizmoDrawing.box((Box)new Box(box.minX, box.minY + (double)entity.getStandingEyeHeight() - (double)0.01f, box.minZ, box.maxX, box.minY + (double)entity.getStandingEyeHeight() + (double)0.01f, box.maxZ), (DrawStyle)DrawStyle.stroked((int)-65536));
+        }
+        if (entity instanceof EnderDragonEntity) {
+            EnderDragonEntity enderDragonEntity = (EnderDragonEntity)entity;
+            for (EnderDragonPart enderDragonPart : enderDragonEntity.getBodyParts()) {
+                Vec3d vec3d5 = enderDragonPart.getEntityPos();
+                Vec3d vec3d6 = enderDragonPart.getLerpedPos(tickProgress);
+                Vec3d vec3d7 = vec3d6.subtract(vec3d5);
+                GizmoDrawing.box((Box)enderDragonPart.getBoundingBox().offset(vec3d7), (DrawStyle)DrawStyle.stroked((int)ColorHelper.fromFloats((float)1.0f, (float)0.25f, (float)1.0f, (float)0.0f)));
+            }
+        }
+        Vec3d vec3d8 = vec3d2.add(0.0, (double)entity.getStandingEyeHeight(), 0.0);
+        Vec3d vec3d9 = entity.getRotationVec(tickProgress);
+        GizmoDrawing.arrow((Vec3d)vec3d8, (Vec3d)vec3d8.add(vec3d9.multiply(2.0)), (int)-16776961);
+        if (inLocalServer) {
+            vec3d4 = entity.getVelocity();
+            GizmoDrawing.arrow((Vec3d)vec3d2, (Vec3d)vec3d2.add(vec3d4), (int)-256);
+        }
+    }
+}
+

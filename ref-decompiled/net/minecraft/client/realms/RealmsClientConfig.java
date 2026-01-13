@@ -1,24 +1,31 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.realms.RealmsClientConfig
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.realms;
 
 import java.net.Proxy;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 public class RealmsClientConfig {
-   @Nullable
-   private static Proxy proxy;
+    private static @Nullable Proxy proxy;
 
-   @Nullable
-   public static Proxy getProxy() {
-      return proxy;
-   }
+    public static @Nullable Proxy getProxy() {
+        return proxy;
+    }
 
-   public static void setProxy(Proxy proxy) {
-      if (RealmsClientConfig.proxy == null) {
-         RealmsClientConfig.proxy = proxy;
-      }
-
-   }
+    public static void setProxy(Proxy proxy) {
+        if (RealmsClientConfig.proxy == null) {
+            RealmsClientConfig.proxy = proxy;
+        }
+    }
 }
+

@@ -1,95 +1,118 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.block.BlockState
+ *  net.minecraft.block.entity.ViewerCountManager
+ *  net.minecraft.entity.ContainerUser
+ *  net.minecraft.entity.Entity
+ *  net.minecraft.entity.LivingEntity
+ *  net.minecraft.entity.player.PlayerEntity
+ *  net.minecraft.registry.entry.RegistryEntry
+ *  net.minecraft.util.math.BlockPos
+ *  net.minecraft.util.math.Box
+ *  net.minecraft.world.World
+ *  net.minecraft.world.event.GameEvent
+ */
 package net.minecraft.block.entity;
 
-import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.ContainerUser;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.TypeFilter;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 
+/*
+ * Exception performing whole class analysis ignored.
+ */
 public abstract class ViewerCountManager {
-   private static final int SCHEDULE_TICK_DELAY = 5;
-   private int viewerCount;
-   private double maxBlockInteractionRange;
+    private static final int SCHEDULE_TICK_DELAY = 5;
+    private int viewerCount;
+    private double maxBlockInteractionRange;
 
-   protected abstract void onContainerOpen(World world, BlockPos pos, BlockState state);
+    protected abstract void onContainerOpen(World var1, BlockPos var2, BlockState var3);
 
-   protected abstract void onContainerClose(World world, BlockPos pos, BlockState state);
+    protected abstract void onContainerClose(World var1, BlockPos var2, BlockState var3);
 
-   protected abstract void onViewerCountUpdate(World world, BlockPos pos, BlockState state, int oldViewerCount, int newViewerCount);
+    protected abstract void onViewerCountUpdate(World var1, BlockPos var2, BlockState var3, int var4, int var5);
 
-   protected abstract boolean isPlayerViewing(PlayerEntity player);
+    public abstract boolean isPlayerViewing(PlayerEntity var1);
 
-   public void openContainer(PlayerEntity player, World world, BlockPos pos, BlockState state) {
-      int i = this.viewerCount++;
-      if (i == 0) {
-         this.onContainerOpen(world, pos, state);
-         world.emitGameEvent(player, GameEvent.CONTAINER_OPEN, pos);
-         scheduleBlockTick(world, pos, state);
-      }
-
-      this.onViewerCountUpdate(world, pos, state, i, this.viewerCount);
-      this.maxBlockInteractionRange = Math.max(player.getBlockInteractionRange(), this.maxBlockInteractionRange);
-   }
-
-   public void closeContainer(PlayerEntity player, World world, BlockPos pos, BlockState state) {
-      int i = this.viewerCount--;
-      if (this.viewerCount == 0) {
-         this.onContainerClose(world, pos, state);
-         world.emitGameEvent(player, GameEvent.CONTAINER_CLOSE, pos);
-         this.maxBlockInteractionRange = 0.0;
-      }
-
-      this.onViewerCountUpdate(world, pos, state, i, this.viewerCount);
-   }
-
-   private List getViewingPlayers(World world, BlockPos pos) {
-      double d = this.maxBlockInteractionRange + 4.0;
-      Box box = (new Box(pos)).expand(d);
-      return world.getEntitiesByType(TypeFilter.instanceOf(PlayerEntity.class), box, this::isPlayerViewing);
-   }
-
-   public void updateViewerCount(World world, BlockPos pos, BlockState state) {
-      List list = this.getViewingPlayers(world, pos);
-      this.maxBlockInteractionRange = 0.0;
-
-      PlayerEntity playerEntity;
-      for(Iterator var5 = list.iterator(); var5.hasNext(); this.maxBlockInteractionRange = Math.max(playerEntity.getBlockInteractionRange(), this.maxBlockInteractionRange)) {
-         playerEntity = (PlayerEntity)var5.next();
-      }
-
-      int i = list.size();
-      int j = this.viewerCount;
-      if (j != i) {
-         boolean bl = i != 0;
-         boolean bl2 = j != 0;
-         if (bl && !bl2) {
+    public void openContainer(LivingEntity user, World world, BlockPos pos, BlockState state, double userInteractionRange) {
+        int i;
+        if ((i = this.viewerCount++) == 0) {
             this.onContainerOpen(world, pos, state);
-            world.emitGameEvent((Entity)null, GameEvent.CONTAINER_OPEN, pos);
-         } else if (!bl) {
+            world.emitGameEvent((Entity)user, (RegistryEntry)GameEvent.CONTAINER_OPEN, pos);
+            ViewerCountManager.scheduleBlockTick((World)world, (BlockPos)pos, (BlockState)state);
+        }
+        this.onViewerCountUpdate(world, pos, state, i, this.viewerCount);
+        this.maxBlockInteractionRange = Math.max(userInteractionRange, this.maxBlockInteractionRange);
+    }
+
+    public void closeContainer(LivingEntity user, World world, BlockPos pos, BlockState state) {
+        int i = this.viewerCount--;
+        if (this.viewerCount == 0) {
             this.onContainerClose(world, pos, state);
-            world.emitGameEvent((Entity)null, GameEvent.CONTAINER_CLOSE, pos);
-         }
+            world.emitGameEvent((Entity)user, (RegistryEntry)GameEvent.CONTAINER_CLOSE, pos);
+            this.maxBlockInteractionRange = 0.0;
+        }
+        this.onViewerCountUpdate(world, pos, state, i, this.viewerCount);
+    }
 
-         this.viewerCount = i;
-      }
+    public List<ContainerUser> getViewingUsers(World world, BlockPos pos) {
+        double d = this.maxBlockInteractionRange + 4.0;
+        Box box = new Box(pos).expand(d);
+        return world.getOtherEntities((Entity)null, box, entity -> this.hasViewingUsers(entity, pos)).stream().map(entity -> (ContainerUser)entity).collect(Collectors.toList());
+    }
 
-      this.onViewerCountUpdate(world, pos, state, j, i);
-      if (i > 0) {
-         scheduleBlockTick(world, pos, state);
-      }
+    private boolean hasViewingUsers(Entity entity, BlockPos blockPos) {
+        ContainerUser containerUser;
+        if (entity instanceof ContainerUser && !(containerUser = (ContainerUser)entity).asLivingEntity().isSpectator()) {
+            return containerUser.isViewingContainerAt(this, blockPos);
+        }
+        return false;
+    }
 
-   }
+    public void updateViewerCount(World world, BlockPos pos, BlockState state) {
+        List list = this.getViewingUsers(world, pos);
+        this.maxBlockInteractionRange = 0.0;
+        for (ContainerUser containerUser : list) {
+            this.maxBlockInteractionRange = Math.max(containerUser.getContainerInteractionRange(), this.maxBlockInteractionRange);
+        }
+        int j = this.viewerCount;
+        int i = list.size();
+        if (j != i) {
+            boolean bl2;
+            boolean bl = i != 0;
+            boolean bl3 = bl2 = j != 0;
+            if (bl && !bl2) {
+                this.onContainerOpen(world, pos, state);
+                world.emitGameEvent(null, (RegistryEntry)GameEvent.CONTAINER_OPEN, pos);
+            } else if (!bl) {
+                this.onContainerClose(world, pos, state);
+                world.emitGameEvent(null, (RegistryEntry)GameEvent.CONTAINER_CLOSE, pos);
+            }
+            this.viewerCount = i;
+        }
+        this.onViewerCountUpdate(world, pos, state, j, i);
+        if (i > 0) {
+            ViewerCountManager.scheduleBlockTick((World)world, (BlockPos)pos, (BlockState)state);
+        }
+    }
 
-   public int getViewerCount() {
-      return this.viewerCount;
-   }
+    public int getViewerCount() {
+        return this.viewerCount;
+    }
 
-   private static void scheduleBlockTick(World world, BlockPos pos, BlockState state) {
-      world.scheduleBlockTick(pos, state.getBlock(), 5);
-   }
+    private static void scheduleBlockTick(World world, BlockPos pos, BlockState state) {
+        world.scheduleBlockTick(pos, state.getBlock(), 5);
+    }
 }
+

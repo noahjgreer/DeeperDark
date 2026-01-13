@@ -1,71 +1,56 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.serialization.Codec
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.font.FontFilterType
+ *  net.minecraft.util.StringIdentifiable
+ */
 package net.minecraft.client.font;
 
 import com.mojang.serialization.Codec;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.util.StringIdentifiable;
 
-@Environment(EnvType.CLIENT)
-public enum FontFilterType implements StringIdentifiable {
-   UNIFORM("uniform"),
-   JAPANESE_VARIANTS("jp");
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
+public final class FontFilterType
+extends Enum<FontFilterType>
+implements StringIdentifiable {
+    public static final /* enum */ FontFilterType UNIFORM = new FontFilterType("UNIFORM", 0, "uniform");
+    public static final /* enum */ FontFilterType JAPANESE_VARIANTS = new FontFilterType("JAPANESE_VARIANTS", 1, "jp");
+    public static final Codec<FontFilterType> CODEC;
+    private final String id;
+    private static final /* synthetic */ FontFilterType[] field_49116;
 
-   public static final Codec CODEC = StringIdentifiable.createCodec(FontFilterType::values);
-   private final String id;
+    public static FontFilterType[] values() {
+        return (FontFilterType[])field_49116.clone();
+    }
 
-   private FontFilterType(final String id) {
-      this.id = id;
-   }
+    public static FontFilterType valueOf(String string) {
+        return Enum.valueOf(FontFilterType.class, string);
+    }
 
-   public String asString() {
-      return this.id;
-   }
+    private FontFilterType(String id) {
+        this.id = id;
+    }
 
-   // $FF: synthetic method
-   private static FontFilterType[] method_57030() {
-      return new FontFilterType[]{UNIFORM, JAPANESE_VARIANTS};
-   }
+    public String asString() {
+        return this.id;
+    }
 
-   @Environment(EnvType.CLIENT)
-   public static class FilterMap {
-      private final Map activeFilters;
-      public static final Codec CODEC;
-      public static final FilterMap NO_FILTER;
+    private static /* synthetic */ FontFilterType[] method_57030() {
+        return new FontFilterType[]{UNIFORM, JAPANESE_VARIANTS};
+    }
 
-      public FilterMap(Map activeFilters) {
-         this.activeFilters = activeFilters;
-      }
-
-      public boolean isAllowed(Set activeFilters) {
-         Iterator var2 = this.activeFilters.entrySet().iterator();
-
-         Map.Entry entry;
-         do {
-            if (!var2.hasNext()) {
-               return true;
-            }
-
-            entry = (Map.Entry)var2.next();
-         } while(activeFilters.contains(entry.getKey()) == (Boolean)entry.getValue());
-
-         return false;
-      }
-
-      public FilterMap apply(FilterMap activeFilters) {
-         Map map = new HashMap(activeFilters.activeFilters);
-         map.putAll(this.activeFilters);
-         return new FilterMap(Map.copyOf(map));
-      }
-
-      static {
-         CODEC = Codec.unboundedMap(FontFilterType.CODEC, Codec.BOOL).xmap(FilterMap::new, (filterMap) -> {
-            return filterMap.activeFilters;
-         });
-         NO_FILTER = new FilterMap(Map.of());
-      }
-   }
+    static {
+        field_49116 = FontFilterType.method_57030();
+        CODEC = StringIdentifiable.createCodec(FontFilterType::values);
+    }
 }
+

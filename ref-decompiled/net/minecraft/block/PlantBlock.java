@@ -1,6 +1,29 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.serialization.MapCodec
+ *  net.minecraft.block.AbstractBlock$Settings
+ *  net.minecraft.block.Block
+ *  net.minecraft.block.BlockState
+ *  net.minecraft.block.Blocks
+ *  net.minecraft.block.PlantBlock
+ *  net.minecraft.entity.ai.pathing.NavigationType
+ *  net.minecraft.registry.tag.BlockTags
+ *  net.minecraft.util.math.BlockPos
+ *  net.minecraft.util.math.Direction
+ *  net.minecraft.util.math.random.Random
+ *  net.minecraft.world.BlockView
+ *  net.minecraft.world.WorldView
+ *  net.minecraft.world.tick.ScheduledTickView
+ */
 package net.minecraft.block;
 
 import com.mojang.serialization.MapCodec;
+import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.ai.pathing.NavigationType;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
@@ -10,31 +33,39 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.WorldView;
 import net.minecraft.world.tick.ScheduledTickView;
 
-public abstract class PlantBlock extends Block {
-   protected PlantBlock(AbstractBlock.Settings settings) {
-      super(settings);
-   }
+public abstract class PlantBlock
+extends Block {
+    protected PlantBlock(AbstractBlock.Settings settings) {
+        super(settings);
+    }
 
-   protected abstract MapCodec getCodec();
+    protected abstract MapCodec<? extends PlantBlock> getCodec();
 
-   protected boolean canPlantOnTop(BlockState floor, BlockView world, BlockPos pos) {
-      return floor.isIn(BlockTags.DIRT) || floor.isOf(Blocks.FARMLAND);
-   }
+    protected boolean canPlantOnTop(BlockState floor, BlockView world, BlockPos pos) {
+        return floor.isIn(BlockTags.DIRT) || floor.isOf(Blocks.FARMLAND);
+    }
 
-   protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
-      return !state.canPlaceAt(world, pos) ? Blocks.AIR.getDefaultState() : super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
-   }
+    protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
+        if (!state.canPlaceAt(world, pos)) {
+            return Blocks.AIR.getDefaultState();
+        }
+        return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
+    }
 
-   protected boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
-      BlockPos blockPos = pos.down();
-      return this.canPlantOnTop(world.getBlockState(blockPos), world, blockPos);
-   }
+    protected boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
+        BlockPos blockPos = pos.down();
+        return this.canPlantOnTop(world.getBlockState(blockPos), (BlockView)world, blockPos);
+    }
 
-   protected boolean isTransparent(BlockState state) {
-      return state.getFluidState().isEmpty();
-   }
+    protected boolean isTransparent(BlockState state) {
+        return state.getFluidState().isEmpty();
+    }
 
-   protected boolean canPathfindThrough(BlockState state, NavigationType type) {
-      return type == NavigationType.AIR && !this.collidable ? true : super.canPathfindThrough(state, type);
-   }
+    protected boolean canPathfindThrough(BlockState state, NavigationType type) {
+        if (type == NavigationType.AIR && !this.collidable) {
+            return true;
+        }
+        return super.canPathfindThrough(state, type);
+    }
 }
+

@@ -47,7 +47,7 @@ public class SiphonEvents {
                      int totalExperience = getTotalExperience(player);
 
                      if (totalExperience >= 10 || player.isCreative()) {
-                         if (!world.isClient) {
+                         if (!world.isClient()) {
                              if (!player.isCreative()) {
                                  player.addExperience(-10);
                              }
@@ -84,14 +84,14 @@ public class SiphonEvents {
                  return ActionResult.PASS;
             }
 
-            if (!world.isClient) {
+            if (!world.isClient()) {
                 // Place Siphon
-                CustomBlockManager.place(world, placePos, stack, Blocks.COBBLED_DEEPSLATE_SLAB, null);
+                if (CustomBlockManager.place(world, placePos, stack, Blocks.COBBLED_DEEPSLATE_SLAB, null)) {
+                    world.playSound(null, placePos, BlockSoundGroup.STONE.getPlaceSound(), SoundCategory.BLOCKS, 1f, 1f);
 
-                world.playSound(null, placePos, BlockSoundGroup.STONE.getPlaceSound(), SoundCategory.BLOCKS, 1f, 1f);
-
-                if (!player.isCreative()) {
-                    stack.decrement(1);
+                    if (!player.isCreative()) {
+                        stack.decrement(1);
+                    }
                 }
             }
 

@@ -1,25 +1,44 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.gui.screen.Screen
+ *  net.minecraft.client.gui.screen.option.ChatOptionsScreen
+ *  net.minecraft.client.gui.screen.option.GameOptionsScreen
+ *  net.minecraft.client.option.GameOptions
+ *  net.minecraft.client.option.SimpleOption
+ *  net.minecraft.text.Text
+ */
 package net.minecraft.client.gui.screen.option;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.option.GameOptionsScreen;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.SimpleOption;
 import net.minecraft.text.Text;
 
-@Environment(EnvType.CLIENT)
-public class ChatOptionsScreen extends GameOptionsScreen {
-   private static final Text TITLE_TEXT = Text.translatable("options.chat.title");
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
+public class ChatOptionsScreen
+extends GameOptionsScreen {
+    private static final Text TITLE_TEXT = Text.translatable((String)"options.chat.title");
 
-   private static SimpleOption[] getOptions(GameOptions gameOptions) {
-      return new SimpleOption[]{gameOptions.getChatVisibility(), gameOptions.getChatColors(), gameOptions.getChatLinks(), gameOptions.getChatLinksPrompt(), gameOptions.getChatOpacity(), gameOptions.getTextBackgroundOpacity(), gameOptions.getChatScale(), gameOptions.getChatLineSpacing(), gameOptions.getChatDelay(), gameOptions.getChatWidth(), gameOptions.getChatHeightFocused(), gameOptions.getChatHeightUnfocused(), gameOptions.getNarrator(), gameOptions.getAutoSuggestions(), gameOptions.getHideMatchedNames(), gameOptions.getReducedDebugInfo(), gameOptions.getOnlyShowSecureChat()};
-   }
+    private static SimpleOption<?>[] getOptions(GameOptions gameOptions) {
+        return new SimpleOption[]{gameOptions.getChatVisibility(), gameOptions.getChatColors(), gameOptions.getChatLinks(), gameOptions.getChatLinksPrompt(), gameOptions.getChatOpacity(), gameOptions.getTextBackgroundOpacity(), gameOptions.getChatScale(), gameOptions.getChatLineSpacing(), gameOptions.getChatDelay(), gameOptions.getChatWidth(), gameOptions.getChatHeightFocused(), gameOptions.getChatHeightUnfocused(), gameOptions.getNarrator(), gameOptions.getAutoSuggestions(), gameOptions.getHideMatchedNames(), gameOptions.getReducedDebugInfo(), gameOptions.getOnlyShowSecureChat(), gameOptions.getChatDrafts()};
+    }
 
-   public ChatOptionsScreen(Screen parent, GameOptions options) {
-      super(parent, options, TITLE_TEXT);
-   }
+    public ChatOptionsScreen(Screen parent, GameOptions options) {
+        super(parent, options, TITLE_TEXT);
+    }
 
-   protected void addOptions() {
-      this.body.addAll(getOptions(this.gameOptions));
-   }
+    protected void addOptions() {
+        this.body.addAll(ChatOptionsScreen.getOptions((GameOptions)this.gameOptions));
+    }
 }
+

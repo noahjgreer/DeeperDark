@@ -1,0 +1,14 @@
+failed
+:compileJava
+PlayerTickHandler.java
+incompatible types: World cannot be converted to ServerWorld
+ServerPlayerEntityMixin.java
+cannot find symbol method get(GameRule<Boolean>)
+SlipPortalHandler.java
+server has private access in ServerPlayerEntity
+server has private access in ServerPlayerEntity
+server has private access in ServerPlayerEntity
+server has private access in ServerPlayerEntity
+PaleMansionProcessor.java
+uses unchecked or unsafe operations.
+uses unchecked or unsafe operations.

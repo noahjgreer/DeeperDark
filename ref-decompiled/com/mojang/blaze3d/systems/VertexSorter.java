@@ -1,48 +1,58 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.google.common.primitives.Floats
+ *  com.mojang.blaze3d.systems.VertexSorter
+ *  com.mojang.blaze3d.systems.VertexSorter$SortKeyMapper
+ *  it.unimi.dsi.fastutil.ints.IntArrays
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.util.math.Vec3fArray
+ *  org.joml.Vector3f
+ *  org.joml.Vector3fc
+ */
 package com.mojang.blaze3d.systems;
 
 import com.google.common.primitives.Floats;
+import com.mojang.blaze3d.systems.VertexSorter;
 import it.unimi.dsi.fastutil.ints.IntArrays;
-import java.util.Objects;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.util.math.Vec3fArray;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
-@Environment(EnvType.CLIENT)
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
 public interface VertexSorter {
-   VertexSorter BY_DISTANCE = byDistance(0.0F, 0.0F, 0.0F);
-   VertexSorter BY_Z = of((vec) -> {
-      return -vec.z();
-   });
+    public static final VertexSorter BY_DISTANCE = VertexSorter.byDistance((float)0.0f, (float)0.0f, (float)0.0f);
+    public static final VertexSorter BY_Z = VertexSorter.of(vec -> -vec.z());
 
-   static VertexSorter byDistance(float originX, float originY, float originZ) {
-      return byDistance(new Vector3f(originX, originY, originZ));
-   }
+    public static VertexSorter byDistance(float originX, float originY, float originZ) {
+        return VertexSorter.byDistance((Vector3fc)new Vector3f(originX, originY, originZ));
+    }
 
-   static VertexSorter byDistance(Vector3f origin) {
-      Objects.requireNonNull(origin);
-      return of(origin::distanceSquared);
-   }
+    public static VertexSorter byDistance(Vector3fc origin) {
+        return VertexSorter.of(arg_0 -> ((Vector3fc)origin).distanceSquared(arg_0));
+    }
 
-   static VertexSorter of(SortKeyMapper mapper) {
-      return (vec) -> {
-         float[] fs = new float[vec.length];
-         int[] is = new int[vec.length];
+    public static VertexSorter of(SortKeyMapper mapper) {
+        return vectors -> {
+            Vector3f vector3f = new Vector3f();
+            float[] fs = new float[vectors.size()];
+            int[] is = new int[vectors.size()];
+            for (int i = 0; i < vectors.size(); ++i) {
+                fs[i] = mapper.apply(vectors.get(i, vector3f));
+                is[i] = i;
+            }
+            IntArrays.mergeSort((int[])is, (a, b) -> Floats.compare((float)fs[b], (float)fs[a]));
+            return is;
+        };
+    }
 
-         for(int i = 0; i < vec.length; is[i] = i++) {
-            fs[i] = mapper.apply(vec[i]);
-         }
-
-         IntArrays.mergeSort(is, (a, b) -> {
-            return Floats.compare(fs[b], fs[a]);
-         });
-         return is;
-      };
-   }
-
-   int[] sort(Vector3f[] vec);
-
-   @Environment(EnvType.CLIENT)
-   public interface SortKeyMapper {
-      float apply(Vector3f vec);
-   }
+    public int[] sort(Vec3fArray var1);
 }
+

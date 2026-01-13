@@ -1,14 +1,46 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.gui.screen.AccessibilityOnboardingScreen
+ *  net.minecraft.client.gui.screen.ConfirmLinkScreen
+ *  net.minecraft.client.gui.screen.Screen
+ *  net.minecraft.client.gui.screen.option.AccessibilityOptionsScreen
+ *  net.minecraft.client.gui.screen.option.ControlsOptionsScreen
+ *  net.minecraft.client.gui.screen.option.GameOptionsScreen
+ *  net.minecraft.client.gui.screen.option.OptionsScreen
+ *  net.minecraft.client.gui.tooltip.Tooltip
+ *  net.minecraft.client.gui.widget.ButtonWidget
+ *  net.minecraft.client.gui.widget.ButtonWidget$PressAction
+ *  net.minecraft.client.gui.widget.ClickableWidget
+ *  net.minecraft.client.gui.widget.DirectionalLayoutWidget
+ *  net.minecraft.client.gui.widget.Widget
+ *  net.minecraft.client.option.GameOptions
+ *  net.minecraft.client.option.SimpleOption
+ *  net.minecraft.resource.featuretoggle.FeatureFlags
+ *  net.minecraft.screen.ScreenTexts
+ *  net.minecraft.text.Text
+ *  net.minecraft.util.Urls
+ */
 package net.minecraft.client.gui.screen.option;
 
 import java.net.URI;
+import java.util.Arrays;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.gui.screen.AccessibilityOnboardingScreen;
 import net.minecraft.client.gui.screen.ConfirmLinkScreen;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.option.ControlsOptionsScreen;
+import net.minecraft.client.gui.screen.option.GameOptionsScreen;
+import net.minecraft.client.gui.screen.option.OptionsScreen;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.DirectionalLayoutWidget;
+import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.SimpleOption;
 import net.minecraft.resource.featuretoggle.FeatureFlags;
@@ -16,46 +48,55 @@ import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import net.minecraft.util.Urls;
 
-@Environment(EnvType.CLIENT)
-public class AccessibilityOptionsScreen extends GameOptionsScreen {
-   public static final Text TITLE_TEXT = Text.translatable("options.accessibility.title");
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
+public class AccessibilityOptionsScreen
+extends GameOptionsScreen {
+    public static final Text TITLE_TEXT = Text.translatable((String)"options.accessibility.title");
 
-   private static SimpleOption[] getOptions(GameOptions gameOptions) {
-      return new SimpleOption[]{gameOptions.getNarrator(), gameOptions.getShowSubtitles(), gameOptions.getHighContrast(), gameOptions.getAutoJump(), gameOptions.getMenuBackgroundBlurriness(), gameOptions.getTextBackgroundOpacity(), gameOptions.getBackgroundForChatOnly(), gameOptions.getChatOpacity(), gameOptions.getChatLineSpacing(), gameOptions.getChatDelay(), gameOptions.getNotificationDisplayTime(), gameOptions.getBobView(), gameOptions.getSneakToggled(), gameOptions.getSprintToggled(), gameOptions.getDistortionEffectScale(), gameOptions.getFovEffectScale(), gameOptions.getDarknessEffectScale(), gameOptions.getDamageTiltStrength(), gameOptions.getGlintSpeed(), gameOptions.getGlintStrength(), gameOptions.getHideLightningFlashes(), gameOptions.getMonochromeLogo(), gameOptions.getPanoramaSpeed(), gameOptions.getHideSplashTexts(), gameOptions.getNarratorHotkey(), gameOptions.getRotateWithMinecart(), gameOptions.getHighContrastBlockOutline()};
-   }
+    private static SimpleOption<?>[] getOptions(GameOptions gameOptions) {
+        return new SimpleOption[]{gameOptions.getNarrator(), gameOptions.getShowSubtitles(), gameOptions.getHighContrast(), gameOptions.getMenuBackgroundBlurriness(), gameOptions.getTextBackgroundOpacity(), gameOptions.getBackgroundForChatOnly(), gameOptions.getChatOpacity(), gameOptions.getChatLineSpacing(), gameOptions.getChatDelay(), gameOptions.getNotificationDisplayTime(), gameOptions.getBobView(), gameOptions.getDistortionEffectScale(), gameOptions.getFovEffectScale(), gameOptions.getDarknessEffectScale(), gameOptions.getDamageTiltStrength(), gameOptions.getGlintSpeed(), gameOptions.getGlintStrength(), gameOptions.getHideLightningFlashes(), gameOptions.getMonochromeLogo(), gameOptions.getPanoramaSpeed(), gameOptions.getHideSplashTexts(), gameOptions.getNarratorHotkey(), gameOptions.getRotateWithMinecart(), gameOptions.getHighContrastBlockOutline()};
+    }
 
-   public AccessibilityOptionsScreen(Screen parent, GameOptions gameOptions) {
-      super(parent, gameOptions, TITLE_TEXT);
-   }
+    public AccessibilityOptionsScreen(Screen parent, GameOptions gameOptions) {
+        super(parent, gameOptions, TITLE_TEXT);
+    }
 
-   protected void init() {
-      super.init();
-      ClickableWidget clickableWidget = this.body.getWidgetFor(this.gameOptions.getHighContrast());
-      if (clickableWidget != null && !this.client.getResourcePackManager().getIds().contains("high_contrast")) {
-         clickableWidget.active = false;
-         clickableWidget.setTooltip(Tooltip.of(Text.translatable("options.accessibility.high_contrast.error.tooltip")));
-      }
+    protected void init() {
+        ClickableWidget clickableWidget2;
+        super.init();
+        ClickableWidget clickableWidget = this.body.getWidgetFor(this.gameOptions.getHighContrast());
+        if (clickableWidget != null && !this.client.getResourcePackManager().getIds().contains("high_contrast")) {
+            clickableWidget.active = false;
+            clickableWidget.setTooltip(Tooltip.of((Text)Text.translatable((String)"options.accessibility.high_contrast.error.tooltip")));
+        }
+        if ((clickableWidget2 = this.body.getWidgetFor(this.gameOptions.getRotateWithMinecart())) != null) {
+            clickableWidget2.active = this.isMinecartImprovementsExperimentEnabled();
+        }
+    }
 
-      ClickableWidget clickableWidget2 = this.body.getWidgetFor(this.gameOptions.getRotateWithMinecart());
-      if (clickableWidget2 != null) {
-         clickableWidget2.active = this.isMinecartImprovementsExperimentEnabled();
-      }
+    protected void addOptions() {
+        SimpleOption[] simpleOptions = AccessibilityOptionsScreen.getOptions((GameOptions)this.gameOptions);
+        ButtonWidget buttonWidget2 = ButtonWidget.builder((Text)OptionsScreen.CONTROL_TEXT, buttonWidget -> this.client.setScreen((Screen)new ControlsOptionsScreen((Screen)this, this.gameOptions))).build();
+        SimpleOption simpleOption = simpleOptions[0];
+        this.body.addWidgetEntry(simpleOption.createWidget(this.gameOptions), this.gameOptions.getNarrator(), (ClickableWidget)buttonWidget2);
+        this.body.addAll((SimpleOption[])Arrays.stream(simpleOptions).filter(simpleOption2 -> simpleOption2 != simpleOption).toArray(SimpleOption[]::new));
+    }
 
-   }
+    protected void initFooter() {
+        DirectionalLayoutWidget directionalLayoutWidget = (DirectionalLayoutWidget)this.layout.addFooter((Widget)DirectionalLayoutWidget.horizontal().spacing(8));
+        directionalLayoutWidget.add((Widget)ButtonWidget.builder((Text)Text.translatable((String)"options.accessibility.link"), (ButtonWidget.PressAction)ConfirmLinkScreen.opening((Screen)this, (URI)Urls.JAVA_ACCESSIBILITY)).build());
+        directionalLayoutWidget.add((Widget)ButtonWidget.builder((Text)ScreenTexts.DONE, button -> this.client.setScreen(this.parent)).build());
+    }
 
-   protected void addOptions() {
-      this.body.addAll(getOptions(this.gameOptions));
-   }
+    protected boolean allowRotatingPanorama() {
+        return !(this.parent instanceof AccessibilityOnboardingScreen);
+    }
 
-   protected void initFooter() {
-      DirectionalLayoutWidget directionalLayoutWidget = (DirectionalLayoutWidget)this.layout.addFooter(DirectionalLayoutWidget.horizontal().spacing(8));
-      directionalLayoutWidget.add(ButtonWidget.builder(Text.translatable("options.accessibility.link"), ConfirmLinkScreen.opening(this, (URI)Urls.JAVA_ACCESSIBILITY)).build());
-      directionalLayoutWidget.add(ButtonWidget.builder(ScreenTexts.DONE, (button) -> {
-         this.client.setScreen(this.parent);
-      }).build());
-   }
-
-   private boolean isMinecartImprovementsExperimentEnabled() {
-      return this.client.world != null && this.client.world.getEnabledFeatures().contains(FeatureFlags.MINECART_IMPROVEMENTS);
-   }
+    private boolean isMinecartImprovementsExperimentEnabled() {
+        return this.client.world != null && this.client.world.getEnabledFeatures().contains(FeatureFlags.MINECART_IMPROVEMENTS);
+    }
 }
+

@@ -1,3 +1,24 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.google.common.annotations.VisibleForTesting
+ *  com.google.common.collect.Lists
+ *  com.mojang.logging.LogUtils
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.MinecraftClient
+ *  net.minecraft.client.font.TextRenderer
+ *  net.minecraft.client.gui.EditBox
+ *  net.minecraft.client.gui.EditBox$1
+ *  net.minecraft.client.gui.EditBox$Substring
+ *  net.minecraft.client.input.CursorMovement
+ *  net.minecraft.client.input.KeyInput
+ *  net.minecraft.text.Style
+ *  net.minecraft.util.StringHelper
+ *  net.minecraft.util.math.MathHelper
+ *  org.slf4j.Logger
+ */
 package net.minecraft.client.gui;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -10,408 +31,387 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.EditBox;
 import net.minecraft.client.input.CursorMovement;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.text.Style;
 import net.minecraft.util.StringHelper;
 import net.minecraft.util.math.MathHelper;
 import org.slf4j.Logger;
 
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 public class EditBox {
-   private static final Logger LOGGER = LogUtils.getLogger();
-   public static final int UNLIMITED_LENGTH = Integer.MAX_VALUE;
-   private static final int CURSOR_WIDTH = 2;
-   private final TextRenderer textRenderer;
-   private final List lines = Lists.newArrayList();
-   private String text;
-   private int cursor;
-   private int selectionEnd;
-   private boolean selecting;
-   private int maxLength = Integer.MAX_VALUE;
-   private int maxLines = Integer.MAX_VALUE;
-   private final int width;
-   private Consumer changeListener = (text) -> {
-   };
-   private Runnable cursorChangeListener = () -> {
-   };
+    private static final Logger LOGGER = LogUtils.getLogger();
+    public static final int UNLIMITED_LENGTH = Integer.MAX_VALUE;
+    private static final int CURSOR_WIDTH = 2;
+    private final TextRenderer textRenderer;
+    private final List<Substring> lines = Lists.newArrayList();
+    private String text;
+    private int cursor;
+    private int selectionEnd;
+    private boolean selecting;
+    private int maxLength = Integer.MAX_VALUE;
+    private int maxLines = Integer.MAX_VALUE;
+    private final int width;
+    private Consumer<String> changeListener = text -> {};
+    private Runnable cursorChangeListener = () -> {};
 
-   public EditBox(TextRenderer textRenderer, int width) {
-      this.textRenderer = textRenderer;
-      this.width = width;
-      this.setText("");
-   }
+    public EditBox(TextRenderer textRenderer, int width) {
+        this.textRenderer = textRenderer;
+        this.width = width;
+        this.setText("");
+    }
 
-   public int getMaxLength() {
-      return this.maxLength;
-   }
+    public int getMaxLength() {
+        return this.maxLength;
+    }
 
-   public void setMaxLength(int maxLength) {
-      if (maxLength < 0) {
-         throw new IllegalArgumentException("Character limit cannot be negative");
-      } else {
-         this.maxLength = maxLength;
-      }
-   }
+    public void setMaxLength(int maxLength) {
+        if (maxLength < 0) {
+            throw new IllegalArgumentException("Character limit cannot be negative");
+        }
+        this.maxLength = maxLength;
+    }
 
-   public void setMaxLines(int maxLines) {
-      if (maxLines < 0) {
-         throw new IllegalArgumentException("Character limit cannot be negative");
-      } else {
-         this.maxLines = maxLines;
-      }
-   }
+    public void setMaxLines(int maxLines) {
+        if (maxLines < 0) {
+            throw new IllegalArgumentException("Character limit cannot be negative");
+        }
+        this.maxLines = maxLines;
+    }
 
-   public boolean hasMaxLength() {
-      return this.maxLength != Integer.MAX_VALUE;
-   }
+    public boolean hasMaxLength() {
+        return this.maxLength != Integer.MAX_VALUE;
+    }
 
-   public boolean hasMaxLines() {
-      return this.maxLines != Integer.MAX_VALUE;
-   }
+    public boolean hasMaxLines() {
+        return this.maxLines != Integer.MAX_VALUE;
+    }
 
-   public void setChangeListener(Consumer changeListener) {
-      this.changeListener = changeListener;
-   }
+    public void setChangeListener(Consumer<String> changeListener) {
+        this.changeListener = changeListener;
+    }
 
-   public void setCursorChangeListener(Runnable cursorChangeListener) {
-      this.cursorChangeListener = cursorChangeListener;
-   }
+    public void setCursorChangeListener(Runnable cursorChangeListener) {
+        this.cursorChangeListener = cursorChangeListener;
+    }
 
-   public void setText(String setText) {
-      this.setText(setText, false);
-   }
+    public void setText(String setText) {
+        this.setText(setText, false);
+    }
 
-   public void setText(String text, boolean allowOverflow) {
-      String string = this.truncateForReplacement(text);
-      if (allowOverflow || !this.exceedsMaxLines(string)) {
-         this.text = string;
-         this.cursor = this.text.length();
-         this.selectionEnd = this.cursor;
-         this.onChange();
-      }
-   }
+    public void setText(String text, boolean allowOverflow) {
+        String string = this.truncateForReplacement(text);
+        if (!allowOverflow && this.exceedsMaxLines(string)) {
+            return;
+        }
+        this.text = string;
+        this.selectionEnd = this.cursor = this.text.length();
+        this.onChange();
+    }
 
-   public String getText() {
-      return this.text;
-   }
+    public String getText() {
+        return this.text;
+    }
 
-   public void replaceSelection(String string) {
-      if (!string.isEmpty() || this.hasSelection()) {
-         String string2 = this.truncate(StringHelper.stripInvalidChars(string, true));
-         Substring substring = this.getSelection();
-         String string3 = (new StringBuilder(this.text)).replace(substring.beginIndex, substring.endIndex, string2).toString();
-         if (!this.exceedsMaxLines(string3)) {
-            this.text = string3;
-            this.cursor = substring.beginIndex + string2.length();
-            this.selectionEnd = this.cursor;
-            this.onChange();
-         }
-      }
-   }
+    public void replaceSelection(String string) {
+        if (string.isEmpty() && !this.hasSelection()) {
+            return;
+        }
+        String string2 = this.truncate(StringHelper.stripInvalidChars((String)string, (boolean)true));
+        Substring substring = this.getSelection();
+        String string3 = new StringBuilder(this.text).replace(substring.beginIndex, substring.endIndex, string2).toString();
+        if (this.exceedsMaxLines(string3)) {
+            return;
+        }
+        this.text = string3;
+        this.selectionEnd = this.cursor = substring.beginIndex + string2.length();
+        this.onChange();
+    }
 
-   public void delete(int offset) {
-      if (!this.hasSelection()) {
-         this.selectionEnd = MathHelper.clamp(this.cursor + offset, 0, this.text.length());
-      }
+    public void delete(int offset) {
+        if (!this.hasSelection()) {
+            this.selectionEnd = MathHelper.clamp((int)(this.cursor + offset), (int)0, (int)this.text.length());
+        }
+        this.replaceSelection("");
+    }
 
-      this.replaceSelection("");
-   }
+    public int getCursor() {
+        return this.cursor;
+    }
 
-   public int getCursor() {
-      return this.cursor;
-   }
+    public void setSelecting(boolean selecting) {
+        this.selecting = selecting;
+    }
 
-   public void setSelecting(boolean selecting) {
-      this.selecting = selecting;
-   }
+    public Substring getSelection() {
+        return new Substring(Math.min(this.selectionEnd, this.cursor), Math.max(this.selectionEnd, this.cursor));
+    }
 
-   public Substring getSelection() {
-      return new Substring(Math.min(this.selectionEnd, this.cursor), Math.max(this.selectionEnd, this.cursor));
-   }
+    public int getLineCount() {
+        return this.lines.size();
+    }
 
-   public int getLineCount() {
-      return this.lines.size();
-   }
-
-   public int getCurrentLineIndex() {
-      for(int i = 0; i < this.lines.size(); ++i) {
-         Substring substring = (Substring)this.lines.get(i);
-         if (this.cursor >= substring.beginIndex && this.cursor <= substring.endIndex) {
+    public int getCurrentLineIndex() {
+        for (int i = 0; i < this.lines.size(); ++i) {
+            Substring substring = (Substring)this.lines.get(i);
+            if (this.cursor < substring.beginIndex || this.cursor > substring.endIndex) continue;
             return i;
-         }
-      }
+        }
+        return -1;
+    }
 
-      return -1;
-   }
+    public Substring getLine(int index) {
+        return (Substring)this.lines.get(MathHelper.clamp((int)index, (int)0, (int)(this.lines.size() - 1)));
+    }
 
-   public Substring getLine(int index) {
-      return (Substring)this.lines.get(MathHelper.clamp(index, 0, this.lines.size() - 1));
-   }
+    public void moveCursor(CursorMovement movement, int amount) {
+        switch (1.field_39523[movement.ordinal()]) {
+            case 1: {
+                this.cursor = amount;
+                break;
+            }
+            case 2: {
+                this.cursor += amount;
+                break;
+            }
+            case 3: {
+                this.cursor = this.text.length() + amount;
+            }
+        }
+        this.cursor = MathHelper.clamp((int)this.cursor, (int)0, (int)this.text.length());
+        this.cursorChangeListener.run();
+        if (!this.selecting) {
+            this.selectionEnd = this.cursor;
+        }
+    }
 
-   public void moveCursor(CursorMovement movement, int amount) {
-      switch (movement) {
-         case ABSOLUTE:
-            this.cursor = amount;
-            break;
-         case RELATIVE:
-            this.cursor += amount;
-            break;
-         case END:
-            this.cursor = this.text.length() + amount;
-      }
+    public void moveCursorLine(int offset) {
+        if (offset == 0) {
+            return;
+        }
+        int i = this.textRenderer.getWidth(this.text.substring(this.getCurrentLine().beginIndex, this.cursor)) + 2;
+        Substring substring = this.getOffsetLine(offset);
+        int j = this.textRenderer.trimToWidth(this.text.substring(substring.beginIndex, substring.endIndex), i).length();
+        this.moveCursor(CursorMovement.ABSOLUTE, substring.beginIndex + j);
+    }
 
-      this.cursor = MathHelper.clamp(this.cursor, 0, this.text.length());
-      this.cursorChangeListener.run();
-      if (!this.selecting) {
-         this.selectionEnd = this.cursor;
-      }
+    public void moveCursor(double x, double y) {
+        int i = MathHelper.floor((double)x);
+        Objects.requireNonNull(this.textRenderer);
+        int j = MathHelper.floor((double)(y / 9.0));
+        Substring substring = (Substring)this.lines.get(MathHelper.clamp((int)j, (int)0, (int)(this.lines.size() - 1)));
+        int k = this.textRenderer.trimToWidth(this.text.substring(substring.beginIndex, substring.endIndex), i).length();
+        this.moveCursor(CursorMovement.ABSOLUTE, substring.beginIndex + k);
+    }
 
-   }
+    public void selectWord() {
+        Substring substring = this.getPreviousWordAtCursor();
+        this.moveCursor(CursorMovement.ABSOLUTE, substring.beginIndex);
+        this.setSelecting(true);
+        this.moveCursor(CursorMovement.ABSOLUTE, substring.endIndex);
+    }
 
-   public void moveCursorLine(int offset) {
-      if (offset != 0) {
-         int i = this.textRenderer.getWidth(this.text.substring(this.getCurrentLine().beginIndex, this.cursor)) + 2;
-         Substring substring = this.getOffsetLine(offset);
-         int j = this.textRenderer.trimToWidth(this.text.substring(substring.beginIndex, substring.endIndex), i).length();
-         this.moveCursor(CursorMovement.ABSOLUTE, substring.beginIndex + j);
-      }
-   }
+    public boolean handleSpecialKey(KeyInput key) {
+        this.selecting = key.hasShift();
+        if (key.isSelectAll()) {
+            this.cursor = this.text.length();
+            this.selectionEnd = 0;
+            return true;
+        }
+        if (key.isCopy()) {
+            MinecraftClient.getInstance().keyboard.setClipboard(this.getSelectedText());
+            return true;
+        }
+        if (key.isPaste()) {
+            this.replaceSelection(MinecraftClient.getInstance().keyboard.getClipboard());
+            return true;
+        }
+        if (key.isCut()) {
+            MinecraftClient.getInstance().keyboard.setClipboard(this.getSelectedText());
+            this.replaceSelection("");
+            return true;
+        }
+        switch (key.key()) {
+            case 263: {
+                if (key.hasCtrlOrCmd()) {
+                    Substring substring = this.getPreviousWordAtCursor();
+                    this.moveCursor(CursorMovement.ABSOLUTE, substring.beginIndex);
+                } else {
+                    this.moveCursor(CursorMovement.RELATIVE, -1);
+                }
+                return true;
+            }
+            case 262: {
+                if (key.hasCtrlOrCmd()) {
+                    Substring substring = this.getNextWordAtCursor();
+                    this.moveCursor(CursorMovement.ABSOLUTE, substring.beginIndex);
+                } else {
+                    this.moveCursor(CursorMovement.RELATIVE, 1);
+                }
+                return true;
+            }
+            case 265: {
+                if (!key.hasCtrlOrCmd()) {
+                    this.moveCursorLine(-1);
+                }
+                return true;
+            }
+            case 264: {
+                if (!key.hasCtrlOrCmd()) {
+                    this.moveCursorLine(1);
+                }
+                return true;
+            }
+            case 266: {
+                this.moveCursor(CursorMovement.ABSOLUTE, 0);
+                return true;
+            }
+            case 267: {
+                this.moveCursor(CursorMovement.END, 0);
+                return true;
+            }
+            case 268: {
+                if (key.hasCtrlOrCmd()) {
+                    this.moveCursor(CursorMovement.ABSOLUTE, 0);
+                } else {
+                    this.moveCursor(CursorMovement.ABSOLUTE, this.getCurrentLine().beginIndex);
+                }
+                return true;
+            }
+            case 269: {
+                if (key.hasCtrlOrCmd()) {
+                    this.moveCursor(CursorMovement.END, 0);
+                } else {
+                    this.moveCursor(CursorMovement.ABSOLUTE, this.getCurrentLine().endIndex);
+                }
+                return true;
+            }
+            case 259: {
+                if (key.hasCtrlOrCmd()) {
+                    Substring substring = this.getPreviousWordAtCursor();
+                    this.delete(substring.beginIndex - this.cursor);
+                } else {
+                    this.delete(-1);
+                }
+                return true;
+            }
+            case 261: {
+                if (key.hasCtrlOrCmd()) {
+                    Substring substring = this.getNextWordAtCursor();
+                    this.delete(substring.beginIndex - this.cursor);
+                } else {
+                    this.delete(1);
+                }
+                return true;
+            }
+            case 257: 
+            case 335: {
+                this.replaceSelection("\n");
+                return true;
+            }
+        }
+        return false;
+    }
 
-   public void moveCursor(double x, double y) {
-      int i = MathHelper.floor(x);
-      Objects.requireNonNull(this.textRenderer);
-      int j = MathHelper.floor(y / 9.0);
-      Substring substring = (Substring)this.lines.get(MathHelper.clamp(j, 0, this.lines.size() - 1));
-      int k = this.textRenderer.trimToWidth(this.text.substring(substring.beginIndex, substring.endIndex), i).length();
-      this.moveCursor(CursorMovement.ABSOLUTE, substring.beginIndex + k);
-   }
+    public Iterable<Substring> getLines() {
+        return this.lines;
+    }
 
-   public boolean handleSpecialKey(int keyCode) {
-      this.selecting = Screen.hasShiftDown();
-      if (Screen.isSelectAll(keyCode)) {
-         this.cursor = this.text.length();
-         this.selectionEnd = 0;
-         return true;
-      } else if (Screen.isCopy(keyCode)) {
-         MinecraftClient.getInstance().keyboard.setClipboard(this.getSelectedText());
-         return true;
-      } else if (Screen.isPaste(keyCode)) {
-         this.replaceSelection(MinecraftClient.getInstance().keyboard.getClipboard());
-         return true;
-      } else if (Screen.isCut(keyCode)) {
-         MinecraftClient.getInstance().keyboard.setClipboard(this.getSelectedText());
-         this.replaceSelection("");
-         return true;
-      } else {
-         Substring substring;
-         switch (keyCode) {
-            case 257:
-            case 335:
-               this.replaceSelection("\n");
-               return true;
-            case 259:
-               if (Screen.hasControlDown()) {
-                  substring = this.getPreviousWordAtCursor();
-                  this.delete(substring.beginIndex - this.cursor);
-               } else {
-                  this.delete(-1);
-               }
+    public boolean hasSelection() {
+        return this.selectionEnd != this.cursor;
+    }
 
-               return true;
-            case 261:
-               if (Screen.hasControlDown()) {
-                  substring = this.getNextWordAtCursor();
-                  this.delete(substring.beginIndex - this.cursor);
-               } else {
-                  this.delete(1);
-               }
+    @VisibleForTesting
+    public String getSelectedText() {
+        Substring substring = this.getSelection();
+        return this.text.substring(substring.beginIndex, substring.endIndex);
+    }
 
-               return true;
-            case 262:
-               if (Screen.hasControlDown()) {
-                  substring = this.getNextWordAtCursor();
-                  this.moveCursor(CursorMovement.ABSOLUTE, substring.beginIndex);
-               } else {
-                  this.moveCursor(CursorMovement.RELATIVE, 1);
-               }
+    private Substring getCurrentLine() {
+        return this.getOffsetLine(0);
+    }
 
-               return true;
-            case 263:
-               if (Screen.hasControlDown()) {
-                  substring = this.getPreviousWordAtCursor();
-                  this.moveCursor(CursorMovement.ABSOLUTE, substring.beginIndex);
-               } else {
-                  this.moveCursor(CursorMovement.RELATIVE, -1);
-               }
+    private Substring getOffsetLine(int offsetFromCurrent) {
+        int i = this.getCurrentLineIndex();
+        if (i < 0) {
+            LOGGER.error("Cursor is not within text (cursor = {}, length = {})", (Object)this.cursor, (Object)this.text.length());
+            return (Substring)this.lines.getLast();
+        }
+        return (Substring)this.lines.get(MathHelper.clamp((int)(i + offsetFromCurrent), (int)0, (int)(this.lines.size() - 1)));
+    }
 
-               return true;
-            case 264:
-               if (!Screen.hasControlDown()) {
-                  this.moveCursorLine(1);
-               }
-
-               return true;
-            case 265:
-               if (!Screen.hasControlDown()) {
-                  this.moveCursorLine(-1);
-               }
-
-               return true;
-            case 266:
-               this.moveCursor(CursorMovement.ABSOLUTE, 0);
-               return true;
-            case 267:
-               this.moveCursor(CursorMovement.END, 0);
-               return true;
-            case 268:
-               if (Screen.hasControlDown()) {
-                  this.moveCursor(CursorMovement.ABSOLUTE, 0);
-               } else {
-                  this.moveCursor(CursorMovement.ABSOLUTE, this.getCurrentLine().beginIndex);
-               }
-
-               return true;
-            case 269:
-               if (Screen.hasControlDown()) {
-                  this.moveCursor(CursorMovement.END, 0);
-               } else {
-                  this.moveCursor(CursorMovement.ABSOLUTE, this.getCurrentLine().endIndex);
-               }
-
-               return true;
-            default:
-               return false;
-         }
-      }
-   }
-
-   public Iterable getLines() {
-      return this.lines;
-   }
-
-   public boolean hasSelection() {
-      return this.selectionEnd != this.cursor;
-   }
-
-   @VisibleForTesting
-   public String getSelectedText() {
-      Substring substring = this.getSelection();
-      return this.text.substring(substring.beginIndex, substring.endIndex);
-   }
-
-   private Substring getCurrentLine() {
-      return this.getOffsetLine(0);
-   }
-
-   private Substring getOffsetLine(int offsetFromCurrent) {
-      int i = this.getCurrentLineIndex();
-      if (i < 0) {
-         LOGGER.error("Cursor is not within text (cursor = {}, length = {})", this.cursor, this.text.length());
-         return (Substring)this.lines.getLast();
-      } else {
-         return (Substring)this.lines.get(MathHelper.clamp(i + offsetFromCurrent, 0, this.lines.size() - 1));
-      }
-   }
-
-   @VisibleForTesting
-   public Substring getPreviousWordAtCursor() {
-      if (this.text.isEmpty()) {
-         return EditBox.Substring.EMPTY;
-      } else {
-         int i;
-         for(i = MathHelper.clamp(this.cursor, 0, this.text.length() - 1); i > 0 && Character.isWhitespace(this.text.charAt(i - 1)); --i) {
-         }
-
-         while(i > 0 && !Character.isWhitespace(this.text.charAt(i - 1))) {
+    @VisibleForTesting
+    public Substring getPreviousWordAtCursor() {
+        int i;
+        if (this.text.isEmpty()) {
+            return Substring.EMPTY;
+        }
+        for (i = MathHelper.clamp((int)this.cursor, (int)0, (int)(this.text.length() - 1)); i > 0 && Character.isWhitespace(this.text.charAt(i - 1)); --i) {
+        }
+        while (i > 0 && !Character.isWhitespace(this.text.charAt(i - 1))) {
             --i;
-         }
+        }
+        return new Substring(i, this.getWordEndIndex(i));
+    }
 
-         return new Substring(i, this.getWordEndIndex(i));
-      }
-   }
-
-   @VisibleForTesting
-   public Substring getNextWordAtCursor() {
-      if (this.text.isEmpty()) {
-         return EditBox.Substring.EMPTY;
-      } else {
-         int i;
-         for(i = MathHelper.clamp(this.cursor, 0, this.text.length() - 1); i < this.text.length() && !Character.isWhitespace(this.text.charAt(i)); ++i) {
-         }
-
-         while(i < this.text.length() && Character.isWhitespace(this.text.charAt(i))) {
+    @VisibleForTesting
+    public Substring getNextWordAtCursor() {
+        int i;
+        if (this.text.isEmpty()) {
+            return Substring.EMPTY;
+        }
+        for (i = MathHelper.clamp((int)this.cursor, (int)0, (int)(this.text.length() - 1)); i < this.text.length() && !Character.isWhitespace(this.text.charAt(i)); ++i) {
+        }
+        while (i < this.text.length() && Character.isWhitespace(this.text.charAt(i))) {
             ++i;
-         }
+        }
+        return new Substring(i, this.getWordEndIndex(i));
+    }
 
-         return new Substring(i, this.getWordEndIndex(i));
-      }
-   }
+    private int getWordEndIndex(int startIndex) {
+        int i;
+        for (i = startIndex; i < this.text.length() && !Character.isWhitespace(this.text.charAt(i)); ++i) {
+        }
+        return i;
+    }
 
-   private int getWordEndIndex(int startIndex) {
-      int i;
-      for(i = startIndex; i < this.text.length() && !Character.isWhitespace(this.text.charAt(i)); ++i) {
-      }
+    private void onChange() {
+        this.rewrap();
+        this.changeListener.accept(this.text);
+        this.cursorChangeListener.run();
+    }
 
-      return i;
-   }
-
-   private void onChange() {
-      this.rewrap();
-      this.changeListener.accept(this.text);
-      this.cursorChangeListener.run();
-   }
-
-   private void rewrap() {
-      this.lines.clear();
-      if (this.text.isEmpty()) {
-         this.lines.add(EditBox.Substring.EMPTY);
-      } else {
-         this.textRenderer.getTextHandler().wrapLines(this.text, this.width, Style.EMPTY, false, (style, start, end) -> {
-            this.lines.add(new Substring(start, end));
-         });
-         if (this.text.charAt(this.text.length() - 1) == '\n') {
+    private void rewrap() {
+        this.lines.clear();
+        if (this.text.isEmpty()) {
+            this.lines.add(Substring.EMPTY);
+            return;
+        }
+        this.textRenderer.getTextHandler().wrapLines(this.text, this.width, Style.EMPTY, false, (style, start, end) -> this.lines.add(new Substring(start, end)));
+        if (this.text.charAt(this.text.length() - 1) == '\n') {
             this.lines.add(new Substring(this.text.length(), this.text.length()));
-         }
+        }
+    }
 
-      }
-   }
+    private String truncateForReplacement(String value) {
+        if (this.hasMaxLength()) {
+            return StringHelper.truncate((String)value, (int)this.maxLength, (boolean)false);
+        }
+        return value;
+    }
 
-   private String truncateForReplacement(String value) {
-      return this.hasMaxLength() ? StringHelper.truncate(value, this.maxLength, false) : value;
-   }
+    private String truncate(String value) {
+        String string = value;
+        if (this.hasMaxLength()) {
+            int i = this.maxLength - this.text.length();
+            string = StringHelper.truncate((String)value, (int)i, (boolean)false);
+        }
+        return string;
+    }
 
-   private String truncate(String value) {
-      String string = value;
-      if (this.hasMaxLength()) {
-         int i = this.maxLength - this.text.length();
-         string = StringHelper.truncate(value, i, false);
-      }
-
-      return string;
-   }
-
-   private boolean exceedsMaxLines(String text) {
-      return this.hasMaxLines() && this.textRenderer.getTextHandler().wrapLines(text, this.width, Style.EMPTY).size() + (StringHelper.endsWithLineBreak(text) ? 1 : 0) > this.maxLines;
-   }
-
-   @Environment(EnvType.CLIENT)
-   protected static record Substring(int beginIndex, int endIndex) {
-      final int beginIndex;
-      final int endIndex;
-      static final Substring EMPTY = new Substring(0, 0);
-
-      protected Substring(int i, int j) {
-         this.beginIndex = i;
-         this.endIndex = j;
-      }
-
-      public int beginIndex() {
-         return this.beginIndex;
-      }
-
-      public int endIndex() {
-         return this.endIndex;
-      }
-   }
+    private boolean exceedsMaxLines(String text) {
+        return this.hasMaxLines() && this.textRenderer.getTextHandler().wrapLines(text, this.width, Style.EMPTY).size() + (StringHelper.endsWithLineBreak((String)text) ? 1 : 0) > this.maxLines;
+    }
 }
+

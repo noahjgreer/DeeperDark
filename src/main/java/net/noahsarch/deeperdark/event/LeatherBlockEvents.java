@@ -47,7 +47,7 @@ public class LeatherBlockEvents {
                  return ActionResult.PASS;
             }
 
-            if (!world.isClient) {
+            if (!world.isClient()) {
                 // Place Brown Wool (generic "soft" block) with Leather Block Display
                 // Using Brown Wool for map color and sound base
                 if (CustomBlockManager.place(world, placePos, stack, Blocks.ORANGE_WOOL, null)) {

@@ -1,38 +1,30 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.particle.ParticleTextureSheet
+ */
 package net.minecraft.client.particle;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.texture.SpriteAtlasTexture;
-import org.jetbrains.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
-public record ParticleTextureSheet(String name, @Nullable RenderLayer renderType) {
-   public static final ParticleTextureSheet TERRAIN_SHEET;
-   public static final ParticleTextureSheet PARTICLE_SHEET_OPAQUE;
-   public static final ParticleTextureSheet PARTICLE_SHEET_TRANSLUCENT;
-   public static final ParticleTextureSheet CUSTOM;
-   public static final ParticleTextureSheet NO_RENDER;
+@Environment(value=EnvType.CLIENT)
+public record ParticleTextureSheet(String name) {
+    private final String name;
+    public static final ParticleTextureSheet SINGLE_QUADS = new ParticleTextureSheet("SINGLE_QUADS");
+    public static final ParticleTextureSheet ITEM_PICKUP = new ParticleTextureSheet("ITEM_PICKUP");
+    public static final ParticleTextureSheet ELDER_GUARDIANS = new ParticleTextureSheet("ELDER_GUARDIANS");
+    public static final ParticleTextureSheet NO_RENDER = new ParticleTextureSheet("NO_RENDER");
 
-   public ParticleTextureSheet(String string, @Nullable RenderLayer renderLayer) {
-      this.name = string;
-      this.renderType = renderLayer;
-   }
+    public ParticleTextureSheet(String name) {
+        this.name = name;
+    }
 
-   public String name() {
-      return this.name;
-   }
-
-   @Nullable
-   public RenderLayer renderType() {
-      return this.renderType;
-   }
-
-   static {
-      TERRAIN_SHEET = new ParticleTextureSheet("TERRAIN_SHEET", RenderLayer.getTranslucentParticle(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE));
-      PARTICLE_SHEET_OPAQUE = new ParticleTextureSheet("PARTICLE_SHEET_OPAQUE", RenderLayer.getOpaqueParticle(SpriteAtlasTexture.PARTICLE_ATLAS_TEXTURE));
-      PARTICLE_SHEET_TRANSLUCENT = new ParticleTextureSheet("PARTICLE_SHEET_TRANSLUCENT", RenderLayer.getTranslucentParticle(SpriteAtlasTexture.PARTICLE_ATLAS_TEXTURE));
-      CUSTOM = new ParticleTextureSheet("CUSTOM", (RenderLayer)null);
-      NO_RENDER = new ParticleTextureSheet("NO_RENDER", (RenderLayer)null);
-   }
+    public String name() {
+        return this.name;
+    }
 }
+

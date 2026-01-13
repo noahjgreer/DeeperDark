@@ -1,37 +1,62 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.option.Perspective
+ */
 package net.minecraft.client.option;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
-@Environment(EnvType.CLIENT)
-public enum Perspective {
-   FIRST_PERSON(true, false),
-   THIRD_PERSON_BACK(false, false),
-   THIRD_PERSON_FRONT(false, true);
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
+public final class Perspective
+extends Enum<Perspective> {
+    public static final /* enum */ Perspective FIRST_PERSON = new Perspective("FIRST_PERSON", 0, true, false);
+    public static final /* enum */ Perspective THIRD_PERSON_BACK = new Perspective("THIRD_PERSON_BACK", 1, false, false);
+    public static final /* enum */ Perspective THIRD_PERSON_FRONT = new Perspective("THIRD_PERSON_FRONT", 2, false, true);
+    private static final Perspective[] VALUES;
+    private final boolean firstPerson;
+    private final boolean frontView;
+    private static final /* synthetic */ Perspective[] field_26670;
 
-   private static final Perspective[] VALUES = values();
-   private final boolean firstPerson;
-   private final boolean frontView;
+    public static Perspective[] values() {
+        return (Perspective[])field_26670.clone();
+    }
 
-   private Perspective(final boolean firstPerson, final boolean frontView) {
-      this.firstPerson = firstPerson;
-      this.frontView = frontView;
-   }
+    public static Perspective valueOf(String string) {
+        return Enum.valueOf(Perspective.class, string);
+    }
 
-   public boolean isFirstPerson() {
-      return this.firstPerson;
-   }
+    private Perspective(boolean firstPerson, boolean frontView) {
+        this.firstPerson = firstPerson;
+        this.frontView = frontView;
+    }
 
-   public boolean isFrontView() {
-      return this.frontView;
-   }
+    public boolean isFirstPerson() {
+        return this.firstPerson;
+    }
 
-   public Perspective next() {
-      return VALUES[(this.ordinal() + 1) % VALUES.length];
-   }
+    public boolean isFrontView() {
+        return this.frontView;
+    }
 
-   // $FF: synthetic method
-   private static Perspective[] method_36859() {
-      return new Perspective[]{FIRST_PERSON, THIRD_PERSON_BACK, THIRD_PERSON_FRONT};
-   }
+    public Perspective next() {
+        return VALUES[(this.ordinal() + 1) % VALUES.length];
+    }
+
+    private static /* synthetic */ Perspective[] method_36859() {
+        return new Perspective[]{FIRST_PERSON, THIRD_PERSON_BACK, THIRD_PERSON_FRONT};
+    }
+
+    static {
+        field_26670 = Perspective.method_36859();
+        VALUES = Perspective.values();
+    }
 }
+

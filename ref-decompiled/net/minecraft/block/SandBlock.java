@@ -1,29 +1,54 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.MapCodec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
+ *  net.minecraft.block.AbstractBlock$Settings
+ *  net.minecraft.block.BlockState
+ *  net.minecraft.block.ColoredFallingBlock
+ *  net.minecraft.block.SandBlock
+ *  net.minecraft.sound.AmbientDesertBlockSounds
+ *  net.minecraft.util.ColorCode
+ *  net.minecraft.util.math.BlockPos
+ *  net.minecraft.util.math.random.Random
+ *  net.minecraft.world.World
+ */
 package net.minecraft.block;
 
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.ColoredFallingBlock;
 import net.minecraft.sound.AmbientDesertBlockSounds;
 import net.minecraft.util.ColorCode;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 
-public class SandBlock extends ColoredFallingBlock {
-   public static final MapCodec CODEC = RecordCodecBuilder.mapCodec((instance) -> {
-      return instance.group(ColorCode.CODEC.fieldOf("falling_dust_color").forGetter((block) -> {
-         return block.color;
-      }), createSettingsCodec()).apply(instance, SandBlock::new);
-   });
+/*
+ * Exception performing whole class analysis ignored.
+ */
+public class SandBlock
+extends ColoredFallingBlock {
+    public static final MapCodec<SandBlock> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group((App)ColorCode.CODEC.fieldOf("falling_dust_color").forGetter(block -> block.color), (App)SandBlock.createSettingsCodec()).apply((Applicative)instance, SandBlock::new));
 
-   public MapCodec getCodec() {
-      return CODEC;
-   }
+    public MapCodec<SandBlock> getCodec() {
+        return CODEC;
+    }
 
-   public SandBlock(ColorCode colorCode, AbstractBlock.Settings settings) {
-      super(colorCode, settings);
-   }
+    public SandBlock(ColorCode colorCode, AbstractBlock.Settings settings) {
+        super(colorCode, settings);
+    }
 
-   public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
-      AmbientDesertBlockSounds.tryPlaySandSounds(world, pos, random);
-   }
+    public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
+        super.randomDisplayTick(state, world, pos, random);
+        AmbientDesertBlockSounds.tryPlaySandSounds((World)world, (BlockPos)pos, (Random)random);
+    }
 }
+

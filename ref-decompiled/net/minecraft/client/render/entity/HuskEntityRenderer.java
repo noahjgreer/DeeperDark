@@ -1,26 +1,43 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.render.entity.EntityRendererFactory$Context
+ *  net.minecraft.client.render.entity.HuskEntityRenderer
+ *  net.minecraft.client.render.entity.ZombieEntityRenderer
+ *  net.minecraft.client.render.entity.model.EntityModelLayers
+ *  net.minecraft.client.render.entity.state.LivingEntityRenderState
+ *  net.minecraft.client.render.entity.state.ZombieEntityRenderState
+ *  net.minecraft.util.Identifier
+ */
 package net.minecraft.client.render.entity;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.render.entity.ZombieEntityRenderer;
 import net.minecraft.client.render.entity.model.EntityModelLayers;
 import net.minecraft.client.render.entity.state.LivingEntityRenderState;
 import net.minecraft.client.render.entity.state.ZombieEntityRenderState;
 import net.minecraft.util.Identifier;
 
-@Environment(EnvType.CLIENT)
-public class HuskEntityRenderer extends ZombieEntityRenderer {
-   private static final Identifier TEXTURE = Identifier.ofVanilla("textures/entity/zombie/husk.png");
+@Environment(value=EnvType.CLIENT)
+public class HuskEntityRenderer
+extends ZombieEntityRenderer {
+    private static final Identifier TEXTURE = Identifier.ofVanilla((String)"textures/entity/zombie/husk.png");
 
-   public HuskEntityRenderer(EntityRendererFactory.Context context) {
-      super(context, EntityModelLayers.HUSK, EntityModelLayers.HUSK_BABY, EntityModelLayers.HUSK_INNER_ARMOR, EntityModelLayers.HUSK_OUTER_ARMOR, EntityModelLayers.HUSK_BABY_INNER_ARMOR, EntityModelLayers.HUSK_BABY_OUTER_ARMOR);
-   }
+    public HuskEntityRenderer(EntityRendererFactory.Context context) {
+        super(context, EntityModelLayers.HUSK, EntityModelLayers.HUSK_BABY, EntityModelLayers.HUSK_EQUIPMENT, EntityModelLayers.HUSK_BABY_EQUIPMENT);
+    }
 
-   public Identifier getTexture(ZombieEntityRenderState zombieEntityRenderState) {
-      return TEXTURE;
-   }
+    public Identifier getTexture(ZombieEntityRenderState zombieEntityRenderState) {
+        return TEXTURE;
+    }
 
-   // $FF: synthetic method
-   public Identifier getTexture(final LivingEntityRenderState state) {
-      return this.getTexture((ZombieEntityRenderState)state);
-   }
+    public /* synthetic */ Identifier getTexture(LivingEntityRenderState state) {
+        return this.getTexture((ZombieEntityRenderState)state);
+    }
 }
+

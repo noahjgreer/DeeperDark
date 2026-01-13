@@ -32,7 +32,7 @@ public class CustomBlockManager {
      * @return true if successfully placed, false if blocked.
      */
     public static boolean place(World world, BlockPos pos, ItemStack stack, Block baseBlock, Consumer<ItemDisplayEntity> displayConfigurator) {
-        if (world.isClient) return false;
+        if (world.isClient()) return false;
 
         // Collision Check: Prevent placing if entity is inside
         if (!world.canPlace(baseBlock.getDefaultState(), pos, ShapeContext.absent())) {
@@ -107,7 +107,7 @@ public class CustomBlockManager {
      */
     public static boolean onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player, Identifier targetModelId, BlockSoundGroup breakSound, Runnable customAction, java.util.function.UnaryOperator<ItemStack> dropTransformer) {
 
-        if (!world.isClient && world instanceof ServerWorld serverWorld) {
+        if (!world.isClient() && world instanceof ServerWorld serverWorld) {
             CustomBlockTracker tracker = CustomBlockTracker.get(serverWorld);
             if (tracker.hasBlock(pos)) {
                 // Remove from tracker
@@ -126,7 +126,7 @@ public class CustomBlockManager {
 
              if (modelId != null && modelId.equals(targetModelId)) {
                  // Drops
-                 if (!world.isClient && !player.isCreative() && player.canHarvest(state)) {
+                 if (!world.isClient() && !player.isCreative() && player.canHarvest(state)) {
                      ItemStack dropStack = stack;
                      if (dropTransformer != null) {
                          dropStack = dropTransformer.apply(stack);
@@ -137,7 +137,7 @@ public class CustomBlockManager {
                  // Clean up entity
                  display.discard();
 
-                 if (!world.isClient) {
+                 if (!world.isClient()) {
                      // Custom logic (like particles)
                      if (customAction != null) {
                          customAction.run();

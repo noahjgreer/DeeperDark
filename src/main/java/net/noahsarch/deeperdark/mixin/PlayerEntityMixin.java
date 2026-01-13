@@ -12,13 +12,13 @@ import net.minecraft.storage.WriteView;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.world.World;
+import net.noahsarch.deeperdark.duck.EntityAccessor;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(PlayerEntity.class)
 public abstract class PlayerEntityMixin extends LivingEntity implements Leashable {
@@ -53,8 +53,8 @@ public abstract class PlayerEntityMixin extends LivingEntity implements Leashabl
 
     @Inject(method = "tick", at = @At("TAIL"))
     private void tickLeash(CallbackInfo ci) {
-        if (!this.getWorld().isClient) {
-            Leashable.tickLeash((ServerWorld) this.getWorld(), (LivingEntity & Leashable) (Object) this);
+        if (!((EntityAccessor)this).deeperdark$getWorld().isClient()) {
+            Leashable.tickLeash((ServerWorld) ((EntityAccessor)this).deeperdark$getWorld(), (LivingEntity & Leashable) this);
         }
     }
 

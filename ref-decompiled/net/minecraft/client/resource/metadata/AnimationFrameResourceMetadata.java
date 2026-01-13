@@ -1,5 +1,21 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.datafixers.util.Either
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.resource.metadata.AnimationFrameResourceMetadata
+ *  net.minecraft.util.dynamic.Codecs
+ */
 package net.minecraft.client.resource.metadata;
 
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -8,41 +24,32 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.util.dynamic.Codecs;
 
-@Environment(EnvType.CLIENT)
-public record AnimationFrameResourceMetadata(int index, Optional time) {
-   public static final Codec BASE_CODEC = RecordCodecBuilder.create((instance) -> {
-      return instance.group(Codecs.NON_NEGATIVE_INT.fieldOf("index").forGetter(AnimationFrameResourceMetadata::index), Codecs.POSITIVE_INT.optionalFieldOf("time").forGetter(AnimationFrameResourceMetadata::time)).apply(instance, AnimationFrameResourceMetadata::new);
-   });
-   public static final Codec CODEC;
+@Environment(value=EnvType.CLIENT)
+public record AnimationFrameResourceMetadata(int index, Optional<Integer> time) {
+    private final int index;
+    private final Optional<Integer> time;
+    public static final Codec<AnimationFrameResourceMetadata> BASE_CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Codecs.NON_NEGATIVE_INT.fieldOf("index").forGetter(AnimationFrameResourceMetadata::index), (App)Codecs.POSITIVE_INT.optionalFieldOf("time").forGetter(AnimationFrameResourceMetadata::time)).apply((Applicative)instance, AnimationFrameResourceMetadata::new));
+    public static final Codec<AnimationFrameResourceMetadata> CODEC = Codec.either((Codec)Codecs.NON_NEGATIVE_INT, (Codec)BASE_CODEC).xmap(either -> (AnimationFrameResourceMetadata)either.map(AnimationFrameResourceMetadata::new, metadata -> metadata), metadatax -> metadatax.time.isPresent() ? Either.right((Object)metadatax) : Either.left((Object)metadatax.index));
 
-   public AnimationFrameResourceMetadata(int index) {
-      this(index, Optional.empty());
-   }
+    public AnimationFrameResourceMetadata(int index) {
+        this(index, Optional.empty());
+    }
 
-   public AnimationFrameResourceMetadata(int index, Optional optional) {
-      this.index = index;
-      this.time = optional;
-   }
+    public AnimationFrameResourceMetadata(int index, Optional<Integer> time) {
+        this.index = index;
+        this.time = time;
+    }
 
-   public int getTime(int defaultTime) {
-      return (Integer)this.time.orElse(defaultTime);
-   }
+    public int getTime(int defaultTime) {
+        return this.time.orElse(defaultTime);
+    }
 
-   public int index() {
-      return this.index;
-   }
+    public int index() {
+        return this.index;
+    }
 
-   public Optional time() {
-      return this.time;
-   }
-
-   static {
-      CODEC = Codec.either(Codecs.NON_NEGATIVE_INT, BASE_CODEC).xmap((either) -> {
-         return (AnimationFrameResourceMetadata)either.map(AnimationFrameResourceMetadata::new, (metadata) -> {
-            return metadata;
-         });
-      }, (metadatax) -> {
-         return metadatax.time.isPresent() ? Either.right(metadatax) : Either.left(metadatax.index);
-      });
-   }
+    public Optional<Integer> time() {
+        return this.time;
+    }
 }
+

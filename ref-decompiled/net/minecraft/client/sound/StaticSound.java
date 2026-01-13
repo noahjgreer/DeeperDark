@@ -1,3 +1,14 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.sound.AlUtil
+ *  net.minecraft.client.sound.StaticSound
+ *  org.jspecify.annotations.Nullable
+ *  org.lwjgl.openal.AL10
+ */
 package net.minecraft.client.sound;
 
 import java.nio.ByteBuffer;
@@ -5,62 +16,58 @@ import java.util.OptionalInt;
 import javax.sound.sampled.AudioFormat;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.client.sound.AlUtil;
+import org.jspecify.annotations.Nullable;
 import org.lwjgl.openal.AL10;
 
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 public class StaticSound {
-   @Nullable
-   private ByteBuffer sample;
-   private final AudioFormat format;
-   private boolean hasBuffer;
-   private int streamBufferPointer;
+    private @Nullable ByteBuffer sample;
+    private final AudioFormat format;
+    private boolean hasBuffer;
+    private int streamBufferPointer;
 
-   public StaticSound(ByteBuffer sample, AudioFormat format) {
-      this.sample = sample;
-      this.format = format;
-   }
+    public StaticSound(ByteBuffer sample, AudioFormat format) {
+        this.sample = sample;
+        this.format = format;
+    }
 
-   OptionalInt getStreamBufferPointer() {
-      if (!this.hasBuffer) {
-         if (this.sample == null) {
-            return OptionalInt.empty();
-         }
+    OptionalInt getStreamBufferPointer() {
+        if (!this.hasBuffer) {
+            if (this.sample == null) {
+                return OptionalInt.empty();
+            }
+            int i = AlUtil.getFormatId((AudioFormat)this.format);
+            int[] is = new int[1];
+            AL10.alGenBuffers((int[])is);
+            if (AlUtil.checkErrors((String)"Creating buffer")) {
+                return OptionalInt.empty();
+            }
+            AL10.alBufferData((int)is[0], (int)i, (ByteBuffer)this.sample, (int)((int)this.format.getSampleRate()));
+            if (AlUtil.checkErrors((String)"Assigning buffer data")) {
+                return OptionalInt.empty();
+            }
+            this.streamBufferPointer = is[0];
+            this.hasBuffer = true;
+            this.sample = null;
+        }
+        return OptionalInt.of(this.streamBufferPointer);
+    }
 
-         int i = AlUtil.getFormatId(this.format);
-         int[] is = new int[1];
-         AL10.alGenBuffers(is);
-         if (AlUtil.checkErrors("Creating buffer")) {
-            return OptionalInt.empty();
-         }
+    public void close() {
+        if (this.hasBuffer) {
+            AL10.alDeleteBuffers((int[])new int[]{this.streamBufferPointer});
+            if (AlUtil.checkErrors((String)"Deleting stream buffers")) {
+                return;
+            }
+        }
+        this.hasBuffer = false;
+    }
 
-         AL10.alBufferData(is[0], i, this.sample, (int)this.format.getSampleRate());
-         if (AlUtil.checkErrors("Assigning buffer data")) {
-            return OptionalInt.empty();
-         }
-
-         this.streamBufferPointer = is[0];
-         this.hasBuffer = true;
-         this.sample = null;
-      }
-
-      return OptionalInt.of(this.streamBufferPointer);
-   }
-
-   public void close() {
-      if (this.hasBuffer) {
-         AL10.alDeleteBuffers(new int[]{this.streamBufferPointer});
-         if (AlUtil.checkErrors("Deleting stream buffers")) {
-            return;
-         }
-      }
-
-      this.hasBuffer = false;
-   }
-
-   public OptionalInt takeStreamBufferPointer() {
-      OptionalInt optionalInt = this.getStreamBufferPointer();
-      this.hasBuffer = false;
-      return optionalInt;
-   }
+    public OptionalInt takeStreamBufferPointer() {
+        OptionalInt optionalInt = this.getStreamBufferPointer();
+        this.hasBuffer = false;
+        return optionalInt;
+    }
 }
+

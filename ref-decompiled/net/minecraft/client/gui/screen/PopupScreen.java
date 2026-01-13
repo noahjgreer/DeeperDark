@@ -1,187 +1,134 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.gl.RenderPipelines
+ *  net.minecraft.client.gui.DrawContext
+ *  net.minecraft.client.gui.ScreenRect
+ *  net.minecraft.client.gui.screen.PopupScreen
+ *  net.minecraft.client.gui.screen.PopupScreen$Button
+ *  net.minecraft.client.gui.screen.Screen
+ *  net.minecraft.client.gui.widget.ButtonWidget
+ *  net.minecraft.client.gui.widget.ClickableWidget
+ *  net.minecraft.client.gui.widget.DirectionalLayoutWidget
+ *  net.minecraft.client.gui.widget.IconWidget
+ *  net.minecraft.client.gui.widget.MultilineTextWidget
+ *  net.minecraft.client.gui.widget.SimplePositioningWidget
+ *  net.minecraft.client.gui.widget.Widget
+ *  net.minecraft.screen.ScreenTexts
+ *  net.minecraft.text.Text
+ *  net.minecraft.util.Formatting
+ *  net.minecraft.util.Identifier
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.gui.screen;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.function.Consumer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.ScreenRect;
+import net.minecraft.client.gui.screen.PopupScreen;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.DirectionalLayoutWidget;
 import net.minecraft.client.gui.widget.IconWidget;
 import net.minecraft.client.gui.widget.MultilineTextWidget;
 import net.minecraft.client.gui.widget.SimplePositioningWidget;
+import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
-public class PopupScreen extends Screen {
-   private static final Identifier BACKGROUND_TEXTURE = Identifier.ofVanilla("popup/background");
-   private static final int VERTICAL_SPACING = 12;
-   private static final int MARGIN_WIDTH = 18;
-   private static final int BUTTON_HORIZONTAL_SPACING = 6;
-   private static final int IMAGE_WIDTH = 130;
-   private static final int IMAGE_HEIGHT = 64;
-   private static final int DEFAULT_WIDTH = 250;
-   private final Screen backgroundScreen;
-   @Nullable
-   private final Identifier image;
-   private final Text message;
-   private final List buttons;
-   @Nullable
-   private final Runnable onClosed;
-   private final int innerWidth;
-   private final DirectionalLayoutWidget layout = DirectionalLayoutWidget.vertical();
+@Environment(value=EnvType.CLIENT)
+public class PopupScreen
+extends Screen {
+    private static final Identifier BACKGROUND_TEXTURE = Identifier.ofVanilla((String)"popup/background");
+    private static final int VERTICAL_SPACING = 12;
+    private static final int MARGIN_WIDTH = 18;
+    private static final int BUTTON_HORIZONTAL_SPACING = 6;
+    private static final int IMAGE_WIDTH = 130;
+    private static final int IMAGE_HEIGHT = 64;
+    private static final int DEFAULT_WIDTH = 250;
+    private final Screen backgroundScreen;
+    private final @Nullable Identifier image;
+    private final Text message;
+    private final List<Button> buttons;
+    private final @Nullable Runnable onClosed;
+    private final int innerWidth;
+    private final DirectionalLayoutWidget layout = DirectionalLayoutWidget.vertical();
 
-   PopupScreen(Screen backgroundScreen, int width, @Nullable Identifier image, Text title, Text message, List buttons, @Nullable Runnable onClosed) {
-      super(title);
-      this.backgroundScreen = backgroundScreen;
-      this.image = image;
-      this.message = message;
-      this.buttons = buttons;
-      this.onClosed = onClosed;
-      this.innerWidth = width - 36;
-   }
+    PopupScreen(Screen backgroundScreen, int width, @Nullable Identifier image, Text title, Text message, List<Button> buttons, @Nullable Runnable onClosed) {
+        super(title);
+        this.backgroundScreen = backgroundScreen;
+        this.image = image;
+        this.message = message;
+        this.buttons = buttons;
+        this.onClosed = onClosed;
+        this.innerWidth = width - 36;
+    }
 
-   public void onDisplayed() {
-      super.onDisplayed();
-      this.backgroundScreen.blur();
-   }
+    public void onDisplayed() {
+        super.onDisplayed();
+        this.backgroundScreen.blur();
+    }
 
-   protected void init() {
-      this.backgroundScreen.init(this.client, this.width, this.height);
-      this.layout.spacing(12).getMainPositioner().alignHorizontalCenter();
-      this.layout.add((new MultilineTextWidget(this.title.copy().formatted(Formatting.BOLD), this.textRenderer)).setMaxWidth(this.innerWidth).setCentered(true));
-      if (this.image != null) {
-         this.layout.add(IconWidget.create(130, 64, this.image, 130, 64));
-      }
+    protected void init() {
+        this.backgroundScreen.init(this.width, this.height);
+        this.layout.spacing(12).getMainPositioner().alignHorizontalCenter();
+        this.layout.add((Widget)new MultilineTextWidget((Text)this.title.copy().formatted(Formatting.BOLD), this.textRenderer).setMaxWidth(this.innerWidth).setCentered(true));
+        if (this.image != null) {
+            this.layout.add((Widget)IconWidget.create((int)130, (int)64, (Identifier)this.image, (int)130, (int)64));
+        }
+        this.layout.add((Widget)new MultilineTextWidget(this.message, this.textRenderer).setMaxWidth(this.innerWidth).setCentered(true));
+        this.layout.add((Widget)this.createButtonLayout());
+        this.layout.forEachChild(child -> {
+            ClickableWidget cfr_ignored_0 = (ClickableWidget)this.addDrawableChild(child);
+        });
+        this.refreshWidgetPositions();
+    }
 
-      this.layout.add((new MultilineTextWidget(this.message, this.textRenderer)).setMaxWidth(this.innerWidth).setCentered(true));
-      this.layout.add(this.createButtonLayout());
-      this.layout.forEachChild((child) -> {
-         ClickableWidget var10000 = (ClickableWidget)this.addDrawableChild(child);
-      });
-      this.refreshWidgetPositions();
-   }
+    private DirectionalLayoutWidget createButtonLayout() {
+        int i = 6 * (this.buttons.size() - 1);
+        int j = Math.min((this.innerWidth - i) / this.buttons.size(), 150);
+        DirectionalLayoutWidget directionalLayoutWidget = DirectionalLayoutWidget.horizontal();
+        directionalLayoutWidget.spacing(6);
+        for (Button button2 : this.buttons) {
+            directionalLayoutWidget.add((Widget)ButtonWidget.builder((Text)button2.message(), button -> button2.action().accept(this)).width(j).build());
+        }
+        return directionalLayoutWidget;
+    }
 
-   private DirectionalLayoutWidget createButtonLayout() {
-      int i = 6 * (this.buttons.size() - 1);
-      int j = Math.min((this.innerWidth - i) / this.buttons.size(), 150);
-      DirectionalLayoutWidget directionalLayoutWidget = DirectionalLayoutWidget.horizontal();
-      directionalLayoutWidget.spacing(6);
-      Iterator var4 = this.buttons.iterator();
+    protected void refreshWidgetPositions() {
+        this.backgroundScreen.resize(this.width, this.height);
+        this.layout.refreshPositions();
+        SimplePositioningWidget.setPos((Widget)this.layout, (ScreenRect)this.getNavigationFocus());
+    }
 
-      while(var4.hasNext()) {
-         Button button = (Button)var4.next();
-         directionalLayoutWidget.add(ButtonWidget.builder(button.message(), (buttonx) -> {
-            button.action().accept(this);
-         }).width(j).build());
-      }
+    public void renderBackground(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
+        this.backgroundScreen.renderBackground(context, mouseX, mouseY, deltaTicks);
+        context.createNewRootLayer();
+        this.backgroundScreen.render(context, -1, -1, deltaTicks);
+        context.createNewRootLayer();
+        this.renderInGameBackground(context);
+        context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, BACKGROUND_TEXTURE, this.layout.getX() - 18, this.layout.getY() - 18, this.layout.getWidth() + 36, this.layout.getHeight() + 36);
+    }
 
-      return directionalLayoutWidget;
-   }
+    public Text getNarratedTitle() {
+        return ScreenTexts.joinSentences((Text[])new Text[]{this.title, this.message});
+    }
 
-   protected void refreshWidgetPositions() {
-      this.backgroundScreen.resize(this.client, this.width, this.height);
-      this.layout.refreshPositions();
-      SimplePositioningWidget.setPos(this.layout, this.getNavigationFocus());
-   }
-
-   public void renderBackground(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
-      this.backgroundScreen.renderBackground(context, mouseX, mouseY, deltaTicks);
-      context.createNewRootLayer();
-      this.backgroundScreen.render(context, -1, -1, deltaTicks);
-      context.createNewRootLayer();
-      this.renderInGameBackground(context);
-      context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, BACKGROUND_TEXTURE, this.layout.getX() - 18, this.layout.getY() - 18, this.layout.getWidth() + 36, this.layout.getHeight() + 36);
-   }
-
-   public Text getNarratedTitle() {
-      return ScreenTexts.joinSentences(this.title, this.message);
-   }
-
-   public void close() {
-      if (this.onClosed != null) {
-         this.onClosed.run();
-      }
-
-      this.client.setScreen(this.backgroundScreen);
-   }
-
-   @Environment(EnvType.CLIENT)
-   static record Button(Text message, Consumer action) {
-      Button(Text text, Consumer consumer) {
-         this.message = text;
-         this.action = consumer;
-      }
-
-      public Text message() {
-         return this.message;
-      }
-
-      public Consumer action() {
-         return this.action;
-      }
-   }
-
-   @Environment(EnvType.CLIENT)
-   public static class Builder {
-      private final Screen backgroundScreen;
-      private final Text title;
-      private Text message;
-      private int width;
-      @Nullable
-      private Identifier image;
-      private final List buttons;
-      @Nullable
-      private Runnable onClosed;
-
-      public Builder(Screen backgroundScreen, Text title) {
-         this.message = ScreenTexts.EMPTY;
-         this.width = 250;
-         this.buttons = new ArrayList();
-         this.onClosed = null;
-         this.backgroundScreen = backgroundScreen;
-         this.title = title;
-      }
-
-      public Builder width(int width) {
-         this.width = width;
-         return this;
-      }
-
-      public Builder image(Identifier image) {
-         this.image = image;
-         return this;
-      }
-
-      public Builder message(Text message) {
-         this.message = message;
-         return this;
-      }
-
-      public Builder button(Text message, Consumer action) {
-         this.buttons.add(new Button(message, action));
-         return this;
-      }
-
-      public Builder onClosed(Runnable onClosed) {
-         this.onClosed = onClosed;
-         return this;
-      }
-
-      public PopupScreen build() {
-         if (this.buttons.isEmpty()) {
-            throw new IllegalStateException("Popup must have at least one button");
-         } else {
-            return new PopupScreen(this.backgroundScreen, this.width, this.image, this.title, this.message, List.copyOf(this.buttons), this.onClosed);
-         }
-      }
-   }
+    public void close() {
+        if (this.onClosed != null) {
+            this.onClosed.run();
+        }
+        this.client.setScreen(this.backgroundScreen);
+    }
 }
+

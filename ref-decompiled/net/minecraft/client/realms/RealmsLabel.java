@@ -1,3 +1,15 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.MinecraftClient
+ *  net.minecraft.client.gui.DrawContext
+ *  net.minecraft.client.gui.Drawable
+ *  net.minecraft.client.realms.RealmsLabel
+ *  net.minecraft.text.Text
+ */
 package net.minecraft.client.realms;
 
 import net.fabricmc.api.EnvType;
@@ -7,25 +19,27 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.text.Text;
 
-@Environment(EnvType.CLIENT)
-public class RealmsLabel implements Drawable {
-   private final Text text;
-   private final int x;
-   private final int y;
-   private final int color;
+@Environment(value=EnvType.CLIENT)
+public class RealmsLabel
+implements Drawable {
+    private final Text text;
+    private final int x;
+    private final int y;
+    private final int color;
 
-   public RealmsLabel(Text text, int x, int y, int color) {
-      this.text = text;
-      this.x = x;
-      this.y = y;
-      this.color = color;
-   }
+    public RealmsLabel(Text text, int x, int y, int color) {
+        this.text = text;
+        this.x = x;
+        this.y = y;
+        this.color = color;
+    }
 
-   public void render(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
-      context.drawCenteredTextWithShadow(MinecraftClient.getInstance().textRenderer, this.text, this.x, this.y, this.color);
-   }
+    public void render(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
+        context.drawCenteredTextWithShadow(MinecraftClient.getInstance().textRenderer, this.text, this.x, this.y, this.color);
+    }
 
-   public Text getText() {
-      return this.text;
-   }
+    public Text getText() {
+        return this.text;
+    }
 }
+

@@ -1,11 +1,31 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.blaze3d.buffers.GpuBufferSlice
+ *  com.mojang.blaze3d.buffers.Std140SizeCalculator
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.gl.DynamicUniformStorage
+ *  net.minecraft.client.gl.DynamicUniformStorage$Uploadable
+ *  net.minecraft.client.gl.DynamicUniforms
+ *  net.minecraft.client.gl.DynamicUniforms$ChunkSectionsValue
+ *  net.minecraft.client.gl.DynamicUniforms$TransformsValue
+ *  org.joml.Matrix4f
+ *  org.joml.Matrix4fc
+ *  org.joml.Vector3f
+ *  org.joml.Vector3fc
+ *  org.joml.Vector4f
+ *  org.joml.Vector4fc
+ */
 package net.minecraft.client.gl;
 
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
-import com.mojang.blaze3d.buffers.Std140Builder;
 import com.mojang.blaze3d.buffers.Std140SizeCalculator;
-import java.nio.ByteBuffer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.gl.DynamicUniformStorage;
+import net.minecraft.client.gl.DynamicUniforms;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 import org.joml.Vector3f;
@@ -13,64 +33,36 @@ import org.joml.Vector3fc;
 import org.joml.Vector4f;
 import org.joml.Vector4fc;
 
-@Environment(EnvType.CLIENT)
-public class DynamicUniforms implements AutoCloseable {
-   public static final int SIZE = (new Std140SizeCalculator()).putMat4f().putVec4().putVec3().putMat4f().putFloat().get();
-   private static final int DEFAULT_CAPACITY = 2;
-   private final DynamicUniformStorage storage;
+@Environment(value=EnvType.CLIENT)
+public class DynamicUniforms
+implements AutoCloseable {
+    public static final int TRANSFORMS_SIZE = new Std140SizeCalculator().putMat4f().putVec4().putVec3().putMat4f().get();
+    public static final int CHUNK_SECTIONS_SIZE = new Std140SizeCalculator().putMat4f().putFloat().putIVec2().putIVec3().get();
+    private static final int DEFAULT_CAPACITY = 2;
+    private final DynamicUniformStorage<TransformsValue> transformsStorage = new DynamicUniformStorage("Dynamic Transforms UBO", TRANSFORMS_SIZE, 2);
+    private final DynamicUniformStorage<ChunkSectionsValue> chunkSectionsStorage = new DynamicUniformStorage("Chunk Sections UBO", CHUNK_SECTIONS_SIZE, 2);
 
-   public DynamicUniforms() {
-      this.storage = new DynamicUniformStorage("Dynamic Transforms UBO", SIZE, 2);
-   }
+    public void clear() {
+        this.transformsStorage.clear();
+        this.chunkSectionsStorage.clear();
+    }
 
-   public void clear() {
-      this.storage.clear();
-   }
+    @Override
+    public void close() {
+        this.transformsStorage.close();
+        this.chunkSectionsStorage.close();
+    }
 
-   public void close() {
-      this.storage.close();
-   }
+    public GpuBufferSlice write(Matrix4fc modelView, Vector4fc colorModulator, Vector3fc modelOffset, Matrix4fc textureMatrix) {
+        return this.transformsStorage.write((DynamicUniformStorage.Uploadable)new TransformsValue((Matrix4fc)new Matrix4f(modelView), (Vector4fc)new Vector4f(colorModulator), (Vector3fc)new Vector3f(modelOffset), (Matrix4fc)new Matrix4f(textureMatrix)));
+    }
 
-   public GpuBufferSlice write(Matrix4fc modelView, Vector4fc colorModulator, Vector3fc modelOffset, Matrix4fc textureMatrix, float lineWidth) {
-      return this.storage.write(new UniformValue(new Matrix4f(modelView), new Vector4f(colorModulator), new Vector3f(modelOffset), new Matrix4f(textureMatrix), lineWidth));
-   }
+    public GpuBufferSlice[] writeTransforms(TransformsValue ... values) {
+        return this.transformsStorage.writeAll((DynamicUniformStorage.Uploadable[])values);
+    }
 
-   public GpuBufferSlice[] writeAll(UniformValue... values) {
-      return this.storage.writeAll(values);
-   }
-
-   @Environment(EnvType.CLIENT)
-   public static record UniformValue(Matrix4fc modelView, Vector4fc colorModulator, Vector3fc modelOffset, Matrix4fc textureMatrix, float lineWidth) implements DynamicUniformStorage.Uploadable {
-      public UniformValue(Matrix4fc matrix4fc, Vector4fc vector4fc, Vector3fc vector3fc, Matrix4fc matrix4fc2, float f) {
-         this.modelView = matrix4fc;
-         this.colorModulator = vector4fc;
-         this.modelOffset = vector3fc;
-         this.textureMatrix = matrix4fc2;
-         this.lineWidth = f;
-      }
-
-      public void write(ByteBuffer buffer) {
-         Std140Builder.intoBuffer(buffer).putMat4f(this.modelView).putVec4(this.colorModulator).putVec3(this.modelOffset).putMat4f(this.textureMatrix).putFloat(this.lineWidth);
-      }
-
-      public Matrix4fc modelView() {
-         return this.modelView;
-      }
-
-      public Vector4fc colorModulator() {
-         return this.colorModulator;
-      }
-
-      public Vector3fc modelOffset() {
-         return this.modelOffset;
-      }
-
-      public Matrix4fc textureMatrix() {
-         return this.textureMatrix;
-      }
-
-      public float lineWidth() {
-         return this.lineWidth;
-      }
-   }
+    public GpuBufferSlice[] writeChunkSections(ChunkSectionsValue ... values) {
+        return this.chunkSectionsStorage.writeAll((DynamicUniformStorage.Uploadable[])values);
+    }
 }
+

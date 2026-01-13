@@ -1,3 +1,18 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.MinecraftClient
+ *  net.minecraft.client.gui.DrawContext
+ *  net.minecraft.client.gui.screen.narration.NarrationMessageBuilder
+ *  net.minecraft.client.gui.screen.narration.NarrationPart
+ *  net.minecraft.client.gui.widget.ClickableWidget
+ *  net.minecraft.client.gui.widget.ItemStackWidget
+ *  net.minecraft.item.ItemStack
+ *  net.minecraft.text.Text
+ */
 package net.minecraft.client.gui.widget;
 
 import net.fabricmc.api.EnvType;
@@ -6,45 +21,49 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.screen.narration.NarrationPart;
+import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 
-@Environment(EnvType.CLIENT)
-public class ItemStackWidget extends ClickableWidget {
-   private final MinecraftClient client;
-   private final int xOffset;
-   private final int yOffset;
-   private final ItemStack stack;
-   private final boolean drawOverlay;
-   private final boolean hasTooltip;
+@Environment(value=EnvType.CLIENT)
+public class ItemStackWidget
+extends ClickableWidget {
+    private final MinecraftClient client;
+    private final int xOffset;
+    private final int yOffset;
+    private final ItemStack stack;
+    private final boolean drawOverlay;
+    private final boolean hasTooltip;
 
-   public ItemStackWidget(MinecraftClient client, int x, int y, int width, int height, Text message, ItemStack stack, boolean drawOverlay, boolean hasTooltip) {
-      super(0, 0, width, height, message);
-      this.client = client;
-      this.xOffset = x;
-      this.yOffset = y;
-      this.stack = stack;
-      this.drawOverlay = drawOverlay;
-      this.hasTooltip = hasTooltip;
-   }
+    public ItemStackWidget(MinecraftClient client, int x, int y, int width, int height, Text message, ItemStack stack, boolean drawOverlay, boolean hasTooltip) {
+        super(0, 0, width, height, message);
+        this.client = client;
+        this.xOffset = x;
+        this.yOffset = y;
+        this.stack = stack;
+        this.drawOverlay = drawOverlay;
+        this.hasTooltip = hasTooltip;
+    }
 
-   protected void renderWidget(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
-      context.drawItem(this.stack, this.getX() + this.xOffset, this.getY() + this.yOffset, 0);
-      if (this.drawOverlay) {
-         context.drawStackOverlay(this.client.textRenderer, this.stack, this.getX() + this.xOffset, this.getY() + this.yOffset, (String)null);
-      }
+    protected void renderWidget(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
+        context.drawItem(this.stack, this.getX() + this.xOffset, this.getY() + this.yOffset, 0);
+        if (this.drawOverlay) {
+            context.drawStackOverlay(this.client.textRenderer, this.stack, this.getX() + this.xOffset, this.getY() + this.yOffset, null);
+        }
+        if (this.isFocused()) {
+            context.drawStrokedRectangle(this.getX(), this.getY(), this.getWidth(), this.getHeight(), -1);
+        }
+        if (this.hasTooltip && this.isSelected()) {
+            this.renderTooltip(context, mouseX, mouseY);
+        }
+    }
 
-      if (this.isFocused()) {
-         context.drawBorder(this.getX(), this.getY(), this.getWidth(), this.getHeight(), -1);
-      }
+    protected void renderTooltip(DrawContext context, int mouseX, int mouseY) {
+        context.drawItemTooltip(this.client.textRenderer, this.stack, mouseX, mouseY);
+    }
 
-      if (this.hasTooltip && this.isSelected()) {
-         context.drawItemTooltip(this.client.textRenderer, this.stack, mouseX, mouseY);
-      }
-
-   }
-
-   protected void appendClickableNarrations(NarrationMessageBuilder builder) {
-      builder.put(NarrationPart.TITLE, (Text)Text.translatable("narration.item", this.stack.getName()));
-   }
+    protected void appendClickableNarrations(NarrationMessageBuilder builder) {
+        builder.put(NarrationPart.TITLE, (Text)Text.translatable((String)"narration.item", (Object[])new Object[]{this.stack.getName()}));
+    }
 }
+

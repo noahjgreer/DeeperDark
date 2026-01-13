@@ -1,38 +1,57 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.google.gson.JsonElement
+ *  com.mojang.logging.LogUtils
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.realms.dto.Backup
+ *  net.minecraft.client.realms.dto.BackupList
+ *  net.minecraft.util.LenientJsonParser
+ *  org.slf4j.Logger
+ */
 package net.minecraft.client.realms.dto;
 
-import com.google.common.collect.Lists;
 import com.google.gson.JsonElement;
 import com.mojang.logging.LogUtils;
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.realms.dto.Backup;
 import net.minecraft.util.LenientJsonParser;
 import org.slf4j.Logger;
 
-@Environment(EnvType.CLIENT)
-public class BackupList extends ValueObject {
-   private static final Logger LOGGER = LogUtils.getLogger();
-   public List backups;
+@Environment(value=EnvType.CLIENT)
+public record BackupList(List<Backup> backups) {
+    private final List<Backup> backups;
+    private static final Logger LOGGER = LogUtils.getLogger();
 
-   public static BackupList parse(String json) {
-      BackupList backupList = new BackupList();
-      backupList.backups = Lists.newArrayList();
+    public BackupList(List<Backup> backups) {
+        this.backups = backups;
+    }
 
-      try {
-         JsonElement jsonElement = LenientJsonParser.parse(json).getAsJsonObject().get("backups");
-         if (jsonElement.isJsonArray()) {
-            Iterator var3 = jsonElement.getAsJsonArray().iterator();
-
-            while(var3.hasNext()) {
-               JsonElement jsonElement2 = (JsonElement)var3.next();
-               backupList.backups.add(Backup.parse(jsonElement2));
+    public static BackupList parse(String json) {
+        ArrayList<Backup> list = new ArrayList<Backup>();
+        try {
+            JsonElement jsonElement = LenientJsonParser.parse((String)json).getAsJsonObject().get("backups");
+            if (jsonElement.isJsonArray()) {
+                for (JsonElement jsonElement2 : jsonElement.getAsJsonArray()) {
+                    Backup backup = Backup.parse((JsonElement)jsonElement2);
+                    if (backup == null) continue;
+                    list.add(backup);
+                }
             }
-         }
-      } catch (Exception var5) {
-         LOGGER.error("Could not parse BackupList: {}", var5.getMessage());
-      }
+        }
+        catch (Exception exception) {
+            LOGGER.error("Could not parse BackupList", (Throwable)exception);
+        }
+        return new BackupList(list);
+    }
 
-      return backupList;
-   }
+    public List<Backup> backups() {
+        return this.backups;
+    }
 }
+

@@ -1,27 +1,43 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.block.BlockState
+ *  net.minecraft.block.entity.BlockEntityType
+ *  net.minecraft.block.entity.HangingSignBlockEntity
+ *  net.minecraft.block.entity.SignBlockEntity
+ *  net.minecraft.sound.SoundEvent
+ *  net.minecraft.sound.SoundEvents
+ *  net.minecraft.util.math.BlockPos
+ */
 package net.minecraft.block.entity;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 
-public class HangingSignBlockEntity extends SignBlockEntity {
-   private static final int MAX_TEXT_WIDTH = 60;
-   private static final int TEXT_LINE_HEIGHT = 9;
+public class HangingSignBlockEntity
+extends SignBlockEntity {
+    private static final int MAX_TEXT_WIDTH = 60;
+    private static final int TEXT_LINE_HEIGHT = 9;
 
-   public HangingSignBlockEntity(BlockPos blockPos, BlockState blockState) {
-      super(BlockEntityType.HANGING_SIGN, blockPos, blockState);
-   }
+    public HangingSignBlockEntity(BlockPos blockPos, BlockState blockState) {
+        super(BlockEntityType.HANGING_SIGN, blockPos, blockState);
+    }
 
-   public int getTextLineHeight() {
-      return 9;
-   }
+    public int getTextLineHeight() {
+        return 9;
+    }
 
-   public int getMaxTextWidth() {
-      return 60;
-   }
+    public int getMaxTextWidth() {
+        return 60;
+    }
 
-   public SoundEvent getInteractionFailSound() {
-      return SoundEvents.BLOCK_HANGING_SIGN_WAXED_INTERACT_FAIL;
-   }
+    public SoundEvent getInteractionFailSound() {
+        return SoundEvents.BLOCK_HANGING_SIGN_WAXED_INTERACT_FAIL;
+    }
 }
+

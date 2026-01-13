@@ -1,13 +1,40 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
+ *  net.minecraft.advancement.AdvancementRewards
+ *  net.minecraft.command.permission.LeveledPermissionPredicate
+ *  net.minecraft.command.permission.PermissionPredicate
+ *  net.minecraft.entity.ItemEntity
+ *  net.minecraft.item.ItemStack
+ *  net.minecraft.loot.LootTable
+ *  net.minecraft.loot.context.LootContextParameters
+ *  net.minecraft.loot.context.LootContextTypes
+ *  net.minecraft.loot.context.LootWorldContext
+ *  net.minecraft.loot.context.LootWorldContext$Builder
+ *  net.minecraft.recipe.Recipe
+ *  net.minecraft.registry.RegistryKey
+ *  net.minecraft.server.MinecraftServer
+ *  net.minecraft.server.function.LazyContainer
+ *  net.minecraft.server.network.ServerPlayerEntity
+ *  net.minecraft.server.world.ServerWorld
+ *  net.minecraft.sound.SoundCategory
+ *  net.minecraft.sound.SoundEvents
+ */
 package net.minecraft.advancement;
 
-import com.google.common.collect.ImmutableList;
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import it.unimi.dsi.fastutil.objects.ObjectListIterator;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
-import net.minecraft.entity.Entity;
+import net.minecraft.command.permission.LeveledPermissionPredicate;
+import net.minecraft.command.permission.PermissionPredicate;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.LootTable;
@@ -22,123 +49,64 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.Identifier;
 
-public record AdvancementRewards(int experience, List loot, List recipes, Optional function) {
-   public static final Codec CODEC = RecordCodecBuilder.create((instance) -> {
-      return instance.group(Codec.INT.optionalFieldOf("experience", 0).forGetter(AdvancementRewards::experience), LootTable.TABLE_KEY.listOf().optionalFieldOf("loot", List.of()).forGetter(AdvancementRewards::loot), Recipe.KEY_CODEC.listOf().optionalFieldOf("recipes", List.of()).forGetter(AdvancementRewards::recipes), LazyContainer.CODEC.optionalFieldOf("function").forGetter(AdvancementRewards::function)).apply(instance, AdvancementRewards::new);
-   });
-   public static final AdvancementRewards NONE = new AdvancementRewards(0, List.of(), List.of(), Optional.empty());
+public record AdvancementRewards(int experience, List<RegistryKey<LootTable>> loot, List<RegistryKey<Recipe<?>>> recipes, Optional<LazyContainer> function) {
+    private final int experience;
+    private final List<RegistryKey<LootTable>> loot;
+    private final List<RegistryKey<Recipe<?>>> recipes;
+    private final Optional<LazyContainer> function;
+    public static final Codec<AdvancementRewards> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Codec.INT.optionalFieldOf("experience", (Object)0).forGetter(AdvancementRewards::experience), (App)LootTable.TABLE_KEY.listOf().optionalFieldOf("loot", List.of()).forGetter(AdvancementRewards::loot), (App)Recipe.KEY_CODEC.listOf().optionalFieldOf("recipes", List.of()).forGetter(AdvancementRewards::recipes), (App)LazyContainer.CODEC.optionalFieldOf("function").forGetter(AdvancementRewards::function)).apply((Applicative)instance, AdvancementRewards::new));
+    public static final AdvancementRewards NONE = new AdvancementRewards(0, List.of(), List.of(), Optional.empty());
 
-   public AdvancementRewards(int experience, List list, List list2, Optional optional) {
-      this.experience = experience;
-      this.loot = list;
-      this.recipes = list2;
-      this.function = optional;
-   }
+    public AdvancementRewards(int experience, List<RegistryKey<LootTable>> loot, List<RegistryKey<Recipe<?>>> recipes, Optional<LazyContainer> function) {
+        this.experience = experience;
+        this.loot = loot;
+        this.recipes = recipes;
+        this.function = function;
+    }
 
-   public void apply(ServerPlayerEntity player) {
-      player.addExperience(this.experience);
-      ServerWorld serverWorld = player.getWorld();
-      MinecraftServer minecraftServer = serverWorld.getServer();
-      LootWorldContext lootWorldContext = (new LootWorldContext.Builder(serverWorld)).add(LootContextParameters.THIS_ENTITY, player).add(LootContextParameters.ORIGIN, player.getPos()).build(LootContextTypes.ADVANCEMENT_REWARD);
-      boolean bl = false;
-      Iterator var6 = this.loot.iterator();
-
-      while(var6.hasNext()) {
-         RegistryKey registryKey = (RegistryKey)var6.next();
-         ObjectListIterator var8 = minecraftServer.getReloadableRegistries().getLootTable(registryKey).generateLoot(lootWorldContext).iterator();
-
-         while(var8.hasNext()) {
-            ItemStack itemStack = (ItemStack)var8.next();
-            if (player.giveItemStack(itemStack)) {
-               serverWorld.playSound((Entity)null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 0.2F, ((player.getRandom().nextFloat() - player.getRandom().nextFloat()) * 0.7F + 1.0F) * 2.0F);
-               bl = true;
-            } else {
-               ItemEntity itemEntity = player.dropItem(itemStack, false);
-               if (itemEntity != null) {
-                  itemEntity.resetPickupDelay();
-                  itemEntity.setOwner(player.getUuid());
-               }
+    public void apply(ServerPlayerEntity player) {
+        player.addExperience(this.experience);
+        ServerWorld serverWorld = player.getEntityWorld();
+        MinecraftServer minecraftServer = serverWorld.getServer();
+        LootWorldContext lootWorldContext = new LootWorldContext.Builder(serverWorld).add(LootContextParameters.THIS_ENTITY, (Object)player).add(LootContextParameters.ORIGIN, (Object)player.getEntityPos()).build(LootContextTypes.ADVANCEMENT_REWARD);
+        boolean bl = false;
+        for (RegistryKey registryKey : this.loot) {
+            for (ItemStack itemStack : minecraftServer.getReloadableRegistries().getLootTable(registryKey).generateLoot(lootWorldContext)) {
+                if (player.giveItemStack(itemStack)) {
+                    serverWorld.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 0.2f, ((player.getRandom().nextFloat() - player.getRandom().nextFloat()) * 0.7f + 1.0f) * 2.0f);
+                    bl = true;
+                    continue;
+                }
+                ItemEntity itemEntity = player.dropItem(itemStack, false);
+                if (itemEntity == null) continue;
+                itemEntity.resetPickupDelay();
+                itemEntity.setOwner(player.getUuid());
             }
-         }
-      }
+        }
+        if (bl) {
+            player.currentScreenHandler.sendContentUpdates();
+        }
+        if (!this.recipes.isEmpty()) {
+            player.unlockRecipes(this.recipes);
+        }
+        this.function.flatMap(function -> function.get(minecraftServer.getCommandFunctionManager())).ifPresent(function -> minecraftServer.getCommandFunctionManager().execute(function, player.getCommandSource().withSilent().withPermissions((PermissionPredicate)LeveledPermissionPredicate.GAMEMASTERS)));
+    }
 
-      if (bl) {
-         player.currentScreenHandler.sendContentUpdates();
-      }
+    public int experience() {
+        return this.experience;
+    }
 
-      if (!this.recipes.isEmpty()) {
-         player.unlockRecipes(this.recipes);
-      }
+    public List<RegistryKey<LootTable>> loot() {
+        return this.loot;
+    }
 
-      this.function.flatMap((function) -> {
-         return function.get(minecraftServer.getCommandFunctionManager());
-      }).ifPresent((function) -> {
-         minecraftServer.getCommandFunctionManager().execute(function, player.getCommandSource().withSilent().withLevel(2));
-      });
-   }
+    public List<RegistryKey<Recipe<?>>> recipes() {
+        return this.recipes;
+    }
 
-   public int experience() {
-      return this.experience;
-   }
-
-   public List loot() {
-      return this.loot;
-   }
-
-   public List recipes() {
-      return this.recipes;
-   }
-
-   public Optional function() {
-      return this.function;
-   }
-
-   public static class Builder {
-      private int experience;
-      private final ImmutableList.Builder loot = ImmutableList.builder();
-      private final ImmutableList.Builder recipes = ImmutableList.builder();
-      private Optional function = Optional.empty();
-
-      public static Builder experience(int experience) {
-         return (new Builder()).setExperience(experience);
-      }
-
-      public Builder setExperience(int experience) {
-         this.experience += experience;
-         return this;
-      }
-
-      public static Builder loot(RegistryKey loot) {
-         return (new Builder()).addLoot(loot);
-      }
-
-      public Builder addLoot(RegistryKey loot) {
-         this.loot.add(loot);
-         return this;
-      }
-
-      public static Builder recipe(RegistryKey recipeKey) {
-         return (new Builder()).addRecipe(recipeKey);
-      }
-
-      public Builder addRecipe(RegistryKey recipeKey) {
-         this.recipes.add(recipeKey);
-         return this;
-      }
-
-      public static Builder function(Identifier function) {
-         return (new Builder()).setFunction(function);
-      }
-
-      public Builder setFunction(Identifier function) {
-         this.function = Optional.of(function);
-         return this;
-      }
-
-      public AdvancementRewards build() {
-         return new AdvancementRewards(this.experience, this.loot.build(), this.recipes.build(), this.function.map(LazyContainer::new));
-      }
-   }
+    public Optional<LazyContainer> function() {
+        return this.function;
+    }
 }
+

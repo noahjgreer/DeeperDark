@@ -1,3 +1,17 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.google.common.collect.Sets
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.sound.Channel
+ *  net.minecraft.client.sound.Channel$SourceManager
+ *  net.minecraft.client.sound.SoundEngine
+ *  net.minecraft.client.sound.SoundEngine$RunMode
+ *  net.minecraft.client.sound.Source
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.sound;
 
 import com.google.common.collect.Sets;
@@ -7,93 +21,62 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.client.sound.Channel;
+import net.minecraft.client.sound.SoundEngine;
+import net.minecraft.client.sound.Source;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 public class Channel {
-   private final Set sources = Sets.newIdentityHashSet();
-   final SoundEngine soundEngine;
-   final Executor executor;
+    private final Set<SourceManager> sources = Sets.newIdentityHashSet();
+    final SoundEngine soundEngine;
+    final Executor executor;
 
-   public Channel(SoundEngine soundEngine, Executor executor) {
-      this.soundEngine = soundEngine;
-      this.executor = executor;
-   }
+    public Channel(SoundEngine soundEngine, Executor executor) {
+        this.soundEngine = soundEngine;
+        this.executor = executor;
+    }
 
-   public CompletableFuture createSource(SoundEngine.RunMode mode) {
-      CompletableFuture completableFuture = new CompletableFuture();
-      this.executor.execute(() -> {
-         Source source = this.soundEngine.createSource(mode);
-         if (source != null) {
-            SourceManager sourceManager = new SourceManager(source);
-            this.sources.add(sourceManager);
-            completableFuture.complete(sourceManager);
-         } else {
-            completableFuture.complete((Object)null);
-         }
-
-      });
-      return completableFuture;
-   }
-
-   public void execute(Consumer sourcesConsumer) {
-      this.executor.execute(() -> {
-         sourcesConsumer.accept(this.sources.stream().map((source) -> {
-            return source.source;
-         }).filter(Objects::nonNull));
-      });
-   }
-
-   public void tick() {
-      this.executor.execute(() -> {
-         Iterator iterator = this.sources.iterator();
-
-         while(iterator.hasNext()) {
-            SourceManager sourceManager = (SourceManager)iterator.next();
-            sourceManager.source.tick();
-            if (sourceManager.source.isStopped()) {
-               sourceManager.close();
-               iterator.remove();
+    public CompletableFuture<// Could not load outer class - annotation placement on inner may be incorrect
+    @Nullable SourceManager> createSource(SoundEngine.RunMode mode) {
+        CompletableFuture<// Could not load outer class - annotation placement on inner may be incorrect
+        @Nullable SourceManager> completableFuture = new CompletableFuture<SourceManager>();
+        this.executor.execute(() -> {
+            Source source = this.soundEngine.createSource(mode);
+            if (source != null) {
+                SourceManager sourceManager = new SourceManager(this, source);
+                this.sources.add(sourceManager);
+                completableFuture.complete(sourceManager);
+            } else {
+                completableFuture.complete(null);
             }
-         }
+        });
+        return completableFuture;
+    }
 
-      });
-   }
+    public void execute(Consumer<Stream<Source>> sourcesConsumer) {
+        this.executor.execute(() -> sourcesConsumer.accept(this.sources.stream().map(source -> source.source).filter(Objects::nonNull)));
+    }
 
-   public void close() {
-      this.sources.forEach(SourceManager::close);
-      this.sources.clear();
-   }
-
-   @Environment(EnvType.CLIENT)
-   public class SourceManager {
-      @Nullable
-      Source source;
-      private boolean stopped;
-
-      public boolean isStopped() {
-         return this.stopped;
-      }
-
-      public SourceManager(final Source source) {
-         this.source = source;
-      }
-
-      public void run(Consumer action) {
-         Channel.this.executor.execute(() -> {
-            if (this.source != null) {
-               action.accept(this.source);
+    public void tick() {
+        this.executor.execute(() -> {
+            Iterator iterator = this.sources.iterator();
+            while (iterator.hasNext()) {
+                SourceManager sourceManager = (SourceManager)iterator.next();
+                sourceManager.source.tick();
+                if (!sourceManager.source.isStopped()) continue;
+                sourceManager.close();
+                iterator.remove();
             }
+        });
+    }
 
-         });
-      }
-
-      public void close() {
-         this.stopped = true;
-         Channel.this.soundEngine.release(this.source);
-         this.source = null;
-      }
-   }
+    public void close() {
+        this.sources.forEach(SourceManager::close);
+        this.sources.clear();
+    }
 }
+

@@ -1,44 +1,33 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.serialization.Codec
+ *  net.minecraft.advancement.AdvancementCriterion
+ *  net.minecraft.advancement.PlayerAdvancementTracker
+ *  net.minecraft.advancement.criterion.Criterion
+ *  net.minecraft.advancement.criterion.Criterion$ConditionsContainer
+ *  net.minecraft.advancement.criterion.CriterionConditions
+ */
 package net.minecraft.advancement.criterion;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.advancement.AdvancementCriterion;
-import net.minecraft.advancement.AdvancementEntry;
 import net.minecraft.advancement.PlayerAdvancementTracker;
+import net.minecraft.advancement.criterion.Criterion;
+import net.minecraft.advancement.criterion.CriterionConditions;
 
-public interface Criterion {
-   void beginTrackingCondition(PlayerAdvancementTracker manager, ConditionsContainer conditions);
+public interface Criterion<T extends CriterionConditions> {
+    public void beginTrackingCondition(PlayerAdvancementTracker var1, ConditionsContainer<T> var2);
 
-   void endTrackingCondition(PlayerAdvancementTracker manager, ConditionsContainer conditions);
+    public void endTrackingCondition(PlayerAdvancementTracker var1, ConditionsContainer<T> var2);
 
-   void endTracking(PlayerAdvancementTracker tracker);
+    public void endTracking(PlayerAdvancementTracker var1);
 
-   Codec getConditionsCodec();
+    public Codec<T> getConditionsCodec();
 
-   default AdvancementCriterion create(CriterionConditions conditions) {
-      return new AdvancementCriterion(this, conditions);
-   }
-
-   public static record ConditionsContainer(CriterionConditions conditions, AdvancementEntry advancement, String id) {
-      public ConditionsContainer(CriterionConditions conditions, AdvancementEntry advancementEntry, String id) {
-         this.conditions = conditions;
-         this.advancement = advancementEntry;
-         this.id = id;
-      }
-
-      public void grant(PlayerAdvancementTracker tracker) {
-         tracker.grantCriterion(this.advancement, this.id);
-      }
-
-      public CriterionConditions conditions() {
-         return this.conditions;
-      }
-
-      public AdvancementEntry advancement() {
-         return this.advancement;
-      }
-
-      public String id() {
-         return this.id;
-      }
-   }
+    default public AdvancementCriterion<T> create(T conditions) {
+        return new AdvancementCriterion(this, conditions);
+    }
 }
+

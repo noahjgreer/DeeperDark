@@ -1,9 +1,40 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.block.BarrelBlock
+ *  net.minecraft.block.BlockState
+ *  net.minecraft.block.entity.BarrelBlockEntity
+ *  net.minecraft.block.entity.BlockEntityType
+ *  net.minecraft.block.entity.LootableContainerBlockEntity
+ *  net.minecraft.block.entity.ViewerCountManager
+ *  net.minecraft.entity.ContainerUser
+ *  net.minecraft.entity.player.PlayerInventory
+ *  net.minecraft.inventory.Inventories
+ *  net.minecraft.inventory.Inventory
+ *  net.minecraft.item.ItemStack
+ *  net.minecraft.screen.GenericContainerScreenHandler
+ *  net.minecraft.screen.ScreenHandler
+ *  net.minecraft.sound.SoundCategory
+ *  net.minecraft.sound.SoundEvent
+ *  net.minecraft.state.property.Property
+ *  net.minecraft.storage.ReadView
+ *  net.minecraft.storage.WriteView
+ *  net.minecraft.text.Text
+ *  net.minecraft.util.collection.DefaultedList
+ *  net.minecraft.util.math.BlockPos
+ *  net.minecraft.util.math.Direction
+ *  net.minecraft.util.math.Vec3i
+ */
 package net.minecraft.block.entity;
 
+import java.util.List;
 import net.minecraft.block.BarrelBlock;
 import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.block.entity.LootableContainerBlockEntity;
+import net.minecraft.block.entity.ViewerCountManager;
+import net.minecraft.entity.ContainerUser;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
@@ -12,7 +43,7 @@ import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
-import net.minecraft.sound.SoundEvents;
+import net.minecraft.state.property.Property;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
@@ -20,107 +51,84 @@ import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.World;
 
-public class BarrelBlockEntity extends LootableContainerBlockEntity {
-   private DefaultedList inventory;
-   private final ViewerCountManager stateManager;
+public class BarrelBlockEntity
+extends LootableContainerBlockEntity {
+    private static final Text CONTAINER_NAME_TEXT = Text.translatable((String)"container.barrel");
+    private DefaultedList<ItemStack> inventory = DefaultedList.ofSize((int)27, (Object)ItemStack.EMPTY);
+    private final ViewerCountManager stateManager = new /* Unavailable Anonymous Inner Class!! */;
 
-   public BarrelBlockEntity(BlockPos pos, BlockState state) {
-      super(BlockEntityType.BARREL, pos, state);
-      this.inventory = DefaultedList.ofSize(27, ItemStack.EMPTY);
-      this.stateManager = new ViewerCountManager() {
-         protected void onContainerOpen(World world, BlockPos pos, BlockState state) {
-            BarrelBlockEntity.this.playSound(state, SoundEvents.BLOCK_BARREL_OPEN);
-            BarrelBlockEntity.this.setOpen(state, true);
-         }
+    public BarrelBlockEntity(BlockPos pos, BlockState state) {
+        super(BlockEntityType.BARREL, pos, state);
+    }
 
-         protected void onContainerClose(World world, BlockPos pos, BlockState state) {
-            BarrelBlockEntity.this.playSound(state, SoundEvents.BLOCK_BARREL_CLOSE);
-            BarrelBlockEntity.this.setOpen(state, false);
-         }
+    protected void writeData(WriteView view) {
+        super.writeData(view);
+        if (!this.writeLootTable(view)) {
+            Inventories.writeData((WriteView)view, (DefaultedList)this.inventory);
+        }
+    }
 
-         protected void onViewerCountUpdate(World world, BlockPos pos, BlockState state, int oldViewerCount, int newViewerCount) {
-         }
+    protected void readData(ReadView view) {
+        super.readData(view);
+        this.inventory = DefaultedList.ofSize((int)this.size(), (Object)ItemStack.EMPTY);
+        if (!this.readLootTable(view)) {
+            Inventories.readData((ReadView)view, (DefaultedList)this.inventory);
+        }
+    }
 
-         protected boolean isPlayerViewing(PlayerEntity player) {
-            if (player.currentScreenHandler instanceof GenericContainerScreenHandler) {
-               Inventory inventory = ((GenericContainerScreenHandler)player.currentScreenHandler).getInventory();
-               return inventory == BarrelBlockEntity.this;
-            } else {
-               return false;
-            }
-         }
-      };
-   }
+    public int size() {
+        return 27;
+    }
 
-   protected void writeData(WriteView view) {
-      super.writeData(view);
-      if (!this.writeLootTable(view)) {
-         Inventories.writeData(view, this.inventory);
-      }
+    protected DefaultedList<ItemStack> getHeldStacks() {
+        return this.inventory;
+    }
 
-   }
+    protected void setHeldStacks(DefaultedList<ItemStack> inventory) {
+        this.inventory = inventory;
+    }
 
-   protected void readData(ReadView view) {
-      super.readData(view);
-      this.inventory = DefaultedList.ofSize(this.size(), ItemStack.EMPTY);
-      if (!this.readLootTable(view)) {
-         Inventories.readData(view, this.inventory);
-      }
+    protected Text getContainerName() {
+        return CONTAINER_NAME_TEXT;
+    }
 
-   }
+    protected ScreenHandler createScreenHandler(int syncId, PlayerInventory playerInventory) {
+        return GenericContainerScreenHandler.createGeneric9x3((int)syncId, (PlayerInventory)playerInventory, (Inventory)this);
+    }
 
-   public int size() {
-      return 27;
-   }
+    public void onOpen(ContainerUser user) {
+        if (!this.removed && !user.asLivingEntity().isSpectator()) {
+            this.stateManager.openContainer(user.asLivingEntity(), this.getWorld(), this.getPos(), this.getCachedState(), user.getContainerInteractionRange());
+        }
+    }
 
-   protected DefaultedList getHeldStacks() {
-      return this.inventory;
-   }
+    public void onClose(ContainerUser user) {
+        if (!this.removed && !user.asLivingEntity().isSpectator()) {
+            this.stateManager.closeContainer(user.asLivingEntity(), this.getWorld(), this.getPos(), this.getCachedState());
+        }
+    }
 
-   protected void setHeldStacks(DefaultedList inventory) {
-      this.inventory = inventory;
-   }
+    public List<ContainerUser> getViewingUsers() {
+        return this.stateManager.getViewingUsers(this.getWorld(), this.getPos());
+    }
 
-   protected Text getContainerName() {
-      return Text.translatable("container.barrel");
-   }
+    public void tick() {
+        if (!this.removed) {
+            this.stateManager.updateViewerCount(this.getWorld(), this.getPos(), this.getCachedState());
+        }
+    }
 
-   protected ScreenHandler createScreenHandler(int syncId, PlayerInventory playerInventory) {
-      return GenericContainerScreenHandler.createGeneric9x3(syncId, playerInventory, this);
-   }
+    void setOpen(BlockState state, boolean open) {
+        this.world.setBlockState(this.getPos(), (BlockState)state.with((Property)BarrelBlock.OPEN, (Comparable)Boolean.valueOf(open)), 3);
+    }
 
-   public void onOpen(PlayerEntity player) {
-      if (!this.removed && !player.isSpectator()) {
-         this.stateManager.openContainer(player, this.getWorld(), this.getPos(), this.getCachedState());
-      }
-
-   }
-
-   public void onClose(PlayerEntity player) {
-      if (!this.removed && !player.isSpectator()) {
-         this.stateManager.closeContainer(player, this.getWorld(), this.getPos(), this.getCachedState());
-      }
-
-   }
-
-   public void tick() {
-      if (!this.removed) {
-         this.stateManager.updateViewerCount(this.getWorld(), this.getPos(), this.getCachedState());
-      }
-
-   }
-
-   void setOpen(BlockState state, boolean open) {
-      this.world.setBlockState(this.getPos(), (BlockState)state.with(BarrelBlock.OPEN, open), 3);
-   }
-
-   void playSound(BlockState state, SoundEvent soundEvent) {
-      Vec3i vec3i = ((Direction)state.get(BarrelBlock.FACING)).getVector();
-      double d = (double)this.pos.getX() + 0.5 + (double)vec3i.getX() / 2.0;
-      double e = (double)this.pos.getY() + 0.5 + (double)vec3i.getY() / 2.0;
-      double f = (double)this.pos.getZ() + 0.5 + (double)vec3i.getZ() / 2.0;
-      this.world.playSound((Entity)null, d, e, f, (SoundEvent)soundEvent, SoundCategory.BLOCKS, 0.5F, this.world.random.nextFloat() * 0.1F + 0.9F);
-   }
+    void playSound(BlockState state, SoundEvent soundEvent) {
+        Vec3i vec3i = ((Direction)state.get((Property)BarrelBlock.FACING)).getVector();
+        double d = (double)this.pos.getX() + 0.5 + (double)vec3i.getX() / 2.0;
+        double e = (double)this.pos.getY() + 0.5 + (double)vec3i.getY() / 2.0;
+        double f = (double)this.pos.getZ() + 0.5 + (double)vec3i.getZ() / 2.0;
+        this.world.playSound(null, d, e, f, soundEvent, SoundCategory.BLOCKS, 0.5f, this.world.random.nextFloat() * 0.1f + 0.9f);
+    }
 }
+

@@ -1,13 +1,52 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.block.Block
+ *  net.minecraft.block.BlockState
+ *  net.minecraft.block.ChestBlock
+ *  net.minecraft.block.entity.BlockEntity
+ *  net.minecraft.block.entity.BlockEntityType
+ *  net.minecraft.block.entity.ChestBlockEntity
+ *  net.minecraft.block.entity.ChestLidAnimator
+ *  net.minecraft.block.entity.LidOpenable
+ *  net.minecraft.block.entity.LootableContainerBlockEntity
+ *  net.minecraft.block.entity.ViewerCountManager
+ *  net.minecraft.block.enums.ChestType
+ *  net.minecraft.entity.ContainerUser
+ *  net.minecraft.entity.player.PlayerInventory
+ *  net.minecraft.inventory.Inventories
+ *  net.minecraft.inventory.Inventory
+ *  net.minecraft.item.ItemStack
+ *  net.minecraft.screen.GenericContainerScreenHandler
+ *  net.minecraft.screen.ScreenHandler
+ *  net.minecraft.sound.SoundCategory
+ *  net.minecraft.sound.SoundEvent
+ *  net.minecraft.state.property.Property
+ *  net.minecraft.storage.ReadView
+ *  net.minecraft.storage.WriteView
+ *  net.minecraft.text.Text
+ *  net.minecraft.util.collection.DefaultedList
+ *  net.minecraft.util.math.BlockPos
+ *  net.minecraft.util.math.Direction
+ *  net.minecraft.world.BlockView
+ *  net.minecraft.world.World
+ */
 package net.minecraft.block.entity;
 
+import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ChestBlock;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.block.entity.ChestLidAnimator;
+import net.minecraft.block.entity.LidOpenable;
+import net.minecraft.block.entity.LootableContainerBlockEntity;
+import net.minecraft.block.entity.ViewerCountManager;
 import net.minecraft.block.enums.ChestType;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.ContainerUser;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.DoubleInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
@@ -15,7 +54,7 @@ import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
-import net.minecraft.sound.SoundEvents;
+import net.minecraft.state.property.Property;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
@@ -25,155 +64,130 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
-public class ChestBlockEntity extends LootableContainerBlockEntity implements LidOpenable {
-   private static final int VIEWER_COUNT_UPDATE_EVENT_TYPE = 1;
-   private DefaultedList inventory;
-   private final ViewerCountManager stateManager;
-   private final ChestLidAnimator lidAnimator;
+public class ChestBlockEntity
+extends LootableContainerBlockEntity
+implements LidOpenable {
+    private static final int VIEWER_COUNT_UPDATE_EVENT_TYPE = 1;
+    private static final Text CONTAINER_NAME_TEXT = Text.translatable((String)"container.chest");
+    private DefaultedList<ItemStack> inventory = DefaultedList.ofSize((int)27, (Object)ItemStack.EMPTY);
+    private final ViewerCountManager stateManager = new /* Unavailable Anonymous Inner Class!! */;
+    private final ChestLidAnimator lidAnimator = new ChestLidAnimator();
 
-   protected ChestBlockEntity(BlockEntityType blockEntityType, BlockPos blockPos, BlockState blockState) {
-      super(blockEntityType, blockPos, blockState);
-      this.inventory = DefaultedList.ofSize(27, ItemStack.EMPTY);
-      this.stateManager = new ViewerCountManager() {
-         protected void onContainerOpen(World world, BlockPos pos, BlockState state) {
-            ChestBlockEntity.playSound(world, pos, state, SoundEvents.BLOCK_CHEST_OPEN);
-         }
+    protected ChestBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
+        super(blockEntityType, blockPos, blockState);
+    }
 
-         protected void onContainerClose(World world, BlockPos pos, BlockState state) {
-            ChestBlockEntity.playSound(world, pos, state, SoundEvents.BLOCK_CHEST_CLOSE);
-         }
+    public ChestBlockEntity(BlockPos pos, BlockState state) {
+        this(BlockEntityType.CHEST, pos, state);
+    }
 
-         protected void onViewerCountUpdate(World world, BlockPos pos, BlockState state, int oldViewerCount, int newViewerCount) {
-            ChestBlockEntity.this.onViewerCountUpdate(world, pos, state, oldViewerCount, newViewerCount);
-         }
+    public int size() {
+        return 27;
+    }
 
-         protected boolean isPlayerViewing(PlayerEntity player) {
-            if (!(player.currentScreenHandler instanceof GenericContainerScreenHandler)) {
-               return false;
-            } else {
-               Inventory inventory = ((GenericContainerScreenHandler)player.currentScreenHandler).getInventory();
-               return inventory == ChestBlockEntity.this || inventory instanceof DoubleInventory && ((DoubleInventory)inventory).isPart(ChestBlockEntity.this);
-            }
-         }
-      };
-      this.lidAnimator = new ChestLidAnimator();
-   }
+    protected Text getContainerName() {
+        return CONTAINER_NAME_TEXT;
+    }
 
-   public ChestBlockEntity(BlockPos pos, BlockState state) {
-      this(BlockEntityType.CHEST, pos, state);
-   }
+    protected void readData(ReadView view) {
+        super.readData(view);
+        this.inventory = DefaultedList.ofSize((int)this.size(), (Object)ItemStack.EMPTY);
+        if (!this.readLootTable(view)) {
+            Inventories.readData((ReadView)view, (DefaultedList)this.inventory);
+        }
+    }
 
-   public int size() {
-      return 27;
-   }
+    protected void writeData(WriteView view) {
+        super.writeData(view);
+        if (!this.writeLootTable(view)) {
+            Inventories.writeData((WriteView)view, (DefaultedList)this.inventory);
+        }
+    }
 
-   protected Text getContainerName() {
-      return Text.translatable("container.chest");
-   }
+    public static void clientTick(World world, BlockPos pos, BlockState state, ChestBlockEntity blockEntity) {
+        blockEntity.lidAnimator.step();
+    }
 
-   protected void readData(ReadView view) {
-      super.readData(view);
-      this.inventory = DefaultedList.ofSize(this.size(), ItemStack.EMPTY);
-      if (!this.readLootTable(view)) {
-         Inventories.readData(view, this.inventory);
-      }
-
-   }
-
-   protected void writeData(WriteView view) {
-      super.writeData(view);
-      if (!this.writeLootTable(view)) {
-         Inventories.writeData(view, this.inventory);
-      }
-
-   }
-
-   public static void clientTick(World world, BlockPos pos, BlockState state, ChestBlockEntity blockEntity) {
-      blockEntity.lidAnimator.step();
-   }
-
-   static void playSound(World world, BlockPos pos, BlockState state, SoundEvent soundEvent) {
-      ChestType chestType = (ChestType)state.get(ChestBlock.CHEST_TYPE);
-      if (chestType != ChestType.LEFT) {
-         double d = (double)pos.getX() + 0.5;
-         double e = (double)pos.getY() + 0.5;
-         double f = (double)pos.getZ() + 0.5;
-         if (chestType == ChestType.RIGHT) {
-            Direction direction = ChestBlock.getFacing(state);
+    static void playSound(World world, BlockPos pos, BlockState state, SoundEvent soundEvent) {
+        ChestType chestType = (ChestType)state.get((Property)ChestBlock.CHEST_TYPE);
+        if (chestType == ChestType.LEFT) {
+            return;
+        }
+        double d = (double)pos.getX() + 0.5;
+        double e = (double)pos.getY() + 0.5;
+        double f = (double)pos.getZ() + 0.5;
+        if (chestType == ChestType.RIGHT) {
+            Direction direction = ChestBlock.getFacing((BlockState)state);
             d += (double)direction.getOffsetX() * 0.5;
             f += (double)direction.getOffsetZ() * 0.5;
-         }
+        }
+        world.playSound(null, d, e, f, soundEvent, SoundCategory.BLOCKS, 0.5f, world.random.nextFloat() * 0.1f + 0.9f);
+    }
 
-         world.playSound((Entity)null, d, e, f, (SoundEvent)soundEvent, SoundCategory.BLOCKS, 0.5F, world.random.nextFloat() * 0.1F + 0.9F);
-      }
-   }
+    public boolean onSyncedBlockEvent(int type, int data) {
+        if (type == 1) {
+            this.lidAnimator.setOpen(data > 0);
+            return true;
+        }
+        return super.onSyncedBlockEvent(type, data);
+    }
 
-   public boolean onSyncedBlockEvent(int type, int data) {
-      if (type == 1) {
-         this.lidAnimator.setOpen(data > 0);
-         return true;
-      } else {
-         return super.onSyncedBlockEvent(type, data);
-      }
-   }
+    public void onOpen(ContainerUser user) {
+        if (!this.removed && !user.asLivingEntity().isSpectator()) {
+            this.stateManager.openContainer(user.asLivingEntity(), this.getWorld(), this.getPos(), this.getCachedState(), user.getContainerInteractionRange());
+        }
+    }
 
-   public void onOpen(PlayerEntity player) {
-      if (!this.removed && !player.isSpectator()) {
-         this.stateManager.openContainer(player, this.getWorld(), this.getPos(), this.getCachedState());
-      }
+    public void onClose(ContainerUser user) {
+        if (!this.removed && !user.asLivingEntity().isSpectator()) {
+            this.stateManager.closeContainer(user.asLivingEntity(), this.getWorld(), this.getPos(), this.getCachedState());
+        }
+    }
 
-   }
+    public List<ContainerUser> getViewingUsers() {
+        return this.stateManager.getViewingUsers(this.getWorld(), this.getPos());
+    }
 
-   public void onClose(PlayerEntity player) {
-      if (!this.removed && !player.isSpectator()) {
-         this.stateManager.closeContainer(player, this.getWorld(), this.getPos(), this.getCachedState());
-      }
+    protected DefaultedList<ItemStack> getHeldStacks() {
+        return this.inventory;
+    }
 
-   }
+    protected void setHeldStacks(DefaultedList<ItemStack> inventory) {
+        this.inventory = inventory;
+    }
 
-   protected DefaultedList getHeldStacks() {
-      return this.inventory;
-   }
+    public float getAnimationProgress(float tickProgress) {
+        return this.lidAnimator.getProgress(tickProgress);
+    }
 
-   protected void setHeldStacks(DefaultedList inventory) {
-      this.inventory = inventory;
-   }
-
-   public float getAnimationProgress(float tickProgress) {
-      return this.lidAnimator.getProgress(tickProgress);
-   }
-
-   public static int getPlayersLookingInChestCount(BlockView world, BlockPos pos) {
-      BlockState blockState = world.getBlockState(pos);
-      if (blockState.hasBlockEntity()) {
-         BlockEntity blockEntity = world.getBlockEntity(pos);
-         if (blockEntity instanceof ChestBlockEntity) {
+    public static int getPlayersLookingInChestCount(BlockView world, BlockPos pos) {
+        BlockEntity blockEntity;
+        BlockState blockState = world.getBlockState(pos);
+        if (blockState.hasBlockEntity() && (blockEntity = world.getBlockEntity(pos)) instanceof ChestBlockEntity) {
             return ((ChestBlockEntity)blockEntity).stateManager.getViewerCount();
-         }
-      }
+        }
+        return 0;
+    }
 
-      return 0;
-   }
+    public static void copyInventory(ChestBlockEntity from, ChestBlockEntity to) {
+        DefaultedList defaultedList = from.getHeldStacks();
+        from.setHeldStacks(to.getHeldStacks());
+        to.setHeldStacks(defaultedList);
+    }
 
-   public static void copyInventory(ChestBlockEntity from, ChestBlockEntity to) {
-      DefaultedList defaultedList = from.getHeldStacks();
-      from.setHeldStacks(to.getHeldStacks());
-      to.setHeldStacks(defaultedList);
-   }
+    protected ScreenHandler createScreenHandler(int syncId, PlayerInventory playerInventory) {
+        return GenericContainerScreenHandler.createGeneric9x3((int)syncId, (PlayerInventory)playerInventory, (Inventory)this);
+    }
 
-   protected ScreenHandler createScreenHandler(int syncId, PlayerInventory playerInventory) {
-      return GenericContainerScreenHandler.createGeneric9x3(syncId, playerInventory, this);
-   }
+    public void onScheduledTick() {
+        if (!this.removed) {
+            this.stateManager.updateViewerCount(this.getWorld(), this.getPos(), this.getCachedState());
+        }
+    }
 
-   public void onScheduledTick() {
-      if (!this.removed) {
-         this.stateManager.updateViewerCount(this.getWorld(), this.getPos(), this.getCachedState());
-      }
-
-   }
-
-   protected void onViewerCountUpdate(World world, BlockPos pos, BlockState state, int oldViewerCount, int newViewerCount) {
-      Block block = state.getBlock();
-      world.addSyncedBlockEvent(pos, block, 1, newViewerCount);
-   }
+    protected void onViewerCountUpdate(World world, BlockPos pos, BlockState state, int oldViewerCount, int newViewerCount) {
+        Block block = state.getBlock();
+        world.addSyncedBlockEvent(pos, block, 1, newViewerCount);
+    }
 }
+

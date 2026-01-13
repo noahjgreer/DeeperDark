@@ -1,45 +1,54 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.google.gson.annotations.SerializedName
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.realms.RealmsSerializable
+ *  net.minecraft.client.realms.dto.RealmsSettingDto
+ */
 package net.minecraft.client.realms.dto;
 
 import com.google.gson.annotations.SerializedName;
-import java.util.Iterator;
 import java.util.List;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.realms.RealmsSerializable;
 
-@Environment(EnvType.CLIENT)
-public record RealmsSettingDto(String name, String value) implements RealmsSerializable {
-   public RealmsSettingDto(String string, String string2) {
-      this.name = string;
-      this.value = string2;
-   }
+@Environment(value=EnvType.CLIENT)
+public record RealmsSettingDto(@SerializedName(value="name") String name, @SerializedName(value="value") String value) implements RealmsSerializable
+{
+    @SerializedName(value="name")
+    private final String name;
+    @SerializedName(value="value")
+    private final String value;
 
-   public static RealmsSettingDto ofHardcore(boolean hardcore) {
-      return new RealmsSettingDto("hardcore", Boolean.toString(hardcore));
-   }
+    public RealmsSettingDto(String name, String value) {
+        this.name = name;
+        this.value = value;
+    }
 
-   public static boolean isHardcore(List settings) {
-      Iterator var1 = settings.iterator();
+    public static RealmsSettingDto ofHardcore(boolean hardcore) {
+        return new RealmsSettingDto("hardcore", Boolean.toString(hardcore));
+    }
 
-      RealmsSettingDto realmsSettingDto;
-      do {
-         if (!var1.hasNext()) {
-            return false;
-         }
+    public static boolean isHardcore(List<RealmsSettingDto> settings) {
+        for (RealmsSettingDto realmsSettingDto : settings) {
+            if (!realmsSettingDto.name().equals("hardcore")) continue;
+            return Boolean.parseBoolean(realmsSettingDto.value());
+        }
+        return false;
+    }
 
-         realmsSettingDto = (RealmsSettingDto)var1.next();
-      } while(!realmsSettingDto.name().equals("hardcore"));
+    @SerializedName(value="name")
+    public String name() {
+        return this.name;
+    }
 
-      return Boolean.parseBoolean(realmsSettingDto.value());
-   }
-
-   @SerializedName("name")
-   public String name() {
-      return this.name;
-   }
-
-   @SerializedName("value")
-   public String value() {
-      return this.value;
-   }
+    @SerializedName(value="value")
+    public String value() {
+        return this.value;
+    }
 }
+

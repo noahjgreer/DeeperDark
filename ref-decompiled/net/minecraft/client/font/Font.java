@@ -1,41 +1,35 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  it.unimi.dsi.fastutil.ints.IntSet
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.font.Font
+ *  net.minecraft.client.font.Glyph
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.font;
 
 import it.unimi.dsi.fastutil.ints.IntSet;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.client.font.Glyph;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
-public interface Font extends AutoCloseable {
-   float field_48382 = 7.0F;
+@Environment(value=EnvType.CLIENT)
+public interface Font
+extends AutoCloseable {
+    public static final float DEFAULT_ASCENT = 7.0f;
 
-   default void close() {
-   }
+    @Override
+    default public void close() {
+    }
 
-   @Nullable
-   default Glyph getGlyph(int codePoint) {
-      return null;
-   }
+    default public @Nullable Glyph getGlyph(int codePoint) {
+        return null;
+    }
 
-   IntSet getProvidedGlyphs();
-
-   @Environment(EnvType.CLIENT)
-   public static record FontFilterPair(Font provider, FontFilterType.FilterMap filter) implements AutoCloseable {
-      public FontFilterPair(Font font, FontFilterType.FilterMap filterMap) {
-         this.provider = font;
-         this.filter = filterMap;
-      }
-
-      public void close() {
-         this.provider.close();
-      }
-
-      public Font provider() {
-         return this.provider;
-      }
-
-      public FontFilterType.FilterMap filter() {
-         return this.filter;
-      }
-   }
+    public IntSet getProvidedGlyphs();
 }
+

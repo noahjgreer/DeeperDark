@@ -20,6 +20,8 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.TeleportTarget;
 import net.minecraft.world.World;
+import net.noahsarch.deeperdark.duck.ServerPlayerAccessor;
+import net.noahsarch.deeperdark.duck.EntityAccessor;
 
 import java.util.*;
 
@@ -140,7 +142,7 @@ public class SlipPortalHandler {
     public static void register() {
         // Handle water bucket placement to activate portals
         UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
-            if (world.isClient) {
+            if (world.isClient()) {
                 return ActionResult.PASS;
             }
 
@@ -181,7 +183,7 @@ public class SlipPortalHandler {
 
         // Handle flint and steel activation for vertical portals in the Slip
         UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
-            if (world.isClient) {
+            if (world.isClient()) {
                 return ActionResult.PASS;
             }
 
@@ -292,7 +294,8 @@ public class SlipPortalHandler {
     private static void handleHorizontalPortals(net.minecraft.server.MinecraftServer server, ServerWorld endWorld) {
         // Check players for teleportation
         for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
-            if (!player.getWorld().getRegistryKey().equals(THE_END)) {
+            net.minecraft.world.World world = ((net.noahsarch.deeperdark.duck.EntityAccessor)player).deeperdark$getWorld();
+            if (!world.getRegistryKey().equals(THE_END)) {
                 continue;
             }
 
@@ -303,7 +306,7 @@ public class SlipPortalHandler {
             for (HorizontalPortalData portal : activeHorizontalPortals.values()) {
                 if (portal.waterBlocks.contains(playerPos)) {
                     playerInPortalNow = true;
-                    long currentTime = player.getWorld().getTime();
+                    long currentTime = ((net.noahsarch.deeperdark.duck.EntityAccessor)player).deeperdark$getWorld().getTime();
 
                     if (playerCooldowns.containsKey(playerId)) {
                         long lastTeleport = playerCooldowns.get(playerId);
@@ -353,7 +356,8 @@ public class SlipPortalHandler {
     private static void handleVerticalPortals(net.minecraft.server.MinecraftServer server, ServerWorld slipWorld) {
         // Check players for teleportation to the Overworld
         for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
-            if (!player.getWorld().getRegistryKey().equals(THE_SLIP)) {
+            net.minecraft.world.World world = ((net.noahsarch.deeperdark.duck.EntityAccessor)player).deeperdark$getWorld();
+            if (!world.getRegistryKey().equals(THE_SLIP)) {
                 continue;
             }
 
@@ -364,7 +368,7 @@ public class SlipPortalHandler {
             for (VerticalPortalData portal : activeVerticalPortals.values()) {
                 if (portal.waterBlocks.contains(playerPos)) {
                     playerInPortalNow = true;
-                    long currentTime = player.getWorld().getTime();
+                    long currentTime = ((net.noahsarch.deeperdark.duck.EntityAccessor)player).deeperdark$getWorld().getTime();
 
                     // Only check cooldown if player is not currently marked as in portal
                     if (!playersInPortal.contains(playerId)) {
@@ -1028,54 +1032,16 @@ public class SlipPortalHandler {
         return hasPackedIce;
     }
 
-    /**
-     * Checks if there's a valid blue ice frame around the given center position with packed ice in the center (vertical portal)
-     * East-West orientation check
-     */
-    private static boolean isValidVerticalPortalFrameWithPackedIce_EastWest(World world, BlockPos center) {
-        // Check horizontal bars (top and bottom)
-        for (int z = -1; z <= 1; z++) {
-            if (!world.getBlockState(center.add(0, -2, z)).isOf(Blocks.BLUE_ICE)) {
-                return false;
-            }
-            if (!world.getBlockState(center.add(0, 2, z)).isOf(Blocks.BLUE_ICE)) {
-                return false;
-            }
-        }
-
-        // Check vertical bars (left and right)
-        for (int y = -1; y <= 1; y++) {
-            if (!world.getBlockState(center.add(0, y, -2)).isOf(Blocks.BLUE_ICE)) {
-                return false;
-            }
-            if (!world.getBlockState(center.add(0, y, 2)).isOf(Blocks.BLUE_ICE)) {
-                return false;
-            }
-        }
-
-        // Check that at least ONE block in the 3x3 center is packed ice (relaxed requirement)
-        boolean hasPackedIce = false;
-        for (int z = -1; z <= 1; z++) {
-            for (int y = -1; y <= 1; y++) {
-                if (world.getBlockState(center.add(0, y, z)).isOf(Blocks.PACKED_ICE)) {
-                    hasPackedIce = true;
-                    break;
-                }
-            }
-            if (hasPackedIce) break;
-        }
-        return hasPackedIce;
-    }
 
     /**
      * Teleports the player to The Slip dimension
      */
     private static boolean teleportToSlip(ServerPlayerEntity player) {
-        if (player.getServer() == null) {
+        if (((ServerPlayerAccessor)player).deeperdark$getServer() == null) {
             return false;
         }
 
-        ServerWorld slipWorld = player.getServer().getWorld(THE_SLIP);
+        ServerWorld slipWorld = ((ServerPlayerAccessor)player).deeperdark$getServer().getWorld(THE_SLIP);
         if (slipWorld == null) {
             return false;
         }
@@ -1098,12 +1064,9 @@ public class SlipPortalHandler {
         BlockPos scaledPos = new BlockPos(sourcePos.getX() / COORDINATE_SCALE, sourcePos.getY(), sourcePos.getZ() / COORDINATE_SCALE);
         BlockPos targetPos = findOrCreateVerticalPortalLocation(slipWorld, scaledPos);
 
-        if (targetPos == null) {
-            return false;
-        }
 
         // Play portal sound in source dimension
-        player.getWorld().playSound(
+        ((net.noahsarch.deeperdark.duck.EntityAccessor)player).deeperdark$getWorld().playSound(
             null,
             player.getX(),
             player.getY(),
@@ -1145,11 +1108,11 @@ public class SlipPortalHandler {
      * Teleports the player to the Overworld dimension with a waypoint marker
      */
     private static boolean teleportToOverworld(ServerPlayerEntity player, BlockPos slipPortalCenter) {
-        if (player.getServer() == null) {
+        if (((ServerPlayerAccessor)player).deeperdark$getServer() == null) {
             return false;
         }
 
-        ServerWorld overworldWorld = player.getServer().getWorld(OVERWORLD);
+        ServerWorld overworldWorld = ((ServerPlayerAccessor)player).deeperdark$getServer().getWorld(OVERWORLD);
         if (overworldWorld == null) {
             return false;
         }
@@ -1278,7 +1241,7 @@ public class SlipPortalHandler {
      */
     private static void teleportPlayerToWaypoint(ServerPlayerEntity player, ServerWorld overworldWorld, BlockPos waypointPos) {
         // Play portal sound in source dimension
-        player.getWorld().playSound(
+        ((net.noahsarch.deeperdark.duck.EntityAccessor)player).deeperdark$getWorld().playSound(
             null,
             player.getX(),
             player.getY(),
@@ -1358,7 +1321,7 @@ public class SlipPortalHandler {
 
         // Try to find existing portal with extended search radius to prevent adjacent portals
         // Only check X and Z coordinates (ignore Y) to find portals at any height
-        int extendedRadius = SEARCH_RADIUS * 2;
+        int extendedRadius = EXTENDED_SEARCH_RADIUS;
         for (BlockPos portalCenter : activeVerticalPortals.keySet()) {
             int xDiff = Math.abs(portalCenter.getX() - searchCenter.getX());
             int zDiff = Math.abs(portalCenter.getZ() - searchCenter.getZ());

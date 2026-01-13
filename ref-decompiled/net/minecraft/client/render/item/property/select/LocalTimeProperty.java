@@ -1,3 +1,31 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.ibm.icu.text.DateFormat
+ *  com.ibm.icu.text.SimpleDateFormat
+ *  com.ibm.icu.util.Calendar
+ *  com.ibm.icu.util.TimeZone
+ *  com.ibm.icu.util.ULocale
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.DataResult
+ *  com.mojang.serialization.MapCodec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.render.item.property.select.LocalTimeProperty
+ *  net.minecraft.client.render.item.property.select.LocalTimeProperty$Data
+ *  net.minecraft.client.render.item.property.select.SelectProperty
+ *  net.minecraft.client.render.item.property.select.SelectProperty$Type
+ *  net.minecraft.client.world.ClientWorld
+ *  net.minecraft.entity.LivingEntity
+ *  net.minecraft.item.ItemDisplayContext
+ *  net.minecraft.item.ItemStack
+ *  net.minecraft.util.Util
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.render.item.property.select;
 
 import com.ibm.icu.text.DateFormat;
@@ -5,6 +33,8 @@ import com.ibm.icu.text.SimpleDateFormat;
 import com.ibm.icu.util.Calendar;
 import com.ibm.icu.util.TimeZone;
 import com.ibm.icu.util.ULocale;
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
@@ -14,133 +44,84 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.render.item.property.select.LocalTimeProperty;
+import net.minecraft.client.render.item.property.select.SelectProperty;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Util;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
-public class LocalTimeProperty implements SelectProperty {
-   public static final String DEFAULT_FORMATTED_TIME = "";
-   private static final long MILLIS_PER_SECOND;
-   public static final Codec VALUE_CODEC;
-   private static final Codec TIME_ZONE_CODEC;
-   private static final MapCodec DATA_CODEC;
-   public static final SelectProperty.Type TYPE;
-   private final Data data;
-   private final DateFormat dateFormat;
-   private long nextUpdateTime;
-   private String currentTimeFormatted = "";
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
+public class LocalTimeProperty
+implements SelectProperty<String> {
+    public static final String DEFAULT_FORMATTED_TIME = "";
+    private static final long MILLIS_PER_SECOND = TimeUnit.SECONDS.toMillis(1L);
+    public static final Codec<String> VALUE_CODEC = Codec.STRING;
+    private static final Codec<TimeZone> TIME_ZONE_CODEC = VALUE_CODEC.comapFlatMap(timeZone -> {
+        TimeZone timeZone2 = TimeZone.getTimeZone((String)timeZone);
+        if (timeZone2.equals((Object)TimeZone.UNKNOWN_ZONE)) {
+            return DataResult.error(() -> "Unknown timezone: " + timeZone);
+        }
+        return DataResult.success((Object)timeZone2);
+    }, TimeZone::getID);
+    private static final MapCodec<Data> DATA_CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group((App)Codec.STRING.fieldOf("pattern").forGetter(data -> data.format), (App)Codec.STRING.optionalFieldOf("locale", (Object)"").forGetter(data -> data.localeId), (App)TIME_ZONE_CODEC.optionalFieldOf("time_zone").forGetter(data -> data.timeZone)).apply((Applicative)instance, Data::new));
+    public static final SelectProperty.Type<LocalTimeProperty, String> TYPE = SelectProperty.Type.create((MapCodec)DATA_CODEC.flatXmap(LocalTimeProperty::validate, property -> DataResult.success((Object)property.data)), (Codec)VALUE_CODEC);
+    private final Data data;
+    private final DateFormat dateFormat;
+    private long nextUpdateTime;
+    private String currentTimeFormatted = "";
 
-   private LocalTimeProperty(Data data, DateFormat dateFormat) {
-      this.data = data;
-      this.dateFormat = dateFormat;
-   }
+    private LocalTimeProperty(Data data, DateFormat dateFormat) {
+        this.data = data;
+        this.dateFormat = dateFormat;
+    }
 
-   public static LocalTimeProperty create(String pattern, String locale, Optional timeZone) {
-      return (LocalTimeProperty)validate(new Data(pattern, locale, timeZone)).getOrThrow((format) -> {
-         return new IllegalStateException("Failed to validate format: " + format);
-      });
-   }
+    public static LocalTimeProperty create(String pattern, String locale, Optional<TimeZone> timeZone) {
+        return (LocalTimeProperty)LocalTimeProperty.validate((Data)new Data(pattern, locale, timeZone)).getOrThrow(format -> new IllegalStateException("Failed to validate format: " + format));
+    }
 
-   private static DataResult validate(Data data) {
-      ULocale uLocale = new ULocale(data.localeId);
-      Calendar calendar = (Calendar)data.timeZone.map((timeZone) -> {
-         return Calendar.getInstance(timeZone, uLocale);
-      }).orElseGet(() -> {
-         return Calendar.getInstance(uLocale);
-      });
-      SimpleDateFormat simpleDateFormat = new SimpleDateFormat(data.format, uLocale);
-      simpleDateFormat.setCalendar(calendar);
+    private static DataResult<LocalTimeProperty> validate(Data data) {
+        ULocale uLocale = new ULocale(data.localeId);
+        Calendar calendar = data.timeZone.map(timeZone -> Calendar.getInstance((TimeZone)timeZone, (ULocale)uLocale)).orElseGet(() -> Calendar.getInstance((ULocale)uLocale));
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(data.format, uLocale);
+        simpleDateFormat.setCalendar(calendar);
+        try {
+            simpleDateFormat.format(new Date());
+        }
+        catch (Exception exception) {
+            return DataResult.error(() -> "Invalid time format '" + String.valueOf(simpleDateFormat) + "': " + exception.getMessage());
+        }
+        return DataResult.success((Object)new LocalTimeProperty(data, (DateFormat)simpleDateFormat));
+    }
 
-      try {
-         simpleDateFormat.format(new Date());
-      } catch (Exception var5) {
-         return DataResult.error(() -> {
-            String var10000 = String.valueOf(simpleDateFormat);
-            return "Invalid time format '" + var10000 + "': " + var5.getMessage();
-         });
-      }
+    public @Nullable String getValue(ItemStack itemStack, @Nullable ClientWorld clientWorld, @Nullable LivingEntity livingEntity, int i, ItemDisplayContext itemDisplayContext) {
+        long l = Util.getMeasuringTimeMs();
+        if (l > this.nextUpdateTime) {
+            this.currentTimeFormatted = this.formatCurrentTime();
+            this.nextUpdateTime = l + MILLIS_PER_SECOND;
+        }
+        return this.currentTimeFormatted;
+    }
 
-      return DataResult.success(new LocalTimeProperty(data, simpleDateFormat));
-   }
+    private String formatCurrentTime() {
+        return this.dateFormat.format(new Date());
+    }
 
-   @Nullable
-   public String getValue(ItemStack itemStack, @Nullable ClientWorld clientWorld, @Nullable LivingEntity livingEntity, int i, ItemDisplayContext itemDisplayContext) {
-      long l = Util.getMeasuringTimeMs();
-      if (l > this.nextUpdateTime) {
-         this.currentTimeFormatted = this.formatCurrentTime();
-         this.nextUpdateTime = l + MILLIS_PER_SECOND;
-      }
+    public SelectProperty.Type<LocalTimeProperty, String> getType() {
+        return TYPE;
+    }
 
-      return this.currentTimeFormatted;
-   }
+    public Codec<String> valueCodec() {
+        return VALUE_CODEC;
+    }
 
-   private String formatCurrentTime() {
-      return this.dateFormat.format(new Date());
-   }
-
-   public SelectProperty.Type getType() {
-      return TYPE;
-   }
-
-   public Codec valueCodec() {
-      return VALUE_CODEC;
-   }
-
-   // $FF: synthetic method
-   @Nullable
-   public Object getValue(final ItemStack stack, @Nullable final ClientWorld world, @Nullable final LivingEntity user, final int seed, final ItemDisplayContext displayContext) {
-      return this.getValue(stack, world, user, seed, displayContext);
-   }
-
-   static {
-      MILLIS_PER_SECOND = TimeUnit.SECONDS.toMillis(1L);
-      VALUE_CODEC = Codec.STRING;
-      TIME_ZONE_CODEC = VALUE_CODEC.comapFlatMap((timeZone) -> {
-         TimeZone timeZone2 = TimeZone.getTimeZone(timeZone);
-         return timeZone2.equals(TimeZone.UNKNOWN_ZONE) ? DataResult.error(() -> {
-            return "Unknown timezone: " + timeZone;
-         }) : DataResult.success(timeZone2);
-      }, TimeZone::getID);
-      DATA_CODEC = RecordCodecBuilder.mapCodec((instance) -> {
-         return instance.group(Codec.STRING.fieldOf("pattern").forGetter((data) -> {
-            return data.format;
-         }), Codec.STRING.optionalFieldOf("locale", "").forGetter((data) -> {
-            return data.localeId;
-         }), TIME_ZONE_CODEC.optionalFieldOf("time_zone").forGetter((data) -> {
-            return data.timeZone;
-         })).apply(instance, Data::new);
-      });
-      TYPE = SelectProperty.Type.create(DATA_CODEC.flatXmap(LocalTimeProperty::validate, (property) -> {
-         return DataResult.success(property.data);
-      }), VALUE_CODEC);
-   }
-
-   @Environment(EnvType.CLIENT)
-   private static record Data(String format, String localeId, Optional timeZone) {
-      final String format;
-      final String localeId;
-      final Optional timeZone;
-
-      Data(String string, String string2, Optional optional) {
-         this.format = string;
-         this.localeId = string2;
-         this.timeZone = optional;
-      }
-
-      public String format() {
-         return this.format;
-      }
-
-      public String localeId() {
-         return this.localeId;
-      }
-
-      public Optional timeZone() {
-         return this.timeZone;
-      }
-   }
+    public /* synthetic */ @Nullable Object getValue(ItemStack stack, @Nullable ClientWorld world, @Nullable LivingEntity user, int seed, ItemDisplayContext displayContext) {
+        return this.getValue(stack, world, user, seed, displayContext);
+    }
 }
+

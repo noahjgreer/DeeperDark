@@ -1,3 +1,16 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.google.common.collect.ImmutableList
+ *  com.google.common.collect.Streams
+ *  com.mojang.blocklist.BlockListSupplier
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.network.Address
+ *  net.minecraft.client.network.BlockListChecker
+ *  net.minecraft.client.network.ServerAddress
+ */
 package net.minecraft.client.network;
 
 import com.google.common.collect.ImmutableList;
@@ -7,30 +20,18 @@ import java.util.Objects;
 import java.util.ServiceLoader;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.network.Address;
+import net.minecraft.client.network.ServerAddress;
 
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 public interface BlockListChecker {
-   boolean isAllowed(Address address);
+    public boolean isAllowed(Address var1);
 
-   boolean isAllowed(ServerAddress address);
+    public boolean isAllowed(ServerAddress var1);
 
-   static BlockListChecker create() {
-      final ImmutableList immutableList = (ImmutableList)Streams.stream(ServiceLoader.load(BlockListSupplier.class)).map(BlockListSupplier::createBlockList).filter(Objects::nonNull).collect(ImmutableList.toImmutableList());
-      return new BlockListChecker() {
-         public boolean isAllowed(Address address) {
-            String string = address.getHostName();
-            String string2 = address.getHostAddress();
-            return immutableList.stream().noneMatch((predicate) -> {
-               return predicate.test(string) || predicate.test(string2);
-            });
-         }
-
-         public boolean isAllowed(ServerAddress address) {
-            String string = address.getAddress();
-            return immutableList.stream().noneMatch((predicate) -> {
-               return predicate.test(string);
-            });
-         }
-      };
-   }
+    public static BlockListChecker create() {
+        ImmutableList immutableList = (ImmutableList)Streams.stream(ServiceLoader.load(BlockListSupplier.class)).map(BlockListSupplier::createBlockList).filter(Objects::nonNull).collect(ImmutableList.toImmutableList());
+        return new /* Unavailable Anonymous Inner Class!! */;
+    }
 }
+

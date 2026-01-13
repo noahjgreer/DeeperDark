@@ -1,7 +1,37 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.MapCodec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
+ *  net.minecraft.block.AbstractBlock$Settings
+ *  net.minecraft.block.Block
+ *  net.minecraft.block.BlockState
+ *  net.minecraft.block.CoralBlockBlock
+ *  net.minecraft.fluid.FluidState
+ *  net.minecraft.item.ItemPlacementContext
+ *  net.minecraft.registry.Registries
+ *  net.minecraft.registry.tag.FluidTags
+ *  net.minecraft.server.world.ServerWorld
+ *  net.minecraft.util.math.BlockPos
+ *  net.minecraft.util.math.Direction
+ *  net.minecraft.util.math.random.Random
+ *  net.minecraft.world.BlockView
+ *  net.minecraft.world.WorldView
+ *  net.minecraft.world.tick.ScheduledTickView
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.block;
 
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.registry.Registries;
@@ -13,67 +43,53 @@ import net.minecraft.util.math.random.Random;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.WorldView;
 import net.minecraft.world.tick.ScheduledTickView;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-public class CoralBlockBlock extends Block {
-   public static final MapCodec DEAD_FIELD;
-   public static final MapCodec CODEC;
-   private final Block deadCoralBlock;
+/*
+ * Exception performing whole class analysis ignored.
+ */
+public class CoralBlockBlock
+extends Block {
+    public static final MapCodec<Block> DEAD_FIELD = Registries.BLOCK.getCodec().fieldOf("dead");
+    public static final MapCodec<CoralBlockBlock> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group((App)DEAD_FIELD.forGetter(block -> block.deadCoralBlock), (App)CoralBlockBlock.createSettingsCodec()).apply((Applicative)instance, CoralBlockBlock::new));
+    private final Block deadCoralBlock;
 
-   public CoralBlockBlock(Block deadCoralBlock, AbstractBlock.Settings settings) {
-      super(settings);
-      this.deadCoralBlock = deadCoralBlock;
-   }
+    public CoralBlockBlock(Block deadCoralBlock, AbstractBlock.Settings settings) {
+        super(settings);
+        this.deadCoralBlock = deadCoralBlock;
+    }
 
-   public MapCodec getCodec() {
-      return CODEC;
-   }
+    public MapCodec<CoralBlockBlock> getCodec() {
+        return CODEC;
+    }
 
-   protected void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-      if (!this.isInWater(world, pos)) {
-         world.setBlockState(pos, this.deadCoralBlock.getDefaultState(), 2);
-      }
+    protected void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        if (!this.isInWater((BlockView)world, pos)) {
+            world.setBlockState(pos, this.deadCoralBlock.getDefaultState(), 2);
+        }
+    }
 
-   }
+    protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
+        if (!this.isInWater((BlockView)world, pos)) {
+            tickView.scheduleBlockTick(pos, (Block)this, 60 + random.nextInt(40));
+        }
+        return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
+    }
 
-   protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
-      if (!this.isInWater(world, pos)) {
-         tickView.scheduleBlockTick(pos, this, 60 + random.nextInt(40));
-      }
-
-      return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
-   }
-
-   protected boolean isInWater(BlockView world, BlockPos pos) {
-      Direction[] var3 = Direction.values();
-      int var4 = var3.length;
-
-      for(int var5 = 0; var5 < var4; ++var5) {
-         Direction direction = var3[var5];
-         FluidState fluidState = world.getFluidState(pos.offset(direction));
-         if (fluidState.isIn(FluidTags.WATER)) {
+    protected boolean isInWater(BlockView world, BlockPos pos) {
+        for (Direction direction : Direction.values()) {
+            FluidState fluidState = world.getFluidState(pos.offset(direction));
+            if (!fluidState.isIn(FluidTags.WATER)) continue;
             return true;
-         }
-      }
+        }
+        return false;
+    }
 
-      return false;
-   }
-
-   @Nullable
-   public BlockState getPlacementState(ItemPlacementContext ctx) {
-      if (!this.isInWater(ctx.getWorld(), ctx.getBlockPos())) {
-         ctx.getWorld().scheduleBlockTick(ctx.getBlockPos(), this, 60 + ctx.getWorld().getRandom().nextInt(40));
-      }
-
-      return this.getDefaultState();
-   }
-
-   static {
-      DEAD_FIELD = Registries.BLOCK.getCodec().fieldOf("dead");
-      CODEC = RecordCodecBuilder.mapCodec((instance) -> {
-         return instance.group(DEAD_FIELD.forGetter((block) -> {
-            return block.deadCoralBlock;
-         }), createSettingsCodec()).apply(instance, CoralBlockBlock::new);
-      });
-   }
+    public @Nullable BlockState getPlacementState(ItemPlacementContext ctx) {
+        if (!this.isInWater((BlockView)ctx.getWorld(), ctx.getBlockPos())) {
+            ctx.getWorld().scheduleBlockTick(ctx.getBlockPos(), (Block)this, 60 + ctx.getWorld().getRandom().nextInt(40));
+        }
+        return this.getDefaultState();
+    }
 }
+

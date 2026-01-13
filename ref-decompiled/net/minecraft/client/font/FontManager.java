@@ -1,3 +1,60 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.google.common.collect.Lists
+ *  com.google.gson.Gson
+ *  com.google.gson.GsonBuilder
+ *  com.google.gson.JsonElement
+ *  com.google.gson.JsonParseException
+ *  com.mojang.datafixers.util.Pair
+ *  com.mojang.logging.LogUtils
+ *  com.mojang.serialization.DynamicOps
+ *  com.mojang.serialization.JsonOps
+ *  it.unimi.dsi.fastutil.ints.IntCollection
+ *  it.unimi.dsi.fastutil.ints.IntOpenHashSet
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.MinecraftClient
+ *  net.minecraft.client.font.BlankFont
+ *  net.minecraft.client.font.Font
+ *  net.minecraft.client.font.Font$FontFilterPair
+ *  net.minecraft.client.font.FontFilterType
+ *  net.minecraft.client.font.FontFilterType$FilterMap
+ *  net.minecraft.client.font.FontLoader$Loadable
+ *  net.minecraft.client.font.FontLoader$Provider
+ *  net.minecraft.client.font.FontManager
+ *  net.minecraft.client.font.FontManager$FontEntry
+ *  net.minecraft.client.font.FontManager$FontKey
+ *  net.minecraft.client.font.FontManager$Fonts
+ *  net.minecraft.client.font.FontManager$ProviderIndex
+ *  net.minecraft.client.font.FontManager$Providers
+ *  net.minecraft.client.font.FontStorage
+ *  net.minecraft.client.font.GlyphBaker
+ *  net.minecraft.client.font.GlyphProvider
+ *  net.minecraft.client.font.PlayerHeadGlyphs
+ *  net.minecraft.client.font.TextRenderer
+ *  net.minecraft.client.font.TextRenderer$GlyphsProvider
+ *  net.minecraft.client.option.GameOptions
+ *  net.minecraft.client.texture.AtlasManager
+ *  net.minecraft.client.texture.PlayerSkinCache
+ *  net.minecraft.client.texture.SpriteAtlasGlyphs
+ *  net.minecraft.client.texture.TextureManager
+ *  net.minecraft.resource.DependencyTracker
+ *  net.minecraft.resource.DependencyTracker$Dependencies
+ *  net.minecraft.resource.Resource
+ *  net.minecraft.resource.ResourceFinder
+ *  net.minecraft.resource.ResourceManager
+ *  net.minecraft.resource.ResourceReloader
+ *  net.minecraft.resource.ResourceReloader$Store
+ *  net.minecraft.resource.ResourceReloader$Synchronizer
+ *  net.minecraft.text.StyleSpriteSource$Sprite
+ *  net.minecraft.util.Identifier
+ *  net.minecraft.util.Util
+ *  net.minecraft.util.profiler.Profiler
+ *  net.minecraft.util.profiler.Profilers
+ *  org.slf4j.Logger
+ */
 package net.minecraft.client.font;
 
 import com.google.common.collect.Lists;
@@ -5,463 +62,259 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.logging.LogUtils;
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.JsonOps;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
+import it.unimi.dsi.fastutil.ints.IntCollection;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
-import it.unimi.dsi.fastutil.ints.IntSet;
+import java.io.BufferedReader;
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.stream.Stream;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.BlankFont;
+import net.minecraft.client.font.Font;
+import net.minecraft.client.font.FontFilterType;
+import net.minecraft.client.font.FontLoader;
+import net.minecraft.client.font.FontManager;
+import net.minecraft.client.font.FontStorage;
+import net.minecraft.client.font.GlyphBaker;
+import net.minecraft.client.font.GlyphProvider;
+import net.minecraft.client.font.PlayerHeadGlyphs;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.option.GameOptions;
+import net.minecraft.client.texture.AtlasManager;
+import net.minecraft.client.texture.PlayerSkinCache;
+import net.minecraft.client.texture.SpriteAtlasGlyphs;
 import net.minecraft.client.texture.TextureManager;
 import net.minecraft.resource.DependencyTracker;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceFinder;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.ResourceReloader;
+import net.minecraft.text.StyleSpriteSource;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.profiler.Profiler;
 import net.minecraft.util.profiler.Profilers;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
-@Environment(EnvType.CLIENT)
-public class FontManager implements ResourceReloader, AutoCloseable {
-   static final Logger LOGGER = LogUtils.getLogger();
-   private static final String FONTS_JSON = "fonts.json";
-   public static final Identifier MISSING_STORAGE_ID = Identifier.ofVanilla("missing");
-   private static final ResourceFinder FINDER = ResourceFinder.json("font");
-   private static final Gson GSON = (new GsonBuilder()).setPrettyPrinting().disableHtmlEscaping().create();
-   private final FontStorage missingStorage;
-   private final List fonts = new ArrayList();
-   private final Map fontStorages = new HashMap();
-   private final TextureManager textureManager;
-   @Nullable
-   private volatile FontStorage currentStorage;
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
+public class FontManager
+implements ResourceReloader,
+AutoCloseable {
+    static final Logger LOGGER = LogUtils.getLogger();
+    private static final String FONTS_JSON = "fonts.json";
+    public static final Identifier MISSING_STORAGE_ID = Identifier.ofVanilla((String)"missing");
+    private static final ResourceFinder FINDER = ResourceFinder.json((String)"font");
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+    final FontStorage missingStorage;
+    private final List<Font> fonts = new ArrayList();
+    private final Map<Identifier, FontStorage> fontStorages = new HashMap();
+    private final TextureManager textureManager;
+    private final Fonts anyFonts = new Fonts(this, false);
+    private final Fonts advanceValidatedFonts = new Fonts(this, true);
+    private final AtlasManager atlasManager;
+    private final Map<Identifier, SpriteAtlasGlyphs> spriteGlyphs = new HashMap();
+    final PlayerHeadGlyphs playerHeadGlyphs;
 
-   public FontManager(TextureManager manager) {
-      this.textureManager = manager;
-      this.missingStorage = (FontStorage)Util.make(new FontStorage(manager, MISSING_STORAGE_ID), (fontStorage) -> {
-         fontStorage.setFonts(List.of(createEmptyFont()), Set.of());
-      });
-   }
+    public FontManager(TextureManager textureManager, AtlasManager atlasManager, PlayerSkinCache playerSkinCache) {
+        this.textureManager = textureManager;
+        this.atlasManager = atlasManager;
+        this.missingStorage = this.createFontStorage(MISSING_STORAGE_ID, List.of(FontManager.createEmptyFont()), Set.of());
+        this.playerHeadGlyphs = new PlayerHeadGlyphs(playerSkinCache);
+    }
 
-   private static Font.FontFilterPair createEmptyFont() {
-      return new Font.FontFilterPair(new BlankFont(), FontFilterType.FilterMap.NO_FILTER);
-   }
+    private FontStorage createFontStorage(Identifier fontId, List<Font.FontFilterPair> allFonts, Set<FontFilterType> filters) {
+        GlyphBaker glyphBaker = new GlyphBaker(this.textureManager, fontId);
+        FontStorage fontStorage = new FontStorage(glyphBaker);
+        fontStorage.setFonts(allFonts, filters);
+        return fontStorage;
+    }
 
-   public CompletableFuture reload(ResourceReloader.Synchronizer synchronizer, ResourceManager resourceManager, Executor executor, Executor executor2) {
-      CompletableFuture var10000 = this.loadIndex(resourceManager, executor);
-      Objects.requireNonNull(synchronizer);
-      return var10000.thenCompose(synchronizer::whenPrepared).thenAcceptAsync((index) -> {
-         this.reload(index, Profilers.get());
-      }, executor2);
-   }
+    private static Font.FontFilterPair createEmptyFont() {
+        return new Font.FontFilterPair((Font)new BlankFont(), FontFilterType.FilterMap.NO_FILTER);
+    }
 
-   private CompletableFuture loadIndex(ResourceManager resourceManager, Executor executor) {
-      List list = new ArrayList();
-      Iterator var4 = FINDER.findAllResources(resourceManager).entrySet().iterator();
+    public CompletableFuture<Void> reload(ResourceReloader.Store store, Executor executor, ResourceReloader.Synchronizer synchronizer, Executor executor2) {
+        return ((CompletableFuture)this.loadIndex(store.getResourceManager(), executor).thenCompose(arg_0 -> ((ResourceReloader.Synchronizer)synchronizer).whenPrepared(arg_0))).thenAcceptAsync(index -> this.reload(index, Profilers.get()), executor2);
+    }
 
-      while(var4.hasNext()) {
-         Map.Entry entry = (Map.Entry)var4.next();
-         Identifier identifier = FINDER.toResourceId((Identifier)entry.getKey());
-         list.add(CompletableFuture.supplyAsync(() -> {
-            List list = loadFontProviders((List)entry.getValue(), identifier);
-            FontEntry fontEntry = new FontEntry(identifier);
-            Iterator var7 = list.iterator();
-
-            while(var7.hasNext()) {
-               Pair pair = (Pair)var7.next();
-               FontKey fontKey = (FontKey)pair.getFirst();
-               FontFilterType.FilterMap filterMap = ((FontLoader.Provider)pair.getSecond()).filter();
-               ((FontLoader.Provider)pair.getSecond()).definition().build().ifLeft((loadable) -> {
-                  CompletableFuture completableFuture = this.load(fontKey, loadable, resourceManager, executor);
-                  fontEntry.addBuilder(fontKey, filterMap, completableFuture);
-               }).ifRight((reference) -> {
-                  fontEntry.addReferenceBuilder(fontKey, filterMap, reference);
-               });
-            }
-
-            return fontEntry;
-         }, executor));
-      }
-
-      return Util.combineSafe(list).thenCompose((entries) -> {
-         List list = (List)entries.stream().flatMap(FontEntry::getImmediateProviders).collect(Util.toArrayList());
-         Font.FontFilterPair fontFilterPair = createEmptyFont();
-         list.add(CompletableFuture.completedFuture(Optional.of(fontFilterPair.provider())));
-         return Util.combineSafe(list).thenCompose((providers) -> {
-            Map map = this.getRequiredFontProviders(entries);
-            CompletableFuture[] completableFutures = (CompletableFuture[])map.values().stream().map((dest) -> {
-               return CompletableFuture.runAsync(() -> {
-                  this.insertFont(dest, fontFilterPair);
-               }, executor);
-            }).toArray((i) -> {
-               return new CompletableFuture[i];
+    private CompletableFuture<ProviderIndex> loadIndex(ResourceManager resourceManager, Executor executor) {
+        ArrayList<CompletableFuture<FontEntry>> list = new ArrayList<CompletableFuture<FontEntry>>();
+        for (Map.Entry entry : FINDER.findAllResources(resourceManager).entrySet()) {
+            Identifier identifier = FINDER.toResourceId((Identifier)entry.getKey());
+            list.add(CompletableFuture.supplyAsync(() -> {
+                List list = FontManager.loadFontProviders((List)((List)entry.getValue()), (Identifier)identifier);
+                FontEntry fontEntry = new FontEntry(identifier);
+                for (Pair pair : list) {
+                    FontKey fontKey = (FontKey)pair.getFirst();
+                    FontFilterType.FilterMap filterMap = ((FontLoader.Provider)pair.getSecond()).filter();
+                    ((FontLoader.Provider)pair.getSecond()).definition().build().ifLeft(loadable -> {
+                        CompletableFuture completableFuture = this.load(fontKey, loadable, resourceManager, executor);
+                        fontEntry.addBuilder(fontKey, filterMap, completableFuture);
+                    }).ifRight(reference -> fontEntry.addReferenceBuilder(fontKey, filterMap, reference));
+                }
+                return fontEntry;
+            }, executor));
+        }
+        return Util.combineSafe(list).thenCompose(entries -> {
+            List list = (List)entries.stream().flatMap(FontEntry::getImmediateProviders).collect(Util.toArrayList());
+            Font.FontFilterPair fontFilterPair = FontManager.createEmptyFont();
+            list.add(CompletableFuture.completedFuture(Optional.of(fontFilterPair.provider())));
+            return Util.combineSafe((List)list).thenCompose(providers -> {
+                Map map = this.getRequiredFontProviders(entries);
+                CompletableFuture[] completableFutures = (CompletableFuture[])map.values().stream().map(dest -> CompletableFuture.runAsync(() -> this.insertFont(dest, fontFilterPair), executor)).toArray(CompletableFuture[]::new);
+                return CompletableFuture.allOf(completableFutures).thenApply(ignored -> {
+                    List list2 = providers.stream().flatMap(Optional::stream).toList();
+                    return new ProviderIndex(map, list2);
+                });
             });
-            return CompletableFuture.allOf(completableFutures).thenApply((ignored) -> {
-               List list2 = providers.stream().flatMap(Optional::stream).toList();
-               return new ProviderIndex(map, list2);
-            });
-         });
-      });
-   }
+        });
+    }
 
-   private CompletableFuture load(FontKey key, FontLoader.Loadable loadable, ResourceManager resourceManager, Executor executor) {
-      return CompletableFuture.supplyAsync(() -> {
-         try {
-            return Optional.of(loadable.load(resourceManager));
-         } catch (Exception var4) {
-            LOGGER.warn("Failed to load builder {}, rejecting", key, var4);
-            return Optional.empty();
-         }
-      }, executor);
-   }
-
-   private Map getRequiredFontProviders(List entries) {
-      Map map = new HashMap();
-      DependencyTracker dependencyTracker = new DependencyTracker();
-      entries.forEach((entry) -> {
-         dependencyTracker.add(entry.fontId, entry);
-      });
-      dependencyTracker.traverse((dependent, fontEntry) -> {
-         Objects.requireNonNull(map);
-         fontEntry.getRequiredFontProviders(map::get).ifPresent((fonts) -> {
-            map.put(dependent, fonts);
-         });
-      });
-      return map;
-   }
-
-   private void insertFont(List fonts, Font.FontFilterPair font) {
-      fonts.add(0, font);
-      IntSet intSet = new IntOpenHashSet();
-      Iterator var4 = fonts.iterator();
-
-      while(var4.hasNext()) {
-         Font.FontFilterPair fontFilterPair = (Font.FontFilterPair)var4.next();
-         intSet.addAll(fontFilterPair.provider().getProvidedGlyphs());
-      }
-
-      intSet.forEach((codePoint) -> {
-         if (codePoint != 32) {
-            Iterator var2 = Lists.reverse(fonts).iterator();
-
-            while(var2.hasNext()) {
-               Font.FontFilterPair fontFilterPair = (Font.FontFilterPair)var2.next();
-               if (fontFilterPair.provider().getGlyph(codePoint) != null) {
-                  break;
-               }
-            }
-
-         }
-      });
-   }
-
-   private static Set getActiveFilters(GameOptions options) {
-      Set set = EnumSet.noneOf(FontFilterType.class);
-      if ((Boolean)options.getForceUnicodeFont().getValue()) {
-         set.add(FontFilterType.UNIFORM);
-      }
-
-      if ((Boolean)options.getJapaneseGlyphVariants().getValue()) {
-         set.add(FontFilterType.JAPANESE_VARIANTS);
-      }
-
-      return set;
-   }
-
-   private void reload(ProviderIndex index, Profiler profiler) {
-      profiler.push("closing");
-      this.currentStorage = null;
-      this.fontStorages.values().forEach(FontStorage::close);
-      this.fontStorages.clear();
-      this.fonts.forEach(Font::close);
-      this.fonts.clear();
-      Set set = getActiveFilters(MinecraftClient.getInstance().options);
-      profiler.swap("reloading");
-      index.fontSets().forEach((id, fonts) -> {
-         FontStorage fontStorage = new FontStorage(this.textureManager, id);
-         fontStorage.setFonts(Lists.reverse(fonts), set);
-         this.fontStorages.put(id, fontStorage);
-      });
-      this.fonts.addAll(index.allProviders);
-      profiler.pop();
-      if (!this.fontStorages.containsKey(MinecraftClient.DEFAULT_FONT_ID)) {
-         throw new IllegalStateException("Default font failed to load");
-      }
-   }
-
-   public void setActiveFilters(GameOptions options) {
-      Set set = getActiveFilters(options);
-      Iterator var3 = this.fontStorages.values().iterator();
-
-      while(var3.hasNext()) {
-         FontStorage fontStorage = (FontStorage)var3.next();
-         fontStorage.setActiveFilters(set);
-      }
-
-   }
-
-   private static List loadFontProviders(List fontResources, Identifier id) {
-      List list = new ArrayList();
-      Iterator var3 = fontResources.iterator();
-
-      while(var3.hasNext()) {
-         Resource resource = (Resource)var3.next();
-
-         try {
-            Reader reader = resource.getReader();
-
+    private CompletableFuture<Optional<Font>> load(FontKey key, FontLoader.Loadable loadable, ResourceManager resourceManager, Executor executor) {
+        return CompletableFuture.supplyAsync(() -> {
             try {
-               JsonElement jsonElement = (JsonElement)GSON.fromJson(reader, JsonElement.class);
-               Providers providers = (Providers)FontManager.Providers.CODEC.parse(JsonOps.INSTANCE, jsonElement).getOrThrow(JsonParseException::new);
-               List list2 = providers.providers;
-
-               for(int i = list2.size() - 1; i >= 0; --i) {
-                  FontKey fontKey = new FontKey(id, resource.getPackId(), i);
-                  list.add(Pair.of(fontKey, (FontLoader.Provider)list2.get(i)));
-               }
-            } catch (Throwable var12) {
-               if (reader != null) {
-                  try {
-                     reader.close();
-                  } catch (Throwable var11) {
-                     var12.addSuppressed(var11);
-                  }
-               }
-
-               throw var12;
+                return Optional.of(loadable.load(resourceManager));
             }
-
-            if (reader != null) {
-               reader.close();
+            catch (Exception exception) {
+                LOGGER.warn("Failed to load builder {}, rejecting", (Object)key, (Object)exception);
+                return Optional.empty();
             }
-         } catch (Exception var13) {
-            LOGGER.warn("Unable to load font '{}' in {} in resourcepack: '{}'", new Object[]{id, "fonts.json", resource.getPackId(), var13});
-         }
-      }
+        }, executor);
+    }
 
-      return list;
-   }
+    private Map<Identifier, List<Font.FontFilterPair>> getRequiredFontProviders(List<FontEntry> entries) {
+        HashMap<Identifier, List<Font.FontFilterPair>> map = new HashMap<Identifier, List<Font.FontFilterPair>>();
+        DependencyTracker dependencyTracker = new DependencyTracker();
+        entries.forEach(entry -> dependencyTracker.add((Object)entry.fontId, (DependencyTracker.Dependencies)entry));
+        dependencyTracker.traverse((dependent, fontEntry) -> fontEntry.getRequiredFontProviders(map::get).ifPresent(fonts -> map.put((Identifier)dependent, (List<Font.FontFilterPair>)fonts)));
+        return map;
+    }
 
-   public TextRenderer createTextRenderer() {
-      return new TextRenderer(this::getStorage, false);
-   }
-
-   public TextRenderer createAdvanceValidatingTextRenderer() {
-      return new TextRenderer(this::getStorage, true);
-   }
-
-   private FontStorage getStorageInternal(Identifier id) {
-      return (FontStorage)this.fontStorages.getOrDefault(id, this.missingStorage);
-   }
-
-   private FontStorage getStorage(Identifier id) {
-      FontStorage fontStorage = this.currentStorage;
-      if (fontStorage != null && id.equals(fontStorage.getId())) {
-         return fontStorage;
-      } else {
-         FontStorage fontStorage2 = this.getStorageInternal(id);
-         this.currentStorage = fontStorage2;
-         return fontStorage2;
-      }
-   }
-
-   public void close() {
-      this.fontStorages.values().forEach(FontStorage::close);
-      this.fonts.forEach(Font::close);
-      this.missingStorage.close();
-   }
-
-   @Environment(EnvType.CLIENT)
-   private static record FontKey(Identifier fontId, String pack, int index) {
-      FontKey(Identifier identifier, String string, int i) {
-         this.fontId = identifier;
-         this.pack = string;
-         this.index = i;
-      }
-
-      public String toString() {
-         String var10000 = String.valueOf(this.fontId);
-         return "(" + var10000 + ": builder #" + this.index + " from pack " + this.pack + ")";
-      }
-
-      public Identifier fontId() {
-         return this.fontId;
-      }
-
-      public String pack() {
-         return this.pack;
-      }
-
-      public int index() {
-         return this.index;
-      }
-   }
-
-   @Environment(EnvType.CLIENT)
-   private static record ProviderIndex(Map fontSets, List allProviders) {
-      final List allProviders;
-
-      ProviderIndex(Map map, List list) {
-         this.fontSets = map;
-         this.allProviders = list;
-      }
-
-      public Map fontSets() {
-         return this.fontSets;
-      }
-
-      public List allProviders() {
-         return this.allProviders;
-      }
-   }
-
-   @Environment(EnvType.CLIENT)
-   private static record Providers(List providers) {
-      final List providers;
-      public static final Codec CODEC = RecordCodecBuilder.create((instance) -> {
-         return instance.group(FontLoader.Provider.CODEC.listOf().fieldOf("providers").forGetter(Providers::providers)).apply(instance, Providers::new);
-      });
-
-      private Providers(List list) {
-         this.providers = list;
-      }
-
-      public List providers() {
-         return this.providers;
-      }
-   }
-
-   @Environment(EnvType.CLIENT)
-   private static record FontEntry(Identifier fontId, List builders, Set dependencies) implements DependencyTracker.Dependencies {
-      final Identifier fontId;
-
-      public FontEntry(Identifier fontId) {
-         this(fontId, new ArrayList(), new HashSet());
-      }
-
-      private FontEntry(Identifier identifier, List list, Set set) {
-         this.fontId = identifier;
-         this.builders = list;
-         this.dependencies = set;
-      }
-
-      public void addReferenceBuilder(FontKey key, FontFilterType.FilterMap filters, FontLoader.Reference reference) {
-         this.builders.add(new Builder(key, filters, Either.right(reference.id())));
-         this.dependencies.add(reference.id());
-      }
-
-      public void addBuilder(FontKey key, FontFilterType.FilterMap filters, CompletableFuture fontFuture) {
-         this.builders.add(new Builder(key, filters, Either.left(fontFuture)));
-      }
-
-      private Stream getImmediateProviders() {
-         return this.builders.stream().flatMap((builder) -> {
-            return builder.result.left().stream();
-         });
-      }
-
-      public Optional getRequiredFontProviders(Function fontRetriever) {
-         List list = new ArrayList();
-         Iterator var3 = this.builders.iterator();
-
-         while(var3.hasNext()) {
-            Builder builder = (Builder)var3.next();
-            Optional optional = builder.build(fontRetriever);
-            if (!optional.isPresent()) {
-               return Optional.empty();
+    private void insertFont(List<Font.FontFilterPair> fonts, Font.FontFilterPair font) {
+        fonts.add(0, font);
+        IntOpenHashSet intSet = new IntOpenHashSet();
+        for (Font.FontFilterPair fontFilterPair : fonts) {
+            intSet.addAll((IntCollection)fontFilterPair.provider().getProvidedGlyphs());
+        }
+        intSet.forEach(codePoint -> {
+            Font.FontFilterPair fontFilterPair;
+            if (codePoint == 32) {
+                return;
             }
-
-            list.addAll((Collection)optional.get());
-         }
-
-         return Optional.of(list);
-      }
-
-      public void forDependencies(Consumer callback) {
-         this.dependencies.forEach(callback);
-      }
-
-      public void forOptionalDependencies(Consumer callback) {
-      }
-
-      public Identifier fontId() {
-         return this.fontId;
-      }
-
-      public List builders() {
-         return this.builders;
-      }
-
-      public Set dependencies() {
-         return this.dependencies;
-      }
-   }
-
-   @Environment(EnvType.CLIENT)
-   static record Builder(FontKey id, FontFilterType.FilterMap filter, Either result) {
-      final Either result;
-
-      Builder(FontKey fontKey, FontFilterType.FilterMap filterMap, Either either) {
-         this.id = fontKey;
-         this.filter = filterMap;
-         this.result = either;
-      }
-
-      public Optional build(Function fontRetriever) {
-         return (Optional)this.result.map((future) -> {
-            return ((Optional)future.join()).map((font) -> {
-               return List.of(new Font.FontFilterPair(font, this.filter));
-            });
-         }, (referee) -> {
-            List list = (List)fontRetriever.apply(referee);
-            if (list == null) {
-               FontManager.LOGGER.warn("Can't find font {} referenced by builder {}, either because it's missing, failed to load or is part of loading cycle", referee, this.id);
-               return Optional.empty();
-            } else {
-               return Optional.of(list.stream().map(this::applyFilter).toList());
+            Iterator iterator = Lists.reverse((List)fonts).iterator();
+            while (iterator.hasNext() && (fontFilterPair = (Font.FontFilterPair)iterator.next()).provider().getGlyph(codePoint) == null) {
             }
-         });
-      }
+        });
+    }
 
-      private Font.FontFilterPair applyFilter(Font.FontFilterPair font) {
-         return new Font.FontFilterPair(font.provider(), this.filter.apply(font.filter()));
-      }
+    private static Set<FontFilterType> getActiveFilters(GameOptions options) {
+        EnumSet<FontFilterType> set = EnumSet.noneOf(FontFilterType.class);
+        if (((Boolean)options.getForceUnicodeFont().getValue()).booleanValue()) {
+            set.add(FontFilterType.UNIFORM);
+        }
+        if (((Boolean)options.getJapaneseGlyphVariants().getValue()).booleanValue()) {
+            set.add(FontFilterType.JAPANESE_VARIANTS);
+        }
+        return set;
+    }
 
-      public FontKey id() {
-         return this.id;
-      }
+    private void reload(ProviderIndex index, Profiler profiler) {
+        profiler.push("closing");
+        this.anyFonts.clear();
+        this.advanceValidatedFonts.clear();
+        this.fontStorages.values().forEach(FontStorage::close);
+        this.fontStorages.clear();
+        this.fonts.forEach(Font::close);
+        this.fonts.clear();
+        Set set = FontManager.getActiveFilters((GameOptions)MinecraftClient.getInstance().options);
+        profiler.swap("reloading");
+        index.fontSets().forEach((id, fonts) -> this.fontStorages.put(id, this.createFontStorage(id, Lists.reverse((List)fonts), set)));
+        this.fonts.addAll(index.allProviders);
+        profiler.pop();
+        if (!this.fontStorages.containsKey(MinecraftClient.DEFAULT_FONT_ID)) {
+            throw new IllegalStateException("Default font failed to load");
+        }
+        this.spriteGlyphs.clear();
+        this.atlasManager.acceptAtlasTextures((definitionId, atlasTexture) -> this.spriteGlyphs.put(definitionId, new SpriteAtlasGlyphs(atlasTexture)));
+    }
 
-      public FontFilterType.FilterMap filter() {
-         return this.filter;
-      }
+    public void setActiveFilters(GameOptions options) {
+        Set set = FontManager.getActiveFilters((GameOptions)options);
+        for (FontStorage fontStorage : this.fontStorages.values()) {
+            fontStorage.setActiveFilters(set);
+        }
+    }
 
-      public Either result() {
-         return this.result;
-      }
-   }
+    private static List<Pair<FontKey, FontLoader.Provider>> loadFontProviders(List<Resource> fontResources, Identifier id) {
+        ArrayList<Pair<FontKey, FontLoader.Provider>> list = new ArrayList<Pair<FontKey, FontLoader.Provider>>();
+        for (Resource resource : fontResources) {
+            try {
+                BufferedReader reader = resource.getReader();
+                try {
+                    JsonElement jsonElement = (JsonElement)GSON.fromJson((Reader)reader, JsonElement.class);
+                    Providers providers = (Providers)Providers.CODEC.parse((DynamicOps)JsonOps.INSTANCE, (Object)jsonElement).getOrThrow(JsonParseException::new);
+                    List list2 = providers.providers;
+                    for (int i = list2.size() - 1; i >= 0; --i) {
+                        FontKey fontKey = new FontKey(id, resource.getPackId(), i);
+                        list.add((Pair<FontKey, FontLoader.Provider>)Pair.of((Object)fontKey, (Object)((FontLoader.Provider)list2.get(i))));
+                    }
+                }
+                finally {
+                    if (reader == null) continue;
+                    ((Reader)reader).close();
+                }
+            }
+            catch (Exception exception) {
+                LOGGER.warn("Unable to load font '{}' in {} in resourcepack: '{}'", new Object[]{id, "fonts.json", resource.getPackId(), exception});
+            }
+        }
+        return list;
+    }
+
+    public TextRenderer createTextRenderer() {
+        return new TextRenderer((TextRenderer.GlyphsProvider)this.anyFonts);
+    }
+
+    public TextRenderer createAdvanceValidatingTextRenderer() {
+        return new TextRenderer((TextRenderer.GlyphsProvider)this.advanceValidatedFonts);
+    }
+
+    FontStorage getStorageInternal(Identifier id) {
+        return this.fontStorages.getOrDefault(id, this.missingStorage);
+    }
+
+    GlyphProvider getSpriteGlyphs(StyleSpriteSource.Sprite description) {
+        SpriteAtlasGlyphs spriteAtlasGlyphs = (SpriteAtlasGlyphs)this.spriteGlyphs.get(description.atlasId());
+        if (spriteAtlasGlyphs == null) {
+            return this.missingStorage.getGlyphs(false);
+        }
+        return spriteAtlasGlyphs.getGlyphProvider(description.spriteId());
+    }
+
+    @Override
+    public void close() {
+        this.anyFonts.close();
+        this.advanceValidatedFonts.close();
+        this.fontStorages.values().forEach(FontStorage::close);
+        this.fonts.forEach(Font::close);
+        this.missingStorage.close();
+    }
 }
+

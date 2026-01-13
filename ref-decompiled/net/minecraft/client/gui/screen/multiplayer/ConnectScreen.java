@@ -1,10 +1,37 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.logging.LogUtils
+ *  io.netty.channel.ChannelFuture
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.MinecraftClient
+ *  net.minecraft.client.QuickPlay
+ *  net.minecraft.client.QuickPlayLogger$WorldType
+ *  net.minecraft.client.gui.DrawContext
+ *  net.minecraft.client.gui.Element
+ *  net.minecraft.client.gui.screen.Screen
+ *  net.minecraft.client.gui.screen.multiplayer.ConnectScreen
+ *  net.minecraft.client.gui.screen.multiplayer.ConnectScreen$1
+ *  net.minecraft.client.gui.widget.ButtonWidget
+ *  net.minecraft.client.network.CookieStorage
+ *  net.minecraft.client.network.ServerAddress
+ *  net.minecraft.client.network.ServerInfo
+ *  net.minecraft.client.session.report.ReporterEnvironment
+ *  net.minecraft.client.util.NarratorManager
+ *  net.minecraft.network.ClientConnection
+ *  net.minecraft.screen.ScreenTexts
+ *  net.minecraft.text.Text
+ *  net.minecraft.util.Util
+ *  net.minecraft.util.logging.UncaughtExceptionLogger
+ *  org.jspecify.annotations.Nullable
+ *  org.slf4j.Logger
+ */
 package net.minecraft.client.gui.screen.multiplayer;
 
 import com.mojang.logging.LogUtils;
 import io.netty.channel.ChannelFuture;
-import java.net.InetSocketAddress;
-import java.time.Duration;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -12,221 +39,113 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.QuickPlay;
 import net.minecraft.client.QuickPlayLogger;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.DisconnectedScreen;
+import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.multiplayer.ConnectScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.network.Address;
-import net.minecraft.client.network.AllowedAddressResolver;
-import net.minecraft.client.network.ClientLoginNetworkHandler;
 import net.minecraft.client.network.CookieStorage;
 import net.minecraft.client.network.ServerAddress;
 import net.minecraft.client.network.ServerInfo;
-import net.minecraft.client.resource.server.ServerResourcePackManager;
 import net.minecraft.client.session.report.ReporterEnvironment;
 import net.minecraft.client.util.NarratorManager;
 import net.minecraft.network.ClientConnection;
-import net.minecraft.network.NetworkSide;
-import net.minecraft.network.packet.c2s.login.LoginHelloC2SPacket;
-import net.minecraft.network.state.LoginStates;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import net.minecraft.util.logging.UncaughtExceptionLogger;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 
-@Environment(EnvType.CLIENT)
-public class ConnectScreen extends Screen {
-   private static final AtomicInteger CONNECTOR_THREADS_COUNT = new AtomicInteger(0);
-   static final Logger LOGGER = LogUtils.getLogger();
-   private static final long NARRATOR_INTERVAL = 2000L;
-   public static final Text ABORTED_TEXT = Text.translatable("connect.aborted");
-   public static final Text UNKNOWN_HOST_TEXT = Text.translatable("disconnect.genericReason", Text.translatable("disconnect.unknownHost"));
-   @Nullable
-   volatile ClientConnection connection;
-   @Nullable
-   ChannelFuture future;
-   volatile boolean connectingCancelled;
-   final Screen parent;
-   private Text status = Text.translatable("connect.connecting");
-   private long lastNarrationTime = -1L;
-   final Text failureErrorMessage;
+@Environment(value=EnvType.CLIENT)
+public class ConnectScreen
+extends Screen {
+    private static final AtomicInteger CONNECTOR_THREADS_COUNT = new AtomicInteger(0);
+    static final Logger LOGGER = LogUtils.getLogger();
+    private static final long NARRATOR_INTERVAL = 2000L;
+    public static final Text ABORTED_TEXT = Text.translatable((String)"connect.aborted");
+    public static final Text UNKNOWN_HOST_TEXT = Text.translatable((String)"disconnect.genericReason", (Object[])new Object[]{Text.translatable((String)"disconnect.unknownHost")});
+    volatile @Nullable ClientConnection connection;
+    @Nullable ChannelFuture future;
+    volatile boolean connectingCancelled;
+    final Screen parent;
+    private Text status = Text.translatable((String)"connect.connecting");
+    private long lastNarrationTime = -1L;
+    final Text failureErrorMessage;
 
-   private ConnectScreen(Screen parent, Text failureErrorMessage) {
-      super(NarratorManager.EMPTY);
-      this.parent = parent;
-      this.failureErrorMessage = failureErrorMessage;
-   }
+    private ConnectScreen(Screen parent, Text failureErrorMessage) {
+        super(NarratorManager.EMPTY);
+        this.parent = parent;
+        this.failureErrorMessage = failureErrorMessage;
+    }
 
-   public static void connect(Screen screen, MinecraftClient client, ServerAddress address, ServerInfo info, boolean quickPlay, @Nullable CookieStorage cookieStorage) {
-      if (client.currentScreen instanceof ConnectScreen) {
-         LOGGER.error("Attempt to connect while already connecting");
-      } else {
-         Text text;
-         if (cookieStorage != null) {
-            text = ScreenTexts.CONNECT_FAILED_TRANSFER;
-         } else if (quickPlay) {
-            text = QuickPlay.ERROR_TITLE;
-         } else {
-            text = ScreenTexts.CONNECT_FAILED;
-         }
+    public static void connect(Screen screen, MinecraftClient client, ServerAddress address, ServerInfo info, boolean quickPlay, @Nullable CookieStorage cookieStorage) {
+        if (client.currentScreen instanceof ConnectScreen) {
+            LOGGER.error("Attempt to connect while already connecting");
+            return;
+        }
+        Text text = cookieStorage != null ? ScreenTexts.CONNECT_FAILED_TRANSFER : (quickPlay ? QuickPlay.ERROR_TITLE : ScreenTexts.CONNECT_FAILED);
+        ConnectScreen connectScreen = new ConnectScreen(screen, text);
+        if (cookieStorage != null) {
+            connectScreen.setStatus((Text)Text.translatable((String)"connect.transferring"));
+        }
+        client.disconnectWithProgressScreen(false);
+        client.loadBlockList();
+        client.ensureAbuseReportContext(ReporterEnvironment.ofThirdPartyServer((String)info.address));
+        client.getQuickPlayLogger().setWorld(QuickPlayLogger.WorldType.MULTIPLAYER, info.address, info.name);
+        client.setScreen((Screen)connectScreen);
+        connectScreen.connect(client, address, info, cookieStorage);
+    }
 
-         ConnectScreen connectScreen = new ConnectScreen(screen, text);
-         if (cookieStorage != null) {
-            connectScreen.setStatus(Text.translatable("connect.transferring"));
-         }
+    private void connect(MinecraftClient client, ServerAddress address, ServerInfo info, @Nullable CookieStorage cookieStorage) {
+        LOGGER.info("Connecting to {}, {}", (Object)address.getAddress(), (Object)address.getPort());
+        1 thread = new /* Unavailable Anonymous Inner Class!! */;
+        thread.setUncaughtExceptionHandler((Thread.UncaughtExceptionHandler)new UncaughtExceptionLogger(LOGGER));
+        thread.start();
+    }
 
-         client.disconnectWithProgressScreen();
-         client.loadBlockList();
-         client.ensureAbuseReportContext(ReporterEnvironment.ofThirdPartyServer(info.address));
-         client.getQuickPlayLogger().setWorld(QuickPlayLogger.WorldType.MULTIPLAYER, info.address, info.name);
-         client.setScreen(connectScreen);
-         connectScreen.connect(client, address, info, cookieStorage);
-      }
-   }
+    private void setStatus(Text status) {
+        this.status = status;
+    }
 
-   private void connect(final MinecraftClient client, final ServerAddress address, final ServerInfo info, @Nullable final CookieStorage cookieStorage) {
-      LOGGER.info("Connecting to {}, {}", address.getAddress(), address.getPort());
-      Thread thread = new Thread("Server Connector #" + CONNECTOR_THREADS_COUNT.incrementAndGet()) {
-         public void run() {
-            InetSocketAddress inetSocketAddress = null;
-
-            try {
-               if (ConnectScreen.this.connectingCancelled) {
-                  return;
-               }
-
-               Optional optional = AllowedAddressResolver.DEFAULT.resolve(address).map(Address::getInetSocketAddress);
-               if (ConnectScreen.this.connectingCancelled) {
-                  return;
-               }
-
-               if (optional.isEmpty()) {
-                  client.execute(() -> {
-                     client.setScreen(new DisconnectedScreen(ConnectScreen.this.parent, ConnectScreen.this.failureErrorMessage, ConnectScreen.UNKNOWN_HOST_TEXT));
-                  });
-                  return;
-               }
-
-               inetSocketAddress = (InetSocketAddress)optional.get();
-               ClientConnection clientConnection;
-               synchronized(ConnectScreen.this) {
-                  if (ConnectScreen.this.connectingCancelled) {
-                     return;
-                  }
-
-                  clientConnection = new ClientConnection(NetworkSide.CLIENTBOUND);
-                  clientConnection.resetPacketSizeLog(client.getDebugHud().getPacketSizeLog());
-                  ConnectScreen.this.future = ClientConnection.connect(inetSocketAddress, client.options.shouldUseNativeTransport(), clientConnection);
-               }
-
-               ConnectScreen.this.future.syncUninterruptibly();
-               synchronized(ConnectScreen.this) {
-                  if (ConnectScreen.this.connectingCancelled) {
-                     clientConnection.disconnect(ConnectScreen.ABORTED_TEXT);
-                     return;
-                  }
-
-                  ConnectScreen.this.connection = clientConnection;
-                  client.getServerResourcePackProvider().init(clientConnection, toAcceptanceStatus(info.getResourcePackPolicy()));
-               }
-
-               ClientConnection var10000 = ConnectScreen.this.connection;
-               String var10001 = inetSocketAddress.getHostName();
-               int var10002 = inetSocketAddress.getPort();
-               ConnectScreen var10013 = ConnectScreen.this;
-               var10000.connect(var10001, var10002, LoginStates.C2S, LoginStates.S2C, new ClientLoginNetworkHandler(ConnectScreen.this.connection, client, info, ConnectScreen.this.parent, false, (Duration)null, var10013::setStatus, cookieStorage), cookieStorage != null);
-               ConnectScreen.this.connection.send(new LoginHelloC2SPacket(client.getSession().getUsername(), client.getSession().getUuidOrNull()));
-            } catch (Exception var9) {
-               if (ConnectScreen.this.connectingCancelled) {
-                  return;
-               }
-
-               Throwable var5 = var9.getCause();
-               Exception exception3;
-               if (var5 instanceof Exception exception2) {
-                  exception3 = exception2;
-               } else {
-                  exception3 = var9;
-               }
-
-               ConnectScreen.LOGGER.error("Couldn't connect to server", var9);
-               String string = inetSocketAddress == null ? exception3.getMessage() : exception3.getMessage().replaceAll(inetSocketAddress.getHostName() + ":" + inetSocketAddress.getPort(), "").replaceAll(inetSocketAddress.toString(), "");
-               client.execute(() -> {
-                  client.setScreen(new DisconnectedScreen(ConnectScreen.this.parent, ConnectScreen.this.failureErrorMessage, Text.translatable("disconnect.genericReason", string)));
-               });
+    public void tick() {
+        if (this.connection != null) {
+            if (this.connection.isOpen()) {
+                this.connection.tick();
+            } else {
+                this.connection.handleDisconnection();
             }
+        }
+    }
 
-         }
+    public boolean shouldCloseOnEsc() {
+        return false;
+    }
 
-         private static ServerResourcePackManager.AcceptanceStatus toAcceptanceStatus(ServerInfo.ResourcePackPolicy policy) {
-            ServerResourcePackManager.AcceptanceStatus var10000;
-            switch (policy) {
-               case ENABLED:
-                  var10000 = ServerResourcePackManager.AcceptanceStatus.ALLOWED;
-                  break;
-               case DISABLED:
-                  var10000 = ServerResourcePackManager.AcceptanceStatus.DECLINED;
-                  break;
-               case PROMPT:
-                  var10000 = ServerResourcePackManager.AcceptanceStatus.PENDING;
-                  break;
-               default:
-                  throw new MatchException((String)null, (Throwable)null);
+    protected void init() {
+        this.addDrawableChild((Element)ButtonWidget.builder((Text)ScreenTexts.CANCEL, button -> {
+            ConnectScreen connectScreen = this;
+            synchronized (connectScreen) {
+                this.connectingCancelled = true;
+                if (this.future != null) {
+                    this.future.cancel(true);
+                    this.future = null;
+                }
+                if (this.connection != null) {
+                    this.connection.disconnect(ABORTED_TEXT);
+                }
             }
+            this.client.setScreen(this.parent);
+        }).dimensions(this.width / 2 - 100, this.height / 4 + 120 + 12, 200, 20).build());
+    }
 
-            return var10000;
-         }
-      };
-      thread.setUncaughtExceptionHandler(new UncaughtExceptionLogger(LOGGER));
-      thread.start();
-   }
-
-   private void setStatus(Text status) {
-      this.status = status;
-   }
-
-   public void tick() {
-      if (this.connection != null) {
-         if (this.connection.isOpen()) {
-            this.connection.tick();
-         } else {
-            this.connection.handleDisconnection();
-         }
-      }
-
-   }
-
-   public boolean shouldCloseOnEsc() {
-      return false;
-   }
-
-   protected void init() {
-      this.addDrawableChild(ButtonWidget.builder(ScreenTexts.CANCEL, (button) -> {
-         synchronized(this) {
-            this.connectingCancelled = true;
-            if (this.future != null) {
-               this.future.cancel(true);
-               this.future = null;
-            }
-
-            if (this.connection != null) {
-               this.connection.disconnect(ABORTED_TEXT);
-            }
-         }
-
-         this.client.setScreen(this.parent);
-      }).dimensions(this.width / 2 - 100, this.height / 4 + 120 + 12, 200, 20).build());
-   }
-
-   public void render(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
-      super.render(context, mouseX, mouseY, deltaTicks);
-      long l = Util.getMeasuringTimeMs();
-      if (l - this.lastNarrationTime > 2000L) {
-         this.lastNarrationTime = l;
-         this.client.getNarratorManager().narrateSystemImmediately((Text)Text.translatable("narrator.joining"));
-      }
-
-      context.drawCenteredTextWithShadow(this.textRenderer, (Text)this.status, this.width / 2, this.height / 2 - 50, -1);
-   }
+    public void render(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
+        super.render(context, mouseX, mouseY, deltaTicks);
+        long l = Util.getMeasuringTimeMs();
+        if (l - this.lastNarrationTime > 2000L) {
+            this.lastNarrationTime = l;
+            this.client.getNarratorManager().narrateSystemImmediately((Text)Text.translatable((String)"narrator.joining"));
+        }
+        context.drawCenteredTextWithShadow(this.textRenderer, this.status, this.width / 2, this.height / 2 - 50, -1);
+    }
 }
+

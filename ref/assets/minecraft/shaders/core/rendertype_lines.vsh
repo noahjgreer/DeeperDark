@@ -1,4 +1,4 @@
-#version 150
+#version 330
 
 #moj_import <minecraft:fog.glsl>
 #moj_import <minecraft:globals.glsl>
@@ -8,6 +8,7 @@
 in vec3 Position;
 in vec4 Color;
 in vec3 Normal;
+in float LineWidth;
 
 out float sphericalVertexDistance;
 out float cylindricalVertexDistance;

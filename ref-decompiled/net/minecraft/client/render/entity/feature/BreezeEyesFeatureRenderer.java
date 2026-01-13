@@ -1,28 +1,55 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.model.Model
+ *  net.minecraft.client.render.OverlayTexture
+ *  net.minecraft.client.render.RenderLayer
+ *  net.minecraft.client.render.RenderLayers
+ *  net.minecraft.client.render.command.OrderedRenderCommandQueue
+ *  net.minecraft.client.render.entity.feature.BreezeEyesFeatureRenderer
+ *  net.minecraft.client.render.entity.feature.FeatureRenderer
+ *  net.minecraft.client.render.entity.feature.FeatureRendererContext
+ *  net.minecraft.client.render.entity.model.BreezeEntityModel
+ *  net.minecraft.client.render.entity.model.EntityModelLayers
+ *  net.minecraft.client.render.entity.model.LoadedEntityModels
+ *  net.minecraft.client.render.entity.state.BreezeEntityRenderState
+ *  net.minecraft.client.util.math.MatrixStack
+ *  net.minecraft.util.Identifier
+ */
 package net.minecraft.client.render.entity.feature;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.model.Model;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.BreezeEntityRenderer;
+import net.minecraft.client.render.RenderLayers;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
+import net.minecraft.client.render.entity.feature.FeatureRenderer;
+import net.minecraft.client.render.entity.feature.FeatureRendererContext;
 import net.minecraft.client.render.entity.model.BreezeEntityModel;
+import net.minecraft.client.render.entity.model.EntityModelLayers;
+import net.minecraft.client.render.entity.model.LoadedEntityModels;
 import net.minecraft.client.render.entity.state.BreezeEntityRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 
-@Environment(EnvType.CLIENT)
-public class BreezeEyesFeatureRenderer extends FeatureRenderer {
-   private static final RenderLayer TEXTURE = RenderLayer.getEntityTranslucentEmissiveNoOutline(Identifier.ofVanilla("textures/entity/breeze/breeze_eyes.png"));
+@Environment(value=EnvType.CLIENT)
+public class BreezeEyesFeatureRenderer
+extends FeatureRenderer<BreezeEntityRenderState, BreezeEntityModel> {
+    private static final RenderLayer TEXTURE = RenderLayers.entityTranslucentEmissiveNoOutline((Identifier)Identifier.ofVanilla((String)"textures/entity/breeze/breeze_eyes.png"));
+    private final BreezeEntityModel breezeModel;
 
-   public BreezeEyesFeatureRenderer(FeatureRendererContext featureRendererContext) {
-      super(featureRendererContext);
-   }
+    public BreezeEyesFeatureRenderer(FeatureRendererContext<BreezeEntityRenderState, BreezeEntityModel> context, LoadedEntityModels entityModels) {
+        super(context);
+        this.breezeModel = new BreezeEntityModel(entityModels.getModelPart(EntityModelLayers.BREEZE_EYES));
+    }
 
-   public void render(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, BreezeEntityRenderState breezeEntityRenderState, float f, float g) {
-      VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(TEXTURE);
-      BreezeEntityModel breezeEntityModel = (BreezeEntityModel)this.getContextModel();
-      BreezeEntityRenderer.updatePartVisibility(breezeEntityModel, breezeEntityModel.getHead(), breezeEntityModel.getEyes()).render(matrixStack, vertexConsumer, i, OverlayTexture.DEFAULT_UV);
-   }
+    public void render(MatrixStack matrixStack, OrderedRenderCommandQueue orderedRenderCommandQueue, int i, BreezeEntityRenderState breezeEntityRenderState, float f, float g) {
+        orderedRenderCommandQueue.getBatchingQueue(1).submitModel((Model)this.breezeModel, (Object)breezeEntityRenderState, matrixStack, TEXTURE, i, OverlayTexture.DEFAULT_UV, -1, null, breezeEntityRenderState.outlineColor, null);
+    }
 }
+

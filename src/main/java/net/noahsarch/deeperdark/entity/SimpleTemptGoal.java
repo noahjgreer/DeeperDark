@@ -31,7 +31,7 @@ public class SimpleTemptGoal extends Goal {
             return false;
         }
 
-        this.closestPlayer = this.entity.getWorld().getClosestPlayer(this.entity, 10.0);
+        this.closestPlayer = ((net.noahsarch.deeperdark.duck.EntityAccessor)this.entity).deeperdark$getWorld().getClosestPlayer(this.entity, 10.0);
         if (this.closestPlayer == null) {
             return false;
         }

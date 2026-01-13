@@ -1,3 +1,16 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.fabricmc.fabric.api.renderer.v1.model.FabricBlockModels
+ *  net.minecraft.block.BlockState
+ *  net.minecraft.client.render.block.BlockModels
+ *  net.minecraft.client.render.model.BakedModelManager
+ *  net.minecraft.client.render.model.BlockStateModel
+ *  net.minecraft.client.texture.Sprite
+ */
 package net.minecraft.client.render.block;
 
 import java.util.Map;
@@ -9,33 +22,34 @@ import net.minecraft.client.render.model.BakedModelManager;
 import net.minecraft.client.render.model.BlockStateModel;
 import net.minecraft.client.texture.Sprite;
 
-@Environment(EnvType.CLIENT)
-public class BlockModels implements FabricBlockModels {
-   private Map models = Map.of();
-   private final BakedModelManager modelManager;
+@Environment(value=EnvType.CLIENT)
+public class BlockModels
+implements FabricBlockModels {
+    private Map<BlockState, BlockStateModel> models = Map.of();
+    private final BakedModelManager modelManager;
 
-   public BlockModels(BakedModelManager modelManager) {
-      this.modelManager = modelManager;
-   }
+    public BlockModels(BakedModelManager modelManager) {
+        this.modelManager = modelManager;
+    }
 
-   public Sprite getModelParticleSprite(BlockState state) {
-      return this.getModel(state).particleSprite();
-   }
+    public Sprite getModelParticleSprite(BlockState state) {
+        return this.getModel(state).particleSprite();
+    }
 
-   public BlockStateModel getModel(BlockState state) {
-      BlockStateModel blockStateModel = (BlockStateModel)this.models.get(state);
-      if (blockStateModel == null) {
-         blockStateModel = this.modelManager.getMissingModel();
-      }
+    public BlockStateModel getModel(BlockState state) {
+        BlockStateModel blockStateModel = (BlockStateModel)this.models.get(state);
+        if (blockStateModel == null) {
+            blockStateModel = this.modelManager.getMissingModel();
+        }
+        return blockStateModel;
+    }
 
-      return blockStateModel;
-   }
+    public BakedModelManager getModelManager() {
+        return this.modelManager;
+    }
 
-   public BakedModelManager getModelManager() {
-      return this.modelManager;
-   }
-
-   public void setModels(Map models) {
-      this.models = models;
-   }
+    public void setModels(Map<BlockState, BlockStateModel> models) {
+        this.models = models;
+    }
 }
+

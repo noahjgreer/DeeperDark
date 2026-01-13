@@ -1,6 +1,26 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.gl.RenderPipelines
+ *  net.minecraft.client.gui.DrawContext
+ *  net.minecraft.client.gui.screen.TitleScreen
+ *  net.minecraft.client.realms.RealmsAvailability
+ *  net.minecraft.client.realms.RealmsAvailability$Type
+ *  net.minecraft.client.realms.RealmsPeriodicCheckers
+ *  net.minecraft.client.realms.dto.RealmsNotification
+ *  net.minecraft.client.realms.gui.screen.RealmsNotificationsScreen
+ *  net.minecraft.client.realms.gui.screen.RealmsNotificationsScreen$NotificationRunnersFactory
+ *  net.minecraft.client.realms.gui.screen.RealmsScreen
+ *  net.minecraft.client.realms.util.PeriodicRunnerFactory$RunnersManager
+ *  net.minecraft.client.util.NarratorManager
+ *  net.minecraft.util.Identifier
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.realms.gui.screen;
 
-import java.util.Iterator;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import net.fabricmc.api.EnvType;
@@ -11,177 +31,134 @@ import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.realms.RealmsAvailability;
 import net.minecraft.client.realms.RealmsPeriodicCheckers;
 import net.minecraft.client.realms.dto.RealmsNotification;
+import net.minecraft.client.realms.gui.screen.RealmsNotificationsScreen;
+import net.minecraft.client.realms.gui.screen.RealmsScreen;
 import net.minecraft.client.realms.util.PeriodicRunnerFactory;
 import net.minecraft.client.util.NarratorManager;
 import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
-public class RealmsNotificationsScreen extends RealmsScreen {
-   private static final Identifier UNSEEN_NOTIFICATION_ICON_TEXTURE = Identifier.ofVanilla("icon/unseen_notification");
-   private static final Identifier NEWS_ICON_TEXTURE = Identifier.ofVanilla("icon/news");
-   private static final Identifier INVITE_ICON_TEXTURE = Identifier.ofVanilla("icon/invite");
-   private static final Identifier TRIAL_AVAILABLE_ICON_TEXTURE = Identifier.ofVanilla("icon/trial_available");
-   private final CompletableFuture validClient = RealmsAvailability.check().thenApply((info) -> {
-      return info.type() == RealmsAvailability.Type.SUCCESS;
-   });
-   @Nullable
-   private PeriodicRunnerFactory.RunnersManager periodicRunnersManager;
-   @Nullable
-   private NotificationRunnersFactory currentRunnersFactory;
-   private volatile int pendingInvitesCount;
-   private static boolean trialAvailable;
-   private static boolean hasUnreadNews;
-   private static boolean hasUnseenNotification;
-   private final NotificationRunnersFactory newsAndNotifications = new NotificationRunnersFactory() {
-      public PeriodicRunnerFactory.RunnersManager createPeriodicRunnersManager(RealmsPeriodicCheckers checkers) {
-         PeriodicRunnerFactory.RunnersManager runnersManager = checkers.runnerFactory.create();
-         RealmsNotificationsScreen.this.addRunners(checkers, runnersManager);
-         RealmsNotificationsScreen.this.addNotificationRunner(checkers, runnersManager);
-         return runnersManager;
-      }
+@Environment(value=EnvType.CLIENT)
+public class RealmsNotificationsScreen
+extends RealmsScreen {
+    private static final Identifier UNSEEN_NOTIFICATION_ICON_TEXTURE = Identifier.ofVanilla((String)"icon/unseen_notification");
+    private static final Identifier NEWS_ICON_TEXTURE = Identifier.ofVanilla((String)"icon/news");
+    private static final Identifier INVITE_ICON_TEXTURE = Identifier.ofVanilla((String)"icon/invite");
+    private static final Identifier TRIAL_AVAILABLE_ICON_TEXTURE = Identifier.ofVanilla((String)"icon/trial_available");
+    private final CompletableFuture<Boolean> validClient = RealmsAvailability.check().thenApply(info -> info.type() == RealmsAvailability.Type.SUCCESS);
+    private // Could not load outer class - annotation placement on inner may be incorrect
+    @Nullable PeriodicRunnerFactory.RunnersManager periodicRunnersManager;
+    private // Could not load outer class - annotation placement on inner may be incorrect
+    @Nullable RealmsNotificationsScreen.NotificationRunnersFactory currentRunnersFactory;
+    private volatile int pendingInvitesCount;
+    private static boolean trialAvailable;
+    private static boolean hasUnreadNews;
+    private static boolean hasUnseenNotification;
+    private final NotificationRunnersFactory newsAndNotifications = new /* Unavailable Anonymous Inner Class!! */;
+    private final NotificationRunnersFactory notificationsOnly = new /* Unavailable Anonymous Inner Class!! */;
 
-      public boolean isNews() {
-         return true;
-      }
-   };
-   private final NotificationRunnersFactory notificationsOnly = new NotificationRunnersFactory() {
-      public PeriodicRunnerFactory.RunnersManager createPeriodicRunnersManager(RealmsPeriodicCheckers checkers) {
-         PeriodicRunnerFactory.RunnersManager runnersManager = checkers.runnerFactory.create();
-         RealmsNotificationsScreen.this.addNotificationRunner(checkers, runnersManager);
-         return runnersManager;
-      }
+    public RealmsNotificationsScreen() {
+        super(NarratorManager.EMPTY);
+    }
 
-      public boolean isNews() {
-         return false;
-      }
-   };
+    public void init() {
+        if (this.periodicRunnersManager != null) {
+            this.periodicRunnersManager.forceRunListeners();
+        }
+    }
 
-   public RealmsNotificationsScreen() {
-      super(NarratorManager.EMPTY);
-   }
+    public void onDisplayed() {
+        super.onDisplayed();
+        this.client.getRealmsPeriodicCheckers().notifications.reset();
+    }
 
-   public void init() {
-      if (this.periodicRunnersManager != null) {
-         this.periodicRunnersManager.forceRunListeners();
-      }
+    private // Could not load outer class - annotation placement on inner may be incorrect
+    @Nullable RealmsNotificationsScreen.NotificationRunnersFactory getRunnersFactory() {
+        boolean bl;
+        boolean bl2 = bl = this.isTitleScreen() && this.validClient.getNow(false) != false;
+        if (!bl) {
+            return null;
+        }
+        return this.shouldShowRealmsNews() ? this.newsAndNotifications : this.notificationsOnly;
+    }
 
-   }
+    public void tick() {
+        NotificationRunnersFactory notificationRunnersFactory = this.getRunnersFactory();
+        if (!Objects.equals(this.currentRunnersFactory, notificationRunnersFactory)) {
+            this.currentRunnersFactory = notificationRunnersFactory;
+            this.periodicRunnersManager = this.currentRunnersFactory != null ? this.currentRunnersFactory.createPeriodicRunnersManager(this.client.getRealmsPeriodicCheckers()) : null;
+        }
+        if (this.periodicRunnersManager != null) {
+            this.periodicRunnersManager.runAll();
+        }
+    }
 
-   public void onDisplayed() {
-      super.onDisplayed();
-      this.client.getRealmsPeriodicCheckers().notifications.reset();
-   }
+    private boolean shouldShowRealmsNews() {
+        return (Boolean)this.client.options.getRealmsNotifications().getValue();
+    }
 
-   @Nullable
-   private NotificationRunnersFactory getRunnersFactory() {
-      boolean bl = this.isTitleScreen() && (Boolean)this.validClient.getNow(false);
-      if (!bl) {
-         return null;
-      } else {
-         return this.shouldShowRealmsNews() ? this.newsAndNotifications : this.notificationsOnly;
-      }
-   }
+    private boolean isTitleScreen() {
+        return this.client.currentScreen instanceof TitleScreen;
+    }
 
-   public void tick() {
-      NotificationRunnersFactory notificationRunnersFactory = this.getRunnersFactory();
-      if (!Objects.equals(this.currentRunnersFactory, notificationRunnersFactory)) {
-         this.currentRunnersFactory = notificationRunnersFactory;
-         if (this.currentRunnersFactory != null) {
-            this.periodicRunnersManager = this.currentRunnersFactory.createPeriodicRunnersManager(this.client.getRealmsPeriodicCheckers());
-         } else {
-            this.periodicRunnersManager = null;
-         }
-      }
+    public void render(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
+        super.render(context, mouseX, mouseY, deltaTicks);
+        if (this.validClient.getNow(false).booleanValue()) {
+            this.drawIcons(context);
+        }
+    }
 
-      if (this.periodicRunnersManager != null) {
-         this.periodicRunnersManager.runAll();
-      }
+    public void renderBackground(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
+    }
 
-   }
-
-   private boolean shouldShowRealmsNews() {
-      return (Boolean)this.client.options.getRealmsNotifications().getValue();
-   }
-
-   private boolean isTitleScreen() {
-      return this.client.currentScreen instanceof TitleScreen;
-   }
-
-   public void render(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
-      super.render(context, mouseX, mouseY, deltaTicks);
-      if ((Boolean)this.validClient.getNow(false)) {
-         this.drawIcons(context);
-      }
-
-   }
-
-   public void renderBackground(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
-   }
-
-   private void drawIcons(DrawContext context) {
-      int i = this.pendingInvitesCount;
-      int j = true;
-      int k = this.height / 4 + 48;
-      int l = this.width / 2 + 100;
-      int m = k + 48 + 2;
-      int n = l - 3;
-      if (hasUnseenNotification) {
-         context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, UNSEEN_NOTIFICATION_ICON_TEXTURE, n - 12, m + 3, 10, 10);
-         n -= 16;
-      }
-
-      if (this.currentRunnersFactory != null && this.currentRunnersFactory.isNews()) {
-         if (hasUnreadNews) {
-            context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, NEWS_ICON_TEXTURE, n - 14, m + 1, 14, 14);
+    private void drawIcons(DrawContext context) {
+        int i = this.pendingInvitesCount;
+        int j = 24;
+        int k = this.height / 4 + 48;
+        int l = this.width / 2 + 100;
+        int m = k + 48 + 2;
+        int n = l - 3;
+        if (hasUnseenNotification) {
+            context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, UNSEEN_NOTIFICATION_ICON_TEXTURE, n - 12, m + 3, 10, 10);
             n -= 16;
-         }
-
-         if (i != 0) {
-            context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, INVITE_ICON_TEXTURE, n - 14, m + 1, 14, 14);
-            n -= 16;
-         }
-
-         if (trialAvailable) {
-            context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, TRIAL_AVAILABLE_ICON_TEXTURE, n - 10, m + 4, 8, 8);
-         }
-      }
-
-   }
-
-   void addRunners(RealmsPeriodicCheckers checkers, PeriodicRunnerFactory.RunnersManager manager) {
-      manager.add(checkers.pendingInvitesCount, (pendingInvitesCount) -> {
-         this.pendingInvitesCount = pendingInvitesCount;
-      });
-      manager.add(checkers.trialAvailability, (trialAvailable) -> {
-         RealmsNotificationsScreen.trialAvailable = trialAvailable;
-      });
-      manager.add(checkers.news, (news) -> {
-         checkers.newsUpdater.updateNews(news);
-         hasUnreadNews = checkers.newsUpdater.hasUnreadNews();
-      });
-   }
-
-   void addNotificationRunner(RealmsPeriodicCheckers checkers, PeriodicRunnerFactory.RunnersManager manager) {
-      manager.add(checkers.notifications, (notifications) -> {
-         hasUnseenNotification = false;
-         Iterator var1 = notifications.iterator();
-
-         while(var1.hasNext()) {
-            RealmsNotification realmsNotification = (RealmsNotification)var1.next();
-            if (!realmsNotification.isSeen()) {
-               hasUnseenNotification = true;
-               break;
+        }
+        if (this.currentRunnersFactory != null && this.currentRunnersFactory.isNews()) {
+            if (hasUnreadNews) {
+                context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, NEWS_ICON_TEXTURE, n - 14, m + 1, 14, 14);
+                n -= 16;
             }
-         }
+            if (i != 0) {
+                context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, INVITE_ICON_TEXTURE, n - 14, m + 1, 14, 14);
+                n -= 16;
+            }
+            if (trialAvailable) {
+                context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, TRIAL_AVAILABLE_ICON_TEXTURE, n - 10, m + 4, 8, 8);
+            }
+        }
+    }
 
-      });
-   }
+    void addRunners(RealmsPeriodicCheckers checkers, PeriodicRunnerFactory.RunnersManager manager) {
+        manager.add(checkers.pendingInvitesCount, pendingInvitesCount -> {
+            this.pendingInvitesCount = pendingInvitesCount;
+        });
+        manager.add(checkers.trialAvailability, trialAvailable -> {
+            RealmsNotificationsScreen.trialAvailable = trialAvailable;
+        });
+        manager.add(checkers.news, news -> {
+            realmsPeriodicCheckers.newsUpdater.updateNews(news);
+            hasUnreadNews = realmsPeriodicCheckers.newsUpdater.hasUnreadNews();
+        });
+    }
 
-   @Environment(EnvType.CLIENT)
-   private interface NotificationRunnersFactory {
-      PeriodicRunnerFactory.RunnersManager createPeriodicRunnersManager(RealmsPeriodicCheckers checkers);
-
-      boolean isNews();
-   }
+    void addNotificationRunner(RealmsPeriodicCheckers checkers, PeriodicRunnerFactory.RunnersManager manager) {
+        manager.add(checkers.notifications, notifications -> {
+            hasUnseenNotification = false;
+            for (RealmsNotification realmsNotification : notifications) {
+                if (realmsNotification.isSeen()) continue;
+                hasUnseenNotification = true;
+                break;
+            }
+        });
+    }
 }
+

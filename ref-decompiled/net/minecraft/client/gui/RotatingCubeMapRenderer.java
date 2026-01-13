@@ -1,40 +1,59 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.MinecraftClient
+ *  net.minecraft.client.gl.RenderPipelines
+ *  net.minecraft.client.gui.CubeMapRenderer
+ *  net.minecraft.client.gui.DrawContext
+ *  net.minecraft.client.gui.RotatingCubeMapRenderer
+ *  net.minecraft.client.texture.TextureManager
+ *  net.minecraft.util.Identifier
+ */
 package net.minecraft.client.gui;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.RenderPipelines;
+import net.minecraft.client.gui.CubeMapRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.texture.TextureManager;
 import net.minecraft.util.Identifier;
 
-@Environment(EnvType.CLIENT)
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
 public class RotatingCubeMapRenderer {
-   public static final Identifier OVERLAY_TEXTURE = Identifier.ofVanilla("textures/gui/title/background/panorama_overlay.png");
-   private final MinecraftClient client;
-   private final CubeMapRenderer cubeMap;
-   private float pitch;
+    public static final Identifier OVERLAY_TEXTURE = Identifier.ofVanilla((String)"textures/gui/title/background/panorama_overlay.png");
+    private final MinecraftClient client;
+    private final CubeMapRenderer cubeMap;
+    private float pitch;
 
-   public RotatingCubeMapRenderer(CubeMapRenderer cubeMap) {
-      this.cubeMap = cubeMap;
-      this.client = MinecraftClient.getInstance();
-   }
+    public RotatingCubeMapRenderer(CubeMapRenderer cubeMap) {
+        this.cubeMap = cubeMap;
+        this.client = MinecraftClient.getInstance();
+    }
 
-   public void render(DrawContext context, int width, int height, boolean rotate) {
-      if (rotate) {
-         float f = this.client.getRenderTickCounter().getFixedDeltaTicks();
-         float g = (float)((double)f * (Double)this.client.options.getPanoramaSpeed().getValue());
-         this.pitch = wrapOnce(this.pitch + g * 0.1F, 360.0F);
-      }
+    public void render(DrawContext context, int width, int height, boolean rotate) {
+        if (rotate) {
+            float f = this.client.getRenderTickCounter().getFixedDeltaTicks();
+            float g = (float)((double)f * (Double)this.client.options.getPanoramaSpeed().getValue());
+            this.pitch = RotatingCubeMapRenderer.wrapOnce((float)(this.pitch + g * 0.1f), (float)360.0f);
+        }
+        this.cubeMap.draw(this.client, 10.0f, -this.pitch);
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, OVERLAY_TEXTURE, 0, 0, 0.0f, 0.0f, width, height, 16, 128, 16, 128);
+    }
 
-      this.cubeMap.draw(this.client, 10.0F, -this.pitch);
-      context.drawTexture(RenderPipelines.GUI_TEXTURED, OVERLAY_TEXTURE, 0, 0, 0.0F, 0.0F, width, height, 16, 128, 16, 128);
-   }
+    private static float wrapOnce(float a, float b) {
+        return a > b ? a - b : a;
+    }
 
-   private static float wrapOnce(float a, float b) {
-      return a > b ? a - b : a;
-   }
-
-   public void registerTextures(TextureManager textureManager) {
-      this.cubeMap.registerTextures(textureManager);
-   }
+    public void registerTextures(TextureManager textureManager) {
+        this.cubeMap.registerTextures(textureManager);
+    }
 }
+

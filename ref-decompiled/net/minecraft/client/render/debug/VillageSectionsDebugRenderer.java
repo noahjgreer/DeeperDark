@@ -1,45 +1,42 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.render.DrawStyle
+ *  net.minecraft.client.render.Frustum
+ *  net.minecraft.client.render.debug.DebugRenderer$Renderer
+ *  net.minecraft.client.render.debug.VillageSectionsDebugRenderer
+ *  net.minecraft.util.math.BlockPos
+ *  net.minecraft.util.math.ChunkSectionPos
+ *  net.minecraft.util.math.ColorHelper
+ *  net.minecraft.world.debug.DebugDataStore
+ *  net.minecraft.world.debug.DebugSubscriptionTypes
+ *  net.minecraft.world.debug.gizmo.GizmoDrawing
+ */
 package net.minecraft.client.render.debug;
 
-import com.google.common.collect.Sets;
-import java.util.Set;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.render.DrawStyle;
+import net.minecraft.client.render.Frustum;
+import net.minecraft.client.render.debug.DebugRenderer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkSectionPos;
+import net.minecraft.util.math.ColorHelper;
+import net.minecraft.world.debug.DebugDataStore;
+import net.minecraft.world.debug.DebugSubscriptionTypes;
+import net.minecraft.world.debug.gizmo.GizmoDrawing;
 
-@Environment(EnvType.CLIENT)
-public class VillageSectionsDebugRenderer implements DebugRenderer.Renderer {
-   private static final int RANGE = 60;
-   private final Set sections = Sets.newHashSet();
-
-   VillageSectionsDebugRenderer() {
-   }
-
-   public void clear() {
-      this.sections.clear();
-   }
-
-   public void addSection(ChunkSectionPos pos) {
-      this.sections.add(pos);
-   }
-
-   public void removeSection(ChunkSectionPos pos) {
-      this.sections.remove(pos);
-   }
-
-   public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, double cameraX, double cameraY, double cameraZ) {
-      BlockPos blockPos = BlockPos.ofFloored(cameraX, cameraY, cameraZ);
-      this.sections.forEach((section) -> {
-         if (blockPos.isWithinDistance(section.getCenterPos(), 60.0)) {
-            drawBoxAtCenterOf(matrices, vertexConsumers, section);
-         }
-
-      });
-   }
-
-   private static void drawBoxAtCenterOf(MatrixStack matrices, VertexConsumerProvider vertexConsumers, ChunkSectionPos sectionPos) {
-      DebugRenderer.drawBlockBox(matrices, vertexConsumers, sectionPos.getCenterPos(), 0.2F, 1.0F, 0.2F, 0.15F);
-   }
+@Environment(value=EnvType.CLIENT)
+public class VillageSectionsDebugRenderer
+implements DebugRenderer.Renderer {
+    public void render(double cameraX, double cameraY, double cameraZ, DebugDataStore store, Frustum frustum, float tickProgress) {
+        store.forEachBlockData(DebugSubscriptionTypes.VILLAGE_SECTIONS, (pos, sections) -> {
+            ChunkSectionPos chunkSectionPos = ChunkSectionPos.from((BlockPos)pos);
+            GizmoDrawing.box((BlockPos)chunkSectionPos.getCenterPos(), (DrawStyle)DrawStyle.filled((int)ColorHelper.fromFloats((float)0.15f, (float)0.2f, (float)1.0f, (float)0.2f)));
+        });
+    }
 }
+

@@ -1,29 +1,51 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.MapCodec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
+ *  net.minecraft.block.AbstractBlock$Settings
+ *  net.minecraft.block.BlockState
+ *  net.minecraft.block.ColoredFallingBlock
+ *  net.minecraft.block.FallingBlock
+ *  net.minecraft.util.ColorCode
+ *  net.minecraft.util.math.BlockPos
+ *  net.minecraft.world.BlockView
+ */
 package net.minecraft.block;
 
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.FallingBlock;
 import net.minecraft.util.ColorCode;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
 
-public class ColoredFallingBlock extends FallingBlock {
-   public static final MapCodec CODEC = RecordCodecBuilder.mapCodec((instance) -> {
-      return instance.group(ColorCode.CODEC.fieldOf("falling_dust_color").forGetter((block) -> {
-         return block.color;
-      }), createSettingsCodec()).apply(instance, ColoredFallingBlock::new);
-   });
-   protected final ColorCode color;
+/*
+ * Exception performing whole class analysis ignored.
+ */
+public class ColoredFallingBlock
+extends FallingBlock {
+    public static final MapCodec<ColoredFallingBlock> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group((App)ColorCode.CODEC.fieldOf("falling_dust_color").forGetter(block -> block.color), (App)ColoredFallingBlock.createSettingsCodec()).apply((Applicative)instance, ColoredFallingBlock::new));
+    protected final ColorCode color;
 
-   public MapCodec getCodec() {
-      return CODEC;
-   }
+    public MapCodec<? extends ColoredFallingBlock> getCodec() {
+        return CODEC;
+    }
 
-   public ColoredFallingBlock(ColorCode color, AbstractBlock.Settings settings) {
-      super(settings);
-      this.color = color;
-   }
+    public ColoredFallingBlock(ColorCode color, AbstractBlock.Settings settings) {
+        super(settings);
+        this.color = color;
+    }
 
-   public int getColor(BlockState state, BlockView world, BlockPos pos) {
-      return this.color.rgba();
-   }
+    public int getColor(BlockState state, BlockView world, BlockPos pos) {
+        return this.color.rgba();
+    }
 }
+

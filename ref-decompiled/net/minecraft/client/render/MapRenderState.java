@@ -1,29 +1,30 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.fabricmc.fabric.api.client.rendering.v1.FabricRenderState
+ *  net.minecraft.client.render.MapRenderState
+ *  net.minecraft.client.render.MapRenderState$Decoration
+ *  net.minecraft.util.Identifier
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.render;
 
 import java.util.ArrayList;
 import java.util.List;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.texture.Sprite;
-import net.minecraft.text.Text;
+import net.fabricmc.fabric.api.client.rendering.v1.FabricRenderState;
+import net.minecraft.client.render.MapRenderState;
 import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
-public class MapRenderState {
-   @Nullable
-   public Identifier texture;
-   public final List decorations = new ArrayList();
-
-   @Environment(EnvType.CLIENT)
-   public static class Decoration {
-      @Nullable
-      public Sprite sprite;
-      public byte x;
-      public byte z;
-      public byte rotation;
-      public boolean alwaysRendered;
-      @Nullable
-      public Text name;
-   }
+@Environment(value=EnvType.CLIENT)
+public class MapRenderState
+implements FabricRenderState {
+    public @Nullable Identifier texture;
+    public final List<Decoration> decorations = new ArrayList();
 }
+

@@ -1,19 +1,36 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.fabricmc.fabric.api.renderer.v1.sprite.FabricErrorCollectingSpriteGetter
+ *  net.minecraft.client.render.model.ErrorCollectingSpriteGetter
+ *  net.minecraft.client.render.model.ModelTextures
+ *  net.minecraft.client.render.model.SimpleModel
+ *  net.minecraft.client.texture.Sprite
+ *  net.minecraft.client.util.SpriteIdentifier
+ */
 package net.minecraft.client.render.model;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.renderer.v1.sprite.FabricErrorCollectingSpriteGetter;
+import net.minecraft.client.render.model.ModelTextures;
+import net.minecraft.client.render.model.SimpleModel;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.SpriteIdentifier;
 
-@Environment(EnvType.CLIENT)
-public interface ErrorCollectingSpriteGetter extends FabricErrorCollectingSpriteGetter {
-   Sprite get(SpriteIdentifier id, SimpleModel model);
+@Environment(value=EnvType.CLIENT)
+public interface ErrorCollectingSpriteGetter
+extends FabricErrorCollectingSpriteGetter {
+    public Sprite get(SpriteIdentifier var1, SimpleModel var2);
 
-   Sprite getMissing(String name, SimpleModel model);
+    public Sprite getMissing(String var1, SimpleModel var2);
 
-   default Sprite get(ModelTextures texture, String name, SimpleModel model) {
-      SpriteIdentifier spriteIdentifier = texture.get(name);
-      return spriteIdentifier != null ? this.get(spriteIdentifier, model) : this.getMissing(name, model);
-   }
+    default public Sprite get(ModelTextures texture, String name, SimpleModel model) {
+        SpriteIdentifier spriteIdentifier = texture.get(name);
+        return spriteIdentifier != null ? this.get(spriteIdentifier, model) : this.getMissing(name, model);
+    }
 }
+

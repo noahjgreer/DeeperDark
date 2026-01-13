@@ -1,3 +1,26 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.google.common.collect.ImmutableMap
+ *  com.google.common.collect.Lists
+ *  com.google.gson.JsonArray
+ *  com.google.gson.JsonObject
+ *  com.google.gson.JsonSyntaxException
+ *  com.mojang.logging.LogUtils
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.resource.VideoWarningManager
+ *  net.minecraft.client.resource.VideoWarningManager$WarningPatternLoader
+ *  net.minecraft.resource.ResourceManager
+ *  net.minecraft.resource.SinglePreparationResourceReloader
+ *  net.minecraft.util.Identifier
+ *  net.minecraft.util.StrictJsonParser
+ *  net.minecraft.util.profiler.Profiler
+ *  net.minecraft.util.profiler.ScopedProfiler
+ *  org.jspecify.annotations.Nullable
+ *  org.slf4j.Logger
+ */
 package net.minecraft.client.resource;
 
 import com.google.common.collect.ImmutableMap;
@@ -5,239 +28,138 @@ import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
-import com.mojang.blaze3d.systems.GpuDevice;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.logging.LogUtils;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.resource.VideoWarningManager;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.SinglePreparationResourceReloader;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.StrictJsonParser;
 import net.minecraft.util.profiler.Profiler;
 import net.minecraft.util.profiler.ScopedProfiler;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 
-@Environment(EnvType.CLIENT)
-public class VideoWarningManager extends SinglePreparationResourceReloader {
-   private static final Logger LOGGER = LogUtils.getLogger();
-   private static final Identifier GPU_WARNLIST_ID = Identifier.ofVanilla("gpu_warnlist.json");
-   private ImmutableMap warnings = ImmutableMap.of();
-   private boolean warningScheduled;
-   private boolean warned;
-   private boolean cancelledAfterWarning;
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
+public class VideoWarningManager
+extends SinglePreparationResourceReloader<WarningPatternLoader> {
+    private static final Logger LOGGER = LogUtils.getLogger();
+    private static final Identifier GPU_WARNLIST_ID = Identifier.ofVanilla((String)"gpu_warnlist.json");
+    private ImmutableMap<String, String> warnings = ImmutableMap.of();
+    private boolean warningScheduled;
+    private boolean warned;
 
-   public boolean hasWarning() {
-      return !this.warnings.isEmpty();
-   }
+    public boolean hasWarning() {
+        return !this.warnings.isEmpty();
+    }
 
-   public boolean canWarn() {
-      return this.hasWarning() && !this.warned;
-   }
+    public boolean canWarn() {
+        return this.hasWarning() && !this.warned;
+    }
 
-   public void scheduleWarning() {
-      this.warningScheduled = true;
-   }
+    public void scheduleWarning() {
+        this.warningScheduled = true;
+    }
 
-   public void acceptAfterWarnings() {
-      this.warned = true;
-   }
+    public void acceptAfterWarnings() {
+        this.warned = true;
+    }
 
-   public void cancelAfterWarnings() {
-      this.warned = true;
-      this.cancelledAfterWarning = true;
-   }
+    public boolean shouldWarn() {
+        return this.warningScheduled && !this.warned;
+    }
 
-   public boolean shouldWarn() {
-      return this.warningScheduled && !this.warned;
-   }
+    public void reset() {
+        this.warningScheduled = false;
+        this.warned = false;
+    }
 
-   public boolean hasCancelledAfterWarning() {
-      return this.cancelledAfterWarning;
-   }
+    public @Nullable String getRendererWarning() {
+        return (String)this.warnings.get((Object)"renderer");
+    }
 
-   public void reset() {
-      this.warningScheduled = false;
-      this.warned = false;
-      this.cancelledAfterWarning = false;
-   }
+    public @Nullable String getVersionWarning() {
+        return (String)this.warnings.get((Object)"version");
+    }
 
-   @Nullable
-   public String getRendererWarning() {
-      return (String)this.warnings.get("renderer");
-   }
+    public @Nullable String getVendorWarning() {
+        return (String)this.warnings.get((Object)"vendor");
+    }
 
-   @Nullable
-   public String getVersionWarning() {
-      return (String)this.warnings.get("version");
-   }
+    public @Nullable String getWarningsAsString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        this.warnings.forEach((key, value) -> stringBuilder.append((String)key).append(": ").append((String)value));
+        return stringBuilder.isEmpty() ? null : stringBuilder.toString();
+    }
 
-   @Nullable
-   public String getVendorWarning() {
-      return (String)this.warnings.get("vendor");
-   }
-
-   @Nullable
-   public String getWarningsAsString() {
-      StringBuilder stringBuilder = new StringBuilder();
-      this.warnings.forEach((key, value) -> {
-         stringBuilder.append(key).append(": ").append(value);
-      });
-      return stringBuilder.length() == 0 ? null : stringBuilder.toString();
-   }
-
-   protected WarningPatternLoader prepare(ResourceManager resourceManager, Profiler profiler) {
-      List list = Lists.newArrayList();
-      List list2 = Lists.newArrayList();
-      List list3 = Lists.newArrayList();
-      JsonObject jsonObject = loadWarnlist(resourceManager, profiler);
-      if (jsonObject != null) {
-         ScopedProfiler scopedProfiler = profiler.scoped("compile_regex");
-
-         try {
-            compilePatterns(jsonObject.getAsJsonArray("renderer"), list);
-            compilePatterns(jsonObject.getAsJsonArray("version"), list2);
-            compilePatterns(jsonObject.getAsJsonArray("vendor"), list3);
-         } catch (Throwable var11) {
-            if (scopedProfiler != null) {
-               try {
-                  scopedProfiler.close();
-               } catch (Throwable var10) {
-                  var11.addSuppressed(var10);
-               }
+    protected WarningPatternLoader prepare(ResourceManager resourceManager, Profiler profiler) {
+        ArrayList list = Lists.newArrayList();
+        ArrayList list2 = Lists.newArrayList();
+        ArrayList list3 = Lists.newArrayList();
+        JsonObject jsonObject = VideoWarningManager.loadWarnlist((ResourceManager)resourceManager, (Profiler)profiler);
+        if (jsonObject != null) {
+            try (ScopedProfiler scopedProfiler = profiler.scoped("compile_regex");){
+                VideoWarningManager.compilePatterns((JsonArray)jsonObject.getAsJsonArray("renderer"), (List)list);
+                VideoWarningManager.compilePatterns((JsonArray)jsonObject.getAsJsonArray("version"), (List)list2);
+                VideoWarningManager.compilePatterns((JsonArray)jsonObject.getAsJsonArray("vendor"), (List)list3);
             }
+        }
+        return new WarningPatternLoader((List)list, (List)list2, (List)list3);
+    }
 
-            throw var11;
-         }
+    protected void apply(WarningPatternLoader warningPatternLoader, ResourceManager resourceManager, Profiler profiler) {
+        this.warnings = warningPatternLoader.buildWarnings();
+    }
 
-         if (scopedProfiler != null) {
-            scopedProfiler.close();
-         }
-      }
+    private static void compilePatterns(JsonArray array, List<Pattern> patterns) {
+        array.forEach(json -> patterns.add(Pattern.compile(json.getAsString(), 2)));
+    }
 
-      return new WarningPatternLoader(list, list2, list3);
-   }
-
-   protected void apply(WarningPatternLoader warningPatternLoader, ResourceManager resourceManager, Profiler profiler) {
-      this.warnings = warningPatternLoader.buildWarnings();
-   }
-
-   private static void compilePatterns(JsonArray array, List patterns) {
-      array.forEach((json) -> {
-         patterns.add(Pattern.compile(json.getAsString(), 2));
-      });
-   }
-
-   @Nullable
-   private static JsonObject loadWarnlist(ResourceManager resourceManager, Profiler profiler) {
-      try {
-         ScopedProfiler scopedProfiler = profiler.scoped("parse_json");
-
-         JsonObject var4;
-         try {
-            Reader reader = resourceManager.openAsReader(GPU_WARNLIST_ID);
-
-            try {
-               var4 = StrictJsonParser.parse((Reader)reader).getAsJsonObject();
-            } catch (Throwable var8) {
-               if (reader != null) {
-                  try {
-                     reader.close();
-                  } catch (Throwable var7) {
-                     var8.addSuppressed(var7);
-                  }
-               }
-
-               throw var8;
+    /*
+     * Enabled aggressive exception aggregation
+     */
+    private static @Nullable JsonObject loadWarnlist(ResourceManager resourceManager, Profiler profiler) {
+        try (ScopedProfiler scopedProfiler = profiler.scoped("parse_json");){
+            JsonObject jsonObject;
+            block14: {
+                BufferedReader reader = resourceManager.openAsReader(GPU_WARNLIST_ID);
+                try {
+                    jsonObject = StrictJsonParser.parse((Reader)reader).getAsJsonObject();
+                    if (reader == null) break block14;
+                }
+                catch (Throwable throwable) {
+                    if (reader != null) {
+                        try {
+                            ((Reader)reader).close();
+                        }
+                        catch (Throwable throwable2) {
+                            throwable.addSuppressed(throwable2);
+                        }
+                    }
+                    throw throwable;
+                }
+                ((Reader)reader).close();
             }
+            return jsonObject;
+        }
+        catch (JsonSyntaxException | IOException exception) {
+            LOGGER.warn("Failed to load GPU warnlist", exception);
+            return null;
+        }
+    }
 
-            if (reader != null) {
-               reader.close();
-            }
-         } catch (Throwable var9) {
-            if (scopedProfiler != null) {
-               try {
-                  scopedProfiler.close();
-               } catch (Throwable var6) {
-                  var9.addSuppressed(var6);
-               }
-            }
-
-            throw var9;
-         }
-
-         if (scopedProfiler != null) {
-            scopedProfiler.close();
-         }
-
-         return var4;
-      } catch (JsonSyntaxException | IOException var10) {
-         LOGGER.warn("Failed to load GPU warnlist", var10);
-         return null;
-      }
-   }
-
-   // $FF: synthetic method
-   protected Object prepare(final ResourceManager manager, final Profiler profiler) {
-      return this.prepare(manager, profiler);
-   }
-
-   @Environment(EnvType.CLIENT)
-   protected static final class WarningPatternLoader {
-      private final List rendererPatterns;
-      private final List versionPatterns;
-      private final List vendorPatterns;
-
-      WarningPatternLoader(List rendererPatterns, List versionPatterns, List vendorPatterns) {
-         this.rendererPatterns = rendererPatterns;
-         this.versionPatterns = versionPatterns;
-         this.vendorPatterns = vendorPatterns;
-      }
-
-      private static String buildWarning(List warningPattern, String info) {
-         List list = Lists.newArrayList();
-         Iterator var3 = warningPattern.iterator();
-
-         while(var3.hasNext()) {
-            Pattern pattern = (Pattern)var3.next();
-            Matcher matcher = pattern.matcher(info);
-
-            while(matcher.find()) {
-               list.add(matcher.group());
-            }
-         }
-
-         return String.join(", ", list);
-      }
-
-      ImmutableMap buildWarnings() {
-         ImmutableMap.Builder builder = new ImmutableMap.Builder();
-         GpuDevice gpuDevice = RenderSystem.getDevice();
-         if (gpuDevice.getBackendName().equals("OpenGL")) {
-            String string = buildWarning(this.rendererPatterns, gpuDevice.getRenderer());
-            if (!string.isEmpty()) {
-               builder.put("renderer", string);
-            }
-
-            String string2 = buildWarning(this.versionPatterns, gpuDevice.getVersion());
-            if (!string2.isEmpty()) {
-               builder.put("version", string2);
-            }
-
-            String string3 = buildWarning(this.vendorPatterns, gpuDevice.getVendor());
-            if (!string3.isEmpty()) {
-               builder.put("vendor", string3);
-            }
-         }
-
-         return builder.build();
-      }
-   }
+    protected /* synthetic */ Object prepare(ResourceManager manager, Profiler profiler) {
+        return this.prepare(manager, profiler);
+    }
 }
+

@@ -1,3 +1,23 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.model.ModelData
+ *  net.minecraft.client.model.ModelPart
+ *  net.minecraft.client.model.ModelPartBuilder
+ *  net.minecraft.client.model.ModelPartData
+ *  net.minecraft.client.model.ModelTransform
+ *  net.minecraft.client.model.TexturedModelData
+ *  net.minecraft.client.render.entity.model.BabyModelTransformer
+ *  net.minecraft.client.render.entity.model.ModelTransformer
+ *  net.minecraft.client.render.entity.model.QuadrupedEntityModel
+ *  net.minecraft.client.render.entity.model.TurtleEntityModel
+ *  net.minecraft.client.render.entity.state.LivingEntityRenderState
+ *  net.minecraft.client.render.entity.state.TurtleEntityRenderState
+ *  net.minecraft.util.math.MathHelper
+ */
 package net.minecraft.client.render.entity.model;
 
 import java.util.Set;
@@ -9,64 +29,65 @@ import net.minecraft.client.model.ModelPartBuilder;
 import net.minecraft.client.model.ModelPartData;
 import net.minecraft.client.model.ModelTransform;
 import net.minecraft.client.model.TexturedModelData;
+import net.minecraft.client.render.entity.model.BabyModelTransformer;
+import net.minecraft.client.render.entity.model.ModelTransformer;
+import net.minecraft.client.render.entity.model.QuadrupedEntityModel;
 import net.minecraft.client.render.entity.state.LivingEntityRenderState;
 import net.minecraft.client.render.entity.state.TurtleEntityRenderState;
 import net.minecraft.util.math.MathHelper;
 
-@Environment(EnvType.CLIENT)
-public class TurtleEntityModel extends QuadrupedEntityModel {
-   private static final String EGG_BELLY = "egg_belly";
-   public static final ModelTransformer BABY_TRANSFORMER = new BabyModelTransformer(true, 120.0F, 0.0F, 9.0F, 6.0F, 120.0F, Set.of("head"));
-   private final ModelPart plastron;
+@Environment(value=EnvType.CLIENT)
+public class TurtleEntityModel
+extends QuadrupedEntityModel<TurtleEntityRenderState> {
+    private static final String EGG_BELLY = "egg_belly";
+    public static final ModelTransformer BABY_TRANSFORMER = new BabyModelTransformer(true, 120.0f, 0.0f, 9.0f, 6.0f, 120.0f, Set.of("head"));
+    private final ModelPart plastron;
 
-   public TurtleEntityModel(ModelPart modelPart) {
-      super(modelPart);
-      this.plastron = modelPart.getChild("egg_belly");
-   }
+    public TurtleEntityModel(ModelPart modelPart) {
+        super(modelPart);
+        this.plastron = modelPart.getChild(EGG_BELLY);
+    }
 
-   public static TexturedModelData getTexturedModelData() {
-      ModelData modelData = new ModelData();
-      ModelPartData modelPartData = modelData.getRoot();
-      modelPartData.addChild("head", ModelPartBuilder.create().uv(3, 0).cuboid(-3.0F, -1.0F, -3.0F, 6.0F, 5.0F, 6.0F), ModelTransform.origin(0.0F, 19.0F, -10.0F));
-      modelPartData.addChild("body", ModelPartBuilder.create().uv(7, 37).cuboid("shell", -9.5F, 3.0F, -10.0F, 19.0F, 20.0F, 6.0F).uv(31, 1).cuboid("belly", -5.5F, 3.0F, -13.0F, 11.0F, 18.0F, 3.0F), ModelTransform.of(0.0F, 11.0F, -10.0F, 1.5707964F, 0.0F, 0.0F));
-      modelPartData.addChild("egg_belly", ModelPartBuilder.create().uv(70, 33).cuboid(-4.5F, 3.0F, -14.0F, 9.0F, 18.0F, 1.0F), ModelTransform.of(0.0F, 11.0F, -10.0F, 1.5707964F, 0.0F, 0.0F));
-      int i = true;
-      modelPartData.addChild("right_hind_leg", ModelPartBuilder.create().uv(1, 23).cuboid(-2.0F, 0.0F, 0.0F, 4.0F, 1.0F, 10.0F), ModelTransform.origin(-3.5F, 22.0F, 11.0F));
-      modelPartData.addChild("left_hind_leg", ModelPartBuilder.create().uv(1, 12).cuboid(-2.0F, 0.0F, 0.0F, 4.0F, 1.0F, 10.0F), ModelTransform.origin(3.5F, 22.0F, 11.0F));
-      modelPartData.addChild("right_front_leg", ModelPartBuilder.create().uv(27, 30).cuboid(-13.0F, 0.0F, -2.0F, 13.0F, 1.0F, 5.0F), ModelTransform.origin(-5.0F, 21.0F, -4.0F));
-      modelPartData.addChild("left_front_leg", ModelPartBuilder.create().uv(27, 24).cuboid(0.0F, 0.0F, -2.0F, 13.0F, 1.0F, 5.0F), ModelTransform.origin(5.0F, 21.0F, -4.0F));
-      return TexturedModelData.of(modelData, 128, 64);
-   }
+    public static TexturedModelData getTexturedModelData() {
+        ModelData modelData = new ModelData();
+        ModelPartData modelPartData = modelData.getRoot();
+        modelPartData.addChild("head", ModelPartBuilder.create().uv(3, 0).cuboid(-3.0f, -1.0f, -3.0f, 6.0f, 5.0f, 6.0f), ModelTransform.origin((float)0.0f, (float)19.0f, (float)-10.0f));
+        modelPartData.addChild("body", ModelPartBuilder.create().uv(7, 37).cuboid("shell", -9.5f, 3.0f, -10.0f, 19.0f, 20.0f, 6.0f).uv(31, 1).cuboid("belly", -5.5f, 3.0f, -13.0f, 11.0f, 18.0f, 3.0f), ModelTransform.of((float)0.0f, (float)11.0f, (float)-10.0f, (float)1.5707964f, (float)0.0f, (float)0.0f));
+        modelPartData.addChild(EGG_BELLY, ModelPartBuilder.create().uv(70, 33).cuboid(-4.5f, 3.0f, -14.0f, 9.0f, 18.0f, 1.0f), ModelTransform.of((float)0.0f, (float)11.0f, (float)-10.0f, (float)1.5707964f, (float)0.0f, (float)0.0f));
+        boolean i = true;
+        modelPartData.addChild("right_hind_leg", ModelPartBuilder.create().uv(1, 23).cuboid(-2.0f, 0.0f, 0.0f, 4.0f, 1.0f, 10.0f), ModelTransform.origin((float)-3.5f, (float)22.0f, (float)11.0f));
+        modelPartData.addChild("left_hind_leg", ModelPartBuilder.create().uv(1, 12).cuboid(-2.0f, 0.0f, 0.0f, 4.0f, 1.0f, 10.0f), ModelTransform.origin((float)3.5f, (float)22.0f, (float)11.0f));
+        modelPartData.addChild("right_front_leg", ModelPartBuilder.create().uv(27, 30).cuboid(-13.0f, 0.0f, -2.0f, 13.0f, 1.0f, 5.0f), ModelTransform.origin((float)-5.0f, (float)21.0f, (float)-4.0f));
+        modelPartData.addChild("left_front_leg", ModelPartBuilder.create().uv(27, 24).cuboid(0.0f, 0.0f, -2.0f, 13.0f, 1.0f, 5.0f), ModelTransform.origin((float)5.0f, (float)21.0f, (float)-4.0f));
+        return TexturedModelData.of((ModelData)modelData, (int)128, (int)64);
+    }
 
-   public void setAngles(TurtleEntityRenderState turtleEntityRenderState) {
-      super.setAngles((LivingEntityRenderState)turtleEntityRenderState);
-      float f = turtleEntityRenderState.limbSwingAnimationProgress;
-      float g = turtleEntityRenderState.limbSwingAmplitude;
-      float h;
-      float i;
-      if (turtleEntityRenderState.onLand) {
-         h = turtleEntityRenderState.diggingSand ? 4.0F : 1.0F;
-         i = turtleEntityRenderState.diggingSand ? 2.0F : 1.0F;
-         float j = f * 5.0F;
-         float k = MathHelper.cos(h * j);
-         float l = MathHelper.cos(j);
-         this.rightFrontLeg.yaw = -k * 8.0F * g * i;
-         this.leftFrontLeg.yaw = k * 8.0F * g * i;
-         this.rightHindLeg.yaw = -l * 3.0F * g;
-         this.leftHindLeg.yaw = l * 3.0F * g;
-      } else {
-         h = 0.5F * g;
-         i = MathHelper.cos(f * 0.6662F * 0.6F) * h;
-         this.rightHindLeg.pitch = i;
-         this.leftHindLeg.pitch = -i;
-         this.rightFrontLeg.roll = -i;
-         this.leftFrontLeg.roll = i;
-      }
-
-      this.plastron.visible = turtleEntityRenderState.hasEgg;
-      if (this.plastron.visible) {
-         --this.root.originY;
-      }
-
-   }
+    public void setAngles(TurtleEntityRenderState turtleEntityRenderState) {
+        super.setAngles((LivingEntityRenderState)turtleEntityRenderState);
+        float f = turtleEntityRenderState.limbSwingAnimationProgress;
+        float g = turtleEntityRenderState.limbSwingAmplitude;
+        if (turtleEntityRenderState.onLand) {
+            float h = turtleEntityRenderState.diggingSand ? 4.0f : 1.0f;
+            float i = turtleEntityRenderState.diggingSand ? 2.0f : 1.0f;
+            float j = f * 5.0f;
+            float k = MathHelper.cos((double)(h * j));
+            float l = MathHelper.cos((double)j);
+            this.rightFrontLeg.yaw = -k * 8.0f * g * i;
+            this.leftFrontLeg.yaw = k * 8.0f * g * i;
+            this.rightHindLeg.yaw = -l * 3.0f * g;
+            this.leftHindLeg.yaw = l * 3.0f * g;
+        } else {
+            float i;
+            float h = 0.5f * g;
+            this.rightHindLeg.pitch = i = MathHelper.cos((double)(f * 0.6662f * 0.6f)) * h;
+            this.leftHindLeg.pitch = -i;
+            this.rightFrontLeg.roll = -i;
+            this.leftFrontLeg.roll = i;
+        }
+        this.plastron.visible = turtleEntityRenderState.hasEgg;
+        if (this.plastron.visible) {
+            this.root.originY -= 1.0f;
+        }
+    }
 }
+

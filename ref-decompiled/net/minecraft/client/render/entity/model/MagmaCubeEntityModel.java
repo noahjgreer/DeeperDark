@@ -1,3 +1,19 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.model.ModelData
+ *  net.minecraft.client.model.ModelPart
+ *  net.minecraft.client.model.ModelPartBuilder
+ *  net.minecraft.client.model.ModelPartData
+ *  net.minecraft.client.model.ModelTransform
+ *  net.minecraft.client.model.TexturedModelData
+ *  net.minecraft.client.render.entity.model.EntityModel
+ *  net.minecraft.client.render.entity.model.MagmaCubeEntityModel
+ *  net.minecraft.client.render.entity.state.SlimeEntityRenderState
+ */
 package net.minecraft.client.render.entity.model;
 
 import java.util.Arrays;
@@ -9,52 +25,51 @@ import net.minecraft.client.model.ModelPartBuilder;
 import net.minecraft.client.model.ModelPartData;
 import net.minecraft.client.model.ModelTransform;
 import net.minecraft.client.model.TexturedModelData;
+import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.render.entity.state.SlimeEntityRenderState;
 
-@Environment(EnvType.CLIENT)
-public class MagmaCubeEntityModel extends EntityModel {
-   private static final int SLICES_COUNT = 8;
-   private final ModelPart[] slices = new ModelPart[8];
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
+public class MagmaCubeEntityModel
+extends EntityModel<SlimeEntityRenderState> {
+    private static final int SLICES_COUNT = 8;
+    private final ModelPart[] slices = new ModelPart[8];
 
-   public MagmaCubeEntityModel(ModelPart modelPart) {
-      super(modelPart);
-      Arrays.setAll(this.slices, (i) -> {
-         return modelPart.getChild(getSliceName(i));
-      });
-   }
+    public MagmaCubeEntityModel(ModelPart modelPart) {
+        super(modelPart);
+        Arrays.setAll(this.slices, i -> modelPart.getChild(MagmaCubeEntityModel.getSliceName((int)i)));
+    }
 
-   private static String getSliceName(int index) {
-      return "cube" + index;
-   }
+    private static String getSliceName(int index) {
+        return "cube" + index;
+    }
 
-   public static TexturedModelData getTexturedModelData() {
-      ModelData modelData = new ModelData();
-      ModelPartData modelPartData = modelData.getRoot();
+    public static TexturedModelData getTexturedModelData() {
+        ModelData modelData = new ModelData();
+        ModelPartData modelPartData = modelData.getRoot();
+        for (int i = 0; i < 8; ++i) {
+            int j = 0;
+            int k = 0;
+            if (i > 0 && i < 4) {
+                k += 9 * i;
+            } else if (i > 3) {
+                j = 32;
+                k += 9 * i - 36;
+            }
+            modelPartData.addChild(MagmaCubeEntityModel.getSliceName((int)i), ModelPartBuilder.create().uv(j, k).cuboid(-4.0f, (float)(16 + i), -4.0f, 8.0f, 1.0f, 8.0f), ModelTransform.NONE);
+        }
+        modelPartData.addChild("inside_cube", ModelPartBuilder.create().uv(24, 40).cuboid(-2.0f, 18.0f, -2.0f, 4.0f, 4.0f, 4.0f), ModelTransform.NONE);
+        return TexturedModelData.of((ModelData)modelData, (int)64, (int)64);
+    }
 
-      for(int i = 0; i < 8; ++i) {
-         int j = 0;
-         int k = 0;
-         if (i > 0 && i < 4) {
-            k += 9 * i;
-         } else if (i > 3) {
-            j = 32;
-            k += 9 * i - 36;
-         }
-
-         modelPartData.addChild(getSliceName(i), ModelPartBuilder.create().uv(j, k).cuboid(-4.0F, (float)(16 + i), -4.0F, 8.0F, 1.0F, 8.0F), ModelTransform.NONE);
-      }
-
-      modelPartData.addChild("inside_cube", ModelPartBuilder.create().uv(24, 40).cuboid(-2.0F, 18.0F, -2.0F, 4.0F, 4.0F, 4.0F), ModelTransform.NONE);
-      return TexturedModelData.of(modelData, 64, 64);
-   }
-
-   public void setAngles(SlimeEntityRenderState slimeEntityRenderState) {
-      super.setAngles(slimeEntityRenderState);
-      float f = Math.max(0.0F, slimeEntityRenderState.stretch);
-
-      for(int i = 0; i < this.slices.length; ++i) {
-         this.slices[i].originY = (float)(-(4 - i)) * f * 1.7F;
-      }
-
-   }
+    public void setAngles(SlimeEntityRenderState slimeEntityRenderState) {
+        super.setAngles((Object)slimeEntityRenderState);
+        float f = Math.max(0.0f, slimeEntityRenderState.stretch);
+        for (int i = 0; i < this.slices.length; ++i) {
+            this.slices[i].originY = (float)(-(4 - i)) * f * 1.7f;
+        }
+    }
 }
+

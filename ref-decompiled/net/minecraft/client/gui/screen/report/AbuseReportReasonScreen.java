@@ -1,3 +1,32 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.font.TextRenderer
+ *  net.minecraft.client.gui.DrawContext
+ *  net.minecraft.client.gui.screen.ConfirmLinkScreen
+ *  net.minecraft.client.gui.screen.Screen
+ *  net.minecraft.client.gui.screen.report.AbuseReportReasonScreen
+ *  net.minecraft.client.gui.screen.report.AbuseReportReasonScreen$ReasonListWidget
+ *  net.minecraft.client.gui.screen.report.AbuseReportReasonScreen$ReasonListWidget$ReasonEntry
+ *  net.minecraft.client.gui.widget.ButtonWidget
+ *  net.minecraft.client.gui.widget.ButtonWidget$PressAction
+ *  net.minecraft.client.gui.widget.ClickableWidget
+ *  net.minecraft.client.gui.widget.DirectionalLayoutWidget
+ *  net.minecraft.client.gui.widget.EmptyWidget
+ *  net.minecraft.client.gui.widget.ThreePartsLayoutWidget
+ *  net.minecraft.client.gui.widget.Widget
+ *  net.minecraft.client.session.report.AbuseReportReason
+ *  net.minecraft.client.session.report.AbuseReportType
+ *  net.minecraft.screen.ScreenTexts
+ *  net.minecraft.text.StringVisitable
+ *  net.minecraft.text.Text
+ *  net.minecraft.util.Nullables
+ *  net.minecraft.util.Urls
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.gui.screen.report;
 
 import java.net.URI;
@@ -5,16 +34,17 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ConfirmLinkScreen;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
+import net.minecraft.client.gui.screen.report.AbuseReportReasonScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.DirectionalLayoutWidget;
 import net.minecraft.client.gui.widget.EmptyWidget;
 import net.minecraft.client.gui.widget.ThreePartsLayoutWidget;
+import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.session.report.AbuseReportReason;
 import net.minecraft.client.session.report.AbuseReportType;
 import net.minecraft.screen.ScreenTexts;
@@ -22,180 +52,120 @@ import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Text;
 import net.minecraft.util.Nullables;
 import net.minecraft.util.Urls;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
-public class AbuseReportReasonScreen extends Screen {
-   private static final Text TITLE_TEXT = Text.translatable("gui.abuseReport.reason.title");
-   private static final Text DESCRIPTION_TEXT = Text.translatable("gui.abuseReport.reason.description");
-   private static final Text READ_INFO_TEXT = Text.translatable("gui.abuseReport.read_info");
-   private static final int field_49546 = 320;
-   private static final int field_49547 = 62;
-   private static final int TOP_MARGIN = 4;
-   @Nullable
-   private final Screen parent;
-   @Nullable
-   private ReasonListWidget reasonList;
-   @Nullable
-   AbuseReportReason reason;
-   private final Consumer reasonConsumer;
-   final ThreePartsLayoutWidget layout = new ThreePartsLayoutWidget(this);
-   final AbuseReportType reportType;
+@Environment(value=EnvType.CLIENT)
+public class AbuseReportReasonScreen
+extends Screen {
+    private static final Text TITLE_TEXT = Text.translatable((String)"gui.abuseReport.reason.title");
+    private static final Text DESCRIPTION_TEXT = Text.translatable((String)"gui.abuseReport.reason.description");
+    private static final Text READ_INFO_TEXT = Text.translatable((String)"gui.abuseReport.read_info");
+    private static final int field_49546 = 320;
+    private static final int field_49547 = 62;
+    private static final int TOP_MARGIN = 4;
+    private final @Nullable Screen parent;
+    private // Could not load outer class - annotation placement on inner may be incorrect
+    @Nullable ReasonListWidget reasonList;
+    @Nullable AbuseReportReason reason;
+    private final Consumer<AbuseReportReason> reasonConsumer;
+    final ThreePartsLayoutWidget layout = new ThreePartsLayoutWidget((Screen)this);
+    final AbuseReportType reportType;
 
-   public AbuseReportReasonScreen(@Nullable Screen parent, @Nullable AbuseReportReason reason, AbuseReportType reportType, Consumer reasonConsumer) {
-      super(TITLE_TEXT);
-      this.parent = parent;
-      this.reason = reason;
-      this.reasonConsumer = reasonConsumer;
-      this.reportType = reportType;
-   }
+    public AbuseReportReasonScreen(@Nullable Screen parent, @Nullable AbuseReportReason reason, AbuseReportType reportType, Consumer<AbuseReportReason> reasonConsumer) {
+        super(TITLE_TEXT);
+        this.parent = parent;
+        this.reason = reason;
+        this.reasonConsumer = reasonConsumer;
+        this.reportType = reportType;
+    }
 
-   protected void init() {
-      this.layout.addHeader(TITLE_TEXT, this.textRenderer);
-      DirectionalLayoutWidget directionalLayoutWidget = (DirectionalLayoutWidget)this.layout.addBody(DirectionalLayoutWidget.vertical().spacing(4));
-      this.reasonList = (ReasonListWidget)directionalLayoutWidget.add(new ReasonListWidget(this.client));
-      AbuseReportReason var10000 = this.reason;
-      ReasonListWidget var10001 = this.reasonList;
-      Objects.requireNonNull(var10001);
-      ReasonListWidget.ReasonEntry reasonEntry = (ReasonListWidget.ReasonEntry)Nullables.map(var10000, var10001::getEntry);
-      this.reasonList.setSelected(reasonEntry);
-      directionalLayoutWidget.add(EmptyWidget.ofHeight(this.getHeight()));
-      DirectionalLayoutWidget directionalLayoutWidget2 = (DirectionalLayoutWidget)this.layout.addFooter(DirectionalLayoutWidget.horizontal().spacing(8));
-      directionalLayoutWidget2.add(ButtonWidget.builder(READ_INFO_TEXT, ConfirmLinkScreen.opening(this, (URI)Urls.ABOUT_JAVA_REPORTING)).build());
-      directionalLayoutWidget2.add(ButtonWidget.builder(ScreenTexts.DONE, (button) -> {
-         ReasonListWidget.ReasonEntry reasonEntry = (ReasonListWidget.ReasonEntry)this.reasonList.getSelectedOrNull();
-         if (reasonEntry != null) {
-            this.reasonConsumer.accept(reasonEntry.getReason());
-         }
-
-         this.client.setScreen(this.parent);
-      }).build());
-      this.layout.forEachChild((child) -> {
-         ClickableWidget var10000 = (ClickableWidget)this.addDrawableChild(child);
-      });
-      this.refreshWidgetPositions();
-   }
-
-   protected void refreshWidgetPositions() {
-      this.layout.refreshPositions();
-      if (this.reasonList != null) {
-         this.reasonList.position(this.width, this.getReasonListHeight(), this.layout.getHeaderHeight());
-      }
-
-   }
-
-   public void render(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
-      super.render(context, mouseX, mouseY, deltaTicks);
-      context.fill(this.getLeft(), this.getTop(), this.getRight(), this.getBottom(), -16777216);
-      context.drawBorder(this.getLeft(), this.getTop(), this.getWidth(), this.getHeight(), -1);
-      context.drawTextWithShadow(this.textRenderer, (Text)DESCRIPTION_TEXT, this.getLeft() + 4, this.getTop() + 4, -1);
-      ReasonListWidget.ReasonEntry reasonEntry = (ReasonListWidget.ReasonEntry)this.reasonList.getSelectedOrNull();
-      if (reasonEntry != null) {
-         int i = this.getLeft() + 4 + 16;
-         int j = this.getRight() - 4;
-         int var10000 = this.getTop() + 4;
-         Objects.requireNonNull(this.textRenderer);
-         int k = var10000 + 9 + 2;
-         int l = this.getBottom() - 4;
-         int m = j - i;
-         int n = l - k;
-         int o = this.textRenderer.getWrappedLinesHeight((StringVisitable)reasonEntry.reason.getDescription(), m);
-         context.drawWrappedTextWithShadow(this.textRenderer, reasonEntry.reason.getDescription(), i, k + (n - o) / 2, m, -1);
-      }
-
-   }
-
-   private int getLeft() {
-      return (this.width - 320) / 2;
-   }
-
-   private int getRight() {
-      return (this.width + 320) / 2;
-   }
-
-   private int getTop() {
-      return this.getBottom() - this.getHeight();
-   }
-
-   private int getBottom() {
-      return this.height - this.layout.getFooterHeight() - 4;
-   }
-
-   private int getWidth() {
-      return 320;
-   }
-
-   private int getHeight() {
-      return 62;
-   }
-
-   int getReasonListHeight() {
-      return this.layout.getContentHeight() - this.getHeight() - 8;
-   }
-
-   public void close() {
-      this.client.setScreen(this.parent);
-   }
-
-   @Environment(EnvType.CLIENT)
-   public class ReasonListWidget extends AlwaysSelectedEntryListWidget {
-      public ReasonListWidget(final MinecraftClient client) {
-         super(client, AbuseReportReasonScreen.this.width, AbuseReportReasonScreen.this.getReasonListHeight(), AbuseReportReasonScreen.this.layout.getHeaderHeight(), 18);
-         AbuseReportReason[] var3 = AbuseReportReason.values();
-         int var4 = var3.length;
-
-         for(int var5 = 0; var5 < var4; ++var5) {
-            AbuseReportReason abuseReportReason = var3[var5];
-            if (!AbuseReportReason.getExcludedReasonsForType(AbuseReportReasonScreen.this.reportType).contains(abuseReportReason)) {
-               this.addEntry(new ReasonEntry(abuseReportReason));
+    protected void init() {
+        this.layout.addHeader(TITLE_TEXT, this.textRenderer);
+        DirectionalLayoutWidget directionalLayoutWidget = (DirectionalLayoutWidget)this.layout.addBody((Widget)DirectionalLayoutWidget.vertical().spacing(4));
+        this.reasonList = (ReasonListWidget)directionalLayoutWidget.add((Widget)new ReasonListWidget(this, this.client));
+        ReasonListWidget.ReasonEntry reasonEntry = (ReasonListWidget.ReasonEntry)Nullables.map((Object)this.reason, arg_0 -> ((ReasonListWidget)this.reasonList).getEntry(arg_0));
+        this.reasonList.setSelected(reasonEntry);
+        directionalLayoutWidget.add((Widget)EmptyWidget.ofHeight((int)this.getHeight()));
+        DirectionalLayoutWidget directionalLayoutWidget2 = (DirectionalLayoutWidget)this.layout.addFooter((Widget)DirectionalLayoutWidget.horizontal().spacing(8));
+        directionalLayoutWidget2.add((Widget)ButtonWidget.builder((Text)READ_INFO_TEXT, (ButtonWidget.PressAction)ConfirmLinkScreen.opening((Screen)this, (URI)Urls.ABOUT_JAVA_REPORTING)).build());
+        directionalLayoutWidget2.add((Widget)ButtonWidget.builder((Text)ScreenTexts.DONE, button -> {
+            ReasonListWidget.ReasonEntry reasonEntry = (ReasonListWidget.ReasonEntry)this.reasonList.getSelectedOrNull();
+            if (reasonEntry != null) {
+                this.reasonConsumer.accept(reasonEntry.getReason());
             }
-         }
+            this.client.setScreen(this.parent);
+        }).build());
+        this.layout.forEachChild(child -> {
+            ClickableWidget cfr_ignored_0 = (ClickableWidget)this.addDrawableChild(child);
+        });
+        this.refreshWidgetPositions();
+    }
 
-      }
+    protected void refreshWidgetPositions() {
+        this.layout.refreshPositions();
+        if (this.reasonList != null) {
+            this.reasonList.position(this.width, this.getReasonListHeight(), this.layout.getHeaderHeight());
+        }
+    }
 
-      @Nullable
-      public ReasonEntry getEntry(AbuseReportReason reason) {
-         return (ReasonEntry)this.children().stream().filter((entry) -> {
-            return entry.reason == reason;
-         }).findFirst().orElse((Object)null);
-      }
+    public void render(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
+        super.render(context, mouseX, mouseY, deltaTicks);
+        context.fill(this.getLeft(), this.getTop(), this.getRight(), this.getBottom(), -16777216);
+        context.drawStrokedRectangle(this.getLeft(), this.getTop(), this.getWidth(), this.getHeight(), -1);
+        context.drawTextWithShadow(this.textRenderer, DESCRIPTION_TEXT, this.getLeft() + 4, this.getTop() + 4, -1);
+        ReasonListWidget.ReasonEntry reasonEntry = (ReasonListWidget.ReasonEntry)this.reasonList.getSelectedOrNull();
+        if (reasonEntry != null) {
+            int i = this.getLeft() + 4 + 16;
+            int j = this.getRight() - 4;
+            int n = this.getTop() + 4;
+            Objects.requireNonNull(this.textRenderer);
+            int k = n + 9 + 2;
+            int l = this.getBottom() - 4;
+            int m = j - i;
+            int n2 = l - k;
+            int o = this.textRenderer.getWrappedLinesHeight((StringVisitable)reasonEntry.reason.getDescription(), m);
+            context.drawWrappedTextWithShadow(this.textRenderer, (StringVisitable)reasonEntry.reason.getDescription(), i, k + (n2 - o) / 2, m, -1);
+        }
+    }
 
-      public int getRowWidth() {
-         return 320;
-      }
+    private int getLeft() {
+        return (this.width - 320) / 2;
+    }
 
-      public void setSelected(@Nullable ReasonEntry reasonEntry) {
-         super.setSelected(reasonEntry);
-         AbuseReportReasonScreen.this.reason = reasonEntry != null ? reasonEntry.getReason() : null;
-      }
+    private int getRight() {
+        return (this.width + 320) / 2;
+    }
 
-      @Environment(EnvType.CLIENT)
-      public class ReasonEntry extends AlwaysSelectedEntryListWidget.Entry {
-         final AbuseReportReason reason;
+    private int getTop() {
+        return this.getBottom() - this.getHeight();
+    }
 
-         public ReasonEntry(final AbuseReportReason reason) {
-            this.reason = reason;
-         }
+    private int getBottom() {
+        return this.height - this.layout.getFooterHeight() - 4;
+    }
 
-         public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickProgress) {
-            int i = x + 1;
-            Objects.requireNonNull(AbuseReportReasonScreen.this.textRenderer);
-            int j = y + (entryHeight - 9) / 2 + 1;
-            context.drawTextWithShadow(AbuseReportReasonScreen.this.textRenderer, (Text)this.reason.getText(), i, j, -1);
-         }
+    private int getWidth() {
+        return 320;
+    }
 
-         public Text getNarration() {
-            return Text.translatable("gui.abuseReport.reason.narration", this.reason.getText(), this.reason.getDescription());
-         }
+    private int getHeight() {
+        return 62;
+    }
 
-         public boolean mouseClicked(double mouseX, double mouseY, int button) {
-            ReasonListWidget.this.setSelected(this);
-            return super.mouseClicked(mouseX, mouseY, button);
-         }
+    int getReasonListHeight() {
+        return this.layout.getContentHeight() - this.getHeight() - 8;
+    }
 
-         public AbuseReportReason getReason() {
-            return this.reason;
-         }
-      }
-   }
+    public void close() {
+        this.client.setScreen(this.parent);
+    }
+
+    static /* synthetic */ TextRenderer method_44521(AbuseReportReasonScreen abuseReportReasonScreen) {
+        return abuseReportReasonScreen.textRenderer;
+    }
+
+    static /* synthetic */ TextRenderer method_44671(AbuseReportReasonScreen abuseReportReasonScreen) {
+        return abuseReportReasonScreen.textRenderer;
+    }
 }
+

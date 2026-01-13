@@ -1,59 +1,78 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.sound.MovingMinecartSoundInstance
+ *  net.minecraft.client.sound.MovingSoundInstance
+ *  net.minecraft.client.sound.SoundInstance
+ *  net.minecraft.entity.vehicle.AbstractMinecartEntity
+ *  net.minecraft.entity.vehicle.ExperimentalMinecartController
+ *  net.minecraft.sound.SoundCategory
+ *  net.minecraft.sound.SoundEvents
+ *  net.minecraft.util.math.MathHelper
+ */
 package net.minecraft.client.sound;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.sound.MovingSoundInstance;
+import net.minecraft.client.sound.SoundInstance;
 import net.minecraft.entity.vehicle.AbstractMinecartEntity;
 import net.minecraft.entity.vehicle.ExperimentalMinecartController;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.MathHelper;
 
-@Environment(EnvType.CLIENT)
-public class MovingMinecartSoundInstance extends MovingSoundInstance {
-   private static final float field_33001 = 0.0F;
-   private static final float field_33002 = 0.7F;
-   private static final float field_33003 = 0.0F;
-   private static final float field_33004 = 1.0F;
-   private static final float field_33005 = 0.0025F;
-   private final AbstractMinecartEntity minecart;
-   private float distance = 0.0F;
+@Environment(value=EnvType.CLIENT)
+public class MovingMinecartSoundInstance
+extends MovingSoundInstance {
+    private static final float field_33001 = 0.0f;
+    private static final float field_33002 = 0.7f;
+    private static final float field_33003 = 0.0f;
+    private static final float field_33004 = 1.0f;
+    private static final float field_33005 = 0.0025f;
+    private final AbstractMinecartEntity minecart;
+    private float distance = 0.0f;
 
-   public MovingMinecartSoundInstance(AbstractMinecartEntity minecart) {
-      super(SoundEvents.ENTITY_MINECART_RIDING, SoundCategory.NEUTRAL, SoundInstance.createRandom());
-      this.minecart = minecart;
-      this.repeat = true;
-      this.repeatDelay = 0;
-      this.volume = 0.0F;
-      this.x = (double)((float)minecart.getX());
-      this.y = (double)((float)minecart.getY());
-      this.z = (double)((float)minecart.getZ());
-   }
+    public MovingMinecartSoundInstance(AbstractMinecartEntity minecart) {
+        super(SoundEvents.ENTITY_MINECART_RIDING, SoundCategory.NEUTRAL, SoundInstance.createRandom());
+        this.minecart = minecart;
+        this.repeat = true;
+        this.repeatDelay = 0;
+        this.volume = 0.0f;
+        this.x = (float)minecart.getX();
+        this.y = (float)minecart.getY();
+        this.z = (float)minecart.getZ();
+    }
 
-   public boolean canPlay() {
-      return !this.minecart.isSilent();
-   }
+    public boolean canPlay() {
+        return !this.minecart.isSilent();
+    }
 
-   public boolean shouldAlwaysPlay() {
-      return true;
-   }
+    public boolean shouldAlwaysPlay() {
+        return true;
+    }
 
-   public void tick() {
-      if (this.minecart.isRemoved()) {
-         this.setDone();
-      } else {
-         this.x = (double)((float)this.minecart.getX());
-         this.y = (double)((float)this.minecart.getY());
-         this.z = (double)((float)this.minecart.getZ());
-         float f = (float)this.minecart.getVelocity().horizontalLength();
-         boolean bl = !this.minecart.isOnRail() && this.minecart.getController() instanceof ExperimentalMinecartController;
-         if (f >= 0.01F && this.minecart.getWorld().getTickManager().shouldTick() && !bl) {
-            this.distance = MathHelper.clamp(this.distance + 0.0025F, 0.0F, 1.0F);
-            this.volume = MathHelper.lerp(MathHelper.clamp(f, 0.0F, 0.5F), 0.0F, 0.7F);
-         } else {
-            this.distance = 0.0F;
-            this.volume = 0.0F;
-         }
-
-      }
-   }
+    public void tick() {
+        boolean bl;
+        if (this.minecart.isRemoved()) {
+            this.setDone();
+            return;
+        }
+        this.x = (float)this.minecart.getX();
+        this.y = (float)this.minecart.getY();
+        this.z = (float)this.minecart.getZ();
+        float f = (float)this.minecart.getVelocity().horizontalLength();
+        boolean bl2 = bl = !this.minecart.isOnRail() && this.minecart.getController() instanceof ExperimentalMinecartController;
+        if (f >= 0.01f && this.minecart.getEntityWorld().getTickManager().shouldTick() && !bl) {
+            this.distance = MathHelper.clamp((float)(this.distance + 0.0025f), (float)0.0f, (float)1.0f);
+            this.volume = MathHelper.lerp((float)MathHelper.clamp((float)f, (float)0.0f, (float)0.5f), (float)0.0f, (float)0.7f);
+        } else {
+            this.distance = 0.0f;
+            this.volume = 0.0f;
+        }
+    }
 }
+

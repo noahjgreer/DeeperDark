@@ -1,3 +1,19 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.block.enums.CameraSubmersionType
+ *  net.minecraft.client.render.Camera
+ *  net.minecraft.client.render.RenderTickCounter
+ *  net.minecraft.client.render.fog.FogData
+ *  net.minecraft.client.render.fog.FogModifier
+ *  net.minecraft.client.world.ClientWorld
+ *  net.minecraft.entity.Entity
+ *  net.minecraft.entity.LivingEntity
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.render.fog;
 
 import net.fabricmc.api.EnvType;
@@ -5,34 +21,32 @@ import net.fabricmc.api.Environment;
 import net.minecraft.block.enums.CameraSubmersionType;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.RenderTickCounter;
+import net.minecraft.client.render.fog.FogData;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.math.BlockPos;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 public abstract class FogModifier {
-   public abstract void applyStartEndModifier(FogData data, Entity cameraEntity, BlockPos cameraPos, ClientWorld world, float viewDistance, RenderTickCounter tickCounter);
+    public abstract void applyStartEndModifier(FogData var1, Camera var2, ClientWorld var3, float var4, RenderTickCounter var5);
 
-   public boolean isColorSource() {
-      return true;
-   }
+    public boolean isColorSource() {
+        return true;
+    }
 
-   public int getFogColor(ClientWorld world, Camera camera, int viewDistance, float skyDarkness) {
-      return -1;
-   }
+    public int getFogColor(ClientWorld world, Camera camera, int viewDistance, float skyDarkness) {
+        return -1;
+    }
 
-   public boolean isDarknessModifier() {
-      return false;
-   }
+    public boolean isDarknessModifier() {
+        return false;
+    }
 
-   public float applyDarknessModifier(LivingEntity cameraEntity, float darkness, float tickProgress) {
-      return darkness;
-   }
+    public float applyDarknessModifier(LivingEntity cameraEntity, float darkness, float tickProgress) {
+        return darkness;
+    }
 
-   public abstract boolean shouldApply(@Nullable CameraSubmersionType submersionType, Entity cameraEntity);
-
-   public void onSkipped() {
-   }
+    public abstract boolean shouldApply(@Nullable CameraSubmersionType var1, Entity var2);
 }
+

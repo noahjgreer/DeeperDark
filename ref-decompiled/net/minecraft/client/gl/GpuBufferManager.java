@@ -1,117 +1,49 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.blaze3d.buffers.GpuBuffer$Usage
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.gl.BufferManager
+ *  net.minecraft.client.gl.GlBackend
+ *  net.minecraft.client.gl.GlGpuBuffer
+ *  net.minecraft.client.gl.GlGpuBuffer$Mapped
+ *  net.minecraft.client.gl.GpuBufferManager
+ *  net.minecraft.client.gl.GpuBufferManager$ARBGpuBufferManager
+ *  net.minecraft.client.gl.GpuBufferManager$DirectGpuBufferManager
+ *  org.jspecify.annotations.Nullable
+ *  org.lwjgl.opengl.GLCapabilities
+ */
 package net.minecraft.client.gl;
 
-import com.mojang.blaze3d.opengl.GlConst;
-import com.mojang.blaze3d.opengl.GlStateManager;
+import com.mojang.blaze3d.buffers.GpuBuffer;
 import java.nio.ByteBuffer;
 import java.util.Set;
 import java.util.function.Supplier;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.client.gl.BufferManager;
+import net.minecraft.client.gl.GlBackend;
+import net.minecraft.client.gl.GlGpuBuffer;
+import net.minecraft.client.gl.GpuBufferManager;
+import org.jspecify.annotations.Nullable;
 import org.lwjgl.opengl.GLCapabilities;
-import org.lwjgl.system.MemoryUtil;
 
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 public abstract class GpuBufferManager {
-   public static GpuBufferManager create(GLCapabilities capabilities, Set usedCapabilities) {
-      if (capabilities.GL_ARB_buffer_storage && GlBackend.allowGlBufferStorage) {
-         usedCapabilities.add("GL_ARB_buffer_storage");
-         return new ARBGpuBufferManager();
-      } else {
-         return new DirectGpuBufferManager();
-      }
-   }
+    public static GpuBufferManager create(GLCapabilities capabilities, Set<String> usedCapabilities) {
+        if (capabilities.GL_ARB_buffer_storage && GlBackend.allowGlBufferStorage) {
+            usedCapabilities.add("GL_ARB_buffer_storage");
+            return new ARBGpuBufferManager();
+        }
+        return new DirectGpuBufferManager();
+    }
 
-   public abstract GlGpuBuffer createBuffer(BufferManager bufferManager, @Nullable Supplier debugLabelSupplier, int usage, int size);
+    public abstract GlGpuBuffer createBuffer(BufferManager var1, @Nullable Supplier<String> var2, @GpuBuffer.Usage int var3, long var4);
 
-   public abstract GlGpuBuffer createBuffer(BufferManager bufferManager, @Nullable Supplier debugLabelSupplier, int usage, ByteBuffer data);
+    public abstract GlGpuBuffer createBuffer(BufferManager var1, @Nullable Supplier<String> var2, @GpuBuffer.Usage int var3, ByteBuffer var4);
 
-   public abstract GlGpuBuffer.Mapped mapBufferRange(BufferManager bufferManager, GlGpuBuffer buffer, int offset, int length, int flags);
-
-   @Environment(EnvType.CLIENT)
-   static class ARBGpuBufferManager extends GpuBufferManager {
-      public GlGpuBuffer createBuffer(BufferManager bufferManager, @Nullable Supplier debugLabelSupplier, int usage, int size) {
-         int i = bufferManager.createBuffer();
-         bufferManager.setBufferStorage(i, (long)size, GlConst.bufferUsageToGlFlag(usage));
-         ByteBuffer byteBuffer = this.mapBufferRange(bufferManager, usage, i, size);
-         return new GlGpuBuffer(debugLabelSupplier, bufferManager, usage, size, i, byteBuffer);
-      }
-
-      public GlGpuBuffer createBuffer(BufferManager bufferManager, @Nullable Supplier debugLabelSupplier, int usage, ByteBuffer data) {
-         int i = bufferManager.createBuffer();
-         int j = data.remaining();
-         bufferManager.setBufferStorage(i, data, GlConst.bufferUsageToGlFlag(usage));
-         ByteBuffer byteBuffer = this.mapBufferRange(bufferManager, usage, i, j);
-         return new GlGpuBuffer(debugLabelSupplier, bufferManager, usage, j, i, byteBuffer);
-      }
-
-      @Nullable
-      private ByteBuffer mapBufferRange(BufferManager bufferManager, int usage, int buffer, int length) {
-         int i = 0;
-         if ((usage & 1) != 0) {
-            i |= 1;
-         }
-
-         if ((usage & 2) != 0) {
-            i |= 18;
-         }
-
-         ByteBuffer byteBuffer;
-         if (i != 0) {
-            GlStateManager.clearGlErrors();
-            byteBuffer = bufferManager.mapBufferRange(buffer, 0, length, i | 64);
-            if (byteBuffer == null) {
-               throw new IllegalStateException("Can't persistently map buffer, opengl error " + GlStateManager._getError());
-            }
-         } else {
-            byteBuffer = null;
-         }
-
-         return byteBuffer;
-      }
-
-      public GlGpuBuffer.Mapped mapBufferRange(BufferManager bufferManager, GlGpuBuffer buffer, int offset, int length, int flags) {
-         if (buffer.backingBuffer == null) {
-            throw new IllegalStateException("Somehow trying to map an unmappable buffer");
-         } else {
-            return new GlGpuBuffer.Mapped(() -> {
-               if ((flags & 2) != 0) {
-                  bufferManager.flushMappedBufferRange(buffer.id, offset, length);
-               }
-
-            }, buffer, MemoryUtil.memSlice(buffer.backingBuffer, offset, length));
-         }
-      }
-   }
-
-   @Environment(EnvType.CLIENT)
-   private static class DirectGpuBufferManager extends GpuBufferManager {
-      DirectGpuBufferManager() {
-      }
-
-      public GlGpuBuffer createBuffer(BufferManager bufferManager, @Nullable Supplier debugLabelSupplier, int usage, int size) {
-         int i = bufferManager.createBuffer();
-         bufferManager.setBufferData(i, (long)size, GlConst.bufferUsageToGlEnum(usage));
-         return new GlGpuBuffer(debugLabelSupplier, bufferManager, usage, size, i, (ByteBuffer)null);
-      }
-
-      public GlGpuBuffer createBuffer(BufferManager bufferManager, @Nullable Supplier debugLabelSupplier, int usage, ByteBuffer data) {
-         int i = bufferManager.createBuffer();
-         int j = data.remaining();
-         bufferManager.setBufferData(i, data, GlConst.bufferUsageToGlEnum(usage));
-         return new GlGpuBuffer(debugLabelSupplier, bufferManager, usage, j, i, (ByteBuffer)null);
-      }
-
-      public GlGpuBuffer.Mapped mapBufferRange(BufferManager bufferManager, GlGpuBuffer buffer, int offset, int length, int flags) {
-         GlStateManager.clearGlErrors();
-         ByteBuffer byteBuffer = bufferManager.mapBufferRange(buffer.id, offset, length, flags);
-         if (byteBuffer == null) {
-            throw new IllegalStateException("Can't map buffer, opengl error " + GlStateManager._getError());
-         } else {
-            return new GlGpuBuffer.Mapped(() -> {
-               bufferManager.unmapBuffer(buffer.id);
-            }, buffer, byteBuffer);
-         }
-      }
-   }
+    public abstract GlGpuBuffer.Mapped mapBufferRange(BufferManager var1, GlGpuBuffer var2, long var3, long var5, int var7);
 }
+

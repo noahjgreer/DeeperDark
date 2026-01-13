@@ -1,3 +1,21 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.model.Dilation
+ *  net.minecraft.client.model.ModelData
+ *  net.minecraft.client.model.ModelPart
+ *  net.minecraft.client.model.ModelPartBuilder
+ *  net.minecraft.client.model.ModelPartData
+ *  net.minecraft.client.model.ModelTransform
+ *  net.minecraft.client.model.TexturedModelData
+ *  net.minecraft.client.render.entity.model.CreeperEntityModel
+ *  net.minecraft.client.render.entity.model.EntityModel
+ *  net.minecraft.client.render.entity.state.CreeperEntityRenderState
+ *  net.minecraft.util.math.MathHelper
+ */
 package net.minecraft.client.render.entity.model;
 
 import net.fabricmc.api.EnvType;
@@ -9,49 +27,52 @@ import net.minecraft.client.model.ModelPartBuilder;
 import net.minecraft.client.model.ModelPartData;
 import net.minecraft.client.model.ModelTransform;
 import net.minecraft.client.model.TexturedModelData;
+import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.render.entity.state.CreeperEntityRenderState;
 import net.minecraft.util.math.MathHelper;
 
-@Environment(EnvType.CLIENT)
-public class CreeperEntityModel extends EntityModel {
-   private final ModelPart head;
-   private final ModelPart leftHindLeg;
-   private final ModelPart rightHindLeg;
-   private final ModelPart leftFrontLeg;
-   private final ModelPart rightFrontLeg;
-   private static final int HEAD_AND_BODY_Y_PIVOT = 6;
+@Environment(value=EnvType.CLIENT)
+public class CreeperEntityModel
+extends EntityModel<CreeperEntityRenderState> {
+    private final ModelPart head;
+    private final ModelPart leftHindLeg;
+    private final ModelPart rightHindLeg;
+    private final ModelPart leftFrontLeg;
+    private final ModelPart rightFrontLeg;
+    private static final int HEAD_AND_BODY_Y_PIVOT = 6;
 
-   public CreeperEntityModel(ModelPart modelPart) {
-      super(modelPart);
-      this.head = modelPart.getChild("head");
-      this.rightHindLeg = modelPart.getChild("right_hind_leg");
-      this.leftHindLeg = modelPart.getChild("left_hind_leg");
-      this.rightFrontLeg = modelPart.getChild("right_front_leg");
-      this.leftFrontLeg = modelPart.getChild("left_front_leg");
-   }
+    public CreeperEntityModel(ModelPart modelPart) {
+        super(modelPart);
+        this.head = modelPart.getChild("head");
+        this.rightHindLeg = modelPart.getChild("right_hind_leg");
+        this.leftHindLeg = modelPart.getChild("left_hind_leg");
+        this.rightFrontLeg = modelPart.getChild("right_front_leg");
+        this.leftFrontLeg = modelPart.getChild("left_front_leg");
+    }
 
-   public static TexturedModelData getTexturedModelData(Dilation dilation) {
-      ModelData modelData = new ModelData();
-      ModelPartData modelPartData = modelData.getRoot();
-      modelPartData.addChild("head", ModelPartBuilder.create().uv(0, 0).cuboid(-4.0F, -8.0F, -4.0F, 8.0F, 8.0F, 8.0F, dilation), ModelTransform.origin(0.0F, 6.0F, 0.0F));
-      modelPartData.addChild("body", ModelPartBuilder.create().uv(16, 16).cuboid(-4.0F, 0.0F, -2.0F, 8.0F, 12.0F, 4.0F, dilation), ModelTransform.origin(0.0F, 6.0F, 0.0F));
-      ModelPartBuilder modelPartBuilder = ModelPartBuilder.create().uv(0, 16).cuboid(-2.0F, 0.0F, -2.0F, 4.0F, 6.0F, 4.0F, dilation);
-      modelPartData.addChild("right_hind_leg", modelPartBuilder, ModelTransform.origin(-2.0F, 18.0F, 4.0F));
-      modelPartData.addChild("left_hind_leg", modelPartBuilder, ModelTransform.origin(2.0F, 18.0F, 4.0F));
-      modelPartData.addChild("right_front_leg", modelPartBuilder, ModelTransform.origin(-2.0F, 18.0F, -4.0F));
-      modelPartData.addChild("left_front_leg", modelPartBuilder, ModelTransform.origin(2.0F, 18.0F, -4.0F));
-      return TexturedModelData.of(modelData, 64, 32);
-   }
+    public static TexturedModelData getTexturedModelData(Dilation dilation) {
+        ModelData modelData = new ModelData();
+        ModelPartData modelPartData = modelData.getRoot();
+        modelPartData.addChild("head", ModelPartBuilder.create().uv(0, 0).cuboid(-4.0f, -8.0f, -4.0f, 8.0f, 8.0f, 8.0f, dilation), ModelTransform.origin((float)0.0f, (float)6.0f, (float)0.0f));
+        modelPartData.addChild("body", ModelPartBuilder.create().uv(16, 16).cuboid(-4.0f, 0.0f, -2.0f, 8.0f, 12.0f, 4.0f, dilation), ModelTransform.origin((float)0.0f, (float)6.0f, (float)0.0f));
+        ModelPartBuilder modelPartBuilder = ModelPartBuilder.create().uv(0, 16).cuboid(-2.0f, 0.0f, -2.0f, 4.0f, 6.0f, 4.0f, dilation);
+        modelPartData.addChild("right_hind_leg", modelPartBuilder, ModelTransform.origin((float)-2.0f, (float)18.0f, (float)4.0f));
+        modelPartData.addChild("left_hind_leg", modelPartBuilder, ModelTransform.origin((float)2.0f, (float)18.0f, (float)4.0f));
+        modelPartData.addChild("right_front_leg", modelPartBuilder, ModelTransform.origin((float)-2.0f, (float)18.0f, (float)-4.0f));
+        modelPartData.addChild("left_front_leg", modelPartBuilder, ModelTransform.origin((float)2.0f, (float)18.0f, (float)-4.0f));
+        return TexturedModelData.of((ModelData)modelData, (int)64, (int)32);
+    }
 
-   public void setAngles(CreeperEntityRenderState creeperEntityRenderState) {
-      super.setAngles(creeperEntityRenderState);
-      this.head.yaw = creeperEntityRenderState.relativeHeadYaw * 0.017453292F;
-      this.head.pitch = creeperEntityRenderState.pitch * 0.017453292F;
-      float f = creeperEntityRenderState.limbSwingAmplitude;
-      float g = creeperEntityRenderState.limbSwingAnimationProgress;
-      this.leftHindLeg.pitch = MathHelper.cos(g * 0.6662F) * 1.4F * f;
-      this.rightHindLeg.pitch = MathHelper.cos(g * 0.6662F + 3.1415927F) * 1.4F * f;
-      this.leftFrontLeg.pitch = MathHelper.cos(g * 0.6662F + 3.1415927F) * 1.4F * f;
-      this.rightFrontLeg.pitch = MathHelper.cos(g * 0.6662F) * 1.4F * f;
-   }
+    public void setAngles(CreeperEntityRenderState creeperEntityRenderState) {
+        super.setAngles((Object)creeperEntityRenderState);
+        this.head.yaw = creeperEntityRenderState.relativeHeadYaw * ((float)Math.PI / 180);
+        this.head.pitch = creeperEntityRenderState.pitch * ((float)Math.PI / 180);
+        float f = creeperEntityRenderState.limbSwingAmplitude;
+        float g = creeperEntityRenderState.limbSwingAnimationProgress;
+        this.leftHindLeg.pitch = MathHelper.cos((double)(g * 0.6662f)) * 1.4f * f;
+        this.rightHindLeg.pitch = MathHelper.cos((double)(g * 0.6662f + (float)Math.PI)) * 1.4f * f;
+        this.leftFrontLeg.pitch = MathHelper.cos((double)(g * 0.6662f + (float)Math.PI)) * 1.4f * f;
+        this.rightFrontLeg.pitch = MathHelper.cos((double)(g * 0.6662f)) * 1.4f * f;
+    }
 }
+

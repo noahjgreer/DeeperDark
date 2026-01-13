@@ -1,28 +1,90 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.google.common.collect.ImmutableList
+ *  com.google.common.collect.ImmutableList$Builder
+ *  com.mojang.serialization.MapCodec
+ *  net.minecraft.block.AbstractBlock$Settings
+ *  net.minecraft.block.Block
+ *  net.minecraft.block.BlockState
+ *  net.minecraft.block.RespawnAnchorBlock
+ *  net.minecraft.block.RespawnAnchorBlock$1
+ *  net.minecraft.entity.Dismounting
+ *  net.minecraft.entity.Entity
+ *  net.minecraft.entity.EntityType
+ *  net.minecraft.entity.LivingEntity
+ *  net.minecraft.entity.ai.pathing.NavigationType
+ *  net.minecraft.entity.player.PlayerEntity
+ *  net.minecraft.fluid.FluidState
+ *  net.minecraft.item.ItemStack
+ *  net.minecraft.item.Items
+ *  net.minecraft.particle.ParticleEffect
+ *  net.minecraft.particle.ParticleTypes
+ *  net.minecraft.registry.RegistryKey
+ *  net.minecraft.registry.entry.RegistryEntry
+ *  net.minecraft.registry.tag.FluidTags
+ *  net.minecraft.server.network.ServerPlayerEntity
+ *  net.minecraft.server.network.ServerPlayerEntity$Respawn
+ *  net.minecraft.server.world.ServerWorld
+ *  net.minecraft.sound.SoundCategory
+ *  net.minecraft.sound.SoundEvents
+ *  net.minecraft.state.StateManager$Builder
+ *  net.minecraft.state.property.IntProperty
+ *  net.minecraft.state.property.Properties
+ *  net.minecraft.state.property.Property
+ *  net.minecraft.util.ActionResult
+ *  net.minecraft.util.Hand
+ *  net.minecraft.util.hit.BlockHitResult
+ *  net.minecraft.util.math.BlockPos
+ *  net.minecraft.util.math.BlockPos$Mutable
+ *  net.minecraft.util.math.Direction
+ *  net.minecraft.util.math.Direction$Type
+ *  net.minecraft.util.math.MathHelper
+ *  net.minecraft.util.math.Vec3d
+ *  net.minecraft.util.math.Vec3i
+ *  net.minecraft.util.math.random.Random
+ *  net.minecraft.world.CollisionView
+ *  net.minecraft.world.World
+ *  net.minecraft.world.World$ExplosionSourceType
+ *  net.minecraft.world.WorldProperties$SpawnPoint
+ *  net.minecraft.world.attribute.EnvironmentAttributes
+ *  net.minecraft.world.event.GameEvent
+ *  net.minecraft.world.event.GameEvent$Emitter
+ *  net.minecraft.world.explosion.ExplosionBehavior
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.block;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.UnmodifiableIterator;
 import com.mojang.serialization.MapCodec;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Stream;
+import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.RespawnAnchorBlock;
 import net.minecraft.entity.Dismounting;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.pathing.NavigationType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.IntProperty;
 import net.minecraft.state.property.Properties;
+import net.minecraft.state.property.Property;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -32,179 +94,167 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.math.random.Random;
-import net.minecraft.world.BlockView;
 import net.minecraft.world.CollisionView;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldProperties;
+import net.minecraft.world.attribute.EnvironmentAttributes;
 import net.minecraft.world.event.GameEvent;
-import net.minecraft.world.explosion.Explosion;
 import net.minecraft.world.explosion.ExplosionBehavior;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-public class RespawnAnchorBlock extends Block {
-   public static final MapCodec CODEC = createCodec(RespawnAnchorBlock::new);
-   public static final int NO_CHARGES = 0;
-   public static final int MAX_CHARGES = 4;
-   public static final IntProperty CHARGES;
-   private static final ImmutableList VALID_HORIZONTAL_SPAWN_OFFSETS;
-   private static final ImmutableList VALID_SPAWN_OFFSETS;
+/*
+ * Exception performing whole class analysis ignored.
+ */
+public class RespawnAnchorBlock
+extends Block {
+    public static final MapCodec<RespawnAnchorBlock> CODEC = RespawnAnchorBlock.createCodec(RespawnAnchorBlock::new);
+    public static final int NO_CHARGES = 0;
+    public static final int MAX_CHARGES = 4;
+    public static final IntProperty CHARGES = Properties.CHARGES;
+    private static final ImmutableList<Vec3i> VALID_HORIZONTAL_SPAWN_OFFSETS = ImmutableList.of((Object)new Vec3i(0, 0, -1), (Object)new Vec3i(-1, 0, 0), (Object)new Vec3i(0, 0, 1), (Object)new Vec3i(1, 0, 0), (Object)new Vec3i(-1, 0, -1), (Object)new Vec3i(1, 0, -1), (Object)new Vec3i(-1, 0, 1), (Object)new Vec3i(1, 0, 1));
+    private static final ImmutableList<Vec3i> VALID_SPAWN_OFFSETS = new ImmutableList.Builder().addAll((Iterable)VALID_HORIZONTAL_SPAWN_OFFSETS).addAll(VALID_HORIZONTAL_SPAWN_OFFSETS.stream().map(Vec3i::down).iterator()).addAll(VALID_HORIZONTAL_SPAWN_OFFSETS.stream().map(Vec3i::up).iterator()).add((Object)new Vec3i(0, 1, 0)).build();
 
-   public MapCodec getCodec() {
-      return CODEC;
-   }
+    public MapCodec<RespawnAnchorBlock> getCodec() {
+        return CODEC;
+    }
 
-   public RespawnAnchorBlock(AbstractBlock.Settings settings) {
-      super(settings);
-      this.setDefaultState((BlockState)((BlockState)this.stateManager.getDefaultState()).with(CHARGES, 0));
-   }
+    public RespawnAnchorBlock(AbstractBlock.Settings settings) {
+        super(settings);
+        this.setDefaultState((BlockState)((BlockState)this.stateManager.getDefaultState()).with((Property)CHARGES, (Comparable)Integer.valueOf(0)));
+    }
 
-   protected ActionResult onUseWithItem(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-      if (isChargeItem(stack) && canCharge(state)) {
-         charge(player, world, pos, state);
-         stack.decrementUnlessCreative(1, player);
-         return ActionResult.SUCCESS;
-      } else {
-         return (ActionResult)(hand == Hand.MAIN_HAND && isChargeItem(player.getStackInHand(Hand.OFF_HAND)) && canCharge(state) ? ActionResult.PASS : ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION);
-      }
-   }
+    protected ActionResult onUseWithItem(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (RespawnAnchorBlock.isChargeItem((ItemStack)stack) && RespawnAnchorBlock.canCharge((BlockState)state)) {
+            RespawnAnchorBlock.charge((Entity)player, (World)world, (BlockPos)pos, (BlockState)state);
+            stack.decrementUnlessCreative(1, (LivingEntity)player);
+            return ActionResult.SUCCESS;
+        }
+        if (hand == Hand.MAIN_HAND && RespawnAnchorBlock.isChargeItem((ItemStack)player.getStackInHand(Hand.OFF_HAND)) && RespawnAnchorBlock.canCharge((BlockState)state)) {
+            return ActionResult.PASS;
+        }
+        return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
+    }
 
-   protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-      if ((Integer)state.get(CHARGES) == 0) {
-         return ActionResult.PASS;
-      } else if (!isNether(world)) {
-         if (!world.isClient) {
-            this.explode(state, world, pos);
-         }
-
-         return ActionResult.SUCCESS;
-      } else {
-         if (player instanceof ServerPlayerEntity) {
-            ServerPlayerEntity serverPlayerEntity = (ServerPlayerEntity)player;
-            ServerPlayerEntity.Respawn respawn = serverPlayerEntity.getRespawn();
-            ServerPlayerEntity.Respawn respawn2 = new ServerPlayerEntity.Respawn(world.getRegistryKey(), pos, 0.0F, false);
-            if (respawn == null || !respawn.posEquals(respawn2)) {
-               serverPlayerEntity.setSpawnPoint(respawn2, true);
-               world.playSound((Entity)null, (double)pos.getX() + 0.5, (double)pos.getY() + 0.5, (double)pos.getZ() + 0.5, (SoundEvent)SoundEvents.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.BLOCKS, 1.0F, 1.0F);
-               return ActionResult.SUCCESS_SERVER;
+    protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+        if ((Integer)state.get((Property)CHARGES) == 0) {
+            return ActionResult.PASS;
+        }
+        if (!(world instanceof ServerWorld)) {
+            return ActionResult.CONSUME;
+        }
+        ServerWorld serverWorld = (ServerWorld)world;
+        if (RespawnAnchorBlock.isUsable((ServerWorld)serverWorld, (BlockPos)pos)) {
+            if (player instanceof ServerPlayerEntity) {
+                ServerPlayerEntity serverPlayerEntity = (ServerPlayerEntity)player;
+                ServerPlayerEntity.Respawn respawn = serverPlayerEntity.getRespawn();
+                ServerPlayerEntity.Respawn respawn2 = new ServerPlayerEntity.Respawn(WorldProperties.SpawnPoint.create((RegistryKey)serverWorld.getRegistryKey(), (BlockPos)pos, (float)0.0f, (float)0.0f), false);
+                if (respawn == null || !respawn.posEquals(respawn2)) {
+                    serverPlayerEntity.setSpawnPoint(respawn2, true);
+                    serverWorld.playSound(null, (double)pos.getX() + 0.5, (double)pos.getY() + 0.5, (double)pos.getZ() + 0.5, SoundEvents.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.BLOCKS, 1.0f, 1.0f);
+                    return ActionResult.SUCCESS_SERVER;
+                }
             }
-         }
+            return ActionResult.CONSUME;
+        }
+        this.explode(state, serverWorld, pos);
+        return ActionResult.SUCCESS_SERVER;
+    }
 
-         return ActionResult.CONSUME;
-      }
-   }
+    private static boolean isChargeItem(ItemStack stack) {
+        return stack.isOf(Items.GLOWSTONE);
+    }
 
-   private static boolean isChargeItem(ItemStack stack) {
-      return stack.isOf(Items.GLOWSTONE);
-   }
+    private static boolean canCharge(BlockState state) {
+        return (Integer)state.get((Property)CHARGES) < 4;
+    }
 
-   private static boolean canCharge(BlockState state) {
-      return (Integer)state.get(CHARGES) < 4;
-   }
-
-   private static boolean hasStillWater(BlockPos pos, World world) {
-      FluidState fluidState = world.getFluidState(pos);
-      if (!fluidState.isIn(FluidTags.WATER)) {
-         return false;
-      } else if (fluidState.isStill()) {
-         return true;
-      } else {
-         float f = (float)fluidState.getLevel();
-         if (f < 2.0F) {
+    private static boolean hasStillWater(BlockPos pos, World world) {
+        FluidState fluidState = world.getFluidState(pos);
+        if (!fluidState.isIn(FluidTags.WATER)) {
             return false;
-         } else {
-            FluidState fluidState2 = world.getFluidState(pos.down());
-            return !fluidState2.isIn(FluidTags.WATER);
-         }
-      }
-   }
+        }
+        if (fluidState.isStill()) {
+            return true;
+        }
+        float f = fluidState.getLevel();
+        if (f < 2.0f) {
+            return false;
+        }
+        FluidState fluidState2 = world.getFluidState(pos.down());
+        return !fluidState2.isIn(FluidTags.WATER);
+    }
 
-   private void explode(BlockState state, World world, final BlockPos explodedPos) {
-      world.removeBlock(explodedPos, false);
-      Stream var10000 = Direction.Type.HORIZONTAL.stream();
-      Objects.requireNonNull(explodedPos);
-      boolean bl = var10000.map(explodedPos::offset).anyMatch((pos) -> {
-         return hasStillWater(pos, world);
-      });
-      final boolean bl2 = bl || world.getFluidState(explodedPos.up()).isIn(FluidTags.WATER);
-      ExplosionBehavior explosionBehavior = new ExplosionBehavior(this) {
-         public Optional getBlastResistance(Explosion explosion, BlockView world, BlockPos pos, BlockState blockState, FluidState fluidState) {
-            return pos.equals(explodedPos) && bl2 ? Optional.of(Blocks.WATER.getBlastResistance()) : super.getBlastResistance(explosion, world, pos, blockState, fluidState);
-         }
-      };
-      Vec3d vec3d = explodedPos.toCenterPos();
-      world.createExplosion((Entity)null, world.getDamageSources().badRespawnPoint(vec3d), explosionBehavior, vec3d, 5.0F, true, World.ExplosionSourceType.BLOCK);
-   }
+    private void explode(BlockState state, ServerWorld world, BlockPos explodedPos) {
+        world.removeBlock(explodedPos, false);
+        boolean bl = Direction.Type.HORIZONTAL.stream().map(arg_0 -> ((BlockPos)explodedPos).offset(arg_0)).anyMatch(pos -> RespawnAnchorBlock.hasStillWater((BlockPos)pos, (World)world));
+        boolean bl2 = bl || world.getFluidState(explodedPos.up()).isIn(FluidTags.WATER);
+        1 explosionBehavior = new /* Unavailable Anonymous Inner Class!! */;
+        Vec3d vec3d = explodedPos.toCenterPos();
+        world.createExplosion(null, world.getDamageSources().badRespawnPoint(vec3d), (ExplosionBehavior)explosionBehavior, vec3d, 5.0f, true, World.ExplosionSourceType.BLOCK);
+    }
 
-   public static boolean isNether(World world) {
-      return world.getDimension().respawnAnchorWorks();
-   }
+    public static boolean isUsable(ServerWorld world, BlockPos pos) {
+        return (Boolean)world.getEnvironmentAttributes().getAttributeValue(EnvironmentAttributes.RESPAWN_ANCHOR_WORKS_GAMEPLAY, pos);
+    }
 
-   public static void charge(@Nullable Entity charger, World world, BlockPos pos, BlockState state) {
-      BlockState blockState = (BlockState)state.with(CHARGES, (Integer)state.get(CHARGES) + 1);
-      world.setBlockState(pos, blockState, 3);
-      world.emitGameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Emitter.of(charger, blockState));
-      world.playSound((Entity)null, (double)pos.getX() + 0.5, (double)pos.getY() + 0.5, (double)pos.getZ() + 0.5, (SoundEvent)SoundEvents.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.BLOCKS, 1.0F, 1.0F);
-   }
+    public static void charge(@Nullable Entity charger, World world, BlockPos pos, BlockState state) {
+        BlockState blockState = (BlockState)state.with((Property)CHARGES, (Comparable)Integer.valueOf((Integer)state.get((Property)CHARGES) + 1));
+        world.setBlockState(pos, blockState, 3);
+        world.emitGameEvent((RegistryEntry)GameEvent.BLOCK_CHANGE, pos, GameEvent.Emitter.of((Entity)charger, (BlockState)blockState));
+        world.playSound(null, (double)pos.getX() + 0.5, (double)pos.getY() + 0.5, (double)pos.getZ() + 0.5, SoundEvents.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.BLOCKS, 1.0f, 1.0f);
+    }
 
-   public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
-      if ((Integer)state.get(CHARGES) != 0) {
-         if (random.nextInt(100) == 0) {
-            world.playSoundAtBlockCenterClient(pos, SoundEvents.BLOCK_RESPAWN_ANCHOR_AMBIENT, SoundCategory.BLOCKS, 1.0F, 1.0F, false);
-         }
+    public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
+        if ((Integer)state.get((Property)CHARGES) == 0) {
+            return;
+        }
+        if (random.nextInt(100) == 0) {
+            world.playSoundAtBlockCenterClient(pos, SoundEvents.BLOCK_RESPAWN_ANCHOR_AMBIENT, SoundCategory.BLOCKS, 1.0f, 1.0f, false);
+        }
+        double d = (double)pos.getX() + 0.5 + (0.5 - random.nextDouble());
+        double e = (double)pos.getY() + 1.0;
+        double f = (double)pos.getZ() + 0.5 + (0.5 - random.nextDouble());
+        double g = (double)random.nextFloat() * 0.04;
+        world.addParticleClient((ParticleEffect)ParticleTypes.REVERSE_PORTAL, d, e, f, 0.0, g, 0.0);
+    }
 
-         double d = (double)pos.getX() + 0.5 + (0.5 - random.nextDouble());
-         double e = (double)pos.getY() + 1.0;
-         double f = (double)pos.getZ() + 0.5 + (0.5 - random.nextDouble());
-         double g = (double)random.nextFloat() * 0.04;
-         world.addParticleClient(ParticleTypes.REVERSE_PORTAL, d, e, f, 0.0, g, 0.0);
-      }
-   }
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(new Property[]{CHARGES});
+    }
 
-   protected void appendProperties(StateManager.Builder builder) {
-      builder.add(CHARGES);
-   }
+    protected boolean hasComparatorOutput(BlockState state) {
+        return true;
+    }
 
-   protected boolean hasComparatorOutput(BlockState state) {
-      return true;
-   }
+    public static int getLightLevel(BlockState state, int maxLevel) {
+        return MathHelper.floor((float)((float)((Integer)state.get((Property)CHARGES) - 0) / 4.0f * (float)maxLevel));
+    }
 
-   public static int getLightLevel(BlockState state, int maxLevel) {
-      return MathHelper.floor((float)((Integer)state.get(CHARGES) - 0) / 4.0F * (float)maxLevel);
-   }
+    protected int getComparatorOutput(BlockState state, World world, BlockPos pos, Direction direction) {
+        return RespawnAnchorBlock.getLightLevel((BlockState)state, (int)15);
+    }
 
-   protected int getComparatorOutput(BlockState state, World world, BlockPos pos) {
-      return getLightLevel(state, 15);
-   }
+    public static Optional<Vec3d> findRespawnPosition(EntityType<?> entity, CollisionView world, BlockPos pos) {
+        Optional optional = RespawnAnchorBlock.findRespawnPosition(entity, (CollisionView)world, (BlockPos)pos, (boolean)true);
+        if (optional.isPresent()) {
+            return optional;
+        }
+        return RespawnAnchorBlock.findRespawnPosition(entity, (CollisionView)world, (BlockPos)pos, (boolean)false);
+    }
 
-   public static Optional findRespawnPosition(EntityType entity, CollisionView world, BlockPos pos) {
-      Optional optional = findRespawnPosition(entity, world, pos, true);
-      return optional.isPresent() ? optional : findRespawnPosition(entity, world, pos, false);
-   }
+    private static Optional<Vec3d> findRespawnPosition(EntityType<?> entity, CollisionView world, BlockPos pos, boolean ignoreInvalidPos) {
+        BlockPos.Mutable mutable = new BlockPos.Mutable();
+        for (Vec3i vec3i : VALID_SPAWN_OFFSETS) {
+            mutable.set((Vec3i)pos).move(vec3i);
+            Vec3d vec3d = Dismounting.findRespawnPos(entity, (CollisionView)world, (BlockPos)mutable, (boolean)ignoreInvalidPos);
+            if (vec3d == null) continue;
+            return Optional.of(vec3d);
+        }
+        return Optional.empty();
+    }
 
-   private static Optional findRespawnPosition(EntityType entity, CollisionView world, BlockPos pos, boolean ignoreInvalidPos) {
-      BlockPos.Mutable mutable = new BlockPos.Mutable();
-      UnmodifiableIterator var5 = VALID_SPAWN_OFFSETS.iterator();
-
-      Vec3d vec3d;
-      do {
-         if (!var5.hasNext()) {
-            return Optional.empty();
-         }
-
-         Vec3i vec3i = (Vec3i)var5.next();
-         mutable.set(pos).move(vec3i);
-         vec3d = Dismounting.findRespawnPos(entity, world, mutable, ignoreInvalidPos);
-      } while(vec3d == null);
-
-      return Optional.of(vec3d);
-   }
-
-   protected boolean canPathfindThrough(BlockState state, NavigationType type) {
-      return false;
-   }
-
-   static {
-      CHARGES = Properties.CHARGES;
-      VALID_HORIZONTAL_SPAWN_OFFSETS = ImmutableList.of(new Vec3i(0, 0, -1), new Vec3i(-1, 0, 0), new Vec3i(0, 0, 1), new Vec3i(1, 0, 0), new Vec3i(-1, 0, -1), new Vec3i(1, 0, -1), new Vec3i(-1, 0, 1), new Vec3i(1, 0, 1));
-      VALID_SPAWN_OFFSETS = (new ImmutableList.Builder()).addAll(VALID_HORIZONTAL_SPAWN_OFFSETS).addAll(VALID_HORIZONTAL_SPAWN_OFFSETS.stream().map(Vec3i::down).iterator()).addAll(VALID_HORIZONTAL_SPAWN_OFFSETS.stream().map(Vec3i::up).iterator()).add(new Vec3i(0, 1, 0)).build();
-   }
+    protected boolean canPathfindThrough(BlockState state, NavigationType type) {
+        return false;
+    }
 }
+

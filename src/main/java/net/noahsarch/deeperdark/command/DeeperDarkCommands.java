@@ -6,7 +6,6 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.CommandSource;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
@@ -75,7 +74,7 @@ public class DeeperDarkCommands {
 
     private static void registerCommands(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(CommandManager.literal("ddgive")
-            .requires(source -> source.hasPermissionLevel(2)) // Operator only
+            //.requires(source -> source.hasPermissionLevel(2)) // Operator only
             .then(CommandManager.argument("item", StringArgumentType.word())
                 .suggests(DeeperDarkCommands::suggestItems)
                 .executes(DeeperDarkCommands::executeGive)));

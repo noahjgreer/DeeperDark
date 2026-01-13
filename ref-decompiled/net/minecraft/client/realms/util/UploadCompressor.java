@@ -1,3 +1,15 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.realms.exception.upload.CancelledRealmsUploadException
+ *  net.minecraft.client.realms.exception.upload.TooBigRealmsUploadException
+ *  net.minecraft.client.realms.util.UploadCompressor
+ *  org.apache.commons.compress.archivers.tar.TarArchiveEntry
+ *  org.apache.commons.compress.archivers.tar.TarArchiveOutputStream
+ */
 package net.minecraft.client.realms.util;
 
 import java.io.File;
@@ -5,6 +17,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.function.BooleanSupplier;
 import java.util.zip.GZIPOutputStream;
@@ -15,94 +28,70 @@ import net.minecraft.client.realms.exception.upload.TooBigRealmsUploadException;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 public class UploadCompressor {
-   private static final long MAX_SIZE = 5368709120L;
-   private static final String field_54369 = "world";
-   private final BooleanSupplier cancellationSupplier;
-   private final Path directory;
+    private static final long MAX_SIZE = 0x140000000L;
+    private static final String field_54369 = "world";
+    private final BooleanSupplier cancellationSupplier;
+    private final Path directory;
 
-   public static File compress(Path directory, BooleanSupplier cancellationSupplier) throws IOException {
-      return (new UploadCompressor(directory, cancellationSupplier)).run();
-   }
+    public static File compress(Path directory, BooleanSupplier cancellationSupplier) throws IOException {
+        return new UploadCompressor(directory, cancellationSupplier).run();
+    }
 
-   private UploadCompressor(Path directory, BooleanSupplier cancellationSupplier) {
-      this.cancellationSupplier = cancellationSupplier;
-      this.directory = directory;
-   }
+    private UploadCompressor(Path directory, BooleanSupplier cancellationSupplier) {
+        this.cancellationSupplier = cancellationSupplier;
+        this.directory = directory;
+    }
 
-   private File run() throws IOException {
-      TarArchiveOutputStream tarArchiveOutputStream = null;
-
-      File var3;
-      try {
-         File file = File.createTempFile("realms-upload-file", ".tar.gz");
-         tarArchiveOutputStream = new TarArchiveOutputStream(new GZIPOutputStream(new FileOutputStream(file)));
-         tarArchiveOutputStream.setLongFileMode(3);
-         this.compress(tarArchiveOutputStream, this.directory, "world", true);
-         if (this.cancellationSupplier.getAsBoolean()) {
-            throw new CancelledRealmsUploadException();
-         }
-
-         tarArchiveOutputStream.finish();
-         this.validateSize(file.length());
-         var3 = file;
-      } finally {
-         if (tarArchiveOutputStream != null) {
-            tarArchiveOutputStream.close();
-         }
-
-      }
-
-      return var3;
-   }
-
-   private void compress(TarArchiveOutputStream stream, Path directory, String prefix, boolean root) throws IOException {
-      if (this.cancellationSupplier.getAsBoolean()) {
-         throw new CancelledRealmsUploadException();
-      } else {
-         this.validateSize(stream.getBytesWritten());
-         File file = directory.toFile();
-         String string = root ? prefix : prefix + file.getName();
-         TarArchiveEntry tarArchiveEntry = new TarArchiveEntry(file, string);
-         stream.putArchiveEntry(tarArchiveEntry);
-         if (file.isFile()) {
-            InputStream inputStream = new FileInputStream(file);
-
-            try {
-               inputStream.transferTo(stream);
-            } catch (Throwable var14) {
-               try {
-                  inputStream.close();
-               } catch (Throwable var13) {
-                  var14.addSuppressed(var13);
-               }
-
-               throw var14;
+    /*
+     * WARNING - Removed try catching itself - possible behaviour change.
+     */
+    private File run() throws IOException {
+        try (TarArchiveOutputStream tarArchiveOutputStream = null;){
+            File file = File.createTempFile("realms-upload-file", ".tar.gz");
+            tarArchiveOutputStream = new TarArchiveOutputStream((OutputStream)new GZIPOutputStream(new FileOutputStream(file)));
+            tarArchiveOutputStream.setLongFileMode(3);
+            this.compress(tarArchiveOutputStream, this.directory, field_54369, true);
+            if (this.cancellationSupplier.getAsBoolean()) {
+                throw new CancelledRealmsUploadException();
             }
+            tarArchiveOutputStream.finish();
+            this.validateSize(file.length());
+            File file2 = file;
+            return file2;
+        }
+    }
 
-            inputStream.close();
+    private void compress(TarArchiveOutputStream stream, Path directory, String prefix, boolean root) throws IOException {
+        if (this.cancellationSupplier.getAsBoolean()) {
+            throw new CancelledRealmsUploadException();
+        }
+        this.validateSize(stream.getBytesWritten());
+        File file = directory.toFile();
+        String string = root ? prefix : prefix + file.getName();
+        TarArchiveEntry tarArchiveEntry = new TarArchiveEntry(file, string);
+        stream.putArchiveEntry(tarArchiveEntry);
+        if (file.isFile()) {
+            try (FileInputStream inputStream = new FileInputStream(file);){
+                ((InputStream)inputStream).transferTo((OutputStream)stream);
+            }
             stream.closeArchiveEntry();
-         } else {
+        } else {
             stream.closeArchiveEntry();
             File[] files = file.listFiles();
             if (files != null) {
-               File[] var9 = files;
-               int var10 = files.length;
-
-               for(int var11 = 0; var11 < var10; ++var11) {
-                  File file2 = var9[var11];
-                  this.compress(stream, file2.toPath(), string + "/", false);
-               }
+                for (File file2 : files) {
+                    this.compress(stream, file2.toPath(), string + "/", false);
+                }
             }
-         }
+        }
+    }
 
-      }
-   }
-
-   private void validateSize(long size) {
-      if (size > 5368709120L) {
-         throw new TooBigRealmsUploadException(5368709120L);
-      }
-   }
+    private void validateSize(long size) {
+        if (size > 0x140000000L) {
+            throw new TooBigRealmsUploadException(0x140000000L);
+        }
+    }
 }
+

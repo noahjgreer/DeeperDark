@@ -1,3 +1,20 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.blaze3d.buffers.GpuBuffer
+ *  com.mojang.blaze3d.buffers.Std140Builder
+ *  com.mojang.blaze3d.buffers.Std140SizeCalculator
+ *  com.mojang.blaze3d.systems.RenderSystem
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.gl.GlobalSettings
+ *  net.minecraft.client.render.Camera
+ *  net.minecraft.client.render.RenderTickCounter
+ *  net.minecraft.util.math.MathHelper
+ *  net.minecraft.util.math.Vec3d
+ *  org.lwjgl.system.MemoryStack
+ */
 package net.minecraft.client.gl;
 
 import com.mojang.blaze3d.buffers.GpuBuffer;
@@ -7,46 +24,33 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import java.nio.ByteBuffer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.RenderTickCounter;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import org.lwjgl.system.MemoryStack;
 
-@Environment(EnvType.CLIENT)
-public class GlobalSettings implements AutoCloseable {
-   public static final int SIZE = (new Std140SizeCalculator()).putVec2().putFloat().putFloat().putInt().get();
-   private final GpuBuffer buffer;
+@Environment(value=EnvType.CLIENT)
+public class GlobalSettings
+implements AutoCloseable {
+    public static final int SIZE = new Std140SizeCalculator().putIVec3().putVec3().putVec2().putFloat().putFloat().putInt().putInt().get();
+    private final GpuBuffer buffer = RenderSystem.getDevice().createBuffer(() -> "Global Settings UBO", 136, (long)SIZE);
 
-   public GlobalSettings() {
-      this.buffer = RenderSystem.getDevice().createBuffer(() -> {
-         return "Global Settings UBO";
-      }, 136, SIZE);
-   }
+    public void set(int width, int height, double glintStrength, long time, RenderTickCounter tickCounter, int menuBackgroundBlurriness, Camera camera, boolean bl) {
+        Vec3d vec3d = camera.getCameraPos();
+        try (MemoryStack memoryStack = MemoryStack.stackPush();){
+            int i = MathHelper.floor((double)vec3d.x);
+            int j = MathHelper.floor((double)vec3d.y);
+            int k = MathHelper.floor((double)vec3d.z);
+            ByteBuffer byteBuffer = Std140Builder.onStack((MemoryStack)memoryStack, (int)SIZE).putIVec3(i, j, k).putVec3((float)((double)i - vec3d.x), (float)((double)j - vec3d.y), (float)((double)k - vec3d.z)).putVec2((float)width, (float)height).putFloat((float)glintStrength).putFloat(((float)(time % 24000L) + tickCounter.getTickProgress(false)) / 24000.0f).putInt(menuBackgroundBlurriness).putInt(bl ? 1 : 0).get();
+            RenderSystem.getDevice().createCommandEncoder().writeToBuffer(this.buffer.slice(), byteBuffer);
+        }
+        RenderSystem.setGlobalSettingsUniform((GpuBuffer)this.buffer);
+    }
 
-   public void set(int width, int height, double glintStrength, long time, RenderTickCounter tickCounter, int menuBackgroundBluriness) {
-      MemoryStack memoryStack = MemoryStack.stackPush();
-
-      try {
-         ByteBuffer byteBuffer = Std140Builder.onStack(memoryStack, SIZE).putVec2((float)width, (float)height).putFloat((float)glintStrength).putFloat(((float)(time % 24000L) + tickCounter.getTickProgress(false)) / 24000.0F).putInt(menuBackgroundBluriness).get();
-         RenderSystem.getDevice().createCommandEncoder().writeToBuffer(this.buffer.slice(), byteBuffer);
-      } catch (Throwable var13) {
-         if (memoryStack != null) {
-            try {
-               memoryStack.close();
-            } catch (Throwable var12) {
-               var13.addSuppressed(var12);
-            }
-         }
-
-         throw var13;
-      }
-
-      if (memoryStack != null) {
-         memoryStack.close();
-      }
-
-      RenderSystem.setGlobalSettingsUniform(this.buffer);
-   }
-
-   public void close() {
-      this.buffer.close();
-   }
+    @Override
+    public void close() {
+        this.buffer.close();
+    }
 }
+

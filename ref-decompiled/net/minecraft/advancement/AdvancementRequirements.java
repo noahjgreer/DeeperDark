@@ -1,3 +1,15 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.google.common.collect.Sets
+ *  com.google.common.collect.Sets$SetView
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.DataResult
+ *  it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
+ *  net.minecraft.advancement.AdvancementRequirements
+ *  net.minecraft.network.PacketByteBuf
+ */
 package net.minecraft.advancement;
 
 import com.google.common.collect.Sets;
@@ -5,152 +17,110 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 import net.minecraft.network.PacketByteBuf;
 
-public record AdvancementRequirements(List requirements) {
-   public static final Codec CODEC;
-   public static final AdvancementRequirements EMPTY;
+/*
+ * Exception performing whole class analysis ignored.
+ */
+public record AdvancementRequirements(List<List<String>> requirements) {
+    private final List<List<String>> requirements;
+    public static final Codec<AdvancementRequirements> CODEC = Codec.STRING.listOf().listOf().xmap(AdvancementRequirements::new, AdvancementRequirements::requirements);
+    public static final AdvancementRequirements EMPTY = new AdvancementRequirements(List.of());
 
-   public AdvancementRequirements(PacketByteBuf buf) {
-      this(buf.readList((bufx) -> {
-         return bufx.readList(PacketByteBuf::readString);
-      }));
-   }
+    public AdvancementRequirements(PacketByteBuf buf) {
+        this(buf.readList(bufx -> bufx.readList(PacketByteBuf::readString)));
+    }
 
-   public AdvancementRequirements(List list) {
-      this.requirements = list;
-   }
+    public AdvancementRequirements(List<List<String>> requirements) {
+        this.requirements = requirements;
+    }
 
-   public void writeRequirements(PacketByteBuf buf) {
-      buf.writeCollection(this.requirements, (bufx, requirements) -> {
-         bufx.writeCollection(requirements, PacketByteBuf::writeString);
-      });
-   }
+    public void writeRequirements(PacketByteBuf buf) {
+        buf.writeCollection((Collection)this.requirements, (bufx, requirements) -> bufx.writeCollection((Collection)requirements, PacketByteBuf::writeString));
+    }
 
-   public static AdvancementRequirements allOf(Collection requirements) {
-      return new AdvancementRequirements(requirements.stream().map(List::of).toList());
-   }
+    public static AdvancementRequirements allOf(Collection<String> requirements) {
+        return new AdvancementRequirements(requirements.stream().map(List::of).toList());
+    }
 
-   public static AdvancementRequirements anyOf(Collection requirements) {
-      return new AdvancementRequirements(List.of(List.copyOf(requirements)));
-   }
+    public static AdvancementRequirements anyOf(Collection<String> requirements) {
+        return new AdvancementRequirements(List.of(List.copyOf(requirements)));
+    }
 
-   public int getLength() {
-      return this.requirements.size();
-   }
+    public int getLength() {
+        return this.requirements.size();
+    }
 
-   public boolean matches(Predicate predicate) {
-      if (this.requirements.isEmpty()) {
-         return false;
-      } else {
-         Iterator var2 = this.requirements.iterator();
-
-         List list;
-         do {
-            if (!var2.hasNext()) {
-               return true;
-            }
-
-            list = (List)var2.next();
-         } while(anyMatch(list, predicate));
-
-         return false;
-      }
-   }
-
-   public int countMatches(Predicate predicate) {
-      int i = 0;
-      Iterator var3 = this.requirements.iterator();
-
-      while(var3.hasNext()) {
-         List list = (List)var3.next();
-         if (anyMatch(list, predicate)) {
-            ++i;
-         }
-      }
-
-      return i;
-   }
-
-   private static boolean anyMatch(List requirements, Predicate predicate) {
-      Iterator var2 = requirements.iterator();
-
-      String string;
-      do {
-         if (!var2.hasNext()) {
+    public boolean matches(Predicate<String> predicate) {
+        if (this.requirements.isEmpty()) {
             return false;
-         }
+        }
+        for (List list : this.requirements) {
+            if (AdvancementRequirements.anyMatch((List)list, predicate)) continue;
+            return false;
+        }
+        return true;
+    }
 
-         string = (String)var2.next();
-      } while(!predicate.test(string));
+    public int countMatches(Predicate<String> predicate) {
+        int i = 0;
+        for (List list : this.requirements) {
+            if (!AdvancementRequirements.anyMatch((List)list, predicate)) continue;
+            ++i;
+        }
+        return i;
+    }
 
-      return true;
-   }
+    private static boolean anyMatch(List<String> requirements, Predicate<String> predicate) {
+        for (String string : requirements) {
+            if (!predicate.test(string)) continue;
+            return true;
+        }
+        return false;
+    }
 
-   public DataResult validate(Set requirements) {
-      Set set = new ObjectOpenHashSet();
-      Iterator var3 = this.requirements.iterator();
+    public DataResult<AdvancementRequirements> validate(Set<String> requirements) {
+        ObjectOpenHashSet set = new ObjectOpenHashSet();
+        for (List list : this.requirements) {
+            if (list.isEmpty() && requirements.isEmpty()) {
+                return DataResult.error(() -> "Requirement entry cannot be empty");
+            }
+            set.addAll(list);
+        }
+        if (!requirements.equals(set)) {
+            Sets.SetView set2 = Sets.difference(requirements, (Set)set);
+            Sets.SetView set3 = Sets.difference((Set)set, requirements);
+            return DataResult.error(() -> AdvancementRequirements.method_54926((Set)set2, (Set)set3));
+        }
+        return DataResult.success((Object)this);
+    }
 
-      while(var3.hasNext()) {
-         List list = (List)var3.next();
-         if (list.isEmpty() && requirements.isEmpty()) {
-            return DataResult.error(() -> {
-               return "Requirement entry cannot be empty";
-            });
-         }
+    public boolean isEmpty() {
+        return this.requirements.isEmpty();
+    }
 
-         set.addAll(list);
-      }
+    @Override
+    public String toString() {
+        return this.requirements.toString();
+    }
 
-      if (!requirements.equals(set)) {
-         Set set2 = Sets.difference(requirements, set);
-         Set set3 = Sets.difference(set, requirements);
-         return DataResult.error(() -> {
-            String var10000 = String.valueOf(set2);
-            return "Advancement completion requirements did not exactly match specified criteria. Missing: " + var10000 + ". Unknown: " + String.valueOf(set3);
-         });
-      } else {
-         return DataResult.success(this);
-      }
-   }
+    public Set<String> getNames() {
+        ObjectOpenHashSet set = new ObjectOpenHashSet();
+        for (List list : this.requirements) {
+            set.addAll(list);
+        }
+        return set;
+    }
 
-   public boolean isEmpty() {
-      return this.requirements.isEmpty();
-   }
+    public List<List<String>> requirements() {
+        return this.requirements;
+    }
 
-   public String toString() {
-      return this.requirements.toString();
-   }
-
-   public Set getNames() {
-      Set set = new ObjectOpenHashSet();
-      Iterator var2 = this.requirements.iterator();
-
-      while(var2.hasNext()) {
-         List list = (List)var2.next();
-         set.addAll(list);
-      }
-
-      return set;
-   }
-
-   public List requirements() {
-      return this.requirements;
-   }
-
-   static {
-      CODEC = Codec.STRING.listOf().listOf().xmap(AdvancementRequirements::new, AdvancementRequirements::requirements);
-      EMPTY = new AdvancementRequirements(List.of());
-   }
-
-   public interface CriterionMerger {
-      CriterionMerger AND = AdvancementRequirements::allOf;
-      CriterionMerger OR = AdvancementRequirements::anyOf;
-
-      AdvancementRequirements create(Collection requirements);
-   }
+    private static /* synthetic */ String method_54926(Set set, Set set2) {
+        return "Advancement completion requirements did not exactly match specified criteria. Missing: " + String.valueOf(set) + ". Unknown: " + String.valueOf(set2);
+    }
 }
+

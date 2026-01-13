@@ -1,3 +1,29 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.MinecraftClient
+ *  net.minecraft.client.font.TextRenderer
+ *  net.minecraft.client.gui.screen.Screen
+ *  net.minecraft.client.gui.widget.ButtonWidget
+ *  net.minecraft.client.gui.widget.ClickableWidget
+ *  net.minecraft.client.gui.widget.DirectionalLayoutWidget
+ *  net.minecraft.client.gui.widget.TextWidget
+ *  net.minecraft.client.gui.widget.ThreePartsLayoutWidget
+ *  net.minecraft.client.gui.widget.Widget
+ *  net.minecraft.client.realms.ServiceQuality
+ *  net.minecraft.client.realms.dto.RealmsRegion
+ *  net.minecraft.client.realms.dto.RegionSelectionMethod
+ *  net.minecraft.client.realms.gui.screen.RealmsRegionPreferenceScreen
+ *  net.minecraft.client.realms.gui.screen.RealmsRegionPreferenceScreen$RegionListWidget
+ *  net.minecraft.client.realms.gui.screen.RealmsRegionPreferenceScreen$RegionListWidget$RegionEntry
+ *  net.minecraft.client.realms.gui.screen.tab.RealmsSettingsTab$Region
+ *  net.minecraft.screen.ScreenTexts
+ *  net.minecraft.text.Text
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.realms.gui.screen;
 
 import java.util.Map;
@@ -5,142 +31,91 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.DirectionalLayoutWidget;
 import net.minecraft.client.gui.widget.TextWidget;
 import net.minecraft.client.gui.widget.ThreePartsLayoutWidget;
+import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.realms.ServiceQuality;
 import net.minecraft.client.realms.dto.RealmsRegion;
 import net.minecraft.client.realms.dto.RegionSelectionMethod;
+import net.minecraft.client.realms.gui.screen.RealmsRegionPreferenceScreen;
 import net.minecraft.client.realms.gui.screen.tab.RealmsSettingsTab;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
-public class RealmsRegionPreferenceScreen extends Screen {
-   private static final Text TITLE_TEXT = Text.translatable("mco.configure.world.region_preference.title");
-   private static final int field_60254 = 8;
-   private final ThreePartsLayoutWidget layout = new ThreePartsLayoutWidget(this);
-   private final Screen parent;
-   private final BiConsumer onRegionChanged;
-   final Map availableRegions;
-   @Nullable
-   private RegionListWidget regionList;
-   RealmsSettingsTab.Region currentRegion;
-   @Nullable
-   private ButtonWidget doneButton;
+@Environment(value=EnvType.CLIENT)
+public class RealmsRegionPreferenceScreen
+extends Screen {
+    private static final Text TITLE_TEXT = Text.translatable((String)"mco.configure.world.region_preference.title");
+    private static final int field_60254 = 8;
+    private final ThreePartsLayoutWidget layout = new ThreePartsLayoutWidget((Screen)this);
+    private final Screen parent;
+    private final BiConsumer<RegionSelectionMethod, RealmsRegion> onRegionChanged;
+    final Map<RealmsRegion, ServiceQuality> availableRegions;
+    private // Could not load outer class - annotation placement on inner may be incorrect
+    @Nullable RegionListWidget regionList;
+    RealmsSettingsTab.Region currentRegion;
+    private @Nullable ButtonWidget doneButton;
 
-   public RealmsRegionPreferenceScreen(Screen parent, BiConsumer onRegionChanged, Map availableRegions, RealmsSettingsTab.Region textSupplier) {
-      super(TITLE_TEXT);
-      this.parent = parent;
-      this.onRegionChanged = onRegionChanged;
-      this.availableRegions = availableRegions;
-      this.currentRegion = textSupplier;
-   }
+    public RealmsRegionPreferenceScreen(Screen parent, BiConsumer<RegionSelectionMethod, RealmsRegion> onRegionChanged, Map<RealmsRegion, ServiceQuality> availableRegions, RealmsSettingsTab.Region textSupplier) {
+        super(TITLE_TEXT);
+        this.parent = parent;
+        this.onRegionChanged = onRegionChanged;
+        this.availableRegions = availableRegions;
+        this.currentRegion = textSupplier;
+    }
 
-   public void close() {
-      this.client.setScreen(this.parent);
-   }
+    public void close() {
+        this.client.setScreen(this.parent);
+    }
 
-   protected void init() {
-      DirectionalLayoutWidget directionalLayoutWidget = (DirectionalLayoutWidget)this.layout.addHeader(DirectionalLayoutWidget.vertical().spacing(8));
-      directionalLayoutWidget.getMainPositioner().alignHorizontalCenter();
-      directionalLayoutWidget.add(new TextWidget(this.getTitle(), this.textRenderer));
-      this.regionList = (RegionListWidget)this.layout.addBody(new RegionListWidget());
-      DirectionalLayoutWidget directionalLayoutWidget2 = (DirectionalLayoutWidget)this.layout.addFooter(DirectionalLayoutWidget.horizontal().spacing(8));
-      this.doneButton = (ButtonWidget)directionalLayoutWidget2.add(ButtonWidget.builder(ScreenTexts.DONE, (button) -> {
-         this.onRegionChanged.accept(this.currentRegion.preference(), this.currentRegion.region());
-         this.close();
-      }).build());
-      directionalLayoutWidget2.add(ButtonWidget.builder(ScreenTexts.CANCEL, (button) -> {
-         this.close();
-      }).build());
-      this.regionList.setSelected((RegionListWidget.RegionEntry)this.regionList.children().stream().filter((region) -> {
-         return Objects.equals(region.region, this.currentRegion);
-      }).findFirst().orElse((Object)null));
-      this.layout.forEachChild((child) -> {
-         ClickableWidget var10000 = (ClickableWidget)this.addDrawableChild(child);
-      });
-      this.refreshWidgetPositions();
-   }
+    protected void init() {
+        DirectionalLayoutWidget directionalLayoutWidget = (DirectionalLayoutWidget)this.layout.addHeader((Widget)DirectionalLayoutWidget.vertical().spacing(8));
+        directionalLayoutWidget.getMainPositioner().alignHorizontalCenter();
+        directionalLayoutWidget.add((Widget)new TextWidget(this.getTitle(), this.textRenderer));
+        this.regionList = (RegionListWidget)this.layout.addBody((Widget)new RegionListWidget(this));
+        DirectionalLayoutWidget directionalLayoutWidget2 = (DirectionalLayoutWidget)this.layout.addFooter((Widget)DirectionalLayoutWidget.horizontal().spacing(8));
+        this.doneButton = (ButtonWidget)directionalLayoutWidget2.add((Widget)ButtonWidget.builder((Text)ScreenTexts.DONE, button -> this.onDone()).build());
+        directionalLayoutWidget2.add((Widget)ButtonWidget.builder((Text)ScreenTexts.CANCEL, button -> this.close()).build());
+        this.regionList.setSelected((RegionListWidget.RegionEntry)this.regionList.children().stream().filter(region -> Objects.equals(region.region, this.currentRegion)).findFirst().orElse(null));
+        this.layout.forEachChild(child -> {
+            ClickableWidget cfr_ignored_0 = (ClickableWidget)this.addDrawableChild(child);
+        });
+        this.refreshWidgetPositions();
+    }
 
-   protected void refreshWidgetPositions() {
-      this.layout.refreshPositions();
-      this.regionList.position(this.width, this.layout);
-   }
+    protected void refreshWidgetPositions() {
+        this.layout.refreshPositions();
+        if (this.regionList != null) {
+            this.regionList.position(this.width, this.layout);
+        }
+    }
 
-   void refreshDoneButton() {
-      this.doneButton.active = this.regionList.getSelectedOrNull() != null;
-   }
+    void onDone() {
+        if (this.currentRegion.region() != null) {
+            this.onRegionChanged.accept(this.currentRegion.preference(), this.currentRegion.region());
+        }
+        this.close();
+    }
 
-   @Environment(EnvType.CLIENT)
-   class RegionListWidget extends AlwaysSelectedEntryListWidget {
-      RegionListWidget() {
-         super(RealmsRegionPreferenceScreen.this.client, RealmsRegionPreferenceScreen.this.width, RealmsRegionPreferenceScreen.this.height - 77, 40, 16);
-         this.addEntry(new RegionEntry(RegionSelectionMethod.AUTOMATIC_PLAYER, (RealmsRegion)null));
-         this.addEntry(new RegionEntry(RegionSelectionMethod.AUTOMATIC_OWNER, (RealmsRegion)null));
-         RealmsRegionPreferenceScreen.this.availableRegions.keySet().stream().map((region) -> {
-            return new RegionEntry(RegionSelectionMethod.MANUAL, region);
-         }).forEach((entry) -> {
-            this.addEntry(entry);
-         });
-      }
+    void refreshDoneButton() {
+        if (this.doneButton != null && this.regionList != null) {
+            this.doneButton.active = this.regionList.getSelectedOrNull() != null;
+        }
+    }
 
-      public void setSelected(@Nullable RegionEntry regionEntry) {
-         super.setSelected(regionEntry);
-         if (regionEntry != null) {
-            RealmsRegionPreferenceScreen.this.currentRegion = regionEntry.region;
-         }
+    static /* synthetic */ MinecraftClient method_71222(RealmsRegionPreferenceScreen realmsRegionPreferenceScreen) {
+        return realmsRegionPreferenceScreen.client;
+    }
 
-         RealmsRegionPreferenceScreen.this.refreshDoneButton();
-      }
-
-      @Environment(EnvType.CLIENT)
-      private class RegionEntry extends AlwaysSelectedEntryListWidget.Entry {
-         final RealmsSettingsTab.Region region;
-         private final Text name;
-
-         public RegionEntry(final RegionSelectionMethod selectionMethod, @Nullable final RealmsRegion region) {
-            this(new RealmsSettingsTab.Region(selectionMethod, region));
-         }
-
-         public RegionEntry(final RealmsSettingsTab.Region region) {
-            this.region = region;
-            if (region.preference() == RegionSelectionMethod.MANUAL) {
-               if (region.region() != null) {
-                  this.name = Text.translatable(region.region().translationKey);
-               } else {
-                  this.name = Text.empty();
-               }
-            } else {
-               this.name = Text.translatable(region.preference().translationKey);
-            }
-
-         }
-
-         public Text getNarration() {
-            return Text.translatable("narrator.select", this.name);
-         }
-
-         public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickProgress) {
-            context.drawTextWithShadow(RealmsRegionPreferenceScreen.this.textRenderer, (Text)this.name, x + 5, y + 2, -1);
-            if (this.region.region() != null && RealmsRegionPreferenceScreen.this.availableRegions.containsKey(this.region.region())) {
-               ServiceQuality serviceQuality = (ServiceQuality)RealmsRegionPreferenceScreen.this.availableRegions.getOrDefault(this.region.region(), ServiceQuality.UNKNOWN);
-               context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, serviceQuality.getIcon(), x + entryWidth - 18, y + 2, 10, 8);
-            }
-
-         }
-
-         public boolean mouseClicked(double mouseX, double mouseY, int button) {
-            RegionListWidget.this.setSelected(this);
-            return super.mouseClicked(mouseX, mouseY, button);
-         }
-      }
-   }
+    static /* synthetic */ TextRenderer method_71225(RealmsRegionPreferenceScreen realmsRegionPreferenceScreen) {
+        return realmsRegionPreferenceScreen.textRenderer;
+    }
 }
+

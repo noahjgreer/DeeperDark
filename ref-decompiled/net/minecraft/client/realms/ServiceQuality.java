@@ -1,87 +1,70 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.realms.ServiceQuality
+ *  net.minecraft.util.Identifier
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.realms;
 
-import com.google.gson.TypeAdapter;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
-import com.mojang.logging.LogUtils;
-import java.io.IOException;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
-public enum ServiceQuality {
-   GREAT(1, "icon/ping_5"),
-   GOOD(2, "icon/ping_4"),
-   OKAY(3, "icon/ping_3"),
-   POOR(4, "icon/ping_2"),
-   UNKNOWN(5, "icon/ping_unknown");
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
+public final class ServiceQuality
+extends Enum<ServiceQuality> {
+    public static final /* enum */ ServiceQuality GREAT = new ServiceQuality("GREAT", 0, 1, "icon/ping_5");
+    public static final /* enum */ ServiceQuality GOOD = new ServiceQuality("GOOD", 1, 2, "icon/ping_4");
+    public static final /* enum */ ServiceQuality OKAY = new ServiceQuality("OKAY", 2, 3, "icon/ping_3");
+    public static final /* enum */ ServiceQuality POOR = new ServiceQuality("POOR", 3, 4, "icon/ping_2");
+    public static final /* enum */ ServiceQuality UNKNOWN = new ServiceQuality("UNKNOWN", 4, 5, "icon/ping_unknown");
+    final int index;
+    private final Identifier icon;
+    private static final /* synthetic */ ServiceQuality[] field_60240;
 
-   final int index;
-   private final Identifier icon;
+    public static ServiceQuality[] values() {
+        return (ServiceQuality[])field_60240.clone();
+    }
 
-   private ServiceQuality(final int index, final String icon) {
-      this.index = index;
-      this.icon = Identifier.ofVanilla(icon);
-   }
+    public static ServiceQuality valueOf(String string) {
+        return Enum.valueOf(ServiceQuality.class, string);
+    }
 
-   @Nullable
-   public static ServiceQuality byIndex(int index) {
-      ServiceQuality[] var1 = values();
-      int var2 = var1.length;
+    private ServiceQuality(int index, String icon) {
+        this.index = index;
+        this.icon = Identifier.ofVanilla((String)icon);
+    }
 
-      for(int var3 = 0; var3 < var2; ++var3) {
-         ServiceQuality serviceQuality = var1[var3];
-         if (serviceQuality.getIndex() == index) {
+    public static @Nullable ServiceQuality byIndex(int index) {
+        for (ServiceQuality serviceQuality : ServiceQuality.values()) {
+            if (serviceQuality.getIndex() != index) continue;
             return serviceQuality;
-         }
-      }
+        }
+        return null;
+    }
 
-      return null;
-   }
+    public int getIndex() {
+        return this.index;
+    }
 
-   public int getIndex() {
-      return this.index;
-   }
+    public Identifier getIcon() {
+        return this.icon;
+    }
 
-   public Identifier getIcon() {
-      return this.icon;
-   }
+    private static /* synthetic */ ServiceQuality[] method_71196() {
+        return new ServiceQuality[]{GREAT, GOOD, OKAY, POOR, UNKNOWN};
+    }
 
-   // $FF: synthetic method
-   private static ServiceQuality[] method_71196() {
-      return new ServiceQuality[]{GREAT, GOOD, OKAY, POOR, UNKNOWN};
-   }
-
-   @Environment(EnvType.CLIENT)
-   public static class ServiceQualityTypeAdapter extends TypeAdapter {
-      private static final Logger LOGGER = LogUtils.getLogger();
-
-      public void write(JsonWriter jsonWriter, ServiceQuality serviceQuality) throws IOException {
-         jsonWriter.value((long)serviceQuality.index);
-      }
-
-      public ServiceQuality read(JsonReader jsonReader) throws IOException {
-         int i = jsonReader.nextInt();
-         ServiceQuality serviceQuality = ServiceQuality.byIndex(i);
-         if (serviceQuality == null) {
-            LOGGER.warn("Unsupported ServiceQuality {}", i);
-            return ServiceQuality.UNKNOWN;
-         } else {
-            return serviceQuality;
-         }
-      }
-
-      // $FF: synthetic method
-      public Object read(final JsonReader reader) throws IOException {
-         return this.read(reader);
-      }
-
-      // $FF: synthetic method
-      public void write(final JsonWriter writer, final Object serviceQuality) throws IOException {
-         this.write(writer, (ServiceQuality)serviceQuality);
-      }
-   }
+    static {
+        field_60240 = ServiceQuality.method_71196();
+    }
 }
+

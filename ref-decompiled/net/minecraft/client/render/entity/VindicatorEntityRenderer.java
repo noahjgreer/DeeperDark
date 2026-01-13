@@ -1,49 +1,60 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.render.entity.EntityRendererFactory$Context
+ *  net.minecraft.client.render.entity.IllagerEntityRenderer
+ *  net.minecraft.client.render.entity.VindicatorEntityRenderer
+ *  net.minecraft.client.render.entity.feature.FeatureRenderer
+ *  net.minecraft.client.render.entity.model.EntityModelLayers
+ *  net.minecraft.client.render.entity.model.IllagerEntityModel
+ *  net.minecraft.client.render.entity.state.EntityRenderState
+ *  net.minecraft.client.render.entity.state.IllagerEntityRenderState
+ *  net.minecraft.client.render.entity.state.LivingEntityRenderState
+ *  net.minecraft.entity.mob.VindicatorEntity
+ *  net.minecraft.util.Identifier
+ */
 package net.minecraft.client.render.entity;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.feature.HeldItemFeatureRenderer;
+import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.render.entity.IllagerEntityRenderer;
+import net.minecraft.client.render.entity.feature.FeatureRenderer;
 import net.minecraft.client.render.entity.model.EntityModelLayers;
 import net.minecraft.client.render.entity.model.IllagerEntityModel;
-import net.minecraft.client.render.entity.state.ArmedEntityRenderState;
 import net.minecraft.client.render.entity.state.EntityRenderState;
 import net.minecraft.client.render.entity.state.IllagerEntityRenderState;
 import net.minecraft.client.render.entity.state.LivingEntityRenderState;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.mob.VindicatorEntity;
 import net.minecraft.util.Identifier;
 
-@Environment(EnvType.CLIENT)
-public class VindicatorEntityRenderer extends IllagerEntityRenderer {
-   private static final Identifier TEXTURE = Identifier.ofVanilla("textures/entity/illager/vindicator.png");
+@Environment(value=EnvType.CLIENT)
+public class VindicatorEntityRenderer
+extends IllagerEntityRenderer<VindicatorEntity, IllagerEntityRenderState> {
+    private static final Identifier TEXTURE = Identifier.ofVanilla((String)"textures/entity/illager/vindicator.png");
 
-   public VindicatorEntityRenderer(EntityRendererFactory.Context context) {
-      super(context, new IllagerEntityModel(context.getPart(EntityModelLayers.VINDICATOR)), 0.5F);
-      this.addFeature(new HeldItemFeatureRenderer(this, this) {
-         public void render(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, IllagerEntityRenderState illagerEntityRenderState, float f, float g) {
-            if (illagerEntityRenderState.attacking) {
-               super.render(matrixStack, vertexConsumerProvider, i, (ArmedEntityRenderState)illagerEntityRenderState, f, g);
-            }
+    public VindicatorEntityRenderer(EntityRendererFactory.Context context) {
+        super(context, new IllagerEntityModel(context.getPart(EntityModelLayers.VINDICATOR)), 0.5f);
+        this.addFeature((FeatureRenderer)new /* Unavailable Anonymous Inner Class!! */);
+    }
 
-         }
-      });
-   }
+    public Identifier getTexture(IllagerEntityRenderState illagerEntityRenderState) {
+        return TEXTURE;
+    }
 
-   public Identifier getTexture(IllagerEntityRenderState illagerEntityRenderState) {
-      return TEXTURE;
-   }
+    public IllagerEntityRenderState createRenderState() {
+        return new IllagerEntityRenderState();
+    }
 
-   public IllagerEntityRenderState createRenderState() {
-      return new IllagerEntityRenderState();
-   }
+    public /* synthetic */ Identifier getTexture(LivingEntityRenderState state) {
+        return this.getTexture((IllagerEntityRenderState)state);
+    }
 
-   // $FF: synthetic method
-   public Identifier getTexture(final LivingEntityRenderState state) {
-      return this.getTexture((IllagerEntityRenderState)state);
-   }
-
-   // $FF: synthetic method
-   public EntityRenderState createRenderState() {
-      return this.createRenderState();
-   }
+    public /* synthetic */ EntityRenderState createRenderState() {
+        return this.createRenderState();
+    }
 }
+

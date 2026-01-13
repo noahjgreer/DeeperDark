@@ -8,6 +8,10 @@
     "description": {
       "translate": "dataPack.trade_rebalance.description"
     },
-    "pack_format": 81
+    "max_format": 94,
+    "min_format": [
+      94,
+      1
+    ]
   }
 }

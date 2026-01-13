@@ -1,97 +1,79 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.realms.dto.RealmsRegion
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.realms.dto;
 
-import com.google.gson.TypeAdapter;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
-import com.mojang.logging.LogUtils;
-import java.io.IOException;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
-public enum RealmsRegion {
-   AUSTRALIA_EAST("AustraliaEast", "realms.configuration.region.australia_east"),
-   AUSTRALIA_SOUTHEAST("AustraliaSoutheast", "realms.configuration.region.australia_southeast"),
-   BRAZIL_SOUTH("BrazilSouth", "realms.configuration.region.brazil_south"),
-   CENTRAL_INDIA("CentralIndia", "realms.configuration.region.central_india"),
-   CENTRAL_US("CentralUs", "realms.configuration.region.central_us"),
-   EAST_ASIA("EastAsia", "realms.configuration.region.east_asia"),
-   EAST_US("EastUs", "realms.configuration.region.east_us"),
-   EAST_US_2("EastUs2", "realms.configuration.region.east_us_2"),
-   FRANCE_CENTRAL("FranceCentral", "realms.configuration.region.france_central"),
-   JAPAN_EAST("JapanEast", "realms.configuration.region.japan_east"),
-   JAPAN_WEST("JapanWest", "realms.configuration.region.japan_west"),
-   KOREA_CENTRAL("KoreaCentral", "realms.configuration.region.korea_central"),
-   NORTH_CENTRAL_US("NorthCentralUs", "realms.configuration.region.north_central_us"),
-   NORTH_EUROPE("NorthEurope", "realms.configuration.region.north_europe"),
-   SOUTH_CENTRAL_US("SouthCentralUs", "realms.configuration.region.south_central_us"),
-   SOUTHEAST_ASIA("SoutheastAsia", "realms.configuration.region.southeast_asia"),
-   SWEDEN_CENTRAL("SwedenCentral", "realms.configuration.region.sweden_central"),
-   UAE_NORTH("UAENorth", "realms.configuration.region.uae_north"),
-   UK_SOUTH("UKSouth", "realms.configuration.region.uk_south"),
-   WEST_CENTRAL_US("WestCentralUs", "realms.configuration.region.west_central_us"),
-   WEST_EUROPE("WestEurope", "realms.configuration.region.west_europe"),
-   WEST_US("WestUs", "realms.configuration.region.west_us"),
-   WEST_US_2("WestUs2", "realms.configuration.region.west_us_2"),
-   INVALID_REGION("invalid", "");
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
+public final class RealmsRegion
+extends Enum<RealmsRegion> {
+    public static final /* enum */ RealmsRegion AUSTRALIA_EAST = new RealmsRegion("AUSTRALIA_EAST", 0, "AustraliaEast", "realms.configuration.region.australia_east");
+    public static final /* enum */ RealmsRegion AUSTRALIA_SOUTHEAST = new RealmsRegion("AUSTRALIA_SOUTHEAST", 1, "AustraliaSoutheast", "realms.configuration.region.australia_southeast");
+    public static final /* enum */ RealmsRegion BRAZIL_SOUTH = new RealmsRegion("BRAZIL_SOUTH", 2, "BrazilSouth", "realms.configuration.region.brazil_south");
+    public static final /* enum */ RealmsRegion CENTRAL_INDIA = new RealmsRegion("CENTRAL_INDIA", 3, "CentralIndia", "realms.configuration.region.central_india");
+    public static final /* enum */ RealmsRegion CENTRAL_US = new RealmsRegion("CENTRAL_US", 4, "CentralUs", "realms.configuration.region.central_us");
+    public static final /* enum */ RealmsRegion EAST_ASIA = new RealmsRegion("EAST_ASIA", 5, "EastAsia", "realms.configuration.region.east_asia");
+    public static final /* enum */ RealmsRegion EAST_US = new RealmsRegion("EAST_US", 6, "EastUs", "realms.configuration.region.east_us");
+    public static final /* enum */ RealmsRegion EAST_US_2 = new RealmsRegion("EAST_US_2", 7, "EastUs2", "realms.configuration.region.east_us_2");
+    public static final /* enum */ RealmsRegion FRANCE_CENTRAL = new RealmsRegion("FRANCE_CENTRAL", 8, "FranceCentral", "realms.configuration.region.france_central");
+    public static final /* enum */ RealmsRegion JAPAN_EAST = new RealmsRegion("JAPAN_EAST", 9, "JapanEast", "realms.configuration.region.japan_east");
+    public static final /* enum */ RealmsRegion JAPAN_WEST = new RealmsRegion("JAPAN_WEST", 10, "JapanWest", "realms.configuration.region.japan_west");
+    public static final /* enum */ RealmsRegion KOREA_CENTRAL = new RealmsRegion("KOREA_CENTRAL", 11, "KoreaCentral", "realms.configuration.region.korea_central");
+    public static final /* enum */ RealmsRegion NORTH_CENTRAL_US = new RealmsRegion("NORTH_CENTRAL_US", 12, "NorthCentralUs", "realms.configuration.region.north_central_us");
+    public static final /* enum */ RealmsRegion NORTH_EUROPE = new RealmsRegion("NORTH_EUROPE", 13, "NorthEurope", "realms.configuration.region.north_europe");
+    public static final /* enum */ RealmsRegion SOUTH_CENTRAL_US = new RealmsRegion("SOUTH_CENTRAL_US", 14, "SouthCentralUs", "realms.configuration.region.south_central_us");
+    public static final /* enum */ RealmsRegion SOUTHEAST_ASIA = new RealmsRegion("SOUTHEAST_ASIA", 15, "SoutheastAsia", "realms.configuration.region.southeast_asia");
+    public static final /* enum */ RealmsRegion SWEDEN_CENTRAL = new RealmsRegion("SWEDEN_CENTRAL", 16, "SwedenCentral", "realms.configuration.region.sweden_central");
+    public static final /* enum */ RealmsRegion UAE_NORTH = new RealmsRegion("UAE_NORTH", 17, "UAENorth", "realms.configuration.region.uae_north");
+    public static final /* enum */ RealmsRegion UK_SOUTH = new RealmsRegion("UK_SOUTH", 18, "UKSouth", "realms.configuration.region.uk_south");
+    public static final /* enum */ RealmsRegion WEST_CENTRAL_US = new RealmsRegion("WEST_CENTRAL_US", 19, "WestCentralUs", "realms.configuration.region.west_central_us");
+    public static final /* enum */ RealmsRegion WEST_EUROPE = new RealmsRegion("WEST_EUROPE", 20, "WestEurope", "realms.configuration.region.west_europe");
+    public static final /* enum */ RealmsRegion WEST_US = new RealmsRegion("WEST_US", 21, "WestUs", "realms.configuration.region.west_us");
+    public static final /* enum */ RealmsRegion WEST_US_2 = new RealmsRegion("WEST_US_2", 22, "WestUs2", "realms.configuration.region.west_us_2");
+    public static final /* enum */ RealmsRegion INVALID_REGION = new RealmsRegion("INVALID_REGION", 23, "invalid", "");
+    public final String name;
+    public final String translationKey;
+    private static final /* synthetic */ RealmsRegion[] field_60175;
 
-   public final String name;
-   public final String translationKey;
+    public static RealmsRegion[] values() {
+        return (RealmsRegion[])field_60175.clone();
+    }
 
-   private RealmsRegion(final String name, final String translationKey) {
-      this.name = name;
-      this.translationKey = translationKey;
-   }
+    public static RealmsRegion valueOf(String string) {
+        return Enum.valueOf(RealmsRegion.class, string);
+    }
 
-   @Nullable
-   public static RealmsRegion fromName(String name) {
-      RealmsRegion[] var1 = values();
-      int var2 = var1.length;
+    private RealmsRegion(String name, String translationKey) {
+        this.name = name;
+        this.translationKey = translationKey;
+    }
 
-      for(int var3 = 0; var3 < var2; ++var3) {
-         RealmsRegion realmsRegion = var1[var3];
-         if (realmsRegion.name.equals(name)) {
+    public static @Nullable RealmsRegion fromName(String name) {
+        for (RealmsRegion realmsRegion : RealmsRegion.values()) {
+            if (!realmsRegion.name.equals(name)) continue;
             return realmsRegion;
-         }
-      }
+        }
+        return null;
+    }
 
-      return null;
-   }
+    private static /* synthetic */ RealmsRegion[] method_71172() {
+        return new RealmsRegion[]{AUSTRALIA_EAST, AUSTRALIA_SOUTHEAST, BRAZIL_SOUTH, CENTRAL_INDIA, CENTRAL_US, EAST_ASIA, EAST_US, EAST_US_2, FRANCE_CENTRAL, JAPAN_EAST, JAPAN_WEST, KOREA_CENTRAL, NORTH_CENTRAL_US, NORTH_EUROPE, SOUTH_CENTRAL_US, SOUTHEAST_ASIA, SWEDEN_CENTRAL, UAE_NORTH, UK_SOUTH, WEST_CENTRAL_US, WEST_EUROPE, WEST_US, WEST_US_2, INVALID_REGION};
+    }
 
-   // $FF: synthetic method
-   private static RealmsRegion[] method_71172() {
-      return new RealmsRegion[]{AUSTRALIA_EAST, AUSTRALIA_SOUTHEAST, BRAZIL_SOUTH, CENTRAL_INDIA, CENTRAL_US, EAST_ASIA, EAST_US, EAST_US_2, FRANCE_CENTRAL, JAPAN_EAST, JAPAN_WEST, KOREA_CENTRAL, NORTH_CENTRAL_US, NORTH_EUROPE, SOUTH_CENTRAL_US, SOUTHEAST_ASIA, SWEDEN_CENTRAL, UAE_NORTH, UK_SOUTH, WEST_CENTRAL_US, WEST_EUROPE, WEST_US, WEST_US_2, INVALID_REGION};
-   }
-
-   @Environment(EnvType.CLIENT)
-   public static class RegionTypeAdapter extends TypeAdapter {
-      private static final Logger LOGGER = LogUtils.getLogger();
-
-      public void write(JsonWriter jsonWriter, RealmsRegion realmsRegion) throws IOException {
-         jsonWriter.value(realmsRegion.name);
-      }
-
-      public RealmsRegion read(JsonReader jsonReader) throws IOException {
-         String string = jsonReader.nextString();
-         RealmsRegion realmsRegion = RealmsRegion.fromName(string);
-         if (realmsRegion == null) {
-            LOGGER.warn("Unsupported RealmsRegion {}", string);
-            return RealmsRegion.INVALID_REGION;
-         } else {
-            return realmsRegion;
-         }
-      }
-
-      // $FF: synthetic method
-      public Object read(final JsonReader reader) throws IOException {
-         return this.read(reader);
-      }
-
-      // $FF: synthetic method
-      public void write(final JsonWriter writer, final Object region) throws IOException {
-         this.write(writer, (RealmsRegion)region);
-      }
-   }
+    static {
+        field_60175 = RealmsRegion.method_71172();
+    }
 }
+

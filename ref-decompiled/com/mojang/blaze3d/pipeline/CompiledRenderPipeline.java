@@ -1,11 +1,21 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.blaze3d.pipeline.CompiledRenderPipeline
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.util.annotation.DeobfuscateClass
+ */
 package com.mojang.blaze3d.pipeline;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.util.annotation.DeobfuscateClass;
 
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 @DeobfuscateClass
 public interface CompiledRenderPipeline {
-   boolean isValid();
+    public boolean isValid();
 }
+

@@ -1,8 +1,25 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.authlib.GameProfile
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.network.AbstractClientPlayerEntity
+ *  net.minecraft.client.network.OtherClientPlayerEntity
+ *  net.minecraft.client.world.ClientWorld
+ *  net.minecraft.entity.damage.DamageSource
+ *  net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket
+ *  net.minecraft.util.math.Vec3d
+ *  net.minecraft.util.profiler.Profilers
+ *  net.minecraft.util.profiler.ScopedProfiler
+ */
 package net.minecraft.client.network;
 
 import com.mojang.authlib.GameProfile;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
@@ -10,93 +27,67 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.profiler.Profilers;
 import net.minecraft.util.profiler.ScopedProfiler;
 
-@Environment(EnvType.CLIENT)
-public class OtherClientPlayerEntity extends AbstractClientPlayerEntity {
-   private Vec3d clientVelocity;
-   private int velocityLerpDivisor;
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
+public class OtherClientPlayerEntity
+extends AbstractClientPlayerEntity {
+    private Vec3d clientVelocity = Vec3d.ZERO;
+    private int velocityLerpDivisor;
 
-   public OtherClientPlayerEntity(ClientWorld clientWorld, GameProfile gameProfile) {
-      super(clientWorld, gameProfile);
-      this.clientVelocity = Vec3d.ZERO;
-      this.noClip = true;
-   }
+    public OtherClientPlayerEntity(ClientWorld clientWorld, GameProfile gameProfile) {
+        super(clientWorld, gameProfile);
+        this.noClip = true;
+    }
 
-   public boolean shouldRender(double distance) {
-      double d = this.getBoundingBox().getAverageSideLength() * 10.0;
-      if (Double.isNaN(d)) {
-         d = 1.0;
-      }
+    public boolean shouldRender(double distance) {
+        double d = this.getBoundingBox().getAverageSideLength() * 10.0;
+        if (Double.isNaN(d)) {
+            d = 1.0;
+        }
+        return distance < (d *= 64.0 * OtherClientPlayerEntity.getRenderDistanceMultiplier()) * d;
+    }
 
-      d *= 64.0 * getRenderDistanceMultiplier();
-      return distance < d * d;
-   }
+    public boolean clientDamage(DamageSource source) {
+        return true;
+    }
 
-   public boolean clientDamage(DamageSource source) {
-      return true;
-   }
+    public void tick() {
+        super.tick();
+        this.updateLimbs(false);
+    }
 
-   public void tick() {
-      super.tick();
-      this.updateLimbs(false);
-   }
+    public void tickMovement() {
+        if (this.isInterpolating()) {
+            this.getInterpolator().tick();
+        }
+        if (this.headTrackingIncrements > 0) {
+            this.lerpHeadYaw(this.headTrackingIncrements, this.serverHeadYaw);
+            --this.headTrackingIncrements;
+        }
+        if (this.velocityLerpDivisor > 0) {
+            this.addVelocityInternal(new Vec3d((this.clientVelocity.x - this.getVelocity().x) / (double)this.velocityLerpDivisor, (this.clientVelocity.y - this.getVelocity().y) / (double)this.velocityLerpDivisor, (this.clientVelocity.z - this.getVelocity().z) / (double)this.velocityLerpDivisor));
+            --this.velocityLerpDivisor;
+        }
+        this.tickHandSwing();
+        this.tickPlayerMovement();
+        try (ScopedProfiler scopedProfiler = Profilers.get().scoped("push");){
+            this.tickCramming();
+        }
+    }
 
-   public void tickMovement() {
-      if (this.isInterpolating()) {
-         this.getInterpolator().tick();
-      }
+    public void setVelocityClient(Vec3d clientVelocity) {
+        this.clientVelocity = clientVelocity;
+        this.velocityLerpDivisor = this.getType().getTrackTickInterval() + 1;
+    }
 
-      if (this.headTrackingIncrements > 0) {
-         this.lerpHeadYaw(this.headTrackingIncrements, this.serverHeadYaw);
-         --this.headTrackingIncrements;
-      }
+    protected void updatePose() {
+    }
 
-      if (this.velocityLerpDivisor > 0) {
-         this.addVelocityInternal(new Vec3d((this.clientVelocity.x - this.getVelocity().x) / (double)this.velocityLerpDivisor, (this.clientVelocity.y - this.getVelocity().y) / (double)this.velocityLerpDivisor, (this.clientVelocity.z - this.getVelocity().z) / (double)this.velocityLerpDivisor));
-         --this.velocityLerpDivisor;
-      }
-
-      this.lastStrideDistance = this.strideDistance;
-      this.tickHandSwing();
-      float f;
-      if (this.isOnGround() && !this.isDead()) {
-         f = (float)Math.min(0.1, this.getVelocity().horizontalLength());
-      } else {
-         f = 0.0F;
-      }
-
-      this.strideDistance += (f - this.strideDistance) * 0.4F;
-      ScopedProfiler scopedProfiler = Profilers.get().scoped("push");
-
-      try {
-         this.tickCramming();
-      } catch (Throwable var6) {
-         if (scopedProfiler != null) {
-            try {
-               scopedProfiler.close();
-            } catch (Throwable var5) {
-               var6.addSuppressed(var5);
-            }
-         }
-
-         throw var6;
-      }
-
-      if (scopedProfiler != null) {
-         scopedProfiler.close();
-      }
-
-   }
-
-   public void setVelocityClient(double x, double y, double z) {
-      this.clientVelocity = new Vec3d(x, y, z);
-      this.velocityLerpDivisor = this.getType().getTrackTickInterval() + 1;
-   }
-
-   protected void updatePose() {
-   }
-
-   public void onSpawnPacket(EntitySpawnS2CPacket packet) {
-      super.onSpawnPacket(packet);
-      this.resetPosition();
-   }
+    public void onSpawnPacket(EntitySpawnS2CPacket packet) {
+        super.onSpawnPacket(packet);
+        this.resetPosition();
+    }
 }
+

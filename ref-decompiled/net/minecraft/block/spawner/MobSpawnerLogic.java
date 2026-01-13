@@ -1,19 +1,64 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.logging.LogUtils
+ *  net.minecraft.block.spawner.MobSpawnerEntry
+ *  net.minecraft.block.spawner.MobSpawnerEntry$CustomSpawnRules
+ *  net.minecraft.block.spawner.MobSpawnerLogic
+ *  net.minecraft.entity.Entity
+ *  net.minecraft.entity.EntityType
+ *  net.minecraft.entity.LoadedEntityProcessor
+ *  net.minecraft.entity.SpawnReason
+ *  net.minecraft.entity.SpawnRestriction
+ *  net.minecraft.entity.mob.MobEntity
+ *  net.minecraft.nbt.NbtCompound
+ *  net.minecraft.particle.ParticleEffect
+ *  net.minecraft.particle.ParticleTypes
+ *  net.minecraft.predicate.entity.EntityPredicates
+ *  net.minecraft.registry.Registries
+ *  net.minecraft.registry.RegistryWrapper$WrapperLookup
+ *  net.minecraft.registry.entry.RegistryEntry
+ *  net.minecraft.server.world.ServerWorld
+ *  net.minecraft.storage.NbtReadView
+ *  net.minecraft.storage.ReadView
+ *  net.minecraft.storage.WriteView
+ *  net.minecraft.util.ErrorReporter
+ *  net.minecraft.util.ErrorReporter$Logging
+ *  net.minecraft.util.TypeFilter
+ *  net.minecraft.util.collection.Pool
+ *  net.minecraft.util.math.BlockPos
+ *  net.minecraft.util.math.Box
+ *  net.minecraft.util.math.Position
+ *  net.minecraft.util.math.Vec3d
+ *  net.minecraft.util.math.random.Random
+ *  net.minecraft.world.Difficulty
+ *  net.minecraft.world.ServerWorldAccess
+ *  net.minecraft.world.World
+ *  net.minecraft.world.WorldAccess
+ *  net.minecraft.world.WorldView
+ *  net.minecraft.world.event.GameEvent
+ *  org.jspecify.annotations.Nullable
+ *  org.slf4j.Logger
+ */
 package net.minecraft.block.spawner;
 
 import com.mojang.logging.LogUtils;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Function;
+import net.minecraft.block.spawner.MobSpawnerEntry;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LoadedEntityProcessor;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.SpawnRestriction;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.storage.NbtReadView;
 import net.minecraft.storage.ReadView;
@@ -23,327 +68,215 @@ import net.minecraft.util.TypeFilter;
 import net.minecraft.util.collection.Pool;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Position;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.Difficulty;
+import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
+import net.minecraft.world.WorldView;
 import net.minecraft.world.event.GameEvent;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 
 public abstract class MobSpawnerLogic {
-   private static final Logger LOGGER = LogUtils.getLogger();
-   public static final String SPAWN_DATA_KEY = "SpawnData";
-   private static final int field_30951 = 1;
-   private static final int field_57757 = 20;
-   private static final int DEFAULT_MIN_SPAWN_DELAY = 200;
-   private static final int DEFAULT_MAX_SPAWN_DELAY = 800;
-   private static final int DEFAULT_SPAWN_COUNT = 4;
-   private static final int DEFAULT_MAX_NEARBY_ENTITIES = 6;
-   private static final int DEFAULT_REQUIRED_PLAYER_RANGE = 16;
-   private static final int DEFAULT_SPAWN_RANGE = 4;
-   private int spawnDelay = 20;
-   private Pool spawnPotentials = Pool.empty();
-   @Nullable
-   private MobSpawnerEntry spawnEntry;
-   private double rotation;
-   private double lastRotation;
-   private int minSpawnDelay = 200;
-   private int maxSpawnDelay = 800;
-   private int spawnCount = 4;
-   @Nullable
-   private Entity renderedEntity;
-   private int maxNearbyEntities = 6;
-   private int requiredPlayerRange = 16;
-   private int spawnRange = 4;
+    private static final Logger LOGGER = LogUtils.getLogger();
+    public static final String SPAWN_DATA_KEY = "SpawnData";
+    private static final int field_30951 = 1;
+    private static final int field_57757 = 20;
+    private static final int DEFAULT_MIN_SPAWN_DELAY = 200;
+    private static final int DEFAULT_MAX_SPAWN_DELAY = 800;
+    private static final int DEFAULT_SPAWN_COUNT = 4;
+    private static final int DEFAULT_MAX_NEARBY_ENTITIES = 6;
+    private static final int DEFAULT_REQUIRED_PLAYER_RANGE = 16;
+    private static final int DEFAULT_SPAWN_RANGE = 4;
+    private int spawnDelay = 20;
+    private Pool<MobSpawnerEntry> spawnPotentials = Pool.empty();
+    private @Nullable MobSpawnerEntry spawnEntry;
+    private double rotation;
+    private double lastRotation;
+    private int minSpawnDelay = 200;
+    private int maxSpawnDelay = 800;
+    private int spawnCount = 4;
+    private @Nullable Entity renderedEntity;
+    private int maxNearbyEntities = 6;
+    private int requiredPlayerRange = 16;
+    private int spawnRange = 4;
 
-   public void setEntityId(EntityType type, @Nullable World world, Random random, BlockPos pos) {
-      this.getSpawnEntry(world, random, pos).getNbt().putString("id", Registries.ENTITY_TYPE.getId(type).toString());
-   }
+    public void setEntityId(EntityType<?> type, @Nullable World world, Random random, BlockPos pos) {
+        this.getSpawnEntry(world, random, pos).getNbt().putString("id", Registries.ENTITY_TYPE.getId(type).toString());
+    }
 
-   private boolean isPlayerInRange(World world, BlockPos pos) {
-      return world.isPlayerInRange((double)pos.getX() + 0.5, (double)pos.getY() + 0.5, (double)pos.getZ() + 0.5, (double)this.requiredPlayerRange);
-   }
+    private boolean isPlayerInRange(World world, BlockPos pos) {
+        return world.isPlayerInRange((double)pos.getX() + 0.5, (double)pos.getY() + 0.5, (double)pos.getZ() + 0.5, (double)this.requiredPlayerRange);
+    }
 
-   public void clientTick(World world, BlockPos pos) {
-      if (!this.isPlayerInRange(world, pos)) {
-         this.lastRotation = this.rotation;
-      } else if (this.renderedEntity != null) {
-         Random random = world.getRandom();
-         double d = (double)pos.getX() + random.nextDouble();
-         double e = (double)pos.getY() + random.nextDouble();
-         double f = (double)pos.getZ() + random.nextDouble();
-         world.addParticleClient(ParticleTypes.SMOKE, d, e, f, 0.0, 0.0, 0.0);
-         world.addParticleClient(ParticleTypes.FLAME, d, e, f, 0.0, 0.0, 0.0);
-         if (this.spawnDelay > 0) {
-            --this.spawnDelay;
-         }
-
-         this.lastRotation = this.rotation;
-         this.rotation = (this.rotation + (double)(1000.0F / ((float)this.spawnDelay + 200.0F))) % 360.0;
-      }
-
-   }
-
-   public void serverTick(ServerWorld world, BlockPos pos) {
-      if (this.isPlayerInRange(world, pos)) {
-         if (this.spawnDelay == -1) {
-            this.updateSpawns(world, pos);
-         }
-
-         if (this.spawnDelay > 0) {
-            --this.spawnDelay;
-         } else {
-            boolean bl = false;
+    public void clientTick(World world, BlockPos pos) {
+        if (!this.isPlayerInRange(world, pos)) {
+            this.lastRotation = this.rotation;
+        } else if (this.renderedEntity != null) {
             Random random = world.getRandom();
-            MobSpawnerEntry mobSpawnerEntry = this.getSpawnEntry(world, random, pos);
-
-            for(int i = 0; i < this.spawnCount; ++i) {
-               ErrorReporter.Logging logging = new ErrorReporter.Logging(this::toString, LOGGER);
-
-               label144: {
-                  label143: {
-                     label142: {
-                        label141: {
-                           label140: {
-                              label139: {
-                                 label138: {
-                                    label137: {
-                                       label136: {
-                                          label135: {
-                                             try {
-                                                label155: {
-                                                   ReadView readView = NbtReadView.create(logging, world.getRegistryManager(), mobSpawnerEntry.getNbt());
-                                                   Optional optional = EntityType.fromData(readView);
-                                                   if (optional.isEmpty()) {
-                                                      this.updateSpawns(world, pos);
-                                                      break label143;
-                                                   }
-
-                                                   Vec3d vec3d = (Vec3d)readView.read("Pos", Vec3d.CODEC).orElseGet(() -> {
-                                                      return new Vec3d((double)pos.getX() + (random.nextDouble() - random.nextDouble()) * (double)this.spawnRange + 0.5, (double)(pos.getY() + random.nextInt(3) - 1), (double)pos.getZ() + (random.nextDouble() - random.nextDouble()) * (double)this.spawnRange + 0.5);
-                                                   });
-                                                   if (!world.isSpaceEmpty(((EntityType)optional.get()).getSpawnBox(vec3d.x, vec3d.y, vec3d.z))) {
-                                                      break label138;
-                                                   }
-
-                                                   BlockPos blockPos = BlockPos.ofFloored(vec3d);
-                                                   if (mobSpawnerEntry.getCustomSpawnRules().isPresent()) {
-                                                      if (!((EntityType)optional.get()).getSpawnGroup().isPeaceful() && world.getDifficulty() == Difficulty.PEACEFUL) {
-                                                         break label136;
-                                                      }
-
-                                                      MobSpawnerEntry.CustomSpawnRules customSpawnRules = (MobSpawnerEntry.CustomSpawnRules)mobSpawnerEntry.getCustomSpawnRules().get();
-                                                      if (!customSpawnRules.canSpawn(blockPos, world)) {
-                                                         break label135;
-                                                      }
-                                                   } else if (!SpawnRestriction.canSpawn((EntityType)optional.get(), world, SpawnReason.SPAWNER, blockPos, world.getRandom())) {
-                                                      break label155;
-                                                   }
-
-                                                   Entity entity = EntityType.loadEntityWithPassengers((ReadView)readView, world, SpawnReason.SPAWNER, (entityx) -> {
-                                                      entityx.refreshPositionAndAngles(vec3d.x, vec3d.y, vec3d.z, entityx.getYaw(), entityx.getPitch());
-                                                      return entityx;
-                                                   });
-                                                   if (entity == null) {
-                                                      this.updateSpawns(world, pos);
-                                                      break label144;
-                                                   }
-
-                                                   int j = world.getEntitiesByType(TypeFilter.equals(entity.getClass()), (new Box((double)pos.getX(), (double)pos.getY(), (double)pos.getZ(), (double)(pos.getX() + 1), (double)(pos.getY() + 1), (double)(pos.getZ() + 1))).expand((double)this.spawnRange), EntityPredicates.EXCEPT_SPECTATOR).size();
-                                                   if (j >= this.maxNearbyEntities) {
-                                                      this.updateSpawns(world, pos);
-                                                      break label142;
-                                                   }
-
-                                                   entity.refreshPositionAndAngles(entity.getX(), entity.getY(), entity.getZ(), random.nextFloat() * 360.0F, 0.0F);
-                                                   if (entity instanceof MobEntity) {
-                                                      MobEntity mobEntity = (MobEntity)entity;
-                                                      if (mobSpawnerEntry.getCustomSpawnRules().isEmpty() && !mobEntity.canSpawn(world, SpawnReason.SPAWNER)) {
-                                                         break label140;
-                                                      }
-
-                                                      if (!mobEntity.canSpawn(world)) {
-                                                         break label139;
-                                                      }
-
-                                                      boolean bl2 = mobSpawnerEntry.getNbt().getSize() == 1 && mobSpawnerEntry.getNbt().getString("id").isPresent();
-                                                      if (bl2) {
-                                                         ((MobEntity)entity).initialize(world, world.getLocalDifficulty(entity.getBlockPos()), SpawnReason.SPAWNER, (EntityData)null);
-                                                      }
-
-                                                      Optional var10000 = mobSpawnerEntry.getEquipment();
-                                                      Objects.requireNonNull(mobEntity);
-                                                      var10000.ifPresent(mobEntity::setEquipmentFromTable);
-                                                   }
-
-                                                   if (!world.spawnNewEntityAndPassengers(entity)) {
-                                                      this.updateSpawns(world, pos);
-                                                      break label141;
-                                                   }
-
-                                                   world.syncWorldEvent(2004, pos, 0);
-                                                   world.emitGameEvent(entity, GameEvent.ENTITY_PLACE, blockPos);
-                                                   if (entity instanceof MobEntity) {
-                                                      ((MobEntity)entity).playSpawnEffects();
-                                                   }
-
-                                                   bl = true;
-                                                   break label137;
-                                                }
-                                             } catch (Throwable var17) {
-                                                try {
-                                                   logging.close();
-                                                } catch (Throwable var16) {
-                                                   var17.addSuppressed(var16);
-                                                }
-
-                                                throw var17;
-                                             }
-
-                                             logging.close();
-                                             continue;
-                                          }
-
-                                          logging.close();
-                                          continue;
-                                       }
-
-                                       logging.close();
-                                       continue;
-                                    }
-
-                                    logging.close();
-                                    continue;
-                                 }
-
-                                 logging.close();
-                                 continue;
-                              }
-
-                              logging.close();
-                              continue;
-                           }
-
-                           logging.close();
-                           continue;
-                        }
-
-                        logging.close();
-                        return;
-                     }
-
-                     logging.close();
-                     return;
-                  }
-
-                  logging.close();
-                  return;
-               }
-
-               logging.close();
-               return;
+            double d = (double)pos.getX() + random.nextDouble();
+            double e = (double)pos.getY() + random.nextDouble();
+            double f = (double)pos.getZ() + random.nextDouble();
+            world.addParticleClient((ParticleEffect)ParticleTypes.SMOKE, d, e, f, 0.0, 0.0, 0.0);
+            world.addParticleClient((ParticleEffect)ParticleTypes.FLAME, d, e, f, 0.0, 0.0, 0.0);
+            if (this.spawnDelay > 0) {
+                --this.spawnDelay;
             }
+            this.lastRotation = this.rotation;
+            this.rotation = (this.rotation + (double)(1000.0f / ((float)this.spawnDelay + 200.0f))) % 360.0;
+        }
+    }
 
-            if (bl) {
-               this.updateSpawns(world, pos);
+    public void serverTick(ServerWorld world, BlockPos pos) {
+        if (!this.isPlayerInRange((World)world, pos) || !world.areSpawnerBlocksEnabled()) {
+            return;
+        }
+        if (this.spawnDelay == -1) {
+            this.updateSpawns((World)world, pos);
+        }
+        if (this.spawnDelay > 0) {
+            --this.spawnDelay;
+            return;
+        }
+        boolean bl = false;
+        Random random = world.getRandom();
+        MobSpawnerEntry mobSpawnerEntry = this.getSpawnEntry((World)world, random, pos);
+        for (int i = 0; i < this.spawnCount; ++i) {
+            try (ErrorReporter.Logging logging = new ErrorReporter.Logging(this::toString, LOGGER);){
+                ReadView readView = NbtReadView.create((ErrorReporter)logging, (RegistryWrapper.WrapperLookup)world.getRegistryManager(), (NbtCompound)mobSpawnerEntry.getNbt());
+                Optional optional = EntityType.fromData((ReadView)readView);
+                if (optional.isEmpty()) {
+                    this.updateSpawns((World)world, pos);
+                    return;
+                }
+                Vec3d vec3d = readView.read("Pos", Vec3d.CODEC).orElseGet(() -> new Vec3d((double)pos.getX() + (random.nextDouble() - random.nextDouble()) * (double)this.spawnRange + 0.5, (double)(pos.getY() + random.nextInt(3) - 1), (double)pos.getZ() + (random.nextDouble() - random.nextDouble()) * (double)this.spawnRange + 0.5));
+                if (!world.isSpaceEmpty(((EntityType)optional.get()).getSpawnBox(vec3d.x, vec3d.y, vec3d.z))) continue;
+                BlockPos blockPos = BlockPos.ofFloored((Position)vec3d);
+                if (mobSpawnerEntry.getCustomSpawnRules().isPresent()) {
+                    MobSpawnerEntry.CustomSpawnRules customSpawnRules;
+                    if (!((EntityType)optional.get()).getSpawnGroup().isPeaceful() && world.getDifficulty() == Difficulty.PEACEFUL || !(customSpawnRules = (MobSpawnerEntry.CustomSpawnRules)mobSpawnerEntry.getCustomSpawnRules().get()).canSpawn(blockPos, world)) continue;
+                } else if (!SpawnRestriction.canSpawn((EntityType)((EntityType)optional.get()), (ServerWorldAccess)world, (SpawnReason)SpawnReason.SPAWNER, (BlockPos)blockPos, (Random)world.getRandom())) continue;
+                Entity entity2 = EntityType.loadEntityWithPassengers((ReadView)readView, (World)world, (SpawnReason)SpawnReason.SPAWNER, entity -> {
+                    entity.refreshPositionAndAngles(vec3d.x, vec3d.y, vec3d.z, entity.getYaw(), entity.getPitch());
+                    return entity;
+                });
+                if (entity2 == null) {
+                    this.updateSpawns((World)world, pos);
+                    return;
+                }
+                int j = world.getEntitiesByType(TypeFilter.equals(entity2.getClass()), new Box((double)pos.getX(), (double)pos.getY(), (double)pos.getZ(), (double)(pos.getX() + 1), (double)(pos.getY() + 1), (double)(pos.getZ() + 1)).expand((double)this.spawnRange), EntityPredicates.EXCEPT_SPECTATOR).size();
+                if (j >= this.maxNearbyEntities) {
+                    this.updateSpawns((World)world, pos);
+                    return;
+                }
+                entity2.refreshPositionAndAngles(entity2.getX(), entity2.getY(), entity2.getZ(), random.nextFloat() * 360.0f, 0.0f);
+                if (entity2 instanceof MobEntity) {
+                    boolean bl2;
+                    MobEntity mobEntity = (MobEntity)entity2;
+                    if (mobSpawnerEntry.getCustomSpawnRules().isEmpty() && !mobEntity.canSpawn((WorldAccess)world, SpawnReason.SPAWNER) || !mobEntity.canSpawn((WorldView)world)) continue;
+                    boolean bl3 = bl2 = mobSpawnerEntry.getNbt().getSize() == 1 && mobSpawnerEntry.getNbt().getString("id").isPresent();
+                    if (bl2) {
+                        ((MobEntity)entity2).initialize((ServerWorldAccess)world, world.getLocalDifficulty(entity2.getBlockPos()), SpawnReason.SPAWNER, null);
+                    }
+                    mobSpawnerEntry.getEquipment().ifPresent(arg_0 -> ((MobEntity)mobEntity).setEquipmentFromTable(arg_0));
+                }
+                if (!world.spawnNewEntityAndPassengers(entity2)) {
+                    this.updateSpawns((World)world, pos);
+                    return;
+                }
+                world.syncWorldEvent(2004, pos, 0);
+                world.emitGameEvent(entity2, (RegistryEntry)GameEvent.ENTITY_PLACE, blockPos);
+                if (entity2 instanceof MobEntity) {
+                    ((MobEntity)entity2).playSpawnEffects();
+                }
+                bl = true;
+                continue;
             }
+        }
+        if (bl) {
+            this.updateSpawns((World)world, pos);
+        }
+    }
 
-         }
-      }
-   }
+    private void updateSpawns(World world, BlockPos pos) {
+        Random random = world.random;
+        this.spawnDelay = this.maxSpawnDelay <= this.minSpawnDelay ? this.minSpawnDelay : this.minSpawnDelay + random.nextInt(this.maxSpawnDelay - this.minSpawnDelay);
+        this.spawnPotentials.getOrEmpty(random).ifPresent(spawnPotential -> this.setSpawnEntry(world, pos, spawnPotential));
+        this.sendStatus(world, pos, 1);
+    }
 
-   private void updateSpawns(World world, BlockPos pos) {
-      Random random = world.random;
-      if (this.maxSpawnDelay <= this.minSpawnDelay) {
-         this.spawnDelay = this.minSpawnDelay;
-      } else {
-         this.spawnDelay = this.minSpawnDelay + random.nextInt(this.maxSpawnDelay - this.minSpawnDelay);
-      }
+    public void readData(@Nullable World world, BlockPos pos, ReadView view) {
+        this.spawnDelay = view.getShort("Delay", (short)20);
+        view.read(SPAWN_DATA_KEY, MobSpawnerEntry.CODEC).ifPresent(mobSpawnerEntry -> this.setSpawnEntry(world, pos, mobSpawnerEntry));
+        this.spawnPotentials = view.read("SpawnPotentials", MobSpawnerEntry.DATA_POOL_CODEC).orElseGet(() -> Pool.of((Object)(this.spawnEntry != null ? this.spawnEntry : new MobSpawnerEntry())));
+        this.minSpawnDelay = view.getInt("MinSpawnDelay", 200);
+        this.maxSpawnDelay = view.getInt("MaxSpawnDelay", 800);
+        this.spawnCount = view.getInt("SpawnCount", 4);
+        this.maxNearbyEntities = view.getInt("MaxNearbyEntities", 6);
+        this.requiredPlayerRange = view.getInt("RequiredPlayerRange", 16);
+        this.spawnRange = view.getInt("SpawnRange", 4);
+        this.renderedEntity = null;
+    }
 
-      this.spawnPotentials.getOrEmpty(random).ifPresent((spawnPotential) -> {
-         this.setSpawnEntry(world, pos, spawnPotential);
-      });
-      this.sendStatus(world, pos, 1);
-   }
+    public void writeData(WriteView view) {
+        view.putShort("Delay", (short)this.spawnDelay);
+        view.putShort("MinSpawnDelay", (short)this.minSpawnDelay);
+        view.putShort("MaxSpawnDelay", (short)this.maxSpawnDelay);
+        view.putShort("SpawnCount", (short)this.spawnCount);
+        view.putShort("MaxNearbyEntities", (short)this.maxNearbyEntities);
+        view.putShort("RequiredPlayerRange", (short)this.requiredPlayerRange);
+        view.putShort("SpawnRange", (short)this.spawnRange);
+        view.putNullable(SPAWN_DATA_KEY, MobSpawnerEntry.CODEC, (Object)this.spawnEntry);
+        view.put("SpawnPotentials", MobSpawnerEntry.DATA_POOL_CODEC, (Object)this.spawnPotentials);
+    }
 
-   public void readData(@Nullable World world, BlockPos pos, ReadView view) {
-      this.spawnDelay = view.getShort("Delay", (short)20);
-      view.read("SpawnData", MobSpawnerEntry.CODEC).ifPresent((mobSpawnerEntry) -> {
-         this.setSpawnEntry(world, pos, mobSpawnerEntry);
-      });
-      this.spawnPotentials = (Pool)view.read("SpawnPotentials", MobSpawnerEntry.DATA_POOL_CODEC).orElseGet(() -> {
-         return Pool.of((Object)(this.spawnEntry != null ? this.spawnEntry : new MobSpawnerEntry()));
-      });
-      this.minSpawnDelay = view.getInt("MinSpawnDelay", 200);
-      this.maxSpawnDelay = view.getInt("MaxSpawnDelay", 800);
-      this.spawnCount = view.getInt("SpawnCount", 4);
-      this.maxNearbyEntities = view.getInt("MaxNearbyEntities", 6);
-      this.requiredPlayerRange = view.getInt("RequiredPlayerRange", 16);
-      this.spawnRange = view.getInt("SpawnRange", 4);
-      this.renderedEntity = null;
-   }
+    public @Nullable Entity getRenderedEntity(World world, BlockPos pos) {
+        if (this.renderedEntity == null) {
+            NbtCompound nbtCompound = this.getSpawnEntry(world, world.getRandom(), pos).getNbt();
+            if (nbtCompound.getString("id").isEmpty()) {
+                return null;
+            }
+            this.renderedEntity = EntityType.loadEntityWithPassengers((NbtCompound)nbtCompound, (World)world, (SpawnReason)SpawnReason.SPAWNER, (LoadedEntityProcessor)LoadedEntityProcessor.NOOP);
+            if (nbtCompound.getSize() != 1 || this.renderedEntity instanceof MobEntity) {
+                // empty if block
+            }
+        }
+        return this.renderedEntity;
+    }
 
-   public void writeData(WriteView view) {
-      view.putShort("Delay", (short)this.spawnDelay);
-      view.putShort("MinSpawnDelay", (short)this.minSpawnDelay);
-      view.putShort("MaxSpawnDelay", (short)this.maxSpawnDelay);
-      view.putShort("SpawnCount", (short)this.spawnCount);
-      view.putShort("MaxNearbyEntities", (short)this.maxNearbyEntities);
-      view.putShort("RequiredPlayerRange", (short)this.requiredPlayerRange);
-      view.putShort("SpawnRange", (short)this.spawnRange);
-      view.putNullable("SpawnData", MobSpawnerEntry.CODEC, this.spawnEntry);
-      view.put("SpawnPotentials", MobSpawnerEntry.DATA_POOL_CODEC, this.spawnPotentials);
-   }
+    public boolean handleStatus(World world, int status) {
+        if (status == 1) {
+            if (world.isClient()) {
+                this.spawnDelay = this.minSpawnDelay;
+            }
+            return true;
+        }
+        return false;
+    }
 
-   @Nullable
-   public Entity getRenderedEntity(World world, BlockPos pos) {
-      if (this.renderedEntity == null) {
-         NbtCompound nbtCompound = this.getSpawnEntry(world, world.getRandom(), pos).getNbt();
-         if (nbtCompound.getString("id").isEmpty()) {
-            return null;
-         }
+    protected void setSpawnEntry(@Nullable World world, BlockPos pos, MobSpawnerEntry spawnEntry) {
+        this.spawnEntry = spawnEntry;
+    }
 
-         this.renderedEntity = EntityType.loadEntityWithPassengers(nbtCompound, world, SpawnReason.SPAWNER, Function.identity());
-         if (nbtCompound.getSize() == 1 && this.renderedEntity instanceof MobEntity) {
-         }
-      }
+    private MobSpawnerEntry getSpawnEntry(@Nullable World world, Random random, BlockPos pos) {
+        if (this.spawnEntry != null) {
+            return this.spawnEntry;
+        }
+        this.setSpawnEntry(world, pos, this.spawnPotentials.getOrEmpty(random).orElseGet(MobSpawnerEntry::new));
+        return this.spawnEntry;
+    }
 
-      return this.renderedEntity;
-   }
+    public abstract void sendStatus(World var1, BlockPos var2, int var3);
 
-   public boolean handleStatus(World world, int status) {
-      if (status == 1) {
-         if (world.isClient) {
-            this.spawnDelay = this.minSpawnDelay;
-         }
+    public double getRotation() {
+        return this.rotation;
+    }
 
-         return true;
-      } else {
-         return false;
-      }
-   }
-
-   protected void setSpawnEntry(@Nullable World world, BlockPos pos, MobSpawnerEntry spawnEntry) {
-      this.spawnEntry = spawnEntry;
-   }
-
-   private MobSpawnerEntry getSpawnEntry(@Nullable World world, Random random, BlockPos pos) {
-      if (this.spawnEntry != null) {
-         return this.spawnEntry;
-      } else {
-         this.setSpawnEntry(world, pos, (MobSpawnerEntry)this.spawnPotentials.getOrEmpty(random).orElseGet(MobSpawnerEntry::new));
-         return this.spawnEntry;
-      }
-   }
-
-   public abstract void sendStatus(World world, BlockPos pos, int status);
-
-   public double getRotation() {
-      return this.rotation;
-   }
-
-   public double getLastRotation() {
-      return this.lastRotation;
-   }
+    public double getLastRotation() {
+        return this.lastRotation;
+    }
 }
+

@@ -1,8 +1,43 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.serialization.Codec
+ *  net.minecraft.block.BlockState
+ *  net.minecraft.block.JigsawBlock
+ *  net.minecraft.block.entity.BlockEntity
+ *  net.minecraft.block.entity.BlockEntityType
+ *  net.minecraft.block.entity.JigsawBlockEntity
+ *  net.minecraft.block.entity.JigsawBlockEntity$Joint
+ *  net.minecraft.block.enums.Orientation
+ *  net.minecraft.nbt.NbtCompound
+ *  net.minecraft.network.packet.Packet
+ *  net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket
+ *  net.minecraft.registry.Registry
+ *  net.minecraft.registry.RegistryKey
+ *  net.minecraft.registry.RegistryKeys
+ *  net.minecraft.registry.RegistryWrapper$WrapperLookup
+ *  net.minecraft.registry.entry.RegistryEntry
+ *  net.minecraft.registry.entry.RegistryEntry$Reference
+ *  net.minecraft.server.world.ServerWorld
+ *  net.minecraft.state.property.Property
+ *  net.minecraft.storage.ReadView
+ *  net.minecraft.storage.WriteView
+ *  net.minecraft.structure.StructureTemplate
+ *  net.minecraft.structure.pool.StructurePool
+ *  net.minecraft.structure.pool.StructurePoolBasedGenerator
+ *  net.minecraft.structure.pool.StructurePools
+ *  net.minecraft.util.Identifier
+ *  net.minecraft.util.math.BlockPos
+ */
 package net.minecraft.block.entity;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.JigsawBlock;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.block.entity.JigsawBlockEntity;
 import net.minecraft.block.enums.Orientation;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.Packet;
@@ -13,175 +48,137 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.state.property.Property;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
 import net.minecraft.structure.StructureTemplate;
+import net.minecraft.structure.pool.StructurePool;
 import net.minecraft.structure.pool.StructurePoolBasedGenerator;
 import net.minecraft.structure.pool.StructurePools;
-import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.math.BlockPos;
 
-public class JigsawBlockEntity extends BlockEntity {
-   public static final Codec STRUCTURE_POOL_KEY_CODEC;
-   public static final Identifier DEFAULT_NAME;
-   private static final int DEFAULT_PLACEMENT_PRIORITY = 0;
-   private static final int DEFAULT_SELECTION_PRIORITY = 0;
-   public static final String TARGET_KEY = "target";
-   public static final String POOL_KEY = "pool";
-   public static final String JOINT_KEY = "joint";
-   public static final String PLACEMENT_PRIORITY_KEY = "placement_priority";
-   public static final String SELECTION_PRIORITY_KEY = "selection_priority";
-   public static final String NAME_KEY = "name";
-   public static final String FINAL_STATE_KEY = "final_state";
-   public static final String DEFAULT_FINAL_STATE = "minecraft:air";
-   private Identifier name;
-   private Identifier target;
-   private RegistryKey pool;
-   private Joint joint;
-   private String finalState;
-   private int placementPriority;
-   private int selectionPriority;
+public class JigsawBlockEntity
+extends BlockEntity {
+    public static final Codec<RegistryKey<StructurePool>> STRUCTURE_POOL_KEY_CODEC = RegistryKey.createCodec((RegistryKey)RegistryKeys.TEMPLATE_POOL);
+    public static final Identifier DEFAULT_NAME = Identifier.ofVanilla((String)"empty");
+    private static final int DEFAULT_PLACEMENT_PRIORITY = 0;
+    private static final int DEFAULT_SELECTION_PRIORITY = 0;
+    public static final String TARGET_KEY = "target";
+    public static final String POOL_KEY = "pool";
+    public static final String JOINT_KEY = "joint";
+    public static final String PLACEMENT_PRIORITY_KEY = "placement_priority";
+    public static final String SELECTION_PRIORITY_KEY = "selection_priority";
+    public static final String NAME_KEY = "name";
+    public static final String FINAL_STATE_KEY = "final_state";
+    public static final String DEFAULT_FINAL_STATE = "minecraft:air";
+    private Identifier name = DEFAULT_NAME;
+    private Identifier target = DEFAULT_NAME;
+    private RegistryKey<StructurePool> pool = StructurePools.EMPTY;
+    private Joint joint = Joint.ROLLABLE;
+    private String finalState = "minecraft:air";
+    private int placementPriority = 0;
+    private int selectionPriority = 0;
 
-   public JigsawBlockEntity(BlockPos pos, BlockState state) {
-      super(BlockEntityType.JIGSAW, pos, state);
-      this.name = DEFAULT_NAME;
-      this.target = DEFAULT_NAME;
-      this.pool = StructurePools.EMPTY;
-      this.joint = JigsawBlockEntity.Joint.ROLLABLE;
-      this.finalState = "minecraft:air";
-      this.placementPriority = 0;
-      this.selectionPriority = 0;
-   }
+    public JigsawBlockEntity(BlockPos pos, BlockState state) {
+        super(BlockEntityType.JIGSAW, pos, state);
+    }
 
-   public Identifier getName() {
-      return this.name;
-   }
+    public Identifier getName() {
+        return this.name;
+    }
 
-   public Identifier getTarget() {
-      return this.target;
-   }
+    public Identifier getTarget() {
+        return this.target;
+    }
 
-   public RegistryKey getPool() {
-      return this.pool;
-   }
+    public RegistryKey<StructurePool> getPool() {
+        return this.pool;
+    }
 
-   public String getFinalState() {
-      return this.finalState;
-   }
+    public String getFinalState() {
+        return this.finalState;
+    }
 
-   public Joint getJoint() {
-      return this.joint;
-   }
+    public Joint getJoint() {
+        return this.joint;
+    }
 
-   public int getPlacementPriority() {
-      return this.placementPriority;
-   }
+    public int getPlacementPriority() {
+        return this.placementPriority;
+    }
 
-   public int getSelectionPriority() {
-      return this.selectionPriority;
-   }
+    public int getSelectionPriority() {
+        return this.selectionPriority;
+    }
 
-   public void setName(Identifier name) {
-      this.name = name;
-   }
+    public void setName(Identifier name) {
+        this.name = name;
+    }
 
-   public void setTarget(Identifier target) {
-      this.target = target;
-   }
+    public void setTarget(Identifier target) {
+        this.target = target;
+    }
 
-   public void setPool(RegistryKey pool) {
-      this.pool = pool;
-   }
+    public void setPool(RegistryKey<StructurePool> pool) {
+        this.pool = pool;
+    }
 
-   public void setFinalState(String finalState) {
-      this.finalState = finalState;
-   }
+    public void setFinalState(String finalState) {
+        this.finalState = finalState;
+    }
 
-   public void setJoint(Joint joint) {
-      this.joint = joint;
-   }
+    public void setJoint(Joint joint) {
+        this.joint = joint;
+    }
 
-   public void setPlacementPriority(int placementPriority) {
-      this.placementPriority = placementPriority;
-   }
+    public void setPlacementPriority(int placementPriority) {
+        this.placementPriority = placementPriority;
+    }
 
-   public void setSelectionPriority(int selectionPriority) {
-      this.selectionPriority = selectionPriority;
-   }
+    public void setSelectionPriority(int selectionPriority) {
+        this.selectionPriority = selectionPriority;
+    }
 
-   protected void writeData(WriteView view) {
-      super.writeData(view);
-      view.put("name", Identifier.CODEC, this.name);
-      view.put("target", Identifier.CODEC, this.target);
-      view.put("pool", STRUCTURE_POOL_KEY_CODEC, this.pool);
-      view.putString("final_state", this.finalState);
-      view.put("joint", JigsawBlockEntity.Joint.CODEC, this.joint);
-      view.putInt("placement_priority", this.placementPriority);
-      view.putInt("selection_priority", this.selectionPriority);
-   }
+    protected void writeData(WriteView view) {
+        super.writeData(view);
+        view.put(NAME_KEY, Identifier.CODEC, (Object)this.name);
+        view.put(TARGET_KEY, Identifier.CODEC, (Object)this.target);
+        view.put(POOL_KEY, STRUCTURE_POOL_KEY_CODEC, (Object)this.pool);
+        view.putString(FINAL_STATE_KEY, this.finalState);
+        view.put(JOINT_KEY, (Codec)Joint.CODEC, (Object)this.joint);
+        view.putInt(PLACEMENT_PRIORITY_KEY, this.placementPriority);
+        view.putInt(SELECTION_PRIORITY_KEY, this.selectionPriority);
+    }
 
-   protected void readData(ReadView view) {
-      super.readData(view);
-      this.name = (Identifier)view.read("name", Identifier.CODEC).orElse(DEFAULT_NAME);
-      this.target = (Identifier)view.read("target", Identifier.CODEC).orElse(DEFAULT_NAME);
-      this.pool = (RegistryKey)view.read("pool", STRUCTURE_POOL_KEY_CODEC).orElse(StructurePools.EMPTY);
-      this.finalState = view.getString("final_state", "minecraft:air");
-      this.joint = (Joint)view.read("joint", JigsawBlockEntity.Joint.CODEC).orElseGet(() -> {
-         return StructureTemplate.getJointFromFacing(this.getCachedState());
-      });
-      this.placementPriority = view.getInt("placement_priority", 0);
-      this.selectionPriority = view.getInt("selection_priority", 0);
-   }
+    protected void readData(ReadView view) {
+        super.readData(view);
+        this.name = view.read(NAME_KEY, Identifier.CODEC).orElse(DEFAULT_NAME);
+        this.target = view.read(TARGET_KEY, Identifier.CODEC).orElse(DEFAULT_NAME);
+        this.pool = view.read(POOL_KEY, STRUCTURE_POOL_KEY_CODEC).orElse(StructurePools.EMPTY);
+        this.finalState = view.getString(FINAL_STATE_KEY, DEFAULT_FINAL_STATE);
+        this.joint = view.read(JOINT_KEY, (Codec)Joint.CODEC).orElseGet(() -> StructureTemplate.getJointFromFacing((BlockState)this.getCachedState()));
+        this.placementPriority = view.getInt(PLACEMENT_PRIORITY_KEY, 0);
+        this.selectionPriority = view.getInt(SELECTION_PRIORITY_KEY, 0);
+    }
 
-   public BlockEntityUpdateS2CPacket toUpdatePacket() {
-      return BlockEntityUpdateS2CPacket.create(this);
-   }
+    public BlockEntityUpdateS2CPacket toUpdatePacket() {
+        return BlockEntityUpdateS2CPacket.create((BlockEntity)this);
+    }
 
-   public NbtCompound toInitialChunkDataNbt(RegistryWrapper.WrapperLookup registries) {
-      return this.createComponentlessNbt(registries);
-   }
+    public NbtCompound toInitialChunkDataNbt(RegistryWrapper.WrapperLookup registries) {
+        return this.createComponentlessNbt(registries);
+    }
 
-   public void generate(ServerWorld world, int maxDepth, boolean keepJigsaws) {
-      BlockPos blockPos = this.getPos().offset(((Orientation)this.getCachedState().get(JigsawBlock.ORIENTATION)).getFacing());
-      Registry registry = world.getRegistryManager().getOrThrow(RegistryKeys.TEMPLATE_POOL);
-      RegistryEntry registryEntry = registry.getOrThrow(this.pool);
-      StructurePoolBasedGenerator.generate(world, registryEntry, this.target, maxDepth, blockPos, keepJigsaws);
-   }
+    public void generate(ServerWorld world, int maxDepth, boolean keepJigsaws) {
+        BlockPos blockPos = this.getPos().offset(((Orientation)this.getCachedState().get((Property)JigsawBlock.ORIENTATION)).getFacing());
+        Registry registry = world.getRegistryManager().getOrThrow(RegistryKeys.TEMPLATE_POOL);
+        RegistryEntry.Reference registryEntry = registry.getOrThrow(this.pool);
+        StructurePoolBasedGenerator.generate((ServerWorld)world, (RegistryEntry)registryEntry, (Identifier)this.target, (int)maxDepth, (BlockPos)blockPos, (boolean)keepJigsaws);
+    }
 
-   // $FF: synthetic method
-   public Packet toUpdatePacket() {
-      return this.toUpdatePacket();
-   }
-
-   static {
-      STRUCTURE_POOL_KEY_CODEC = RegistryKey.createCodec(RegistryKeys.TEMPLATE_POOL);
-      DEFAULT_NAME = Identifier.ofVanilla("empty");
-   }
-
-   public static enum Joint implements StringIdentifiable {
-      ROLLABLE("rollable"),
-      ALIGNED("aligned");
-
-      public static final StringIdentifiable.EnumCodec CODEC = StringIdentifiable.createCodec(Joint::values);
-      private final String name;
-
-      private Joint(final String name) {
-         this.name = name;
-      }
-
-      public String asString() {
-         return this.name;
-      }
-
-      public Text asText() {
-         return Text.translatable("jigsaw_block.joint." + this.name);
-      }
-
-      // $FF: synthetic method
-      private static Joint[] method_36716() {
-         return new Joint[]{ROLLABLE, ALIGNED};
-      }
-   }
+    public /* synthetic */ Packet toUpdatePacket() {
+        return this.toUpdatePacket();
+    }
 }
+

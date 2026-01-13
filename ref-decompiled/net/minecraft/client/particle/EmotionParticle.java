@@ -1,73 +1,47 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.particle.BillboardParticle
+ *  net.minecraft.client.particle.BillboardParticle$RenderType
+ *  net.minecraft.client.particle.EmotionParticle
+ *  net.minecraft.client.texture.Sprite
+ *  net.minecraft.client.world.ClientWorld
+ *  net.minecraft.util.math.MathHelper
+ */
 package net.minecraft.client.particle;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.particle.BillboardParticle;
+import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.SimpleParticleType;
 import net.minecraft.util.math.MathHelper;
 
-@Environment(EnvType.CLIENT)
-public class EmotionParticle extends SpriteBillboardParticle {
-   EmotionParticle(ClientWorld clientWorld, double d, double e, double f) {
-      super(clientWorld, d, e, f, 0.0, 0.0, 0.0);
-      this.ascending = true;
-      this.velocityMultiplier = 0.86F;
-      this.velocityX *= 0.009999999776482582;
-      this.velocityY *= 0.009999999776482582;
-      this.velocityZ *= 0.009999999776482582;
-      this.velocityY += 0.1;
-      this.scale *= 1.5F;
-      this.maxAge = 16;
-      this.collidesWithWorld = false;
-   }
+@Environment(value=EnvType.CLIENT)
+public class EmotionParticle
+extends BillboardParticle {
+    EmotionParticle(ClientWorld clientWorld, double d, double e, double f, Sprite sprite) {
+        super(clientWorld, d, e, f, 0.0, 0.0, 0.0, sprite);
+        this.ascending = true;
+        this.velocityMultiplier = 0.86f;
+        this.velocityX *= (double)0.01f;
+        this.velocityY *= (double)0.01f;
+        this.velocityZ *= (double)0.01f;
+        this.velocityY += 0.1;
+        this.scale *= 1.5f;
+        this.maxAge = 16;
+        this.collidesWithWorld = false;
+    }
 
-   public ParticleTextureSheet getType() {
-      return ParticleTextureSheet.PARTICLE_SHEET_OPAQUE;
-   }
+    public BillboardParticle.RenderType getRenderType() {
+        return BillboardParticle.RenderType.PARTICLE_ATLAS_OPAQUE;
+    }
 
-   public float getSize(float tickProgress) {
-      return this.scale * MathHelper.clamp(((float)this.age + tickProgress) / (float)this.maxAge * 32.0F, 0.0F, 1.0F);
-   }
-
-   @Environment(EnvType.CLIENT)
-   public static class AngryVillagerFactory implements ParticleFactory {
-      private final SpriteProvider spriteProvider;
-
-      public AngryVillagerFactory(SpriteProvider spriteProvider) {
-         this.spriteProvider = spriteProvider;
-      }
-
-      public Particle createParticle(SimpleParticleType simpleParticleType, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
-         EmotionParticle emotionParticle = new EmotionParticle(clientWorld, d, e + 0.5, f);
-         emotionParticle.setSprite(this.spriteProvider);
-         emotionParticle.setColor(1.0F, 1.0F, 1.0F);
-         return emotionParticle;
-      }
-
-      // $FF: synthetic method
-      public Particle createParticle(final ParticleEffect particleEffect, final ClientWorld clientWorld, final double d, final double e, final double f, final double g, final double h, final double i) {
-         return this.createParticle((SimpleParticleType)particleEffect, clientWorld, d, e, f, g, h, i);
-      }
-   }
-
-   @Environment(EnvType.CLIENT)
-   public static class HeartFactory implements ParticleFactory {
-      private final SpriteProvider spriteProvider;
-
-      public HeartFactory(SpriteProvider spriteProvider) {
-         this.spriteProvider = spriteProvider;
-      }
-
-      public Particle createParticle(SimpleParticleType simpleParticleType, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
-         EmotionParticle emotionParticle = new EmotionParticle(clientWorld, d, e, f);
-         emotionParticle.setSprite(this.spriteProvider);
-         return emotionParticle;
-      }
-
-      // $FF: synthetic method
-      public Particle createParticle(final ParticleEffect particleEffect, final ClientWorld clientWorld, final double d, final double e, final double f, final double g, final double h, final double i) {
-         return this.createParticle((SimpleParticleType)particleEffect, clientWorld, d, e, f, g, h, i);
-      }
-   }
+    public float getSize(float tickProgress) {
+        return this.scale * MathHelper.clamp((float)(((float)this.age + tickProgress) / (float)this.maxAge * 32.0f), (float)0.0f, (float)1.0f);
+    }
 }
+

@@ -1,31 +1,80 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.google.common.collect.Lists
+ *  com.google.gson.JsonArray
+ *  com.google.gson.JsonElement
+ *  com.google.gson.JsonObject
+ *  com.mojang.blaze3d.textures.GpuTextureView
+ *  com.mojang.logging.LogUtils
+ *  it.unimi.dsi.fastutil.ints.IntOpenHashSet
+ *  it.unimi.dsi.fastutil.ints.IntSet
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.MinecraftClient
+ *  net.minecraft.client.gl.GpuSampler
+ *  net.minecraft.client.gl.RenderPipelines
+ *  net.minecraft.client.gui.DrawContext
+ *  net.minecraft.client.gui.LogoDrawer
+ *  net.minecraft.client.gui.screen.CreditsScreen
+ *  net.minecraft.client.gui.screen.CreditsScreen$CreditsReader
+ *  net.minecraft.client.gui.screen.Screen
+ *  net.minecraft.client.input.KeyInput
+ *  net.minecraft.client.render.block.entity.AbstractEndPortalBlockEntityRenderer
+ *  net.minecraft.client.texture.AbstractTexture
+ *  net.minecraft.client.texture.TextureManager
+ *  net.minecraft.client.texture.TextureSetup
+ *  net.minecraft.client.util.NarratorManager
+ *  net.minecraft.screen.ScreenTexts
+ *  net.minecraft.sound.MusicSound
+ *  net.minecraft.sound.MusicType
+ *  net.minecraft.text.MutableText
+ *  net.minecraft.text.OrderedText
+ *  net.minecraft.text.StringVisitable
+ *  net.minecraft.text.Text
+ *  net.minecraft.util.Formatting
+ *  net.minecraft.util.Identifier
+ *  net.minecraft.util.JsonHelper
+ *  net.minecraft.util.math.random.Random
+ *  org.apache.commons.lang3.StringUtils
+ *  org.slf4j.Logger
+ */
 package net.minecraft.client.gui.screen;
 
 import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mojang.blaze3d.textures.GpuTextureView;
 import com.mojang.logging.LogUtils;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.Iterator;
 import java.util.List;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.GpuSampler;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.LogoDrawer;
-import net.minecraft.client.render.block.entity.EndPortalBlockEntityRenderer;
+import net.minecraft.client.gui.screen.CreditsScreen;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.input.KeyInput;
+import net.minecraft.client.render.block.entity.AbstractEndPortalBlockEntityRenderer;
+import net.minecraft.client.texture.AbstractTexture;
 import net.minecraft.client.texture.TextureManager;
 import net.minecraft.client.texture.TextureSetup;
 import net.minecraft.client.util.NarratorManager;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.sound.MusicSound;
 import net.minecraft.sound.MusicType;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.OrderedText;
+import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
@@ -34,327 +83,263 @@ import net.minecraft.util.math.random.Random;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
-@Environment(EnvType.CLIENT)
-public class CreditsScreen extends Screen {
-   private static final Identifier VIGNETTE_TEXTURE = Identifier.ofVanilla("textures/misc/credits_vignette.png");
-   private static final Logger LOGGER = LogUtils.getLogger();
-   private static final Text SEPARATOR_LINE;
-   private static final String CENTERED_LINE_PREFIX = "           ";
-   private static final String OBFUSCATION_PLACEHOLDER;
-   private static final float SPACE_BAR_SPEED_MULTIPLIER = 5.0F;
-   private static final float CTRL_KEY_SPEED_MULTIPLIER = 15.0F;
-   private static final Identifier END_POEM_TEXT_LOCATION;
-   private static final Identifier CREDITS_TEXT_LOCATION;
-   private static final Identifier POST_CREDITS_TEXT_LOCATION;
-   private final boolean endCredits;
-   private final Runnable finishAction;
-   private float time;
-   private List credits;
-   private List narratedCredits;
-   private IntSet centeredLines;
-   private int creditsHeight;
-   private boolean spaceKeyPressed;
-   private final IntSet pressedCtrlKeys = new IntOpenHashSet();
-   private float speed;
-   private final float baseSpeed;
-   private int speedMultiplier;
-   private final LogoDrawer logoDrawer = new LogoDrawer(false);
+@Environment(value=EnvType.CLIENT)
+public class CreditsScreen
+extends Screen {
+    private static final Identifier VIGNETTE_TEXTURE = Identifier.ofVanilla((String)"textures/misc/credits_vignette.png");
+    private static final Logger LOGGER = LogUtils.getLogger();
+    private static final Text SEPARATOR_LINE = Text.literal((String)"============").formatted(Formatting.WHITE);
+    private static final String CENTERED_LINE_PREFIX = "           ";
+    private static final String OBFUSCATION_PLACEHOLDER = String.valueOf(Formatting.WHITE) + String.valueOf(Formatting.OBFUSCATED) + String.valueOf(Formatting.GREEN) + String.valueOf(Formatting.AQUA);
+    private static final float SPACE_BAR_SPEED_MULTIPLIER = 5.0f;
+    private static final float CTRL_KEY_SPEED_MULTIPLIER = 15.0f;
+    private static final Identifier END_POEM_TEXT_LOCATION = Identifier.ofVanilla((String)"texts/end.txt");
+    private static final Identifier CREDITS_TEXT_LOCATION = Identifier.ofVanilla((String)"texts/credits.json");
+    private static final Identifier POST_CREDITS_TEXT_LOCATION = Identifier.ofVanilla((String)"texts/postcredits.txt");
+    private final boolean endCredits;
+    private final Runnable finishAction;
+    private float time;
+    private List<OrderedText> credits;
+    private List<Text> narratedCredits;
+    private IntSet centeredLines;
+    private int creditsHeight;
+    private boolean spaceKeyPressed;
+    private final IntSet pressedCtrlKeys = new IntOpenHashSet();
+    private float speed;
+    private final float baseSpeed;
+    private int speedMultiplier;
+    private final LogoDrawer logoDrawer = new LogoDrawer(false);
 
-   public CreditsScreen(boolean endCredits, Runnable finishAction) {
-      super(NarratorManager.EMPTY);
-      this.endCredits = endCredits;
-      this.finishAction = finishAction;
-      if (!endCredits) {
-         this.baseSpeed = 0.75F;
-      } else {
-         this.baseSpeed = 0.5F;
-      }
+    public CreditsScreen(boolean endCredits, Runnable finishAction) {
+        super(NarratorManager.EMPTY);
+        this.endCredits = endCredits;
+        this.finishAction = finishAction;
+        this.baseSpeed = !endCredits ? 0.75f : 0.5f;
+        this.speedMultiplier = 1;
+        this.speed = this.baseSpeed;
+    }
 
-      this.speedMultiplier = 1;
-      this.speed = this.baseSpeed;
-   }
+    private float getSpeed() {
+        if (this.spaceKeyPressed) {
+            return this.baseSpeed * (5.0f + (float)this.pressedCtrlKeys.size() * 15.0f) * (float)this.speedMultiplier;
+        }
+        return this.baseSpeed * (float)this.speedMultiplier;
+    }
 
-   private float getSpeed() {
-      return this.spaceKeyPressed ? this.baseSpeed * (5.0F + (float)this.pressedCtrlKeys.size() * 15.0F) * (float)this.speedMultiplier : this.baseSpeed * (float)this.speedMultiplier;
-   }
+    public void tick() {
+        this.client.getMusicTracker().tick();
+        this.client.getSoundManager().tick(false);
+        float f = this.creditsHeight + this.height + this.height + 24;
+        if (this.time > f) {
+            this.closeScreen();
+        }
+    }
 
-   public void tick() {
-      this.client.getMusicTracker().tick();
-      this.client.getSoundManager().tick(false);
-      float f = (float)(this.creditsHeight + this.height + this.height + 24);
-      if (this.time > f) {
-         this.closeScreen();
-      }
-
-   }
-
-   public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-      if (keyCode == 265) {
-         this.speedMultiplier = -1;
-      } else if (keyCode != 341 && keyCode != 345) {
-         if (keyCode == 32) {
+    public boolean keyPressed(KeyInput input) {
+        if (input.isUp()) {
+            this.speedMultiplier = -1;
+        } else if (input.key() == 341 || input.key() == 345) {
+            this.pressedCtrlKeys.add(input.key());
+        } else if (input.key() == 32) {
             this.spaceKeyPressed = true;
-         }
-      } else {
-         this.pressedCtrlKeys.add(keyCode);
-      }
+        }
+        this.speed = this.getSpeed();
+        return super.keyPressed(input);
+    }
 
-      this.speed = this.getSpeed();
-      return super.keyPressed(keyCode, scanCode, modifiers);
-   }
+    public boolean keyReleased(KeyInput input) {
+        if (input.isUp()) {
+            this.speedMultiplier = 1;
+        }
+        if (input.key() == 32) {
+            this.spaceKeyPressed = false;
+        } else if (input.key() == 341 || input.key() == 345) {
+            this.pressedCtrlKeys.remove(input.key());
+        }
+        this.speed = this.getSpeed();
+        return super.keyReleased(input);
+    }
 
-   public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
-      if (keyCode == 265) {
-         this.speedMultiplier = 1;
-      }
+    public void close() {
+        this.closeScreen();
+    }
 
-      if (keyCode == 32) {
-         this.spaceKeyPressed = false;
-      } else if (keyCode == 341 || keyCode == 345) {
-         this.pressedCtrlKeys.remove(keyCode);
-      }
+    private void closeScreen() {
+        this.finishAction.run();
+    }
 
-      this.speed = this.getSpeed();
-      return super.keyReleased(keyCode, scanCode, modifiers);
-   }
+    protected void init() {
+        if (this.credits != null) {
+            return;
+        }
+        this.credits = Lists.newArrayList();
+        this.narratedCredits = Lists.newArrayList();
+        this.centeredLines = new IntOpenHashSet();
+        if (this.endCredits) {
+            this.load(END_POEM_TEXT_LOCATION, arg_0 -> this.readPoem(arg_0));
+        }
+        this.load(CREDITS_TEXT_LOCATION, arg_0 -> this.readCredits(arg_0));
+        if (this.endCredits) {
+            this.load(POST_CREDITS_TEXT_LOCATION, arg_0 -> this.readPoem(arg_0));
+        }
+        this.creditsHeight = this.credits.size() * 12;
+    }
 
-   public void close() {
-      this.closeScreen();
-   }
+    public Text getNarratedTitle() {
+        return ScreenTexts.joinSentences((Text[])((Text[])this.narratedCredits.toArray(Text[]::new)));
+    }
 
-   private void closeScreen() {
-      this.finishAction.run();
-   }
+    private void load(Identifier fileLocation, CreditsReader reader) {
+        try (BufferedReader reader2 = this.client.getResourceManager().openAsReader(fileLocation);){
+            reader.read((Reader)reader2);
+        }
+        catch (Exception exception) {
+            LOGGER.error("Couldn't load credits from file {}", (Object)fileLocation, (Object)exception);
+        }
+    }
 
-   protected void init() {
-      if (this.credits == null) {
-         this.credits = Lists.newArrayList();
-         this.narratedCredits = Lists.newArrayList();
-         this.centeredLines = new IntOpenHashSet();
-         if (this.endCredits) {
-            this.load(END_POEM_TEXT_LOCATION, this::readPoem);
-         }
-
-         this.load(CREDITS_TEXT_LOCATION, this::readCredits);
-         if (this.endCredits) {
-            this.load(POST_CREDITS_TEXT_LOCATION, this::readPoem);
-         }
-
-         this.creditsHeight = this.credits.size() * 12;
-      }
-   }
-
-   public Text getNarratedTitle() {
-      return ScreenTexts.joinSentences((Text[])this.narratedCredits.toArray((i) -> {
-         return new Text[i];
-      }));
-   }
-
-   private void load(Identifier fileLocation, CreditsReader reader) {
-      try {
-         Reader reader2 = this.client.getResourceManager().openAsReader(fileLocation);
-
-         try {
-            reader.read(reader2);
-         } catch (Throwable var7) {
-            if (reader2 != null) {
-               try {
-                  reader2.close();
-               } catch (Throwable var6) {
-                  var7.addSuppressed(var6);
-               }
+    private void readPoem(Reader reader) throws IOException {
+        int i;
+        Object string;
+        BufferedReader bufferedReader = new BufferedReader(reader);
+        Random random = Random.create((long)8124371L);
+        while ((string = bufferedReader.readLine()) != null) {
+            string = ((String)string).replaceAll("PLAYERNAME", this.client.getSession().getUsername());
+            while ((i = ((String)string).indexOf(OBFUSCATION_PLACEHOLDER)) != -1) {
+                String string2 = ((String)string).substring(0, i);
+                String string3 = ((String)string).substring(i + OBFUSCATION_PLACEHOLDER.length());
+                string = string2 + String.valueOf(Formatting.WHITE) + String.valueOf(Formatting.OBFUSCATED) + "XXXXXXXX".substring(0, random.nextInt(4) + 3) + string3;
             }
+            this.addText((String)string);
+            this.addEmptyLine();
+        }
+        for (i = 0; i < 8; ++i) {
+            this.addEmptyLine();
+        }
+    }
 
-            throw var7;
-         }
-
-         if (reader2 != null) {
-            reader2.close();
-         }
-      } catch (Exception var8) {
-         LOGGER.error("Couldn't load credits from file {}", fileLocation, var8);
-      }
-
-   }
-
-   private void readPoem(Reader reader) throws IOException {
-      BufferedReader bufferedReader = new BufferedReader(reader);
-      Random random = Random.create(8124371L);
-
-      String string;
-      int i;
-      while((string = bufferedReader.readLine()) != null) {
-         String string2;
-         String string3;
-         for(string = string.replaceAll("PLAYERNAME", this.client.getSession().getUsername()); (i = string.indexOf(OBFUSCATION_PLACEHOLDER)) != -1; string = string2 + String.valueOf(Formatting.WHITE) + String.valueOf(Formatting.OBFUSCATED) + "XXXXXXXX".substring(0, random.nextInt(4) + 3) + string3) {
-            string2 = string.substring(0, i);
-            string3 = string.substring(i + OBFUSCATION_PLACEHOLDER.length());
-         }
-
-         this.addText(string);
-         this.addEmptyLine();
-      }
-
-      for(i = 0; i < 8; ++i) {
-         this.addEmptyLine();
-      }
-
-   }
-
-   private void readCredits(Reader reader) {
-      JsonArray jsonArray = JsonHelper.deserializeArray(reader);
-      Iterator var3 = jsonArray.iterator();
-
-      while(var3.hasNext()) {
-         JsonElement jsonElement = (JsonElement)var3.next();
-         JsonObject jsonObject = jsonElement.getAsJsonObject();
-         String string = jsonObject.get("section").getAsString();
-         this.addText(SEPARATOR_LINE, true, false);
-         this.addText(Text.literal(string).formatted(Formatting.YELLOW), true, true);
-         this.addText(SEPARATOR_LINE, true, false);
-         this.addEmptyLine();
-         this.addEmptyLine();
-         JsonArray jsonArray2 = jsonObject.getAsJsonArray("disciplines");
-         Iterator var8 = jsonArray2.iterator();
-
-         while(var8.hasNext()) {
-            JsonElement jsonElement2 = (JsonElement)var8.next();
-            JsonObject jsonObject2 = jsonElement2.getAsJsonObject();
-            String string2 = jsonObject2.get("discipline").getAsString();
-            if (StringUtils.isNotEmpty(string2)) {
-               this.addText(Text.literal(string2).formatted(Formatting.YELLOW), true, true);
-               this.addEmptyLine();
-               this.addEmptyLine();
+    private void readCredits(Reader reader) {
+        JsonArray jsonArray = JsonHelper.deserializeArray((Reader)reader);
+        for (JsonElement jsonElement : jsonArray) {
+            JsonObject jsonObject = jsonElement.getAsJsonObject();
+            String string = jsonObject.get("section").getAsString();
+            this.addText(SEPARATOR_LINE, true, false);
+            this.addText((Text)Text.literal((String)string).formatted(Formatting.YELLOW), true, true);
+            this.addText(SEPARATOR_LINE, true, false);
+            this.addEmptyLine();
+            this.addEmptyLine();
+            JsonArray jsonArray2 = jsonObject.getAsJsonArray("disciplines");
+            for (JsonElement jsonElement2 : jsonArray2) {
+                JsonObject jsonObject2 = jsonElement2.getAsJsonObject();
+                String string2 = jsonObject2.get("discipline").getAsString();
+                if (StringUtils.isNotEmpty((CharSequence)string2)) {
+                    this.addText((Text)Text.literal((String)string2).formatted(Formatting.YELLOW), true, true);
+                    this.addEmptyLine();
+                    this.addEmptyLine();
+                }
+                JsonArray jsonArray3 = jsonObject2.getAsJsonArray("titles");
+                for (JsonElement jsonElement3 : jsonArray3) {
+                    JsonObject jsonObject3 = jsonElement3.getAsJsonObject();
+                    String string3 = jsonObject3.get("title").getAsString();
+                    JsonArray jsonArray4 = jsonObject3.getAsJsonArray("names");
+                    this.addText((Text)Text.literal((String)string3).formatted(Formatting.GRAY), false, true);
+                    for (JsonElement jsonElement4 : jsonArray4) {
+                        String string4 = jsonElement4.getAsString();
+                        this.addText((Text)Text.literal((String)CENTERED_LINE_PREFIX).append(string4).formatted(Formatting.WHITE), false, true);
+                    }
+                    this.addEmptyLine();
+                    this.addEmptyLine();
+                }
             }
+        }
+    }
 
-            JsonArray jsonArray3 = jsonObject2.getAsJsonArray("titles");
-            Iterator var13 = jsonArray3.iterator();
+    private void addEmptyLine() {
+        this.credits.add(OrderedText.EMPTY);
+        this.narratedCredits.add(ScreenTexts.EMPTY);
+    }
 
-            while(var13.hasNext()) {
-               JsonElement jsonElement3 = (JsonElement)var13.next();
-               JsonObject jsonObject3 = jsonElement3.getAsJsonObject();
-               String string3 = jsonObject3.get("title").getAsString();
-               JsonArray jsonArray4 = jsonObject3.getAsJsonArray("names");
-               this.addText(Text.literal(string3).formatted(Formatting.GRAY), false, true);
-               Iterator var18 = jsonArray4.iterator();
+    private void addText(String text) {
+        MutableText text2 = Text.literal((String)text);
+        this.credits.addAll(this.client.textRenderer.wrapLines((StringVisitable)text2, 256));
+        this.narratedCredits.add(text2);
+    }
 
-               while(var18.hasNext()) {
-                  JsonElement jsonElement4 = (JsonElement)var18.next();
-                  String string4 = jsonElement4.getAsString();
-                  this.addText(Text.literal("           ").append(string4).formatted(Formatting.WHITE), false, true);
-               }
+    private void addText(Text text, boolean centered, boolean narrate) {
+        if (centered) {
+            this.centeredLines.add(this.credits.size());
+        }
+        this.credits.add(text.asOrderedText());
+        if (narrate) {
+            this.narratedCredits.add(text);
+        }
+    }
 
-               this.addEmptyLine();
-               this.addEmptyLine();
+    public void render(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
+        super.render(context, mouseX, mouseY, deltaTicks);
+        this.renderVignette(context);
+        this.time = Math.max(0.0f, this.time + deltaTicks * this.speed);
+        int i = this.width / 2 - 128;
+        int j = this.height + 50;
+        float f = -this.time;
+        context.getMatrices().pushMatrix();
+        context.getMatrices().translate(0.0f, f);
+        context.createNewRootLayer();
+        this.logoDrawer.draw(context, this.width, 1.0f, j);
+        int k = j + 100;
+        for (int l = 0; l < this.credits.size(); ++l) {
+            float g;
+            if (l == this.credits.size() - 1 && (g = (float)k + f - (float)(this.height / 2 - 6)) < 0.0f) {
+                context.getMatrices().translate(0.0f, -g);
             }
-         }
-      }
-
-   }
-
-   private void addEmptyLine() {
-      this.credits.add(OrderedText.EMPTY);
-      this.narratedCredits.add(ScreenTexts.EMPTY);
-   }
-
-   private void addText(String text) {
-      Text text2 = Text.literal(text);
-      this.credits.addAll(this.client.textRenderer.wrapLines(text2, 256));
-      this.narratedCredits.add(text2);
-   }
-
-   private void addText(Text text, boolean centered, boolean narrate) {
-      if (centered) {
-         this.centeredLines.add(this.credits.size());
-      }
-
-      this.credits.add(text.asOrderedText());
-      if (narrate) {
-         this.narratedCredits.add(text);
-      }
-
-   }
-
-   public void render(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
-      super.render(context, mouseX, mouseY, deltaTicks);
-      this.renderVignette(context);
-      this.time = Math.max(0.0F, this.time + deltaTicks * this.speed);
-      int i = this.width / 2 - 128;
-      int j = this.height + 50;
-      float f = -this.time;
-      context.getMatrices().pushMatrix();
-      context.getMatrices().translate(0.0F, f);
-      context.createNewRootLayer();
-      this.logoDrawer.draw(context, this.width, 1.0F, j);
-      int k = j + 100;
-
-      for(int l = 0; l < this.credits.size(); ++l) {
-         if (l == this.credits.size() - 1) {
-            float g = (float)k + f - (float)(this.height / 2 - 6);
-            if (g < 0.0F) {
-               context.getMatrices().translate(0.0F, -g);
+            if ((float)k + f + 12.0f + 8.0f > 0.0f && (float)k + f < (float)this.height) {
+                OrderedText orderedText = (OrderedText)this.credits.get(l);
+                if (this.centeredLines.contains(l)) {
+                    context.drawCenteredTextWithShadow(this.textRenderer, orderedText, i + 128, k, -1);
+                } else {
+                    context.drawTextWithShadow(this.textRenderer, orderedText, i, k, -1);
+                }
             }
-         }
+            k += 12;
+        }
+        context.getMatrices().popMatrix();
+    }
 
-         if ((float)k + f + 12.0F + 8.0F > 0.0F && (float)k + f < (float)this.height) {
-            OrderedText orderedText = (OrderedText)this.credits.get(l);
-            if (this.centeredLines.contains(l)) {
-               context.drawCenteredTextWithShadow(this.textRenderer, (OrderedText)orderedText, i + 128, k, -1);
-            } else {
-               context.drawTextWithShadow(this.textRenderer, (OrderedText)orderedText, i, k, -1);
-            }
-         }
+    private void renderVignette(DrawContext context) {
+        context.drawTexture(RenderPipelines.VIGNETTE, VIGNETTE_TEXTURE, 0, 0, 0.0f, 0.0f, this.width, this.height, this.width, this.height);
+    }
 
-         k += 12;
-      }
+    public void renderBackground(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
+        if (this.endCredits) {
+            TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
+            AbstractTexture abstractTexture = textureManager.getTexture(AbstractEndPortalBlockEntityRenderer.SKY_TEXTURE);
+            AbstractTexture abstractTexture2 = textureManager.getTexture(AbstractEndPortalBlockEntityRenderer.PORTAL_TEXTURE);
+            TextureSetup textureSetup = TextureSetup.of((GpuTextureView)abstractTexture.getGlTextureView(), (GpuSampler)abstractTexture.getSampler(), (GpuTextureView)abstractTexture2.getGlTextureView(), (GpuSampler)abstractTexture2.getSampler());
+            context.fill(RenderPipelines.END_PORTAL, textureSetup, 0, 0, this.width, this.height);
+        } else {
+            super.renderBackground(context, mouseX, mouseY, deltaTicks);
+        }
+    }
 
-      context.getMatrices().popMatrix();
-   }
+    protected void renderDarkening(DrawContext context, int x, int y, int width, int height) {
+        float f = this.time * 0.5f;
+        Screen.renderBackgroundTexture((DrawContext)context, (Identifier)Screen.MENU_BACKGROUND_TEXTURE, (int)0, (int)0, (float)0.0f, (float)f, (int)width, (int)height);
+    }
 
-   private void renderVignette(DrawContext context) {
-      context.drawTexture(RenderPipelines.VIGNETTE, VIGNETTE_TEXTURE, 0, 0, 0.0F, 0.0F, this.width, this.height, this.width, this.height);
-   }
+    public boolean shouldPause() {
+        return !this.endCredits;
+    }
 
-   public void renderBackground(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
-      if (this.endCredits) {
-         TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
-         TextureSetup textureSetup = TextureSetup.of(textureManager.getTexture(EndPortalBlockEntityRenderer.SKY_TEXTURE).getGlTextureView(), textureManager.getTexture(EndPortalBlockEntityRenderer.PORTAL_TEXTURE).getGlTextureView());
-         context.fill(RenderPipelines.END_PORTAL, textureSetup, 0, 0, this.width, this.height);
-      } else {
-         super.renderBackground(context, mouseX, mouseY, deltaTicks);
-      }
+    public boolean keepOpenThroughPortal() {
+        return true;
+    }
 
-   }
+    public void removed() {
+        this.client.getMusicTracker().stop(MusicType.CREDITS);
+    }
 
-   protected void renderDarkening(DrawContext context, int x, int y, int width, int height) {
-      float f = this.time * 0.5F;
-      Screen.renderBackgroundTexture(context, Screen.MENU_BACKGROUND_TEXTURE, 0, 0, 0.0F, f, width, height);
-   }
-
-   public boolean shouldPause() {
-      return !this.endCredits;
-   }
-
-   public void removed() {
-      this.client.getMusicTracker().stop(MusicType.CREDITS);
-   }
-
-   public MusicSound getMusic() {
-      return MusicType.CREDITS;
-   }
-
-   static {
-      SEPARATOR_LINE = Text.literal("============").formatted(Formatting.WHITE);
-      String var10000 = String.valueOf(Formatting.WHITE);
-      OBFUSCATION_PLACEHOLDER = var10000 + String.valueOf(Formatting.OBFUSCATED) + String.valueOf(Formatting.GREEN) + String.valueOf(Formatting.AQUA);
-      END_POEM_TEXT_LOCATION = Identifier.ofVanilla("texts/end.txt");
-      CREDITS_TEXT_LOCATION = Identifier.ofVanilla("texts/credits.json");
-      POST_CREDITS_TEXT_LOCATION = Identifier.ofVanilla("texts/postcredits.txt");
-   }
-
-   @FunctionalInterface
-   @Environment(EnvType.CLIENT)
-   private interface CreditsReader {
-      void read(Reader reader) throws IOException;
-   }
+    public MusicSound getMusic() {
+        return MusicType.CREDITS;
+    }
 }
+

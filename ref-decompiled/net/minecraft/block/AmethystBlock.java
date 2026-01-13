@@ -1,7 +1,25 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.serialization.MapCodec
+ *  net.minecraft.block.AbstractBlock$Settings
+ *  net.minecraft.block.AmethystBlock
+ *  net.minecraft.block.Block
+ *  net.minecraft.block.BlockState
+ *  net.minecraft.entity.projectile.ProjectileEntity
+ *  net.minecraft.sound.SoundCategory
+ *  net.minecraft.sound.SoundEvents
+ *  net.minecraft.util.hit.BlockHitResult
+ *  net.minecraft.util.math.BlockPos
+ *  net.minecraft.world.World
+ */
 package net.minecraft.block;
 
 import com.mojang.serialization.MapCodec;
-import net.minecraft.entity.Entity;
+import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -9,22 +27,23 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class AmethystBlock extends Block {
-   public static final MapCodec CODEC = createCodec(AmethystBlock::new);
+public class AmethystBlock
+extends Block {
+    public static final MapCodec<AmethystBlock> CODEC = AmethystBlock.createCodec(AmethystBlock::new);
 
-   public MapCodec getCodec() {
-      return CODEC;
-   }
+    public MapCodec<? extends AmethystBlock> getCodec() {
+        return CODEC;
+    }
 
-   public AmethystBlock(AbstractBlock.Settings settings) {
-      super(settings);
-   }
+    public AmethystBlock(AbstractBlock.Settings settings) {
+        super(settings);
+    }
 
-   protected void onProjectileHit(World world, BlockState state, BlockHitResult hit, ProjectileEntity projectile) {
-      if (!world.isClient) {
-         BlockPos blockPos = hit.getBlockPos();
-         world.playSound((Entity)null, blockPos, SoundEvents.BLOCK_AMETHYST_BLOCK_CHIME, SoundCategory.BLOCKS, 1.0F, 0.5F + world.random.nextFloat() * 1.2F);
-      }
-
-   }
+    protected void onProjectileHit(World world, BlockState state, BlockHitResult hit, ProjectileEntity projectile) {
+        if (!world.isClient()) {
+            BlockPos blockPos = hit.getBlockPos();
+            world.playSound(null, blockPos, SoundEvents.BLOCK_AMETHYST_BLOCK_CHIME, SoundCategory.BLOCKS, 1.0f, 0.5f + world.random.nextFloat() * 1.2f);
+        }
+    }
 }
+

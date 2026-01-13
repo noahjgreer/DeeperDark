@@ -1,0 +1,48 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.font.TextRenderer
+ *  net.minecraft.client.gui.DrawContext
+ *  net.minecraft.client.gui.hud.debug.chart.DebugChart
+ *  net.minecraft.client.gui.hud.debug.chart.PingChart
+ *  net.minecraft.util.profiler.log.MultiValueDebugSampleLog
+ */
+package net.minecraft.client.gui.hud.debug.chart;
+
+import java.util.Locale;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.hud.debug.chart.DebugChart;
+import net.minecraft.util.profiler.log.MultiValueDebugSampleLog;
+
+@Environment(value=EnvType.CLIENT)
+public class PingChart
+extends DebugChart {
+    private static final int field_45934 = 500;
+
+    public PingChart(TextRenderer textRenderer, MultiValueDebugSampleLog multiValueDebugSampleLog) {
+        super(textRenderer, multiValueDebugSampleLog);
+    }
+
+    protected void renderThresholds(DrawContext context, int x, int width, int height) {
+        this.drawBorderedText(context, "500 ms", x + 1, height - 60 + 1);
+    }
+
+    protected String format(double value) {
+        return String.format(Locale.ROOT, "%d ms", (int)Math.round(value));
+    }
+
+    protected int getHeight(double value) {
+        return (int)Math.round(value * 60.0 / 500.0);
+    }
+
+    protected int getColor(long value) {
+        return this.getColor((double)value, 0.0, -16711936, 250.0, -256, 500.0, -65536);
+    }
+}
+

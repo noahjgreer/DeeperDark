@@ -1,46 +1,86 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.render.entity.BipedEntityRenderer
+ *  net.minecraft.client.render.entity.EntityRendererFactory$Context
+ *  net.minecraft.client.render.entity.ZombieBaseEntityRenderer
+ *  net.minecraft.client.render.entity.feature.ArmorFeatureRenderer
+ *  net.minecraft.client.render.entity.feature.FeatureRenderer
+ *  net.minecraft.client.render.entity.feature.FeatureRendererContext
+ *  net.minecraft.client.render.entity.model.BipedEntityModel$ArmPose
+ *  net.minecraft.client.render.entity.model.EquipmentModelData
+ *  net.minecraft.client.render.entity.model.ZombieEntityModel
+ *  net.minecraft.client.render.entity.state.LivingEntityRenderState
+ *  net.minecraft.client.render.entity.state.ZombieEntityRenderState
+ *  net.minecraft.component.DataComponentTypes
+ *  net.minecraft.component.type.SwingAnimationComponent
+ *  net.minecraft.entity.mob.ZombieEntity
+ *  net.minecraft.util.Arm
+ *  net.minecraft.util.Identifier
+ *  net.minecraft.util.SwingAnimationType
+ */
 package net.minecraft.client.render.entity;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.render.entity.BipedEntityRenderer;
+import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.render.entity.feature.ArmorFeatureRenderer;
+import net.minecraft.client.render.entity.feature.FeatureRenderer;
+import net.minecraft.client.render.entity.feature.FeatureRendererContext;
+import net.minecraft.client.render.entity.model.BipedEntityModel;
+import net.minecraft.client.render.entity.model.EquipmentModelData;
 import net.minecraft.client.render.entity.model.ZombieEntityModel;
-import net.minecraft.client.render.entity.state.BipedEntityRenderState;
 import net.minecraft.client.render.entity.state.LivingEntityRenderState;
 import net.minecraft.client.render.entity.state.ZombieEntityRenderState;
-import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.SwingAnimationComponent;
 import net.minecraft.entity.mob.ZombieEntity;
+import net.minecraft.util.Arm;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.SwingAnimationType;
 
-@Environment(EnvType.CLIENT)
-public abstract class ZombieBaseEntityRenderer extends BipedEntityRenderer {
-   private static final Identifier TEXTURE = Identifier.ofVanilla("textures/entity/zombie/zombie.png");
+@Environment(value=EnvType.CLIENT)
+public abstract class ZombieBaseEntityRenderer<T extends ZombieEntity, S extends ZombieEntityRenderState, M extends ZombieEntityModel<S>>
+extends BipedEntityRenderer<T, S, M> {
+    private static final Identifier TEXTURE = Identifier.ofVanilla((String)"textures/entity/zombie/zombie.png");
 
-   protected ZombieBaseEntityRenderer(EntityRendererFactory.Context context, ZombieEntityModel mainModel, ZombieEntityModel babyMainModel, ZombieEntityModel armorInnerModel, ZombieEntityModel armorOuterModel, ZombieEntityModel babyArmorInnerModel, ZombieEntityModel babyArmorOuterModel) {
-      super(context, mainModel, babyMainModel, 0.5F);
-      this.addFeature(new ArmorFeatureRenderer(this, armorInnerModel, armorOuterModel, babyArmorInnerModel, babyArmorOuterModel, context.getEquipmentRenderer()));
-   }
+    protected ZombieBaseEntityRenderer(EntityRendererFactory.Context context, M mainModel, M babyMainModel, EquipmentModelData<M> adultModel, EquipmentModelData<M> babyModel) {
+        super(context, mainModel, babyMainModel, 0.5f);
+        this.addFeature((FeatureRenderer)new ArmorFeatureRenderer((FeatureRendererContext)this, adultModel, babyModel, context.getEquipmentRenderer()));
+    }
 
-   public Identifier getTexture(ZombieEntityRenderState zombieEntityRenderState) {
-      return TEXTURE;
-   }
+    public Identifier getTexture(S zombieEntityRenderState) {
+        return TEXTURE;
+    }
 
-   public void updateRenderState(ZombieEntity zombieEntity, ZombieEntityRenderState zombieEntityRenderState, float f) {
-      super.updateRenderState((MobEntity)zombieEntity, (BipedEntityRenderState)zombieEntityRenderState, f);
-      zombieEntityRenderState.attacking = zombieEntity.isAttacking();
-      zombieEntityRenderState.convertingInWater = zombieEntity.isConvertingInWater();
-   }
+    public void updateRenderState(T zombieEntity, S zombieEntityRenderState, float f) {
+        super.updateRenderState(zombieEntity, zombieEntityRenderState, f);
+        ((ZombieEntityRenderState)zombieEntityRenderState).attacking = zombieEntity.isAttacking();
+        ((ZombieEntityRenderState)zombieEntityRenderState).convertingInWater = zombieEntity.isConvertingInWater();
+    }
 
-   protected boolean isShaking(ZombieEntityRenderState zombieEntityRenderState) {
-      return super.isShaking(zombieEntityRenderState) || zombieEntityRenderState.convertingInWater;
-   }
+    protected boolean isShaking(S zombieEntityRenderState) {
+        return super.isShaking(zombieEntityRenderState) || ((ZombieEntityRenderState)zombieEntityRenderState).convertingInWater;
+    }
 
-   // $FF: synthetic method
-   protected boolean isShaking(final LivingEntityRenderState state) {
-      return this.isShaking((ZombieEntityRenderState)state);
-   }
+    protected BipedEntityModel.ArmPose getArmPose(T zombieEntity, Arm arm) {
+        SwingAnimationComponent swingAnimationComponent = (SwingAnimationComponent)zombieEntity.getStackInArm(arm.getOpposite()).get(DataComponentTypes.SWING_ANIMATION);
+        if (swingAnimationComponent != null && swingAnimationComponent.type() == SwingAnimationType.STAB) {
+            return BipedEntityModel.ArmPose.SPEAR;
+        }
+        return super.getArmPose(zombieEntity, arm);
+    }
 
-   // $FF: synthetic method
-   public Identifier getTexture(final LivingEntityRenderState state) {
-      return this.getTexture((ZombieEntityRenderState)state);
-   }
+    protected /* synthetic */ boolean isShaking(LivingEntityRenderState state) {
+        return this.isShaking((ZombieEntityRenderState)state);
+    }
+
+    public /* synthetic */ Identifier getTexture(LivingEntityRenderState state) {
+        return this.getTexture((ZombieEntityRenderState)state);
+    }
 }
+

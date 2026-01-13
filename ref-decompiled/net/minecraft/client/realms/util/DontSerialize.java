@@ -1,3 +1,11 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.realms.util.DontSerialize
+ */
 package net.minecraft.client.realms.util;
 
 import java.lang.annotation.ElementType;
@@ -7,8 +15,9 @@ import java.lang.annotation.Target;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD})
-@Environment(EnvType.CLIENT)
+@Retention(value=RetentionPolicy.RUNTIME)
+@Target(value={ElementType.FIELD})
+@Environment(value=EnvType.CLIENT)
 public @interface DontSerialize {
 }
+

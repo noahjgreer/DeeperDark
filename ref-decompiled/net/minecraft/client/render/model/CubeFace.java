@@ -1,75 +1,75 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.render.model.CubeFace
+ *  net.minecraft.client.render.model.CubeFace$Corner
+ *  net.minecraft.client.render.model.CubeFace$CornerCoord
+ *  net.minecraft.util.Util
+ *  net.minecraft.util.math.Direction
+ */
 package net.minecraft.client.render.model;
 
+import java.util.EnumMap;
+import java.util.Map;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.render.model.CubeFace;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.Direction;
 
-@Environment(EnvType.CLIENT)
-public enum CubeFace {
-   DOWN(new Corner[]{new Corner(CubeFace.DirectionIds.WEST, CubeFace.DirectionIds.DOWN, CubeFace.DirectionIds.SOUTH), new Corner(CubeFace.DirectionIds.WEST, CubeFace.DirectionIds.DOWN, CubeFace.DirectionIds.NORTH), new Corner(CubeFace.DirectionIds.EAST, CubeFace.DirectionIds.DOWN, CubeFace.DirectionIds.NORTH), new Corner(CubeFace.DirectionIds.EAST, CubeFace.DirectionIds.DOWN, CubeFace.DirectionIds.SOUTH)}),
-   UP(new Corner[]{new Corner(CubeFace.DirectionIds.WEST, CubeFace.DirectionIds.UP, CubeFace.DirectionIds.NORTH), new Corner(CubeFace.DirectionIds.WEST, CubeFace.DirectionIds.UP, CubeFace.DirectionIds.SOUTH), new Corner(CubeFace.DirectionIds.EAST, CubeFace.DirectionIds.UP, CubeFace.DirectionIds.SOUTH), new Corner(CubeFace.DirectionIds.EAST, CubeFace.DirectionIds.UP, CubeFace.DirectionIds.NORTH)}),
-   NORTH(new Corner[]{new Corner(CubeFace.DirectionIds.EAST, CubeFace.DirectionIds.UP, CubeFace.DirectionIds.NORTH), new Corner(CubeFace.DirectionIds.EAST, CubeFace.DirectionIds.DOWN, CubeFace.DirectionIds.NORTH), new Corner(CubeFace.DirectionIds.WEST, CubeFace.DirectionIds.DOWN, CubeFace.DirectionIds.NORTH), new Corner(CubeFace.DirectionIds.WEST, CubeFace.DirectionIds.UP, CubeFace.DirectionIds.NORTH)}),
-   SOUTH(new Corner[]{new Corner(CubeFace.DirectionIds.WEST, CubeFace.DirectionIds.UP, CubeFace.DirectionIds.SOUTH), new Corner(CubeFace.DirectionIds.WEST, CubeFace.DirectionIds.DOWN, CubeFace.DirectionIds.SOUTH), new Corner(CubeFace.DirectionIds.EAST, CubeFace.DirectionIds.DOWN, CubeFace.DirectionIds.SOUTH), new Corner(CubeFace.DirectionIds.EAST, CubeFace.DirectionIds.UP, CubeFace.DirectionIds.SOUTH)}),
-   WEST(new Corner[]{new Corner(CubeFace.DirectionIds.WEST, CubeFace.DirectionIds.UP, CubeFace.DirectionIds.NORTH), new Corner(CubeFace.DirectionIds.WEST, CubeFace.DirectionIds.DOWN, CubeFace.DirectionIds.NORTH), new Corner(CubeFace.DirectionIds.WEST, CubeFace.DirectionIds.DOWN, CubeFace.DirectionIds.SOUTH), new Corner(CubeFace.DirectionIds.WEST, CubeFace.DirectionIds.UP, CubeFace.DirectionIds.SOUTH)}),
-   EAST(new Corner[]{new Corner(CubeFace.DirectionIds.EAST, CubeFace.DirectionIds.UP, CubeFace.DirectionIds.SOUTH), new Corner(CubeFace.DirectionIds.EAST, CubeFace.DirectionIds.DOWN, CubeFace.DirectionIds.SOUTH), new Corner(CubeFace.DirectionIds.EAST, CubeFace.DirectionIds.DOWN, CubeFace.DirectionIds.NORTH), new Corner(CubeFace.DirectionIds.EAST, CubeFace.DirectionIds.UP, CubeFace.DirectionIds.NORTH)});
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
+public final class CubeFace
+extends Enum<CubeFace> {
+    public static final /* enum */ CubeFace DOWN = new CubeFace("DOWN", 0, new Corner[]{new Corner(CornerCoord.MIN_X, CornerCoord.MIN_Y, CornerCoord.MAX_Z), new Corner(CornerCoord.MIN_X, CornerCoord.MIN_Y, CornerCoord.MIN_Z), new Corner(CornerCoord.MAX_X, CornerCoord.MIN_Y, CornerCoord.MIN_Z), new Corner(CornerCoord.MAX_X, CornerCoord.MIN_Y, CornerCoord.MAX_Z)});
+    public static final /* enum */ CubeFace UP = new CubeFace("UP", 1, new Corner[]{new Corner(CornerCoord.MIN_X, CornerCoord.MAX_Y, CornerCoord.MIN_Z), new Corner(CornerCoord.MIN_X, CornerCoord.MAX_Y, CornerCoord.MAX_Z), new Corner(CornerCoord.MAX_X, CornerCoord.MAX_Y, CornerCoord.MAX_Z), new Corner(CornerCoord.MAX_X, CornerCoord.MAX_Y, CornerCoord.MIN_Z)});
+    public static final /* enum */ CubeFace NORTH = new CubeFace("NORTH", 2, new Corner[]{new Corner(CornerCoord.MAX_X, CornerCoord.MAX_Y, CornerCoord.MIN_Z), new Corner(CornerCoord.MAX_X, CornerCoord.MIN_Y, CornerCoord.MIN_Z), new Corner(CornerCoord.MIN_X, CornerCoord.MIN_Y, CornerCoord.MIN_Z), new Corner(CornerCoord.MIN_X, CornerCoord.MAX_Y, CornerCoord.MIN_Z)});
+    public static final /* enum */ CubeFace SOUTH = new CubeFace("SOUTH", 3, new Corner[]{new Corner(CornerCoord.MIN_X, CornerCoord.MAX_Y, CornerCoord.MAX_Z), new Corner(CornerCoord.MIN_X, CornerCoord.MIN_Y, CornerCoord.MAX_Z), new Corner(CornerCoord.MAX_X, CornerCoord.MIN_Y, CornerCoord.MAX_Z), new Corner(CornerCoord.MAX_X, CornerCoord.MAX_Y, CornerCoord.MAX_Z)});
+    public static final /* enum */ CubeFace WEST = new CubeFace("WEST", 4, new Corner[]{new Corner(CornerCoord.MIN_X, CornerCoord.MAX_Y, CornerCoord.MIN_Z), new Corner(CornerCoord.MIN_X, CornerCoord.MIN_Y, CornerCoord.MIN_Z), new Corner(CornerCoord.MIN_X, CornerCoord.MIN_Y, CornerCoord.MAX_Z), new Corner(CornerCoord.MIN_X, CornerCoord.MAX_Y, CornerCoord.MAX_Z)});
+    public static final /* enum */ CubeFace EAST = new CubeFace("EAST", 5, new Corner[]{new Corner(CornerCoord.MAX_X, CornerCoord.MAX_Y, CornerCoord.MAX_Z), new Corner(CornerCoord.MAX_X, CornerCoord.MIN_Y, CornerCoord.MAX_Z), new Corner(CornerCoord.MAX_X, CornerCoord.MIN_Y, CornerCoord.MIN_Z), new Corner(CornerCoord.MAX_X, CornerCoord.MAX_Y, CornerCoord.MIN_Z)});
+    private static final Map<Direction, CubeFace> DIRECTION_LOOKUP;
+    private final Corner[] corners;
+    private static final /* synthetic */ CubeFace[] field_3964;
 
-   private static final CubeFace[] DIRECTION_LOOKUP = (CubeFace[])Util.make(new CubeFace[6], (lookup) -> {
-      lookup[CubeFace.DirectionIds.DOWN] = DOWN;
-      lookup[CubeFace.DirectionIds.UP] = UP;
-      lookup[CubeFace.DirectionIds.NORTH] = NORTH;
-      lookup[CubeFace.DirectionIds.SOUTH] = SOUTH;
-      lookup[CubeFace.DirectionIds.WEST] = WEST;
-      lookup[CubeFace.DirectionIds.EAST] = EAST;
-   });
-   private final Corner[] corners;
+    public static CubeFace[] values() {
+        return (CubeFace[])field_3964.clone();
+    }
 
-   public static CubeFace getFace(Direction direction) {
-      return DIRECTION_LOOKUP[direction.getIndex()];
-   }
+    public static CubeFace valueOf(String string) {
+        return Enum.valueOf(CubeFace.class, string);
+    }
 
-   private CubeFace(final Corner... corners) {
-      this.corners = corners;
-   }
+    public static CubeFace getFace(Direction direction) {
+        return (CubeFace)DIRECTION_LOOKUP.get(direction);
+    }
 
-   public Corner getCorner(int corner) {
-      return this.corners[corner];
-   }
+    private CubeFace(Corner ... corners) {
+        this.corners = corners;
+    }
 
-   // $FF: synthetic method
-   private static CubeFace[] method_36913() {
-      return new CubeFace[]{DOWN, UP, NORTH, SOUTH, WEST, EAST};
-   }
+    public Corner getCorner(int corner) {
+        return this.corners[corner];
+    }
 
-   @Environment(EnvType.CLIENT)
-   public static class Corner {
-      public final int xSide;
-      public final int ySide;
-      public final int zSide;
+    private static /* synthetic */ CubeFace[] method_36913() {
+        return new CubeFace[]{DOWN, UP, NORTH, SOUTH, WEST, EAST};
+    }
 
-      Corner(int xSide, int ySide, int zSide) {
-         this.xSide = xSide;
-         this.ySide = ySide;
-         this.zSide = zSide;
-      }
-   }
-
-   @Environment(EnvType.CLIENT)
-   public static final class DirectionIds {
-      public static final int SOUTH;
-      public static final int UP;
-      public static final int EAST;
-      public static final int NORTH;
-      public static final int DOWN;
-      public static final int WEST;
-
-      static {
-         SOUTH = Direction.SOUTH.getIndex();
-         UP = Direction.UP.getIndex();
-         EAST = Direction.EAST.getIndex();
-         NORTH = Direction.NORTH.getIndex();
-         DOWN = Direction.DOWN.getIndex();
-         WEST = Direction.WEST.getIndex();
-      }
-   }
+    static {
+        field_3964 = CubeFace.method_36913();
+        DIRECTION_LOOKUP = (Map)Util.make(new EnumMap(Direction.class), map -> {
+            map.put(Direction.DOWN, DOWN);
+            map.put(Direction.UP, UP);
+            map.put(Direction.NORTH, NORTH);
+            map.put(Direction.SOUTH, SOUTH);
+            map.put(Direction.WEST, WEST);
+            map.put(Direction.EAST, EAST);
+        });
+    }
 }
+

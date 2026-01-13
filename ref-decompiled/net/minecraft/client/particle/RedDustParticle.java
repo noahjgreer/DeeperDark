@@ -1,38 +1,38 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.particle.AbstractDustParticle
+ *  net.minecraft.client.particle.RedDustParticle
+ *  net.minecraft.client.particle.SpriteProvider
+ *  net.minecraft.client.world.ClientWorld
+ *  net.minecraft.particle.AbstractDustParticleEffect
+ *  net.minecraft.particle.DustParticleEffect
+ *  org.joml.Vector3f
+ */
 package net.minecraft.client.particle;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.particle.AbstractDustParticle;
+import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.particle.AbstractDustParticleEffect;
 import net.minecraft.particle.DustParticleEffect;
-import net.minecraft.particle.ParticleEffect;
 import org.joml.Vector3f;
 
-@Environment(EnvType.CLIENT)
-public class RedDustParticle extends AbstractDustParticle {
-   protected RedDustParticle(ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, DustParticleEffect parameters, SpriteProvider spriteProvider) {
-      super(world, x, y, z, velocityX, velocityY, velocityZ, parameters, spriteProvider);
-      float f = this.random.nextFloat() * 0.4F + 0.6F;
-      Vector3f vector3f = parameters.getColor();
-      this.red = this.darken(vector3f.x(), f);
-      this.green = this.darken(vector3f.y(), f);
-      this.blue = this.darken(vector3f.z(), f);
-   }
-
-   @Environment(EnvType.CLIENT)
-   public static class Factory implements ParticleFactory {
-      private final SpriteProvider spriteProvider;
-
-      public Factory(SpriteProvider spriteProvider) {
-         this.spriteProvider = spriteProvider;
-      }
-
-      public Particle createParticle(DustParticleEffect dustParticleEffect, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
-         return new RedDustParticle(clientWorld, d, e, f, g, h, i, dustParticleEffect, this.spriteProvider);
-      }
-
-      // $FF: synthetic method
-      public Particle createParticle(final ParticleEffect particleEffect, final ClientWorld clientWorld, final double d, final double e, final double f, final double g, final double h, final double i) {
-         return this.createParticle((DustParticleEffect)particleEffect, clientWorld, d, e, f, g, h, i);
-      }
-   }
+@Environment(value=EnvType.CLIENT)
+public class RedDustParticle
+extends AbstractDustParticle<DustParticleEffect> {
+    protected RedDustParticle(ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, DustParticleEffect parameters, SpriteProvider spriteProvider) {
+        super(world, x, y, z, velocityX, velocityY, velocityZ, (AbstractDustParticleEffect)parameters, spriteProvider);
+        float f = this.random.nextFloat() * 0.4f + 0.6f;
+        Vector3f vector3f = parameters.getColor();
+        this.red = this.darken(vector3f.x(), f);
+        this.green = this.darken(vector3f.y(), f);
+        this.blue = this.darken(vector3f.z(), f);
+    }
 }
+

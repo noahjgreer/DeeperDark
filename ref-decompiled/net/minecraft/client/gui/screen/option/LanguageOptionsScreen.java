@@ -1,143 +1,141 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.font.TextRenderer
+ *  net.minecraft.client.gui.Element
+ *  net.minecraft.client.gui.screen.AccessibilityOnboardingScreen
+ *  net.minecraft.client.gui.screen.Screen
+ *  net.minecraft.client.gui.screen.option.FontOptionsScreen
+ *  net.minecraft.client.gui.screen.option.GameOptionsScreen
+ *  net.minecraft.client.gui.screen.option.LanguageOptionsScreen
+ *  net.minecraft.client.gui.screen.option.LanguageOptionsScreen$LanguageSelectionListWidget
+ *  net.minecraft.client.gui.screen.option.LanguageOptionsScreen$LanguageSelectionListWidget$LanguageEntry
+ *  net.minecraft.client.gui.widget.ButtonWidget
+ *  net.minecraft.client.gui.widget.DirectionalLayoutWidget
+ *  net.minecraft.client.gui.widget.EntryListWidget$Entry
+ *  net.minecraft.client.gui.widget.TextFieldWidget
+ *  net.minecraft.client.gui.widget.TextWidget
+ *  net.minecraft.client.gui.widget.Widget
+ *  net.minecraft.client.option.GameOptions
+ *  net.minecraft.client.resource.language.LanguageManager
+ *  net.minecraft.screen.ScreenTexts
+ *  net.minecraft.text.Text
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.gui.screen.option;
 
 import java.util.Objects;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Element;
+import net.minecraft.client.gui.screen.AccessibilityOnboardingScreen;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
+import net.minecraft.client.gui.screen.option.FontOptionsScreen;
+import net.minecraft.client.gui.screen.option.GameOptionsScreen;
+import net.minecraft.client.gui.screen.option.LanguageOptionsScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.DirectionalLayoutWidget;
+import net.minecraft.client.gui.widget.EntryListWidget;
+import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.TextWidget;
-import net.minecraft.client.input.KeyCodes;
+import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.option.GameOptions;
-import net.minecraft.client.resource.language.LanguageDefinition;
 import net.minecraft.client.resource.language.LanguageManager;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
-import net.minecraft.util.Util;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
-public class LanguageOptionsScreen extends GameOptionsScreen {
-   private static final Text LANGUAGE_WARNING_TEXT = Text.translatable("options.languageAccuracyWarning").withColor(-4539718);
-   private static final int field_49497 = 53;
-   private LanguageSelectionListWidget languageSelectionList;
-   final LanguageManager languageManager;
+@Environment(value=EnvType.CLIENT)
+public class LanguageOptionsScreen
+extends GameOptionsScreen {
+    private static final Text LANGUAGE_WARNING_TEXT = Text.translatable((String)"options.languageAccuracyWarning").withColor(-4539718);
+    private static final int field_49497 = 53;
+    private static final Text SEARCH_TEXT = Text.translatable((String)"gui.language.search").fillStyle(TextFieldWidget.SEARCH_STYLE);
+    private static final int field_64202 = 15;
+    final LanguageManager languageManager;
+    private // Could not load outer class - annotation placement on inner may be incorrect
+    @Nullable LanguageSelectionListWidget languageSelectionList;
+    private @Nullable TextFieldWidget searchBox;
 
-   public LanguageOptionsScreen(Screen parent, GameOptions options, LanguageManager languageManager) {
-      super(parent, options, Text.translatable("options.language.title"));
-      this.languageManager = languageManager;
-      this.layout.setFooterHeight(53);
-   }
+    public LanguageOptionsScreen(Screen parent, GameOptions options, LanguageManager languageManager) {
+        super(parent, options, (Text)Text.translatable((String)"options.language.title"));
+        this.languageManager = languageManager;
+        this.layout.setFooterHeight(53);
+    }
 
-   protected void initBody() {
-      this.languageSelectionList = (LanguageSelectionListWidget)this.layout.addBody(new LanguageSelectionListWidget(this.client));
-   }
-
-   protected void addOptions() {
-   }
-
-   protected void initFooter() {
-      DirectionalLayoutWidget directionalLayoutWidget = ((DirectionalLayoutWidget)this.layout.addFooter(DirectionalLayoutWidget.vertical())).spacing(8);
-      directionalLayoutWidget.getMainPositioner().alignHorizontalCenter();
-      directionalLayoutWidget.add(new TextWidget(LANGUAGE_WARNING_TEXT, this.textRenderer));
-      DirectionalLayoutWidget directionalLayoutWidget2 = (DirectionalLayoutWidget)directionalLayoutWidget.add(DirectionalLayoutWidget.horizontal().spacing(8));
-      directionalLayoutWidget2.add(ButtonWidget.builder(Text.translatable("options.font"), (button) -> {
-         this.client.setScreen(new FontOptionsScreen(this, this.gameOptions));
-      }).build());
-      directionalLayoutWidget2.add(ButtonWidget.builder(ScreenTexts.DONE, (button) -> {
-         this.onDone();
-      }).build());
-   }
-
-   protected void refreshWidgetPositions() {
-      super.refreshWidgetPositions();
-      this.languageSelectionList.position(this.width, this.layout);
-   }
-
-   void onDone() {
-      LanguageSelectionListWidget.LanguageEntry languageEntry = (LanguageSelectionListWidget.LanguageEntry)this.languageSelectionList.getSelectedOrNull();
-      if (languageEntry != null && !languageEntry.languageCode.equals(this.languageManager.getLanguage())) {
-         this.languageManager.setLanguage(languageEntry.languageCode);
-         this.gameOptions.language = languageEntry.languageCode;
-         this.client.reloadResources();
-      }
-
-      this.client.setScreen(this.parent);
-   }
-
-   @Environment(EnvType.CLIENT)
-   private class LanguageSelectionListWidget extends AlwaysSelectedEntryListWidget {
-      public LanguageSelectionListWidget(final MinecraftClient client) {
-         super(client, LanguageOptionsScreen.this.width, LanguageOptionsScreen.this.height - 33 - 53, 33, 18);
-         String string = LanguageOptionsScreen.this.languageManager.getLanguage();
-         LanguageOptionsScreen.this.languageManager.getAllLanguages().forEach((languageCode, languageDefinition) -> {
-            LanguageEntry languageEntry = new LanguageEntry(languageCode, languageDefinition);
-            this.addEntry(languageEntry);
-            if (string.equals(languageCode)) {
-               this.setSelected(languageEntry);
+    protected void initHeader() {
+        DirectionalLayoutWidget directionalLayoutWidget = (DirectionalLayoutWidget)this.layout.addHeader((Widget)DirectionalLayoutWidget.vertical().spacing(4));
+        directionalLayoutWidget.getMainPositioner().alignHorizontalCenter();
+        directionalLayoutWidget.add((Widget)new TextWidget(this.title, this.textRenderer));
+        this.searchBox = (TextFieldWidget)directionalLayoutWidget.add((Widget)new TextFieldWidget(this.textRenderer, 0, 0, 200, 15, (Text)Text.empty()));
+        this.searchBox.setPlaceholder(SEARCH_TEXT);
+        this.searchBox.setChangedListener(search -> {
+            if (this.languageSelectionList != null) {
+                this.languageSelectionList.setSearch(search);
             }
+        });
+        Objects.requireNonNull(this.textRenderer);
+        this.layout.setHeaderHeight((int)(12.0 + 9.0 + 15.0));
+    }
 
-         });
-         if (this.getSelectedOrNull() != null) {
-            this.centerScrollOn((LanguageEntry)this.getSelectedOrNull());
-         }
+    protected void setInitialFocus() {
+        if (this.searchBox != null) {
+            this.setInitialFocus((Element)this.searchBox);
+        } else {
+            super.setInitialFocus();
+        }
+    }
 
-      }
+    protected void initBody() {
+        this.languageSelectionList = (LanguageSelectionListWidget)this.layout.addBody((Widget)new LanguageSelectionListWidget(this, this.client));
+    }
 
-      public int getRowWidth() {
-         return super.getRowWidth() + 50;
-      }
+    protected void addOptions() {
+    }
 
-      @Environment(EnvType.CLIENT)
-      public class LanguageEntry extends AlwaysSelectedEntryListWidget.Entry {
-         final String languageCode;
-         private final Text languageDefinition;
-         private long clickTime;
+    protected void initFooter() {
+        DirectionalLayoutWidget directionalLayoutWidget = ((DirectionalLayoutWidget)this.layout.addFooter((Widget)DirectionalLayoutWidget.vertical())).spacing(8);
+        directionalLayoutWidget.getMainPositioner().alignHorizontalCenter();
+        directionalLayoutWidget.add((Widget)new TextWidget(LANGUAGE_WARNING_TEXT, this.textRenderer));
+        DirectionalLayoutWidget directionalLayoutWidget2 = (DirectionalLayoutWidget)directionalLayoutWidget.add((Widget)DirectionalLayoutWidget.horizontal().spacing(8));
+        directionalLayoutWidget2.add((Widget)ButtonWidget.builder((Text)Text.translatable((String)"options.font"), button -> this.client.setScreen((Screen)new FontOptionsScreen((Screen)this, this.gameOptions))).build());
+        directionalLayoutWidget2.add((Widget)ButtonWidget.builder((Text)ScreenTexts.DONE, button -> this.onDone()).build());
+    }
 
-         public LanguageEntry(final String languageCode, final LanguageDefinition languageDefinition) {
-            this.languageCode = languageCode;
-            this.languageDefinition = languageDefinition.getDisplayText();
-         }
+    protected void refreshWidgetPositions() {
+        super.refreshWidgetPositions();
+        if (this.languageSelectionList != null) {
+            this.languageSelectionList.position(this.width, this.layout);
+        }
+    }
 
-         public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickProgress) {
-            TextRenderer var10001 = LanguageOptionsScreen.this.textRenderer;
-            Text var10002 = this.languageDefinition;
-            int var10003 = LanguageSelectionListWidget.this.width / 2;
-            int var10004 = y + entryHeight / 2;
-            Objects.requireNonNull(LanguageOptionsScreen.this.textRenderer);
-            context.drawCenteredTextWithShadow(var10001, (Text)var10002, var10003, var10004 - 9 / 2, -1);
-         }
-
-         public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-            if (KeyCodes.isToggle(keyCode)) {
-               this.onPressed();
-               LanguageOptionsScreen.this.onDone();
-               return true;
-            } else {
-               return super.keyPressed(keyCode, scanCode, modifiers);
+    void onDone() {
+        EntryListWidget.Entry entry;
+        if (this.languageSelectionList != null && (entry = this.languageSelectionList.getSelectedOrNull()) instanceof LanguageSelectionListWidget.LanguageEntry) {
+            LanguageSelectionListWidget.LanguageEntry languageEntry = (LanguageSelectionListWidget.LanguageEntry)entry;
+            if (!languageEntry.languageCode.equals(this.languageManager.getLanguage())) {
+                this.languageManager.setLanguage(languageEntry.languageCode);
+                this.gameOptions.language = languageEntry.languageCode;
+                this.client.reloadResources();
             }
-         }
+        }
+        this.client.setScreen(this.parent);
+    }
 
-         public boolean mouseClicked(double mouseX, double mouseY, int button) {
-            this.onPressed();
-            if (Util.getMeasuringTimeMs() - this.clickTime < 250L) {
-               LanguageOptionsScreen.this.onDone();
-            }
+    protected boolean allowRotatingPanorama() {
+        return !(this.parent instanceof AccessibilityOnboardingScreen);
+    }
 
-            this.clickTime = Util.getMeasuringTimeMs();
-            return super.mouseClicked(mouseX, mouseY, button);
-         }
+    static /* synthetic */ TextRenderer method_60328(LanguageOptionsScreen languageOptionsScreen) {
+        return languageOptionsScreen.textRenderer;
+    }
 
-         private void onPressed() {
-            LanguageSelectionListWidget.this.setSelected(this);
-         }
-
-         public Text getNarration() {
-            return Text.translatable("narrator.select", this.languageDefinition);
-         }
-      }
-   }
+    static /* synthetic */ TextRenderer method_61043(LanguageOptionsScreen languageOptionsScreen) {
+        return languageOptionsScreen.textRenderer;
+    }
 }
+

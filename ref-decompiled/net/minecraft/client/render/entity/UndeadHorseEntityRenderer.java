@@ -1,72 +1,76 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.render.entity.AbstractHorseEntityRenderer
+ *  net.minecraft.client.render.entity.EntityRendererFactory$Context
+ *  net.minecraft.client.render.entity.UndeadHorseEntityRenderer
+ *  net.minecraft.client.render.entity.UndeadHorseEntityRenderer$Type
+ *  net.minecraft.client.render.entity.equipment.EquipmentModel$LayerType
+ *  net.minecraft.client.render.entity.feature.FeatureRenderer
+ *  net.minecraft.client.render.entity.feature.FeatureRendererContext
+ *  net.minecraft.client.render.entity.feature.SaddleFeatureRenderer
+ *  net.minecraft.client.render.entity.model.AbstractHorseEntityModel
+ *  net.minecraft.client.render.entity.model.EntityModel
+ *  net.minecraft.client.render.entity.model.EntityModelLayers
+ *  net.minecraft.client.render.entity.model.HorseEntityModel
+ *  net.minecraft.client.render.entity.model.HorseSaddleEntityModel
+ *  net.minecraft.client.render.entity.state.EntityRenderState
+ *  net.minecraft.client.render.entity.state.LivingEntityRenderState
+ *  net.minecraft.client.render.entity.state.LivingHorseEntityRenderState
+ *  net.minecraft.entity.passive.AbstractHorseEntity
+ *  net.minecraft.util.Identifier
+ */
 package net.minecraft.client.render.entity;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.render.entity.AbstractHorseEntityRenderer;
+import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.render.entity.UndeadHorseEntityRenderer;
 import net.minecraft.client.render.entity.equipment.EquipmentModel;
+import net.minecraft.client.render.entity.feature.FeatureRenderer;
+import net.minecraft.client.render.entity.feature.FeatureRendererContext;
 import net.minecraft.client.render.entity.feature.SaddleFeatureRenderer;
-import net.minecraft.client.render.entity.model.EntityModelLayer;
+import net.minecraft.client.render.entity.model.AbstractHorseEntityModel;
+import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.render.entity.model.EntityModelLayers;
 import net.minecraft.client.render.entity.model.HorseEntityModel;
 import net.minecraft.client.render.entity.model.HorseSaddleEntityModel;
 import net.minecraft.client.render.entity.state.EntityRenderState;
 import net.minecraft.client.render.entity.state.LivingEntityRenderState;
 import net.minecraft.client.render.entity.state.LivingHorseEntityRenderState;
+import net.minecraft.entity.passive.AbstractHorseEntity;
 import net.minecraft.util.Identifier;
 
-@Environment(EnvType.CLIENT)
-public class UndeadHorseEntityRenderer extends AbstractHorseEntityRenderer {
-   private final Identifier texture;
+@Environment(value=EnvType.CLIENT)
+public class UndeadHorseEntityRenderer
+extends AbstractHorseEntityRenderer<AbstractHorseEntity, LivingHorseEntityRenderState, AbstractHorseEntityModel<LivingHorseEntityRenderState>> {
+    private final Identifier texture;
 
-   public UndeadHorseEntityRenderer(EntityRendererFactory.Context ctx, Type type) {
-      super(ctx, new HorseEntityModel(ctx.getPart(type.modelLayer)), new HorseEntityModel(ctx.getPart(type.babyModelLayer)));
-      this.texture = type.texture;
-      this.addFeature(new SaddleFeatureRenderer(this, ctx.getEquipmentRenderer(), type.saddleLayerType, (livingHorseEntityRenderState) -> {
-         return livingHorseEntityRenderState.saddleStack;
-      }, new HorseSaddleEntityModel(ctx.getPart(type.saddleModelLayer)), new HorseSaddleEntityModel(ctx.getPart(type.babySaddleModelLayer))));
-   }
+    public UndeadHorseEntityRenderer(EntityRendererFactory.Context ctx, Type type) {
+        super(ctx, (EntityModel)new HorseEntityModel(ctx.getPart(type.modelLayer)), (EntityModel)new HorseEntityModel(ctx.getPart(type.babyModelLayer)));
+        this.texture = type.texture;
+        this.addFeature((FeatureRenderer)new SaddleFeatureRenderer((FeatureRendererContext)this, ctx.getEquipmentRenderer(), EquipmentModel.LayerType.HORSE_BODY, state -> state.armorStack, (EntityModel)new HorseEntityModel(ctx.getPart(EntityModelLayers.UNDEAD_HORSE_ARMOR)), (EntityModel)new HorseEntityModel(ctx.getPart(EntityModelLayers.UNDEAD_HORSE_BABY_ARMOR))));
+        this.addFeature((FeatureRenderer)new SaddleFeatureRenderer((FeatureRendererContext)this, ctx.getEquipmentRenderer(), type.saddleLayerType, state -> state.saddleStack, (EntityModel)new HorseSaddleEntityModel(ctx.getPart(type.saddleModelLayer)), (EntityModel)new HorseSaddleEntityModel(ctx.getPart(type.babySaddleModelLayer))));
+    }
 
-   public Identifier getTexture(LivingHorseEntityRenderState livingHorseEntityRenderState) {
-      return this.texture;
-   }
+    public Identifier getTexture(LivingHorseEntityRenderState livingHorseEntityRenderState) {
+        return this.texture;
+    }
 
-   public LivingHorseEntityRenderState createRenderState() {
-      return new LivingHorseEntityRenderState();
-   }
+    public LivingHorseEntityRenderState createRenderState() {
+        return new LivingHorseEntityRenderState();
+    }
 
-   // $FF: synthetic method
-   public Identifier getTexture(final LivingEntityRenderState state) {
-      return this.getTexture((LivingHorseEntityRenderState)state);
-   }
+    public /* synthetic */ Identifier getTexture(LivingEntityRenderState state) {
+        return this.getTexture((LivingHorseEntityRenderState)state);
+    }
 
-   // $FF: synthetic method
-   public EntityRenderState createRenderState() {
-      return this.createRenderState();
-   }
-
-   @Environment(EnvType.CLIENT)
-   public static enum Type {
-      SKELETON(Identifier.ofVanilla("textures/entity/horse/horse_skeleton.png"), EntityModelLayers.SKELETON_HORSE, EntityModelLayers.SKELETON_HORSE_BABY, EquipmentModel.LayerType.SKELETON_HORSE_SADDLE, EntityModelLayers.SKELETON_HORSE_SADDLE, EntityModelLayers.SKELETON_HORSE_BABY_SADDLE),
-      ZOMBIE(Identifier.ofVanilla("textures/entity/horse/horse_zombie.png"), EntityModelLayers.ZOMBIE_HORSE, EntityModelLayers.ZOMBIE_HORSE_BABY, EquipmentModel.LayerType.ZOMBIE_HORSE_SADDLE, EntityModelLayers.ZOMBIE_HORSE_SADDLE, EntityModelLayers.ZOMBIE_HORSE_BABY_SADDLE);
-
-      final Identifier texture;
-      final EntityModelLayer modelLayer;
-      final EntityModelLayer babyModelLayer;
-      final EquipmentModel.LayerType saddleLayerType;
-      final EntityModelLayer saddleModelLayer;
-      final EntityModelLayer babySaddleModelLayer;
-
-      private Type(final Identifier texture, final EntityModelLayer modelLayer, final EntityModelLayer babyModelLayer, final EquipmentModel.LayerType saddleLayerType, final EntityModelLayer saddleModelLayer, final EntityModelLayer babySaddleModelLayer) {
-         this.texture = texture;
-         this.modelLayer = modelLayer;
-         this.babyModelLayer = babyModelLayer;
-         this.saddleLayerType = saddleLayerType;
-         this.saddleModelLayer = saddleModelLayer;
-         this.babySaddleModelLayer = babySaddleModelLayer;
-      }
-
-      // $FF: synthetic method
-      private static Type[] method_66855() {
-         return new Type[]{SKELETON, ZOMBIE};
-      }
-   }
+    public /* synthetic */ EntityRenderState createRenderState() {
+        return this.createRenderState();
+    }
 }
+

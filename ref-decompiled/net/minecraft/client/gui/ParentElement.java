@@ -1,280 +1,232 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.datafixers.util.Pair
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.gui.Click
+ *  net.minecraft.client.gui.Element
+ *  net.minecraft.client.gui.ParentElement
+ *  net.minecraft.client.gui.ScreenPos
+ *  net.minecraft.client.gui.ScreenRect
+ *  net.minecraft.client.gui.navigation.GuiNavigation
+ *  net.minecraft.client.gui.navigation.GuiNavigation$Arrow
+ *  net.minecraft.client.gui.navigation.GuiNavigation$Tab
+ *  net.minecraft.client.gui.navigation.GuiNavigationPath
+ *  net.minecraft.client.gui.navigation.NavigationAxis
+ *  net.minecraft.client.gui.navigation.NavigationDirection
+ *  net.minecraft.client.input.CharInput
+ *  net.minecraft.client.input.KeyInput
+ *  org.joml.Vector2i
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.gui;
 
 import com.mojang.datafixers.util.Pair;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.gui.Click;
+import net.minecraft.client.gui.Element;
+import net.minecraft.client.gui.ScreenPos;
+import net.minecraft.client.gui.ScreenRect;
 import net.minecraft.client.gui.navigation.GuiNavigation;
 import net.minecraft.client.gui.navigation.GuiNavigationPath;
 import net.minecraft.client.gui.navigation.NavigationAxis;
 import net.minecraft.client.gui.navigation.NavigationDirection;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.client.input.CharInput;
+import net.minecraft.client.input.KeyInput;
 import org.joml.Vector2i;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
-public interface ParentElement extends Element {
-   List children();
+@Environment(value=EnvType.CLIENT)
+public interface ParentElement
+extends Element {
+    public List<? extends Element> children();
 
-   default Optional hoveredElement(double mouseX, double mouseY) {
-      Iterator var5 = this.children().iterator();
+    default public Optional<Element> hoveredElement(double mouseX, double mouseY) {
+        for (Element element : this.children()) {
+            if (!element.isMouseOver(mouseX, mouseY)) continue;
+            return Optional.of(element);
+        }
+        return Optional.empty();
+    }
 
-      Element element;
-      do {
-         if (!var5.hasNext()) {
-            return Optional.empty();
-         }
-
-         element = (Element)var5.next();
-      } while(!element.isMouseOver(mouseX, mouseY));
-
-      return Optional.of(element);
-   }
-
-   default boolean mouseClicked(double mouseX, double mouseY, int button) {
-      Optional optional = this.hoveredElement(mouseX, mouseY);
-      if (optional.isEmpty()) {
-         return false;
-      } else {
-         Element element = (Element)optional.get();
-         if (element.mouseClicked(mouseX, mouseY, button)) {
+    default public boolean mouseClicked(Click click, boolean doubled) {
+        Optional optional = this.hoveredElement(click.x(), click.y());
+        if (optional.isEmpty()) {
+            return false;
+        }
+        Element element = (Element)optional.get();
+        if (element.mouseClicked(click, doubled) && element.isClickable()) {
             this.setFocused(element);
-            if (button == 0) {
-               this.setDragging(true);
+            if (click.button() == 0) {
+                this.setDragging(true);
             }
-         }
+        }
+        return true;
+    }
 
-         return true;
-      }
-   }
-
-   default boolean mouseReleased(double mouseX, double mouseY, int button) {
-      if (button == 0 && this.isDragging()) {
-         this.setDragging(false);
-         if (this.getFocused() != null) {
-            return this.getFocused().mouseReleased(mouseX, mouseY, button);
-         }
-      }
-
-      return false;
-   }
-
-   default boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-      return this.getFocused() != null && this.isDragging() && button == 0 ? this.getFocused().mouseDragged(mouseX, mouseY, button, deltaX, deltaY) : false;
-   }
-
-   boolean isDragging();
-
-   void setDragging(boolean dragging);
-
-   default boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
-      return this.hoveredElement(mouseX, mouseY).filter((element) -> {
-         return element.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
-      }).isPresent();
-   }
-
-   default boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-      return this.getFocused() != null && this.getFocused().keyPressed(keyCode, scanCode, modifiers);
-   }
-
-   default boolean keyReleased(int keyCode, int scanCode, int modifiers) {
-      return this.getFocused() != null && this.getFocused().keyReleased(keyCode, scanCode, modifiers);
-   }
-
-   default boolean charTyped(char chr, int modifiers) {
-      return this.getFocused() != null && this.getFocused().charTyped(chr, modifiers);
-   }
-
-   @Nullable
-   Element getFocused();
-
-   void setFocused(@Nullable Element focused);
-
-   default void setFocused(boolean focused) {
-   }
-
-   default boolean isFocused() {
-      return this.getFocused() != null;
-   }
-
-   @Nullable
-   default GuiNavigationPath getFocusedPath() {
-      Element element = this.getFocused();
-      return element != null ? GuiNavigationPath.of(this, element.getFocusedPath()) : null;
-   }
-
-   @Nullable
-   default GuiNavigationPath getNavigationPath(GuiNavigation navigation) {
-      Element element = this.getFocused();
-      if (element != null) {
-         GuiNavigationPath guiNavigationPath = element.getNavigationPath(navigation);
-         if (guiNavigationPath != null) {
-            return GuiNavigationPath.of(this, guiNavigationPath);
-         }
-      }
-
-      if (navigation instanceof GuiNavigation.Tab tab) {
-         return this.computeNavigationPath(tab);
-      } else if (navigation instanceof GuiNavigation.Arrow arrow) {
-         return this.computeNavigationPath(arrow);
-      } else {
-         return null;
-      }
-   }
-
-   @Nullable
-   private GuiNavigationPath computeNavigationPath(GuiNavigation.Tab navigation) {
-      boolean bl = navigation.forward();
-      Element element = this.getFocused();
-      List list = new ArrayList(this.children());
-      Collections.sort(list, Comparator.comparingInt((child) -> {
-         return child.getNavigationOrder();
-      }));
-      int i = list.indexOf(element);
-      int j;
-      if (element != null && i >= 0) {
-         j = i + (bl ? 1 : 0);
-      } else if (bl) {
-         j = 0;
-      } else {
-         j = list.size();
-      }
-
-      ListIterator listIterator = list.listIterator(j);
-      BooleanSupplier var10000;
-      if (bl) {
-         Objects.requireNonNull(listIterator);
-         var10000 = listIterator::hasNext;
-      } else {
-         Objects.requireNonNull(listIterator);
-         var10000 = listIterator::hasPrevious;
-      }
-
-      BooleanSupplier booleanSupplier = var10000;
-      Supplier var12;
-      if (bl) {
-         Objects.requireNonNull(listIterator);
-         var12 = listIterator::next;
-      } else {
-         Objects.requireNonNull(listIterator);
-         var12 = listIterator::previous;
-      }
-
-      Supplier supplier = var12;
-
-      GuiNavigationPath guiNavigationPath;
-      do {
-         if (!booleanSupplier.getAsBoolean()) {
-            return null;
-         }
-
-         Element element2 = (Element)supplier.get();
-         guiNavigationPath = element2.getNavigationPath(navigation);
-      } while(guiNavigationPath == null);
-
-      return GuiNavigationPath.of(this, guiNavigationPath);
-   }
-
-   @Nullable
-   private GuiNavigationPath computeNavigationPath(GuiNavigation.Arrow navigation) {
-      Element element = this.getFocused();
-      if (element == null) {
-         NavigationDirection navigationDirection = navigation.direction();
-         ScreenRect screenRect = this.getBorder(navigationDirection.getOpposite());
-         return GuiNavigationPath.of(this, this.computeChildPath(screenRect, navigationDirection, (Element)null, navigation));
-      } else {
-         ScreenRect screenRect2 = element.getNavigationFocus();
-         return GuiNavigationPath.of(this, this.computeChildPath(screenRect2, navigation.direction(), element, navigation));
-      }
-   }
-
-   @Nullable
-   private GuiNavigationPath computeChildPath(ScreenRect focus, NavigationDirection direction, @Nullable Element focused, GuiNavigation navigation) {
-      NavigationAxis navigationAxis = direction.getAxis();
-      NavigationAxis navigationAxis2 = navigationAxis.getOther();
-      NavigationDirection navigationDirection = navigationAxis2.getPositiveDirection();
-      int i = focus.getBoundingCoordinate(direction.getOpposite());
-      List list = new ArrayList();
-      Iterator var10 = this.children().iterator();
-
-      while(var10.hasNext()) {
-         Element element = (Element)var10.next();
-         if (element != focused) {
-            ScreenRect screenRect = element.getNavigationFocus();
-            if (screenRect.overlaps(focus, navigationAxis2)) {
-               int j = screenRect.getBoundingCoordinate(direction.getOpposite());
-               if (direction.isAfter(j, i)) {
-                  list.add(element);
-               } else if (j == i && direction.isAfter(screenRect.getBoundingCoordinate(direction), focus.getBoundingCoordinate(direction))) {
-                  list.add(element);
-               }
+    default public boolean mouseReleased(Click click) {
+        if (click.button() == 0 && this.isDragging()) {
+            this.setDragging(false);
+            if (this.getFocused() != null) {
+                return this.getFocused().mouseReleased(click);
             }
-         }
-      }
+        }
+        return false;
+    }
 
-      Comparator comparator = Comparator.comparing((elementx) -> {
-         return elementx.getNavigationFocus().getBoundingCoordinate(direction.getOpposite());
-      }, direction.getComparator());
-      Comparator comparator2 = Comparator.comparing((elementx) -> {
-         return elementx.getNavigationFocus().getBoundingCoordinate(navigationDirection.getOpposite());
-      }, navigationDirection.getComparator());
-      list.sort(comparator.thenComparing(comparator2));
-      Iterator var17 = list.iterator();
+    default public boolean mouseDragged(Click click, double offsetX, double offsetY) {
+        if (this.getFocused() != null && this.isDragging() && click.button() == 0) {
+            return this.getFocused().mouseDragged(click, offsetX, offsetY);
+        }
+        return false;
+    }
 
-      GuiNavigationPath guiNavigationPath;
-      do {
-         if (!var17.hasNext()) {
-            return this.computeInitialChildPath(focus, direction, focused, navigation);
-         }
+    public boolean isDragging();
 
-         Element element2 = (Element)var17.next();
-         guiNavigationPath = element2.getNavigationPath(navigation);
-      } while(guiNavigationPath == null);
+    public void setDragging(boolean var1);
 
-      return guiNavigationPath;
-   }
+    default public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        return this.hoveredElement(mouseX, mouseY).filter(element -> element.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount)).isPresent();
+    }
 
-   @Nullable
-   private GuiNavigationPath computeInitialChildPath(ScreenRect focus, NavigationDirection direction, @Nullable Element focused, GuiNavigation navigation) {
-      NavigationAxis navigationAxis = direction.getAxis();
-      NavigationAxis navigationAxis2 = navigationAxis.getOther();
-      List list = new ArrayList();
-      ScreenPos screenPos = ScreenPos.of(navigationAxis, focus.getBoundingCoordinate(direction), focus.getCenter(navigationAxis2));
-      Iterator var9 = this.children().iterator();
+    default public boolean keyPressed(KeyInput input) {
+        return this.getFocused() != null && this.getFocused().keyPressed(input);
+    }
 
-      while(var9.hasNext()) {
-         Element element = (Element)var9.next();
-         if (element != focused) {
-            ScreenRect screenRect = element.getNavigationFocus();
-            ScreenPos screenPos2 = ScreenPos.of(navigationAxis, screenRect.getBoundingCoordinate(direction.getOpposite()), screenRect.getCenter(navigationAxis2));
-            if (direction.isAfter(screenPos2.getComponent(navigationAxis), screenPos.getComponent(navigationAxis))) {
-               long l = Vector2i.distanceSquared(screenPos.x(), screenPos.y(), screenPos2.x(), screenPos2.y());
-               list.add(Pair.of(element, l));
+    default public boolean keyReleased(KeyInput input) {
+        return this.getFocused() != null && this.getFocused().keyReleased(input);
+    }
+
+    default public boolean charTyped(CharInput input) {
+        return this.getFocused() != null && this.getFocused().charTyped(input);
+    }
+
+    public @Nullable Element getFocused();
+
+    public void setFocused(@Nullable Element var1);
+
+    default public void setFocused(boolean focused) {
+    }
+
+    default public boolean isFocused() {
+        return this.getFocused() != null;
+    }
+
+    default public @Nullable GuiNavigationPath getFocusedPath() {
+        Element element = this.getFocused();
+        if (element != null) {
+            return GuiNavigationPath.of((ParentElement)this, (GuiNavigationPath)element.getFocusedPath());
+        }
+        return null;
+    }
+
+    default public @Nullable GuiNavigationPath getNavigationPath(GuiNavigation navigation) {
+        GuiNavigationPath guiNavigationPath;
+        Element element = this.getFocused();
+        if (element != null && (guiNavigationPath = element.getNavigationPath(navigation)) != null) {
+            return GuiNavigationPath.of((ParentElement)this, (GuiNavigationPath)guiNavigationPath);
+        }
+        if (navigation instanceof GuiNavigation.Tab) {
+            GuiNavigation.Tab tab = (GuiNavigation.Tab)navigation;
+            return this.computeNavigationPath(tab);
+        }
+        if (navigation instanceof GuiNavigation.Arrow) {
+            GuiNavigation.Arrow arrow = (GuiNavigation.Arrow)navigation;
+            return this.computeNavigationPath(arrow);
+        }
+        return null;
+    }
+
+    private @Nullable GuiNavigationPath computeNavigationPath(GuiNavigation.Tab navigation) {
+        Supplier<Element> supplier;
+        BooleanSupplier booleanSupplier;
+        boolean bl = navigation.forward();
+        Element element = this.getFocused();
+        ArrayList list = new ArrayList(this.children());
+        Collections.sort(list, Comparator.comparingInt(child -> child.getNavigationOrder()));
+        int i = list.indexOf(element);
+        int j = element != null && i >= 0 ? i + (bl ? 1 : 0) : (bl ? 0 : list.size());
+        ListIterator listIterator = list.listIterator(j);
+        BooleanSupplier booleanSupplier2 = bl ? listIterator::hasNext : (booleanSupplier = listIterator::hasPrevious);
+        Supplier<Element> supplier2 = bl ? listIterator::next : (supplier = listIterator::previous);
+        while (booleanSupplier.getAsBoolean()) {
+            Element element2 = supplier.get();
+            GuiNavigationPath guiNavigationPath = element2.getNavigationPath((GuiNavigation)navigation);
+            if (guiNavigationPath == null) continue;
+            return GuiNavigationPath.of((ParentElement)this, (GuiNavigationPath)guiNavigationPath);
+        }
+        return null;
+    }
+
+    private @Nullable GuiNavigationPath computeNavigationPath(GuiNavigation.Arrow navigation) {
+        Element element = this.getFocused();
+        if (element == null) {
+            NavigationDirection navigationDirection = navigation.direction();
+            ScreenRect screenRect = this.getBorder(navigationDirection.getOpposite());
+            return GuiNavigationPath.of((ParentElement)this, (GuiNavigationPath)this.computeChildPath(screenRect, navigationDirection, null, (GuiNavigation)navigation));
+        }
+        ScreenRect screenRect2 = element.getNavigationFocus();
+        return GuiNavigationPath.of((ParentElement)this, (GuiNavigationPath)this.computeChildPath(screenRect2, navigation.direction(), element, (GuiNavigation)navigation));
+    }
+
+    private @Nullable GuiNavigationPath computeChildPath(ScreenRect focus, NavigationDirection direction, @Nullable Element focused, GuiNavigation navigation) {
+        NavigationAxis navigationAxis = direction.getAxis();
+        NavigationAxis navigationAxis2 = navigationAxis.getOther();
+        NavigationDirection navigationDirection = navigationAxis2.getPositiveDirection();
+        int i = focus.getBoundingCoordinate(direction.getOpposite());
+        ArrayList<Element> list = new ArrayList<Element>();
+        for (Element element2 : this.children()) {
+            ScreenRect screenRect;
+            if (element2 == focused || !(screenRect = element2.getNavigationFocus()).overlaps(focus, navigationAxis2)) continue;
+            int j = screenRect.getBoundingCoordinate(direction.getOpposite());
+            if (direction.isAfter(j, i)) {
+                list.add(element2);
+                continue;
             }
-         }
-      }
+            if (j != i || !direction.isAfter(screenRect.getBoundingCoordinate(direction), focus.getBoundingCoordinate(direction))) continue;
+            list.add(element2);
+        }
+        Comparator<Element> comparator = Comparator.comparing(element -> element.getNavigationFocus().getBoundingCoordinate(direction.getOpposite()), direction.getComparator());
+        Comparator<Element> comparator2 = Comparator.comparing(element -> element.getNavigationFocus().getBoundingCoordinate(navigationDirection.getOpposite()), navigationDirection.getComparator());
+        list.sort(comparator.thenComparing(comparator2));
+        for (Element element2 : list) {
+            GuiNavigationPath guiNavigationPath = element2.getNavigationPath(navigation);
+            if (guiNavigationPath == null) continue;
+            return guiNavigationPath;
+        }
+        return this.computeInitialChildPath(focus, direction, focused, navigation);
+    }
 
-      list.sort(Comparator.comparingDouble(Pair::getSecond));
-      var9 = list.iterator();
-
-      GuiNavigationPath guiNavigationPath;
-      do {
-         if (!var9.hasNext()) {
-            return null;
-         }
-
-         Pair pair = (Pair)var9.next();
-         guiNavigationPath = ((Element)pair.getFirst()).getNavigationPath(navigation);
-      } while(guiNavigationPath == null);
-
-      return guiNavigationPath;
-   }
+    private @Nullable GuiNavigationPath computeInitialChildPath(ScreenRect focus, NavigationDirection direction, @Nullable Element focused, GuiNavigation navigation) {
+        NavigationAxis navigationAxis = direction.getAxis();
+        NavigationAxis navigationAxis2 = navigationAxis.getOther();
+        ArrayList<Pair> list = new ArrayList<Pair>();
+        ScreenPos screenPos = ScreenPos.of((NavigationAxis)navigationAxis, (int)focus.getBoundingCoordinate(direction), (int)focus.getCenter(navigationAxis2));
+        for (Element element : this.children()) {
+            ScreenRect screenRect;
+            ScreenPos screenPos2;
+            if (element == focused || !direction.isAfter((screenPos2 = ScreenPos.of((NavigationAxis)navigationAxis, (int)(screenRect = element.getNavigationFocus()).getBoundingCoordinate(direction.getOpposite()), (int)screenRect.getCenter(navigationAxis2))).getComponent(navigationAxis), screenPos.getComponent(navigationAxis))) continue;
+            long l = Vector2i.distanceSquared((int)screenPos.x(), (int)screenPos.y(), (int)screenPos2.x(), (int)screenPos2.y());
+            list.add(Pair.of((Object)element, (Object)l));
+        }
+        list.sort(Comparator.comparingDouble(Pair::getSecond));
+        for (Pair pair : list) {
+            GuiNavigationPath guiNavigationPath = ((Element)pair.getFirst()).getNavigationPath(navigation);
+            if (guiNavigationPath == null) continue;
+            return guiNavigationPath;
+        }
+        return null;
+    }
 }
+

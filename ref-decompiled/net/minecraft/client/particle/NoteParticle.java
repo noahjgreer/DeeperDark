@@ -1,54 +1,49 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.particle.BillboardParticle
+ *  net.minecraft.client.particle.BillboardParticle$RenderType
+ *  net.minecraft.client.particle.NoteParticle
+ *  net.minecraft.client.texture.Sprite
+ *  net.minecraft.client.world.ClientWorld
+ *  net.minecraft.util.math.MathHelper
+ */
 package net.minecraft.client.particle;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.particle.BillboardParticle;
+import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.SimpleParticleType;
 import net.minecraft.util.math.MathHelper;
 
-@Environment(EnvType.CLIENT)
-public class NoteParticle extends SpriteBillboardParticle {
-   NoteParticle(ClientWorld world, double x, double y, double z, double d) {
-      super(world, x, y, z, 0.0, 0.0, 0.0);
-      this.velocityMultiplier = 0.66F;
-      this.ascending = true;
-      this.velocityX *= 0.009999999776482582;
-      this.velocityY *= 0.009999999776482582;
-      this.velocityZ *= 0.009999999776482582;
-      this.velocityY += 0.2;
-      this.red = Math.max(0.0F, MathHelper.sin(((float)d + 0.0F) * 6.2831855F) * 0.65F + 0.35F);
-      this.green = Math.max(0.0F, MathHelper.sin(((float)d + 0.33333334F) * 6.2831855F) * 0.65F + 0.35F);
-      this.blue = Math.max(0.0F, MathHelper.sin(((float)d + 0.6666667F) * 6.2831855F) * 0.65F + 0.35F);
-      this.scale *= 1.5F;
-      this.maxAge = 6;
-   }
+@Environment(value=EnvType.CLIENT)
+public class NoteParticle
+extends BillboardParticle {
+    NoteParticle(ClientWorld world, double x, double y, double z, double velocityX, Sprite sprite) {
+        super(world, x, y, z, 0.0, 0.0, 0.0, sprite);
+        this.velocityMultiplier = 0.66f;
+        this.ascending = true;
+        this.velocityX *= (double)0.01f;
+        this.velocityY *= (double)0.01f;
+        this.velocityZ *= (double)0.01f;
+        this.velocityY += 0.2;
+        this.red = Math.max(0.0f, MathHelper.sin((double)(((float)velocityX + 0.0f) * ((float)Math.PI * 2))) * 0.65f + 0.35f);
+        this.green = Math.max(0.0f, MathHelper.sin((double)(((float)velocityX + 0.33333334f) * ((float)Math.PI * 2))) * 0.65f + 0.35f);
+        this.blue = Math.max(0.0f, MathHelper.sin((double)(((float)velocityX + 0.6666667f) * ((float)Math.PI * 2))) * 0.65f + 0.35f);
+        this.scale *= 1.5f;
+        this.maxAge = 6;
+    }
 
-   public ParticleTextureSheet getType() {
-      return ParticleTextureSheet.PARTICLE_SHEET_OPAQUE;
-   }
+    public BillboardParticle.RenderType getRenderType() {
+        return BillboardParticle.RenderType.PARTICLE_ATLAS_OPAQUE;
+    }
 
-   public float getSize(float tickProgress) {
-      return this.scale * MathHelper.clamp(((float)this.age + tickProgress) / (float)this.maxAge * 32.0F, 0.0F, 1.0F);
-   }
-
-   @Environment(EnvType.CLIENT)
-   public static class Factory implements ParticleFactory {
-      private final SpriteProvider spriteProvider;
-
-      public Factory(SpriteProvider spriteProvider) {
-         this.spriteProvider = spriteProvider;
-      }
-
-      public Particle createParticle(SimpleParticleType simpleParticleType, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
-         NoteParticle noteParticle = new NoteParticle(clientWorld, d, e, f, g);
-         noteParticle.setSprite(this.spriteProvider);
-         return noteParticle;
-      }
-
-      // $FF: synthetic method
-      public Particle createParticle(final ParticleEffect particleEffect, final ClientWorld clientWorld, final double d, final double e, final double f, final double g, final double h, final double i) {
-         return this.createParticle((SimpleParticleType)particleEffect, clientWorld, d, e, f, g, h, i);
-      }
-   }
+    public float getSize(float tickProgress) {
+        return this.scale * MathHelper.clamp((float)(((float)this.age + tickProgress) / (float)this.maxAge * 32.0f), (float)0.0f, (float)1.0f);
+    }
 }
+

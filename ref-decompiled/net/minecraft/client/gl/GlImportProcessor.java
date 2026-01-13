@@ -1,144 +1,143 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.google.common.base.Strings
+ *  com.google.common.collect.Lists
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.gl.Defines
+ *  net.minecraft.client.gl.GlImportProcessor
+ *  net.minecraft.client.gl.GlImportProcessor$Context
+ *  net.minecraft.util.StringHelper
+ *  net.minecraft.util.path.PathUtil
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.gl;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.gl.Defines;
+import net.minecraft.client.gl.GlImportProcessor;
 import net.minecraft.util.StringHelper;
 import net.minecraft.util.path.PathUtil;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
 public abstract class GlImportProcessor {
-   private static final String MULTI_LINE_COMMENT_PATTERN = "/\\*(?:[^*]|\\*+[^*/])*\\*+/";
-   private static final String SINGLE_LINE_COMMENT_PATTERN = "//[^\\v]*";
-   private static final Pattern MOJ_IMPORT_PATTERN = Pattern.compile("(#(?:/\\*(?:[^*]|\\*+[^*/])*\\*+/|\\h)*moj_import(?:/\\*(?:[^*]|\\*+[^*/])*\\*+/|\\h)*(?:\"(.*)\"|<(.*)>))");
-   private static final Pattern IMPORT_VERSION_PATTERN = Pattern.compile("(#(?:/\\*(?:[^*]|\\*+[^*/])*\\*+/|\\h)*version(?:/\\*(?:[^*]|\\*+[^*/])*\\*+/|\\h)*(\\d+))\\b");
-   private static final Pattern TRAILING_WHITESPACE_PATTERN = Pattern.compile("(?:^|\\v)(?:\\s|/\\*(?:[^*]|\\*+[^*/])*\\*+/|(//[^\\v]*))*\\z");
+    private static final String MULTI_LINE_COMMENT_PATTERN = "/\\*(?:[^*]|\\*+[^*/])*\\*+/";
+    private static final String SINGLE_LINE_COMMENT_PATTERN = "//[^\\v]*";
+    private static final Pattern MOJ_IMPORT_PATTERN = Pattern.compile("(#(?:/\\*(?:[^*]|\\*+[^*/])*\\*+/|\\h)*moj_import(?:/\\*(?:[^*]|\\*+[^*/])*\\*+/|\\h)*(?:\"(.*)\"|<(.*)>))");
+    private static final Pattern IMPORT_VERSION_PATTERN = Pattern.compile("(#(?:/\\*(?:[^*]|\\*+[^*/])*\\*+/|\\h)*version(?:/\\*(?:[^*]|\\*+[^*/])*\\*+/|\\h)*(\\d+))\\b");
+    private static final Pattern TRAILING_WHITESPACE_PATTERN = Pattern.compile("(?:^|\\v)(?:\\s|/\\*(?:[^*]|\\*+[^*/])*\\*+/|(//[^\\v]*))*\\z");
 
-   public List readSource(String source) {
-      Context context = new Context();
-      List list = this.parseImports(source, context, "");
-      list.set(0, this.readImport((String)list.get(0), context.column));
-      return list;
-   }
+    public List<String> readSource(String source) {
+        Context context = new Context();
+        List list = this.parseImports(source, context, "");
+        list.set(0, this.readImport((String)list.get(0), context.column));
+        return list;
+    }
 
-   private List parseImports(String source, Context context, String path) {
-      int i = context.line;
-      int j = 0;
-      String string = "";
-      List list = Lists.newArrayList();
-      Matcher matcher = MOJ_IMPORT_PATTERN.matcher(source);
-
-      String string2;
-      while(matcher.find()) {
-         if (!hasBogusString(source, matcher, j)) {
+    private List<String> parseImports(String source, Context context, String path) {
+        String string2;
+        int i = context.line;
+        int j = 0;
+        String string = "";
+        ArrayList list = Lists.newArrayList();
+        Matcher matcher = MOJ_IMPORT_PATTERN.matcher(source);
+        while (matcher.find()) {
+            int k;
+            boolean bl;
+            if (GlImportProcessor.hasBogusString((String)source, (Matcher)matcher, (int)j)) continue;
             string2 = matcher.group(2);
-            boolean bl = string2 != null;
+            boolean bl2 = bl = string2 != null;
             if (!bl) {
-               string2 = matcher.group(3);
+                string2 = matcher.group(3);
             }
-
-            if (string2 != null) {
-               String string3 = source.substring(j, matcher.start(1));
-               String string4 = path + string2;
-               String string5 = this.loadImport(bl, string4);
-               int k;
-               if (!Strings.isNullOrEmpty(string5)) {
-                  if (!StringHelper.endsWithLineBreak(string5)) {
-                     string5 = string5 + System.lineSeparator();
-                  }
-
-                  ++context.line;
-                  k = context.line;
-                  List list2 = this.parseImports(string5, context, bl ? PathUtil.getPosixFullPath(string4) : "");
-                  list2.set(0, String.format(Locale.ROOT, "#line %d %d\n%s", 0, k, this.extractVersion((String)list2.get(0), context)));
-                  if (!StringHelper.isBlank(string3)) {
-                     list.add(string3);
-                  }
-
-                  list.addAll(list2);
-               } else {
-                  String string6 = bl ? String.format(Locale.ROOT, "/*#moj_import \"%s\"*/", string2) : String.format(Locale.ROOT, "/*#moj_import <%s>*/", string2);
-                  list.add(string + string3 + string6);
-               }
-
-               k = StringHelper.countLines(source.substring(0, matcher.end(1)));
-               string = String.format(Locale.ROOT, "#line %d %d", k, i);
-               j = matcher.end(1);
+            if (string2 == null) continue;
+            String string3 = source.substring(j, matcher.start(1));
+            String string4 = path + string2;
+            Object string5 = this.loadImport(bl, string4);
+            if (!Strings.isNullOrEmpty((String)string5)) {
+                if (!StringHelper.endsWithLineBreak((String)string5)) {
+                    string5 = (String)string5 + System.lineSeparator();
+                }
+                ++context.line;
+                k = context.line;
+                List list2 = this.parseImports((String)string5, context, bl ? PathUtil.getPosixFullPath((String)string4) : "");
+                list2.set(0, String.format(Locale.ROOT, "#line %d %d\n%s", 0, k, this.extractVersion((String)list2.get(0), context)));
+                if (!StringHelper.isBlank((String)string3)) {
+                    list.add(string3);
+                }
+                list.addAll(list2);
+            } else {
+                String string6 = bl ? String.format(Locale.ROOT, "/*#moj_import \"%s\"*/", string2) : String.format(Locale.ROOT, "/*#moj_import <%s>*/", string2);
+                list.add(string + string3 + string6);
             }
-         }
-      }
+            k = StringHelper.countLines((String)source.substring(0, matcher.end(1)));
+            string = String.format(Locale.ROOT, "#line %d %d", k, i);
+            j = matcher.end(1);
+        }
+        string2 = source.substring(j);
+        if (!StringHelper.isBlank((String)string2)) {
+            list.add(string + string2);
+        }
+        return list;
+    }
 
-      string2 = source.substring(j);
-      if (!StringHelper.isBlank(string2)) {
-         list.add(string + string2);
-      }
+    private String extractVersion(String line, Context context) {
+        Matcher matcher = IMPORT_VERSION_PATTERN.matcher(line);
+        if (matcher.find() && GlImportProcessor.isLineValid((String)line, (Matcher)matcher)) {
+            context.column = Math.max(context.column, Integer.parseInt(matcher.group(2)));
+            return line.substring(0, matcher.start(1)) + "/*" + line.substring(matcher.start(1), matcher.end(1)) + "*/" + line.substring(matcher.end(1));
+        }
+        return line;
+    }
 
-      return list;
-   }
+    private String readImport(String line, int start) {
+        Matcher matcher = IMPORT_VERSION_PATTERN.matcher(line);
+        if (matcher.find() && GlImportProcessor.isLineValid((String)line, (Matcher)matcher)) {
+            return line.substring(0, matcher.start(2)) + Math.max(start, Integer.parseInt(matcher.group(2))) + line.substring(matcher.end(2));
+        }
+        return line;
+    }
 
-   private String extractVersion(String line, Context context) {
-      Matcher matcher = IMPORT_VERSION_PATTERN.matcher(line);
-      if (matcher.find() && isLineValid(line, matcher)) {
-         context.column = Math.max(context.column, Integer.parseInt(matcher.group(2)));
-         String var10000 = line.substring(0, matcher.start(1));
-         return var10000 + "/*" + line.substring(matcher.start(1), matcher.end(1)) + "*/" + line.substring(matcher.end(1));
-      } else {
-         return line;
-      }
-   }
+    private static boolean isLineValid(String line, Matcher matcher) {
+        return !GlImportProcessor.hasBogusString((String)line, (Matcher)matcher, (int)0);
+    }
 
-   private String readImport(String line, int start) {
-      Matcher matcher = IMPORT_VERSION_PATTERN.matcher(line);
-      if (matcher.find() && isLineValid(line, matcher)) {
-         String var10000 = line.substring(0, matcher.start(2));
-         return var10000 + Math.max(start, Integer.parseInt(matcher.group(2))) + line.substring(matcher.end(2));
-      } else {
-         return line;
-      }
-   }
-
-   private static boolean isLineValid(String line, Matcher matcher) {
-      return !hasBogusString(line, matcher, 0);
-   }
-
-   private static boolean hasBogusString(String string, Matcher matcher, int matchEnd) {
-      int i = matcher.start() - matchEnd;
-      if (i == 0) {
-         return false;
-      } else {
-         Matcher matcher2 = TRAILING_WHITESPACE_PATTERN.matcher(string.substring(matchEnd, matcher.start()));
-         if (!matcher2.find()) {
+    private static boolean hasBogusString(String string, Matcher matcher, int matchEnd) {
+        int i = matcher.start() - matchEnd;
+        if (i == 0) {
+            return false;
+        }
+        Matcher matcher2 = TRAILING_WHITESPACE_PATTERN.matcher(string.substring(matchEnd, matcher.start()));
+        if (!matcher2.find()) {
             return true;
-         } else {
-            int j = matcher2.end(1);
-            return j == matcher.start();
-         }
-      }
-   }
+        }
+        int j = matcher2.end(1);
+        return j == matcher.start();
+    }
 
-   @Nullable
-   public abstract String loadImport(boolean inline, String name);
+    public abstract @Nullable String loadImport(boolean var1, String var2);
 
-   public static String addDefines(String source, Defines defines) {
-      if (defines.isEmpty()) {
-         return source;
-      } else {
-         int i = source.indexOf(10);
-         int j = i + 1;
-         String var10000 = source.substring(0, j);
-         return var10000 + defines.toSource() + "#line 1 0\n" + source.substring(j);
-      }
-   }
-
-   @Environment(EnvType.CLIENT)
-   static final class Context {
-      int column;
-      int line;
-   }
+    public static String addDefines(String source, Defines defines) {
+        if (defines.isEmpty()) {
+            return source;
+        }
+        int i = source.indexOf(10);
+        int j = i + 1;
+        return source.substring(0, j) + defines.toSource() + "#line 1 0\n" + source.substring(j);
+    }
 }
+

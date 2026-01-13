@@ -1,65 +1,55 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.gl.RenderPipelines
+ *  net.minecraft.client.gui.DrawContext
+ *  net.minecraft.client.gui.widget.ButtonWidget
+ *  net.minecraft.client.gui.widget.ButtonWidget$PressAction
+ *  net.minecraft.client.gui.widget.LockButtonWidget
+ *  net.minecraft.client.gui.widget.LockButtonWidget$Icon
+ *  net.minecraft.screen.ScreenTexts
+ *  net.minecraft.text.MutableText
+ *  net.minecraft.text.Text
+ */
 package net.minecraft.client.gui.widget;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.LockButtonWidget;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 
-@Environment(EnvType.CLIENT)
-public class LockButtonWidget extends ButtonWidget {
-   private boolean locked;
+@Environment(value=EnvType.CLIENT)
+public class LockButtonWidget
+extends ButtonWidget {
+    private boolean locked;
 
-   public LockButtonWidget(int x, int y, ButtonWidget.PressAction action) {
-      super(x, y, 20, 20, Text.translatable("narrator.button.difficulty_lock"), action, DEFAULT_NARRATION_SUPPLIER);
-   }
+    public LockButtonWidget(int x, int y, ButtonWidget.PressAction action) {
+        super(x, y, 20, 20, (Text)Text.translatable((String)"narrator.button.difficulty_lock"), action, DEFAULT_NARRATION_SUPPLIER);
+    }
 
-   protected MutableText getNarrationMessage() {
-      return ScreenTexts.joinSentences(super.getNarrationMessage(), this.isLocked() ? Text.translatable("narrator.button.difficulty_lock.locked") : Text.translatable("narrator.button.difficulty_lock.unlocked"));
-   }
+    protected MutableText getNarrationMessage() {
+        return ScreenTexts.joinSentences((Text[])new Text[]{super.getNarrationMessage(), this.isLocked() ? Text.translatable((String)"narrator.button.difficulty_lock.locked") : Text.translatable((String)"narrator.button.difficulty_lock.unlocked")});
+    }
 
-   public boolean isLocked() {
-      return this.locked;
-   }
+    public boolean isLocked() {
+        return this.locked;
+    }
 
-   public void setLocked(boolean locked) {
-      this.locked = locked;
-   }
+    public void setLocked(boolean locked) {
+        this.locked = locked;
+    }
 
-   public void renderWidget(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
-      Icon icon;
-      if (!this.active) {
-         icon = this.locked ? LockButtonWidget.Icon.LOCKED_DISABLED : LockButtonWidget.Icon.UNLOCKED_DISABLED;
-      } else if (this.isSelected()) {
-         icon = this.locked ? LockButtonWidget.Icon.LOCKED_HOVER : LockButtonWidget.Icon.UNLOCKED_HOVER;
-      } else {
-         icon = this.locked ? LockButtonWidget.Icon.LOCKED : LockButtonWidget.Icon.UNLOCKED;
-      }
-
-      context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, icon.texture, this.getX(), this.getY(), this.width, this.height);
-   }
-
-   @Environment(EnvType.CLIENT)
-   static enum Icon {
-      LOCKED(Identifier.ofVanilla("widget/locked_button")),
-      LOCKED_HOVER(Identifier.ofVanilla("widget/locked_button_highlighted")),
-      LOCKED_DISABLED(Identifier.ofVanilla("widget/locked_button_disabled")),
-      UNLOCKED(Identifier.ofVanilla("widget/unlocked_button")),
-      UNLOCKED_HOVER(Identifier.ofVanilla("widget/unlocked_button_highlighted")),
-      UNLOCKED_DISABLED(Identifier.ofVanilla("widget/unlocked_button_disabled"));
-
-      final Identifier texture;
-
-      private Icon(final Identifier texture) {
-         this.texture = texture;
-      }
-
-      // $FF: synthetic method
-      private static Icon[] method_36870() {
-         return new Icon[]{LOCKED, LOCKED_HOVER, LOCKED_DISABLED, UNLOCKED, UNLOCKED_HOVER, UNLOCKED_DISABLED};
-      }
-   }
+    public void drawIcon(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
+        Icon icon = !this.active ? (this.locked ? Icon.LOCKED_DISABLED : Icon.UNLOCKED_DISABLED) : (this.isSelected() ? (this.locked ? Icon.LOCKED_HOVER : Icon.UNLOCKED_HOVER) : (this.locked ? Icon.LOCKED : Icon.UNLOCKED));
+        context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, icon.texture, this.getX(), this.getY(), this.width, this.height);
+    }
 }
+

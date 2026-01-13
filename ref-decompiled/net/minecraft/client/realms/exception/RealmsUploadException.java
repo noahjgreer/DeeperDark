@@ -1,19 +1,29 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.realms.exception.RealmsUploadException
+ *  net.minecraft.text.Text
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.realms.exception;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.text.Text;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
-public abstract class RealmsUploadException extends RuntimeException {
-   @Nullable
-   public Text getStatus() {
-      return null;
-   }
+@Environment(value=EnvType.CLIENT)
+public abstract class RealmsUploadException
+extends RuntimeException {
+    public @Nullable Text getStatus() {
+        return null;
+    }
 
-   @Nullable
-   public Text[] getStatusTexts() {
-      return null;
-   }
+    public Text @Nullable [] getStatusTexts() {
+        return null;
+    }
 }
+

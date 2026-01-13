@@ -1,3 +1,30 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.google.common.collect.ImmutableList
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.block.DecoratedPotPattern
+ *  net.minecraft.block.WoodType
+ *  net.minecraft.block.entity.BannerPattern
+ *  net.minecraft.block.enums.ChestType
+ *  net.minecraft.client.render.RenderLayer
+ *  net.minecraft.client.render.RenderLayers
+ *  net.minecraft.client.render.TexturedRenderLayers
+ *  net.minecraft.client.render.TexturedRenderLayers$1
+ *  net.minecraft.client.render.block.entity.state.ChestBlockEntityRenderState$Variant
+ *  net.minecraft.client.texture.SpriteAtlasTexture
+ *  net.minecraft.client.util.SpriteIdentifier
+ *  net.minecraft.client.util.SpriteMapper
+ *  net.minecraft.registry.Registries
+ *  net.minecraft.registry.RegistryKey
+ *  net.minecraft.registry.entry.RegistryEntry
+ *  net.minecraft.registry.entry.RegistryEntry$Reference
+ *  net.minecraft.util.DyeColor
+ *  net.minecraft.util.Identifier
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.render;
 
 import com.google.common.collect.ImmutableList;
@@ -6,7 +33,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import net.fabricmc.api.EnvType;
@@ -14,10 +40,11 @@ import net.fabricmc.api.Environment;
 import net.minecraft.block.DecoratedPotPattern;
 import net.minecraft.block.WoodType;
 import net.minecraft.block.entity.BannerPattern;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.EnderChestBlockEntity;
-import net.minecraft.block.entity.TrappedChestBlockEntity;
 import net.minecraft.block.enums.ChestType;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.RenderLayers;
+import net.minecraft.client.render.TexturedRenderLayers;
+import net.minecraft.client.render.block.entity.state.ChestBlockEntityRenderState;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.client.util.SpriteMapper;
@@ -26,236 +53,210 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
 public class TexturedRenderLayers {
-   public static final Identifier SHULKER_BOXES_ATLAS_TEXTURE = Identifier.ofVanilla("textures/atlas/shulker_boxes.png");
-   public static final Identifier BEDS_ATLAS_TEXTURE = Identifier.ofVanilla("textures/atlas/beds.png");
-   public static final Identifier BANNER_PATTERNS_ATLAS_TEXTURE = Identifier.ofVanilla("textures/atlas/banner_patterns.png");
-   public static final Identifier SHIELD_PATTERNS_ATLAS_TEXTURE = Identifier.ofVanilla("textures/atlas/shield_patterns.png");
-   public static final Identifier SIGNS_ATLAS_TEXTURE = Identifier.ofVanilla("textures/atlas/signs.png");
-   public static final Identifier CHEST_ATLAS_TEXTURE = Identifier.ofVanilla("textures/atlas/chest.png");
-   public static final Identifier ARMOR_TRIMS_ATLAS_TEXTURE = Identifier.ofVanilla("textures/atlas/armor_trims.png");
-   public static final Identifier DECORATED_POT_ATLAS_TEXTURE = Identifier.ofVanilla("textures/atlas/decorated_pot.png");
-   private static final RenderLayer SHULKER_BOXES_RENDER_LAYER;
-   private static final RenderLayer BEDS_RENDER_LAYER;
-   private static final RenderLayer BANNER_PATTERNS_RENDER_LAYER;
-   private static final RenderLayer SHIELD_PATTERNS_RENDER_LAYER;
-   private static final RenderLayer SIGN_RENDER_LAYER;
-   private static final RenderLayer CHEST_RENDER_LAYER;
-   private static final RenderLayer ARMOR_TRIMS_RENDER_LAYER;
-   private static final RenderLayer ARMOR_TRIMS_DECAL_RENDER_LAYER;
-   private static final RenderLayer ENTITY_SOLID;
-   private static final RenderLayer ENTITY_CUTOUT;
-   private static final RenderLayer ITEM_ENTITY_TRANSLUCENT_CULL;
-   public static final SpriteMapper ITEM_SPRITE_MAPPER;
-   public static final SpriteMapper BLOCK_SPRITE_MAPPER;
-   public static final SpriteMapper BANNER_PATTERN_SPRITE_MAPPER;
-   public static final SpriteMapper SHIELD_PATTERN_SPRITE_MAPPER;
-   public static final SpriteMapper CHEST_SPRITE_MAPPER;
-   public static final SpriteMapper DECORATED_POT_SPRITE_MAPPER;
-   public static final SpriteMapper BED_SPRITE_MAPPER;
-   public static final SpriteMapper SHULKER_SPRITE_MAPPER;
-   public static final SpriteMapper SIGN_SPRITE_MAPPER;
-   public static final SpriteMapper HANGING_SIGN_SPRITE_MAPPER;
-   public static final SpriteIdentifier SHULKER_TEXTURE_ID;
-   public static final List COLORED_SHULKER_BOXES_TEXTURES;
-   public static final Map SIGN_TYPE_TEXTURES;
-   public static final Map HANGING_SIGN_TYPE_TEXTURES;
-   public static final SpriteIdentifier BANNER_BASE;
-   public static final SpriteIdentifier SHIELD_BASE;
-   private static final Map BANNER_PATTERN_TEXTURES;
-   private static final Map SHIELD_PATTERN_TEXTURES;
-   public static final Map DECORATED_POT_PATTERN_TEXTURES;
-   public static final SpriteIdentifier DECORATED_POT_BASE;
-   public static final SpriteIdentifier DECORATED_POT_SIDE;
-   private static final SpriteIdentifier[] BED_TEXTURES;
-   public static final SpriteIdentifier TRAPPED_CHEST;
-   public static final SpriteIdentifier TRAPPED_CHEST_LEFT;
-   public static final SpriteIdentifier TRAPPED_CHEST_RIGHT;
-   public static final SpriteIdentifier CHRISTMAS_CHEST;
-   public static final SpriteIdentifier CHRISTMAS_CHEST_LEFT;
-   public static final SpriteIdentifier CHRISTMAS_CHEST_RIGHT;
-   public static final SpriteIdentifier CHEST;
-   public static final SpriteIdentifier CHEST_LEFT;
-   public static final SpriteIdentifier CHEST_RIGHT;
-   public static final SpriteIdentifier ENDER_CHEST;
+    public static final Identifier SHULKER_BOXES_ATLAS_TEXTURE = Identifier.ofVanilla((String)"textures/atlas/shulker_boxes.png");
+    public static final Identifier BEDS_ATLAS_TEXTURE = Identifier.ofVanilla((String)"textures/atlas/beds.png");
+    public static final Identifier BANNER_PATTERNS_ATLAS_TEXTURE = Identifier.ofVanilla((String)"textures/atlas/banner_patterns.png");
+    public static final Identifier SHIELD_PATTERNS_ATLAS_TEXTURE = Identifier.ofVanilla((String)"textures/atlas/shield_patterns.png");
+    public static final Identifier SIGNS_ATLAS_TEXTURE = Identifier.ofVanilla((String)"textures/atlas/signs.png");
+    public static final Identifier CHEST_ATLAS_TEXTURE = Identifier.ofVanilla((String)"textures/atlas/chest.png");
+    public static final Identifier ARMOR_TRIMS_ATLAS_TEXTURE = Identifier.ofVanilla((String)"textures/atlas/armor_trims.png");
+    public static final Identifier DECORATED_POT_ATLAS_TEXTURE = Identifier.ofVanilla((String)"textures/atlas/decorated_pot.png");
+    public static final Identifier GUI_ATLAS_TEXTURE = Identifier.ofVanilla((String)"textures/atlas/gui.png");
+    public static final Identifier MAP_DECORATIONS_ATLAS_TEXTURE = Identifier.ofVanilla((String)"textures/atlas/map_decorations.png");
+    public static final Identifier PAINTINGS_ATLAS_TEXTURE = Identifier.ofVanilla((String)"textures/atlas/paintings.png");
+    public static final Identifier CELESTIALS_ATLAS_TEXTURE = Identifier.ofVanilla((String)"textures/atlas/celestials.png");
+    private static final RenderLayer SHULKER_BOXES_RENDER_LAYER = RenderLayers.entityCutoutNoCull((Identifier)SHULKER_BOXES_ATLAS_TEXTURE);
+    private static final RenderLayer BEDS_RENDER_LAYER = RenderLayers.entitySolid((Identifier)BEDS_ATLAS_TEXTURE);
+    private static final RenderLayer BANNER_PATTERNS_RENDER_LAYER = RenderLayers.entityNoOutline((Identifier)BANNER_PATTERNS_ATLAS_TEXTURE);
+    private static final RenderLayer SHIELD_PATTERNS_RENDER_LAYER = RenderLayers.entityNoOutline((Identifier)SHIELD_PATTERNS_ATLAS_TEXTURE);
+    private static final RenderLayer SIGN_RENDER_LAYER = RenderLayers.entityCutoutNoCull((Identifier)SIGNS_ATLAS_TEXTURE);
+    private static final RenderLayer CHEST_RENDER_LAYER = RenderLayers.entityCutout((Identifier)CHEST_ATLAS_TEXTURE);
+    private static final RenderLayer ARMOR_TRIMS_RENDER_LAYER = RenderLayers.armorCutoutNoCull((Identifier)ARMOR_TRIMS_ATLAS_TEXTURE);
+    private static final RenderLayer ARMOR_TRIMS_DECAL_RENDER_LAYER = RenderLayers.armorDecalCutoutNoCull((Identifier)ARMOR_TRIMS_ATLAS_TEXTURE);
+    private static final RenderLayer ENTITY_SOLID = RenderLayers.entitySolid((Identifier)SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE);
+    private static final RenderLayer ENTITY_CUTOUT = RenderLayers.entityCutout((Identifier)SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE);
+    private static final RenderLayer BLOCK_TRANSLUCENT_CULL = RenderLayers.itemEntityTranslucentCull((Identifier)SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE);
+    private static final RenderLayer ITEM_TRANSLUCENT_CULL = RenderLayers.itemEntityTranslucentCull((Identifier)SpriteAtlasTexture.ITEMS_ATLAS_TEXTURE);
+    public static final SpriteMapper ITEM_SPRITE_MAPPER = new SpriteMapper(SpriteAtlasTexture.ITEMS_ATLAS_TEXTURE, "item");
+    public static final SpriteMapper BLOCK_SPRITE_MAPPER = new SpriteMapper(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, "block");
+    public static final SpriteMapper ENTITY_SPRITE_MAPPER = new SpriteMapper(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, "entity");
+    public static final SpriteMapper BANNER_PATTERN_SPRITE_MAPPER = new SpriteMapper(BANNER_PATTERNS_ATLAS_TEXTURE, "entity/banner");
+    public static final SpriteMapper SHIELD_PATTERN_SPRITE_MAPPER = new SpriteMapper(SHIELD_PATTERNS_ATLAS_TEXTURE, "entity/shield");
+    public static final SpriteMapper CHEST_SPRITE_MAPPER = new SpriteMapper(CHEST_ATLAS_TEXTURE, "entity/chest");
+    public static final SpriteMapper DECORATED_POT_SPRITE_MAPPER = new SpriteMapper(DECORATED_POT_ATLAS_TEXTURE, "entity/decorated_pot");
+    public static final SpriteMapper BED_SPRITE_MAPPER = new SpriteMapper(BEDS_ATLAS_TEXTURE, "entity/bed");
+    public static final SpriteMapper SHULKER_SPRITE_MAPPER = new SpriteMapper(SHULKER_BOXES_ATLAS_TEXTURE, "entity/shulker");
+    public static final SpriteMapper SIGN_SPRITE_MAPPER = new SpriteMapper(SIGNS_ATLAS_TEXTURE, "entity/signs");
+    public static final SpriteMapper HANGING_SIGN_SPRITE_MAPPER = new SpriteMapper(SIGNS_ATLAS_TEXTURE, "entity/signs/hanging");
+    public static final SpriteIdentifier SHULKER_TEXTURE_ID = SHULKER_SPRITE_MAPPER.mapVanilla("shulker");
+    public static final List<SpriteIdentifier> COLORED_SHULKER_BOXES_TEXTURES = (List)Arrays.stream(DyeColor.values()).sorted(Comparator.comparingInt(DyeColor::getIndex)).map(TexturedRenderLayers::createShulkerBoxTextureId).collect(ImmutableList.toImmutableList());
+    public static final Map<WoodType, SpriteIdentifier> SIGN_TYPE_TEXTURES = WoodType.stream().collect(Collectors.toMap(Function.identity(), TexturedRenderLayers::createSignTextureId));
+    public static final Map<WoodType, SpriteIdentifier> HANGING_SIGN_TYPE_TEXTURES = WoodType.stream().collect(Collectors.toMap(Function.identity(), TexturedRenderLayers::createHangingSignTextureId));
+    public static final SpriteIdentifier BANNER_BASE = BANNER_PATTERN_SPRITE_MAPPER.mapVanilla("base");
+    public static final SpriteIdentifier SHIELD_BASE = SHIELD_PATTERN_SPRITE_MAPPER.mapVanilla("base");
+    private static final Map<Identifier, SpriteIdentifier> BANNER_PATTERN_TEXTURES = new HashMap();
+    private static final Map<Identifier, SpriteIdentifier> SHIELD_PATTERN_TEXTURES = new HashMap();
+    public static final Map<RegistryKey<DecoratedPotPattern>, SpriteIdentifier> DECORATED_POT_PATTERN_TEXTURES = Registries.DECORATED_POT_PATTERN.streamEntries().collect(Collectors.toMap(RegistryEntry.Reference::registryKey, pattern -> DECORATED_POT_SPRITE_MAPPER.map(((DecoratedPotPattern)pattern.value()).assetId())));
+    public static final SpriteIdentifier DECORATED_POT_BASE = DECORATED_POT_SPRITE_MAPPER.mapVanilla("decorated_pot_base");
+    public static final SpriteIdentifier DECORATED_POT_SIDE = DECORATED_POT_SPRITE_MAPPER.mapVanilla("decorated_pot_side");
+    private static final SpriteIdentifier[] BED_TEXTURES = (SpriteIdentifier[])Arrays.stream(DyeColor.values()).sorted(Comparator.comparingInt(DyeColor::getIndex)).map(TexturedRenderLayers::createBedTextureId).toArray(SpriteIdentifier[]::new);
+    public static final SpriteIdentifier TRAPPED_CHEST = CHEST_SPRITE_MAPPER.mapVanilla("trapped");
+    public static final SpriteIdentifier TRAPPED_CHEST_LEFT = CHEST_SPRITE_MAPPER.mapVanilla("trapped_left");
+    public static final SpriteIdentifier TRAPPED_CHEST_RIGHT = CHEST_SPRITE_MAPPER.mapVanilla("trapped_right");
+    public static final SpriteIdentifier CHRISTMAS_CHEST = CHEST_SPRITE_MAPPER.mapVanilla("christmas");
+    public static final SpriteIdentifier CHRISTMAS_CHEST_LEFT = CHEST_SPRITE_MAPPER.mapVanilla("christmas_left");
+    public static final SpriteIdentifier CHRISTMAS_CHEST_RIGHT = CHEST_SPRITE_MAPPER.mapVanilla("christmas_right");
+    public static final SpriteIdentifier CHEST = CHEST_SPRITE_MAPPER.mapVanilla("normal");
+    public static final SpriteIdentifier CHEST_LEFT = CHEST_SPRITE_MAPPER.mapVanilla("normal_left");
+    public static final SpriteIdentifier CHEST_RIGHT = CHEST_SPRITE_MAPPER.mapVanilla("normal_right");
+    public static final SpriteIdentifier ENDER_CHEST = CHEST_SPRITE_MAPPER.mapVanilla("ender");
+    public static final SpriteIdentifier COPPER_CHEST = CHEST_SPRITE_MAPPER.mapVanilla("copper");
+    public static final SpriteIdentifier COPPER_CHEST_LEFT = CHEST_SPRITE_MAPPER.mapVanilla("copper_left");
+    public static final SpriteIdentifier COPPER_CHEST_RIGHT = CHEST_SPRITE_MAPPER.mapVanilla("copper_right");
+    public static final SpriteIdentifier EXPOSED_COPPER_CHEST = CHEST_SPRITE_MAPPER.mapVanilla("copper_exposed");
+    public static final SpriteIdentifier EXPOSED_COPPER_CHEST_LEFT = CHEST_SPRITE_MAPPER.mapVanilla("copper_exposed_left");
+    public static final SpriteIdentifier EXPOSED_COPPER_CHEST_RIGHT = CHEST_SPRITE_MAPPER.mapVanilla("copper_exposed_right");
+    public static final SpriteIdentifier WEATHERED_COPPER_CHEST = CHEST_SPRITE_MAPPER.mapVanilla("copper_weathered");
+    public static final SpriteIdentifier WEATHERED_COPPER_CHEST_LEFT = CHEST_SPRITE_MAPPER.mapVanilla("copper_weathered_left");
+    public static final SpriteIdentifier WEATHERED_COPPER_CHEST_RIGHT = CHEST_SPRITE_MAPPER.mapVanilla("copper_weathered_right");
+    public static final SpriteIdentifier OXIDIZED_COPPER_CHEST = CHEST_SPRITE_MAPPER.mapVanilla("copper_oxidized");
+    public static final SpriteIdentifier OXIDIZED_COPPER_CHEST_LEFT = CHEST_SPRITE_MAPPER.mapVanilla("copper_oxidized_left");
+    public static final SpriteIdentifier OXIDIZED_COPPER_CHEST_RIGHT = CHEST_SPRITE_MAPPER.mapVanilla("copper_oxidized_right");
 
-   public static RenderLayer getBannerPatterns() {
-      return BANNER_PATTERNS_RENDER_LAYER;
-   }
+    public static RenderLayer getBannerPatterns() {
+        return BANNER_PATTERNS_RENDER_LAYER;
+    }
 
-   public static RenderLayer getShieldPatterns() {
-      return SHIELD_PATTERNS_RENDER_LAYER;
-   }
+    public static RenderLayer getShieldPatterns() {
+        return SHIELD_PATTERNS_RENDER_LAYER;
+    }
 
-   public static RenderLayer getBeds() {
-      return BEDS_RENDER_LAYER;
-   }
+    public static RenderLayer getBeds() {
+        return BEDS_RENDER_LAYER;
+    }
 
-   public static RenderLayer getShulkerBoxes() {
-      return SHULKER_BOXES_RENDER_LAYER;
-   }
+    public static RenderLayer getShulkerBoxes() {
+        return SHULKER_BOXES_RENDER_LAYER;
+    }
 
-   public static RenderLayer getSign() {
-      return SIGN_RENDER_LAYER;
-   }
+    public static RenderLayer getSign() {
+        return SIGN_RENDER_LAYER;
+    }
 
-   public static RenderLayer getHangingSign() {
-      return SIGN_RENDER_LAYER;
-   }
+    public static RenderLayer getHangingSign() {
+        return SIGN_RENDER_LAYER;
+    }
 
-   public static RenderLayer getChest() {
-      return CHEST_RENDER_LAYER;
-   }
+    public static RenderLayer getChest() {
+        return CHEST_RENDER_LAYER;
+    }
 
-   public static RenderLayer getArmorTrims(boolean decal) {
-      return decal ? ARMOR_TRIMS_DECAL_RENDER_LAYER : ARMOR_TRIMS_RENDER_LAYER;
-   }
+    public static RenderLayer getArmorTrims(boolean decal) {
+        return decal ? ARMOR_TRIMS_DECAL_RENDER_LAYER : ARMOR_TRIMS_RENDER_LAYER;
+    }
 
-   public static RenderLayer getEntitySolid() {
-      return ENTITY_SOLID;
-   }
+    public static RenderLayer getEntitySolid() {
+        return ENTITY_SOLID;
+    }
 
-   public static RenderLayer getEntityCutout() {
-      return ENTITY_CUTOUT;
-   }
+    public static RenderLayer getEntityCutout() {
+        return ENTITY_CUTOUT;
+    }
 
-   public static RenderLayer getItemEntityTranslucentCull() {
-      return ITEM_ENTITY_TRANSLUCENT_CULL;
-   }
+    public static RenderLayer getItemTranslucentCull() {
+        return ITEM_TRANSLUCENT_CULL;
+    }
 
-   public static SpriteIdentifier getBedTextureId(DyeColor color) {
-      return BED_TEXTURES[color.getIndex()];
-   }
+    public static RenderLayer getBlockTranslucentCull() {
+        return BLOCK_TRANSLUCENT_CULL;
+    }
 
-   public static Identifier createColorId(DyeColor color) {
-      return Identifier.ofVanilla(color.getId());
-   }
+    public static SpriteIdentifier getBedTextureId(DyeColor color) {
+        return BED_TEXTURES[color.getIndex()];
+    }
 
-   public static SpriteIdentifier createBedTextureId(DyeColor color) {
-      return BED_SPRITE_MAPPER.map(createColorId(color));
-   }
+    public static Identifier createColorId(DyeColor color) {
+        return Identifier.ofVanilla((String)color.getId());
+    }
 
-   public static SpriteIdentifier getShulkerBoxTextureId(DyeColor color) {
-      return (SpriteIdentifier)COLORED_SHULKER_BOXES_TEXTURES.get(color.getIndex());
-   }
+    public static SpriteIdentifier createBedTextureId(DyeColor color) {
+        return BED_SPRITE_MAPPER.map(TexturedRenderLayers.createColorId((DyeColor)color));
+    }
 
-   public static Identifier createShulkerId(DyeColor color) {
-      return Identifier.ofVanilla("shulker_" + color.getId());
-   }
+    public static SpriteIdentifier getShulkerBoxTextureId(DyeColor color) {
+        return (SpriteIdentifier)COLORED_SHULKER_BOXES_TEXTURES.get(color.getIndex());
+    }
 
-   public static SpriteIdentifier createShulkerBoxTextureId(DyeColor color) {
-      return SHULKER_SPRITE_MAPPER.map(createShulkerId(color));
-   }
+    public static Identifier createShulkerId(DyeColor color) {
+        return Identifier.ofVanilla((String)("shulker_" + color.getId()));
+    }
 
-   private static SpriteIdentifier createSignTextureId(WoodType type) {
-      return SIGN_SPRITE_MAPPER.mapVanilla(type.name());
-   }
+    public static SpriteIdentifier createShulkerBoxTextureId(DyeColor color) {
+        return SHULKER_SPRITE_MAPPER.map(TexturedRenderLayers.createShulkerId((DyeColor)color));
+    }
 
-   private static SpriteIdentifier createHangingSignTextureId(WoodType type) {
-      return HANGING_SIGN_SPRITE_MAPPER.mapVanilla(type.name());
-   }
+    private static SpriteIdentifier createSignTextureId(WoodType type) {
+        return SIGN_SPRITE_MAPPER.mapVanilla(type.name());
+    }
 
-   public static SpriteIdentifier getSignTextureId(WoodType signType) {
-      return (SpriteIdentifier)SIGN_TYPE_TEXTURES.get(signType);
-   }
+    private static SpriteIdentifier createHangingSignTextureId(WoodType type) {
+        return HANGING_SIGN_SPRITE_MAPPER.mapVanilla(type.name());
+    }
 
-   public static SpriteIdentifier getHangingSignTextureId(WoodType signType) {
-      return (SpriteIdentifier)HANGING_SIGN_TYPE_TEXTURES.get(signType);
-   }
+    public static SpriteIdentifier getSignTextureId(WoodType signType) {
+        return (SpriteIdentifier)SIGN_TYPE_TEXTURES.get(signType);
+    }
 
-   public static SpriteIdentifier getBannerPatternTextureId(RegistryEntry pattern) {
-      Map var10000 = BANNER_PATTERN_TEXTURES;
-      Identifier var10001 = ((BannerPattern)pattern.value()).assetId();
-      SpriteMapper var10002 = BANNER_PATTERN_SPRITE_MAPPER;
-      Objects.requireNonNull(var10002);
-      return (SpriteIdentifier)var10000.computeIfAbsent(var10001, var10002::map);
-   }
+    public static SpriteIdentifier getHangingSignTextureId(WoodType signType) {
+        return (SpriteIdentifier)HANGING_SIGN_TYPE_TEXTURES.get(signType);
+    }
 
-   public static SpriteIdentifier getShieldPatternTextureId(RegistryEntry pattern) {
-      Map var10000 = SHIELD_PATTERN_TEXTURES;
-      Identifier var10001 = ((BannerPattern)pattern.value()).assetId();
-      SpriteMapper var10002 = SHIELD_PATTERN_SPRITE_MAPPER;
-      Objects.requireNonNull(var10002);
-      return (SpriteIdentifier)var10000.computeIfAbsent(var10001, var10002::map);
-   }
+    public static SpriteIdentifier getBannerPatternTextureId(RegistryEntry<BannerPattern> pattern) {
+        return BANNER_PATTERN_TEXTURES.computeIfAbsent(((BannerPattern)pattern.value()).assetId(), arg_0 -> ((SpriteMapper)BANNER_PATTERN_SPRITE_MAPPER).map(arg_0));
+    }
 
-   @Nullable
-   public static SpriteIdentifier getDecoratedPotPatternTextureId(@Nullable RegistryKey potPatternKey) {
-      return potPatternKey == null ? null : (SpriteIdentifier)DECORATED_POT_PATTERN_TEXTURES.get(potPatternKey);
-   }
+    public static SpriteIdentifier getShieldPatternTextureId(RegistryEntry<BannerPattern> pattern) {
+        return SHIELD_PATTERN_TEXTURES.computeIfAbsent(((BannerPattern)pattern.value()).assetId(), arg_0 -> ((SpriteMapper)SHIELD_PATTERN_SPRITE_MAPPER).map(arg_0));
+    }
 
-   public static SpriteIdentifier getChestTextureId(BlockEntity blockEntity, ChestType type, boolean christmas) {
-      if (blockEntity instanceof EnderChestBlockEntity) {
-         return ENDER_CHEST;
-      } else if (christmas) {
-         return getChestTextureId(type, CHRISTMAS_CHEST, CHRISTMAS_CHEST_LEFT, CHRISTMAS_CHEST_RIGHT);
-      } else {
-         return blockEntity instanceof TrappedChestBlockEntity ? getChestTextureId(type, TRAPPED_CHEST, TRAPPED_CHEST_LEFT, TRAPPED_CHEST_RIGHT) : getChestTextureId(type, CHEST, CHEST_LEFT, CHEST_RIGHT);
-      }
-   }
+    public static @Nullable SpriteIdentifier getDecoratedPotPatternTextureId(@Nullable RegistryKey<DecoratedPotPattern> potPatternKey) {
+        if (potPatternKey == null) {
+            return null;
+        }
+        return (SpriteIdentifier)DECORATED_POT_PATTERN_TEXTURES.get(potPatternKey);
+    }
 
-   private static SpriteIdentifier getChestTextureId(ChestType type, SpriteIdentifier single, SpriteIdentifier left, SpriteIdentifier right) {
-      switch (type) {
-         case LEFT:
-            return left;
-         case RIGHT:
-            return right;
-         case SINGLE:
-         default:
-            return single;
-      }
-   }
+    public static SpriteIdentifier getChestTextureId(ChestBlockEntityRenderState.Variant variant, ChestType type) {
+        return switch (1.field_61761[variant.ordinal()]) {
+            default -> throw new MatchException(null, null);
+            case 1 -> ENDER_CHEST;
+            case 2 -> TexturedRenderLayers.getChestTextureId((ChestType)type, (SpriteIdentifier)CHRISTMAS_CHEST, (SpriteIdentifier)CHRISTMAS_CHEST_LEFT, (SpriteIdentifier)CHRISTMAS_CHEST_RIGHT);
+            case 3 -> TexturedRenderLayers.getChestTextureId((ChestType)type, (SpriteIdentifier)TRAPPED_CHEST, (SpriteIdentifier)TRAPPED_CHEST_LEFT, (SpriteIdentifier)TRAPPED_CHEST_RIGHT);
+            case 4 -> TexturedRenderLayers.getChestTextureId((ChestType)type, (SpriteIdentifier)COPPER_CHEST, (SpriteIdentifier)COPPER_CHEST_LEFT, (SpriteIdentifier)COPPER_CHEST_RIGHT);
+            case 5 -> TexturedRenderLayers.getChestTextureId((ChestType)type, (SpriteIdentifier)EXPOSED_COPPER_CHEST, (SpriteIdentifier)EXPOSED_COPPER_CHEST_LEFT, (SpriteIdentifier)EXPOSED_COPPER_CHEST_RIGHT);
+            case 6 -> TexturedRenderLayers.getChestTextureId((ChestType)type, (SpriteIdentifier)WEATHERED_COPPER_CHEST, (SpriteIdentifier)WEATHERED_COPPER_CHEST_LEFT, (SpriteIdentifier)WEATHERED_COPPER_CHEST_RIGHT);
+            case 7 -> TexturedRenderLayers.getChestTextureId((ChestType)type, (SpriteIdentifier)OXIDIZED_COPPER_CHEST, (SpriteIdentifier)OXIDIZED_COPPER_CHEST_LEFT, (SpriteIdentifier)OXIDIZED_COPPER_CHEST_RIGHT);
+            case 8 -> TexturedRenderLayers.getChestTextureId((ChestType)type, (SpriteIdentifier)CHEST, (SpriteIdentifier)CHEST_LEFT, (SpriteIdentifier)CHEST_RIGHT);
+        };
+    }
 
-   static {
-      SHULKER_BOXES_RENDER_LAYER = RenderLayer.getEntityCutoutNoCull(SHULKER_BOXES_ATLAS_TEXTURE);
-      BEDS_RENDER_LAYER = RenderLayer.getEntitySolid(BEDS_ATLAS_TEXTURE);
-      BANNER_PATTERNS_RENDER_LAYER = RenderLayer.getEntityNoOutline(BANNER_PATTERNS_ATLAS_TEXTURE);
-      SHIELD_PATTERNS_RENDER_LAYER = RenderLayer.getEntityNoOutline(SHIELD_PATTERNS_ATLAS_TEXTURE);
-      SIGN_RENDER_LAYER = RenderLayer.getEntityCutoutNoCull(SIGNS_ATLAS_TEXTURE);
-      CHEST_RENDER_LAYER = RenderLayer.getEntityCutout(CHEST_ATLAS_TEXTURE);
-      ARMOR_TRIMS_RENDER_LAYER = RenderLayer.getArmorCutoutNoCull(ARMOR_TRIMS_ATLAS_TEXTURE);
-      ARMOR_TRIMS_DECAL_RENDER_LAYER = RenderLayer.createArmorDecalCutoutNoCull(ARMOR_TRIMS_ATLAS_TEXTURE);
-      ENTITY_SOLID = RenderLayer.getEntitySolid(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE);
-      ENTITY_CUTOUT = RenderLayer.getEntityCutout(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE);
-      ITEM_ENTITY_TRANSLUCENT_CULL = RenderLayer.getItemEntityTranslucentCull(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE);
-      ITEM_SPRITE_MAPPER = new SpriteMapper(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, "item");
-      BLOCK_SPRITE_MAPPER = new SpriteMapper(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, "block");
-      BANNER_PATTERN_SPRITE_MAPPER = new SpriteMapper(BANNER_PATTERNS_ATLAS_TEXTURE, "entity/banner");
-      SHIELD_PATTERN_SPRITE_MAPPER = new SpriteMapper(SHIELD_PATTERNS_ATLAS_TEXTURE, "entity/shield");
-      CHEST_SPRITE_MAPPER = new SpriteMapper(CHEST_ATLAS_TEXTURE, "entity/chest");
-      DECORATED_POT_SPRITE_MAPPER = new SpriteMapper(DECORATED_POT_ATLAS_TEXTURE, "entity/decorated_pot");
-      BED_SPRITE_MAPPER = new SpriteMapper(BEDS_ATLAS_TEXTURE, "entity/bed");
-      SHULKER_SPRITE_MAPPER = new SpriteMapper(SHULKER_BOXES_ATLAS_TEXTURE, "entity/shulker");
-      SIGN_SPRITE_MAPPER = new SpriteMapper(SIGNS_ATLAS_TEXTURE, "entity/signs");
-      HANGING_SIGN_SPRITE_MAPPER = new SpriteMapper(SIGNS_ATLAS_TEXTURE, "entity/signs/hanging");
-      SHULKER_TEXTURE_ID = SHULKER_SPRITE_MAPPER.mapVanilla("shulker");
-      COLORED_SHULKER_BOXES_TEXTURES = (List)Arrays.stream(DyeColor.values()).sorted(Comparator.comparingInt(DyeColor::getIndex)).map(TexturedRenderLayers::createShulkerBoxTextureId).collect(ImmutableList.toImmutableList());
-      SIGN_TYPE_TEXTURES = (Map)WoodType.stream().collect(Collectors.toMap(Function.identity(), TexturedRenderLayers::createSignTextureId));
-      HANGING_SIGN_TYPE_TEXTURES = (Map)WoodType.stream().collect(Collectors.toMap(Function.identity(), TexturedRenderLayers::createHangingSignTextureId));
-      BANNER_BASE = BANNER_PATTERN_SPRITE_MAPPER.mapVanilla("base");
-      SHIELD_BASE = SHIELD_PATTERN_SPRITE_MAPPER.mapVanilla("base");
-      BANNER_PATTERN_TEXTURES = new HashMap();
-      SHIELD_PATTERN_TEXTURES = new HashMap();
-      DECORATED_POT_PATTERN_TEXTURES = (Map)Registries.DECORATED_POT_PATTERN.streamEntries().collect(Collectors.toMap(RegistryEntry.Reference::registryKey, (pattern) -> {
-         return DECORATED_POT_SPRITE_MAPPER.map(((DecoratedPotPattern)pattern.value()).assetId());
-      }));
-      DECORATED_POT_BASE = DECORATED_POT_SPRITE_MAPPER.mapVanilla("decorated_pot_base");
-      DECORATED_POT_SIDE = DECORATED_POT_SPRITE_MAPPER.mapVanilla("decorated_pot_side");
-      BED_TEXTURES = (SpriteIdentifier[])Arrays.stream(DyeColor.values()).sorted(Comparator.comparingInt(DyeColor::getIndex)).map(TexturedRenderLayers::createBedTextureId).toArray((i) -> {
-         return new SpriteIdentifier[i];
-      });
-      TRAPPED_CHEST = CHEST_SPRITE_MAPPER.mapVanilla("trapped");
-      TRAPPED_CHEST_LEFT = CHEST_SPRITE_MAPPER.mapVanilla("trapped_left");
-      TRAPPED_CHEST_RIGHT = CHEST_SPRITE_MAPPER.mapVanilla("trapped_right");
-      CHRISTMAS_CHEST = CHEST_SPRITE_MAPPER.mapVanilla("christmas");
-      CHRISTMAS_CHEST_LEFT = CHEST_SPRITE_MAPPER.mapVanilla("christmas_left");
-      CHRISTMAS_CHEST_RIGHT = CHEST_SPRITE_MAPPER.mapVanilla("christmas_right");
-      CHEST = CHEST_SPRITE_MAPPER.mapVanilla("normal");
-      CHEST_LEFT = CHEST_SPRITE_MAPPER.mapVanilla("normal_left");
-      CHEST_RIGHT = CHEST_SPRITE_MAPPER.mapVanilla("normal_right");
-      ENDER_CHEST = CHEST_SPRITE_MAPPER.mapVanilla("ender");
-   }
+    private static SpriteIdentifier getChestTextureId(ChestType type, SpriteIdentifier single, SpriteIdentifier left, SpriteIdentifier right) {
+        switch (1.field_21482[type.ordinal()]) {
+            case 1: {
+                return left;
+            }
+            case 2: {
+                return right;
+            }
+        }
+        return single;
+    }
 }
+

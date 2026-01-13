@@ -1,9 +1,20 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.session.telemetry.SentTelemetryEvent
+ *  net.minecraft.client.session.telemetry.TelemetryLogger
+ */
 package net.minecraft.client.session.telemetry;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.session.telemetry.SentTelemetryEvent;
 
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 public interface TelemetryLogger {
-   void log(SentTelemetryEvent event);
+    public void log(SentTelemetryEvent var1);
 }
+

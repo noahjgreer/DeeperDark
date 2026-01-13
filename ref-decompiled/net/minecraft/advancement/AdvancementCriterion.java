@@ -1,37 +1,62 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.MapCodec
+ *  net.minecraft.advancement.AdvancementCriterion
+ *  net.minecraft.advancement.criterion.Criteria
+ *  net.minecraft.advancement.criterion.Criterion
+ *  net.minecraft.advancement.criterion.CriterionConditions
+ *  net.minecraft.util.dynamic.Codecs
+ */
 package net.minecraft.advancement;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
+import java.lang.invoke.MethodHandle;
+import java.lang.runtime.ObjectMethods;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.advancement.criterion.Criterion;
 import net.minecraft.advancement.criterion.CriterionConditions;
 import net.minecraft.util.dynamic.Codecs;
 
-public record AdvancementCriterion(Criterion trigger, CriterionConditions conditions) {
-   private static final MapCodec MAP_CODEC;
-   public static final Codec CODEC;
+public record AdvancementCriterion<T extends CriterionConditions>(Criterion<T> trigger, T conditions) {
+    private final Criterion<T> trigger;
+    private final T conditions;
+    private static final MapCodec<AdvancementCriterion<?>> MAP_CODEC = Codecs.parameters((String)"trigger", (String)"conditions", (Codec)Criteria.CODEC, AdvancementCriterion::trigger, AdvancementCriterion::getCodec);
+    public static final Codec<AdvancementCriterion<?>> CODEC = MAP_CODEC.codec();
 
-   public AdvancementCriterion(Criterion criterion, CriterionConditions criterionConditions) {
-      this.trigger = criterion;
-      this.conditions = criterionConditions;
-   }
+    public AdvancementCriterion(Criterion<T> trigger, T conditions) {
+        this.trigger = trigger;
+        this.conditions = conditions;
+    }
 
-   private static Codec getCodec(Criterion criterion) {
-      return criterion.getConditionsCodec().xmap((conditions) -> {
-         return new AdvancementCriterion(criterion, conditions);
-      }, AdvancementCriterion::conditions);
-   }
+    private static <T extends CriterionConditions> Codec<AdvancementCriterion<T>> getCodec(Criterion<T> criterion) {
+        return criterion.getConditionsCodec().xmap(conditions -> new AdvancementCriterion(criterion, conditions), AdvancementCriterion::conditions);
+    }
 
-   public Criterion trigger() {
-      return this.trigger;
-   }
+    @Override
+    public final String toString() {
+        return ObjectMethods.bootstrap("toString", new MethodHandle[]{AdvancementCriterion.class, "trigger;triggerInstance", "trigger", "conditions"}, this);
+    }
 
-   public CriterionConditions conditions() {
-      return this.conditions;
-   }
+    @Override
+    public final int hashCode() {
+        return (int)ObjectMethods.bootstrap("hashCode", new MethodHandle[]{AdvancementCriterion.class, "trigger;triggerInstance", "trigger", "conditions"}, this);
+    }
 
-   static {
-      MAP_CODEC = Codecs.parameters("trigger", "conditions", Criteria.CODEC, AdvancementCriterion::trigger, AdvancementCriterion::getCodec);
-      CODEC = MAP_CODEC.codec();
-   }
+    @Override
+    public final boolean equals(Object object) {
+        return (boolean)ObjectMethods.bootstrap("equals", new MethodHandle[]{AdvancementCriterion.class, "trigger;triggerInstance", "trigger", "conditions"}, this, object);
+    }
+
+    public Criterion<T> trigger() {
+        return this.trigger;
+    }
+
+    public T conditions() {
+        return (T)this.conditions;
+    }
 }
+

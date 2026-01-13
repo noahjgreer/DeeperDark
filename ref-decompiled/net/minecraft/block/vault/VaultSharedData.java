@@ -1,91 +1,98 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
+ *  it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet
+ *  net.minecraft.block.vault.VaultConfig
+ *  net.minecraft.block.vault.VaultServerData
+ *  net.minecraft.block.vault.VaultSharedData
+ *  net.minecraft.item.ItemStack
+ *  net.minecraft.server.world.ServerWorld
+ *  net.minecraft.util.Uuids
+ *  net.minecraft.util.math.BlockPos
+ */
 package net.minecraft.block.vault;
 
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
+import net.minecraft.block.vault.VaultConfig;
+import net.minecraft.block.vault.VaultServerData;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Uuids;
 import net.minecraft.util.math.BlockPos;
 
 public class VaultSharedData {
-   static final String SHARED_DATA_KEY = "shared_data";
-   static Codec codec = RecordCodecBuilder.create((instance) -> {
-      return instance.group(ItemStack.createOptionalCodec("display_item").forGetter((data) -> {
-         return data.displayItem;
-      }), Uuids.LINKED_SET_CODEC.lenientOptionalFieldOf("connected_players", Set.of()).forGetter((data) -> {
-         return data.connectedPlayers;
-      }), Codec.DOUBLE.lenientOptionalFieldOf("connected_particles_range", VaultConfig.DEFAULT.deactivationRange()).forGetter((data) -> {
-         return data.connectedParticlesRange;
-      })).apply(instance, VaultSharedData::new);
-   });
-   private ItemStack displayItem;
-   private Set connectedPlayers;
-   private double connectedParticlesRange;
-   boolean dirty;
+    static final String SHARED_DATA_KEY = "shared_data";
+    static Codec<VaultSharedData> codec = RecordCodecBuilder.create(instance -> instance.group((App)ItemStack.createOptionalCodec((String)"display_item").forGetter(data -> data.displayItem), (App)Uuids.LINKED_SET_CODEC.lenientOptionalFieldOf("connected_players", Set.of()).forGetter(data -> data.connectedPlayers), (App)Codec.DOUBLE.lenientOptionalFieldOf("connected_particles_range", (Object)VaultConfig.DEFAULT.deactivationRange()).forGetter(data -> data.connectedParticlesRange)).apply((Applicative)instance, VaultSharedData::new));
+    private ItemStack displayItem = ItemStack.EMPTY;
+    private Set<UUID> connectedPlayers = new ObjectLinkedOpenHashSet();
+    private double connectedParticlesRange = VaultConfig.DEFAULT.deactivationRange();
+    boolean dirty;
 
-   VaultSharedData(ItemStack displayItem, Set connectedPlayers, double connectedParticlesRange) {
-      this.displayItem = ItemStack.EMPTY;
-      this.connectedPlayers = new ObjectLinkedOpenHashSet();
-      this.connectedParticlesRange = VaultConfig.DEFAULT.deactivationRange();
-      this.displayItem = displayItem;
-      this.connectedPlayers.addAll(connectedPlayers);
-      this.connectedParticlesRange = connectedParticlesRange;
-   }
+    VaultSharedData(ItemStack displayItem, Set<UUID> connectedPlayers, double connectedParticlesRange) {
+        this.displayItem = displayItem;
+        this.connectedPlayers.addAll(connectedPlayers);
+        this.connectedParticlesRange = connectedParticlesRange;
+    }
 
-   VaultSharedData() {
-      this.displayItem = ItemStack.EMPTY;
-      this.connectedPlayers = new ObjectLinkedOpenHashSet();
-      this.connectedParticlesRange = VaultConfig.DEFAULT.deactivationRange();
-   }
+    VaultSharedData() {
+    }
 
-   public ItemStack getDisplayItem() {
-      return this.displayItem;
-   }
+    public ItemStack getDisplayItem() {
+        return this.displayItem;
+    }
 
-   public boolean hasDisplayItem() {
-      return !this.displayItem.isEmpty();
-   }
+    public boolean hasDisplayItem() {
+        return !this.displayItem.isEmpty();
+    }
 
-   public void setDisplayItem(ItemStack stack) {
-      if (!ItemStack.areEqual(this.displayItem, stack)) {
-         this.displayItem = stack.copy();
-         this.markDirty();
-      }
-   }
+    public void setDisplayItem(ItemStack stack) {
+        if (ItemStack.areEqual((ItemStack)this.displayItem, (ItemStack)stack)) {
+            return;
+        }
+        this.displayItem = stack.copy();
+        this.markDirty();
+    }
 
-   boolean hasConnectedPlayers() {
-      return !this.connectedPlayers.isEmpty();
-   }
+    boolean hasConnectedPlayers() {
+        return !this.connectedPlayers.isEmpty();
+    }
 
-   Set getConnectedPlayers() {
-      return this.connectedPlayers;
-   }
+    Set<UUID> getConnectedPlayers() {
+        return this.connectedPlayers;
+    }
 
-   double getConnectedParticlesRange() {
-      return this.connectedParticlesRange;
-   }
+    double getConnectedParticlesRange() {
+        return this.connectedParticlesRange;
+    }
 
-   void updateConnectedPlayers(ServerWorld world, BlockPos pos, VaultServerData serverData, VaultConfig config, double radius) {
-      Set set = (Set)config.playerDetector().detect(world, config.entitySelector(), pos, radius, false).stream().filter((uuid) -> {
-         return !serverData.getRewardedPlayers().contains(uuid);
-      }).collect(Collectors.toSet());
-      if (!this.connectedPlayers.equals(set)) {
-         this.connectedPlayers = set;
-         this.markDirty();
-      }
+    void updateConnectedPlayers(ServerWorld world, BlockPos pos, VaultServerData serverData, VaultConfig config, double radius) {
+        Set set = config.playerDetector().detect(world, config.entitySelector(), pos, radius, false).stream().filter(uuid -> !serverData.getRewardedPlayers().contains(uuid)).collect(Collectors.toSet());
+        if (!this.connectedPlayers.equals(set)) {
+            this.connectedPlayers = set;
+            this.markDirty();
+        }
+    }
 
-   }
+    private void markDirty() {
+        this.dirty = true;
+    }
 
-   private void markDirty() {
-      this.dirty = true;
-   }
-
-   void copyFrom(VaultSharedData data) {
-      this.displayItem = data.displayItem;
-      this.connectedPlayers = data.connectedPlayers;
-      this.connectedParticlesRange = data.connectedParticlesRange;
-   }
+    void copyFrom(VaultSharedData data) {
+        this.displayItem = data.displayItem;
+        this.connectedPlayers = data.connectedPlayers;
+        this.connectedParticlesRange = data.connectedParticlesRange;
+    }
 }
+

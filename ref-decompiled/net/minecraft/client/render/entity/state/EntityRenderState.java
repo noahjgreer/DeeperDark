@@ -1,67 +1,67 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.fabricmc.fabric.api.client.rendering.v1.FabricRenderState
+ *  net.minecraft.client.render.entity.state.EntityRenderState
+ *  net.minecraft.client.render.entity.state.EntityRenderState$LeashData
+ *  net.minecraft.client.render.entity.state.EntityRenderState$ShadowPiece
+ *  net.minecraft.entity.EntityType
+ *  net.minecraft.text.Text
+ *  net.minecraft.util.crash.CrashReportSection
+ *  net.minecraft.util.math.Vec3d
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.render.entity.state;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.rendering.v1.FabricRenderState;
+import net.minecraft.client.render.entity.state.EntityRenderState;
 import net.minecraft.entity.EntityType;
 import net.minecraft.text.Text;
 import net.minecraft.util.crash.CrashReportSection;
 import net.minecraft.util.math.Vec3d;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
-public class EntityRenderState {
-   public EntityType entityType;
-   public double x;
-   public double y;
-   public double z;
-   public float age;
-   public float width;
-   public float height;
-   public float standingEyeHeight;
-   public double squaredDistanceToCamera;
-   public boolean invisible;
-   public boolean sneaking;
-   public boolean onFire;
-   @Nullable
-   public Vec3d positionOffset;
-   @Nullable
-   public Text displayName;
-   @Nullable
-   public Vec3d nameLabelPos;
-   @Nullable
-   public List leashDatas;
-   @Nullable
-   public EntityHitboxAndView hitbox;
-   @Nullable
-   public EntityDebugInfo debugInfo;
+@Environment(value=EnvType.CLIENT)
+public class EntityRenderState
+implements FabricRenderState {
+    public static final int NO_OUTLINE = 0;
+    public EntityType<?> entityType;
+    public double x;
+    public double y;
+    public double z;
+    public float age;
+    public float width;
+    public float height;
+    public float standingEyeHeight;
+    public double squaredDistanceToCamera;
+    public boolean invisible;
+    public boolean sneaking;
+    public boolean onFire;
+    public int light = 0xF000F0;
+    public int outlineColor = 0;
+    public @Nullable Vec3d positionOffset;
+    public @Nullable Text displayName;
+    public @Nullable Vec3d nameLabelPos;
+    public @Nullable List<// Could not load outer class - annotation placement on inner may be incorrect
+    LeashData> leashDatas;
+    public float shadowRadius;
+    public final List<ShadowPiece> shadowPieces = new ArrayList();
 
-   public void addCrashReportDetails(CrashReportSection crashReportSection) {
-      crashReportSection.add("EntityRenderState", (Object)this.getClass().getCanonicalName());
-      crashReportSection.add("Entity's Exact location", (Object)String.format(Locale.ROOT, "%.2f, %.2f, %.2f", this.x, this.y, this.z));
-   }
+    public boolean hasOutline() {
+        return this.outlineColor != 0;
+    }
 
-   @Environment(EnvType.CLIENT)
-   public static class LeashData {
-      public Vec3d offset;
-      public Vec3d startPos;
-      public Vec3d endPos;
-      public int leashedEntityBlockLight;
-      public int leashHolderBlockLight;
-      public int leashedEntitySkyLight;
-      public int leashHolderSkyLight;
-      public boolean field_60161;
-
-      public LeashData() {
-         this.offset = Vec3d.ZERO;
-         this.startPos = Vec3d.ZERO;
-         this.endPos = Vec3d.ZERO;
-         this.leashedEntityBlockLight = 0;
-         this.leashHolderBlockLight = 0;
-         this.leashedEntitySkyLight = 15;
-         this.leashHolderSkyLight = 15;
-         this.field_60161 = true;
-      }
-   }
+    public void addCrashReportDetails(CrashReportSection crashReportSection) {
+        crashReportSection.add("EntityRenderState", (Object)this.getClass().getCanonicalName());
+        crashReportSection.add("Entity's Exact location", (Object)String.format(Locale.ROOT, "%.2f, %.2f, %.2f", this.x, this.y, this.z));
+    }
 }
+

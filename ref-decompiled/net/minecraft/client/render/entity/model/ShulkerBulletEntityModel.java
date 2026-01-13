@@ -1,3 +1,19 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.model.ModelData
+ *  net.minecraft.client.model.ModelPart
+ *  net.minecraft.client.model.ModelPartBuilder
+ *  net.minecraft.client.model.ModelPartData
+ *  net.minecraft.client.model.ModelTransform
+ *  net.minecraft.client.model.TexturedModelData
+ *  net.minecraft.client.render.entity.model.EntityModel
+ *  net.minecraft.client.render.entity.model.ShulkerBulletEntityModel
+ *  net.minecraft.client.render.entity.state.ShulkerBulletEntityRenderState
+ */
 package net.minecraft.client.render.entity.model;
 
 import net.fabricmc.api.EnvType;
@@ -8,28 +24,31 @@ import net.minecraft.client.model.ModelPartBuilder;
 import net.minecraft.client.model.ModelPartData;
 import net.minecraft.client.model.ModelTransform;
 import net.minecraft.client.model.TexturedModelData;
+import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.render.entity.state.ShulkerBulletEntityRenderState;
 
-@Environment(EnvType.CLIENT)
-public class ShulkerBulletEntityModel extends EntityModel {
-   private static final String MAIN = "main";
-   private final ModelPart bullet;
+@Environment(value=EnvType.CLIENT)
+public class ShulkerBulletEntityModel
+extends EntityModel<ShulkerBulletEntityRenderState> {
+    private static final String MAIN = "main";
+    private final ModelPart bullet;
 
-   public ShulkerBulletEntityModel(ModelPart modelPart) {
-      super(modelPart);
-      this.bullet = modelPart.getChild("main");
-   }
+    public ShulkerBulletEntityModel(ModelPart modelPart) {
+        super(modelPart);
+        this.bullet = modelPart.getChild(MAIN);
+    }
 
-   public static TexturedModelData getTexturedModelData() {
-      ModelData modelData = new ModelData();
-      ModelPartData modelPartData = modelData.getRoot();
-      modelPartData.addChild("main", ModelPartBuilder.create().uv(0, 0).cuboid(-4.0F, -4.0F, -1.0F, 8.0F, 8.0F, 2.0F).uv(0, 10).cuboid(-1.0F, -4.0F, -4.0F, 2.0F, 8.0F, 8.0F).uv(20, 0).cuboid(-4.0F, -1.0F, -4.0F, 8.0F, 2.0F, 8.0F), ModelTransform.NONE);
-      return TexturedModelData.of(modelData, 64, 32);
-   }
+    public static TexturedModelData getTexturedModelData() {
+        ModelData modelData = new ModelData();
+        ModelPartData modelPartData = modelData.getRoot();
+        modelPartData.addChild(MAIN, ModelPartBuilder.create().uv(0, 0).cuboid(-4.0f, -4.0f, -1.0f, 8.0f, 8.0f, 2.0f).uv(0, 10).cuboid(-1.0f, -4.0f, -4.0f, 2.0f, 8.0f, 8.0f).uv(20, 0).cuboid(-4.0f, -1.0f, -4.0f, 8.0f, 2.0f, 8.0f), ModelTransform.NONE);
+        return TexturedModelData.of((ModelData)modelData, (int)64, (int)32);
+    }
 
-   public void setAngles(ShulkerBulletEntityRenderState shulkerBulletEntityRenderState) {
-      super.setAngles(shulkerBulletEntityRenderState);
-      this.bullet.yaw = shulkerBulletEntityRenderState.yaw * 0.017453292F;
-      this.bullet.pitch = shulkerBulletEntityRenderState.pitch * 0.017453292F;
-   }
+    public void setAngles(ShulkerBulletEntityRenderState shulkerBulletEntityRenderState) {
+        super.setAngles((Object)shulkerBulletEntityRenderState);
+        this.bullet.yaw = shulkerBulletEntityRenderState.yaw * ((float)Math.PI / 180);
+        this.bullet.pitch = shulkerBulletEntityRenderState.pitch * ((float)Math.PI / 180);
+    }
 }
+

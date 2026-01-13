@@ -1,133 +1,132 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.gui.ScreenRect
+ *  net.minecraft.client.gui.widget.Positioner
+ *  net.minecraft.client.gui.widget.SimplePositioningWidget
+ *  net.minecraft.client.gui.widget.SimplePositioningWidget$Element
+ *  net.minecraft.client.gui.widget.Widget
+ *  net.minecraft.client.gui.widget.WrapperWidget
+ *  net.minecraft.util.Util
+ *  net.minecraft.util.math.MathHelper
+ */
 package net.minecraft.client.gui.widget;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Consumer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.ScreenRect;
+import net.minecraft.client.gui.widget.Positioner;
+import net.minecraft.client.gui.widget.SimplePositioningWidget;
+import net.minecraft.client.gui.widget.Widget;
+import net.minecraft.client.gui.widget.WrapperWidget;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 
-@Environment(EnvType.CLIENT)
-public class SimplePositioningWidget extends WrapperWidget {
-   private final List elements;
-   private int minWidth;
-   private int minHeight;
-   private final Positioner mainPositioner;
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
+public class SimplePositioningWidget
+extends WrapperWidget {
+    private final List<Element> elements = new ArrayList();
+    private int minWidth;
+    private int minHeight;
+    private final Positioner mainPositioner = Positioner.create().relative(0.5f, 0.5f);
 
-   public SimplePositioningWidget() {
-      this(0, 0, 0, 0);
-   }
+    public SimplePositioningWidget() {
+        this(0, 0, 0, 0);
+    }
 
-   public SimplePositioningWidget(int width, int height) {
-      this(0, 0, width, height);
-   }
+    public SimplePositioningWidget(int width, int height) {
+        this(0, 0, width, height);
+    }
 
-   public SimplePositioningWidget(int i, int j, int k, int l) {
-      super(i, j, k, l);
-      this.elements = new ArrayList();
-      this.mainPositioner = Positioner.create().relative(0.5F, 0.5F);
-      this.setDimensions(k, l);
-   }
+    public SimplePositioningWidget(int i, int j, int k, int l) {
+        super(i, j, k, l);
+        this.setDimensions(k, l);
+    }
 
-   public SimplePositioningWidget setDimensions(int minWidth, int minHeight) {
-      return this.setMinWidth(minWidth).setMinHeight(minHeight);
-   }
+    public SimplePositioningWidget setDimensions(int minWidth, int minHeight) {
+        return this.setMinWidth(minWidth).setMinHeight(minHeight);
+    }
 
-   public SimplePositioningWidget setMinHeight(int minHeight) {
-      this.minHeight = minHeight;
-      return this;
-   }
+    public SimplePositioningWidget setMinHeight(int minHeight) {
+        this.minHeight = minHeight;
+        return this;
+    }
 
-   public SimplePositioningWidget setMinWidth(int minWidth) {
-      this.minWidth = minWidth;
-      return this;
-   }
+    public SimplePositioningWidget setMinWidth(int minWidth) {
+        this.minWidth = minWidth;
+        return this;
+    }
 
-   public Positioner copyPositioner() {
-      return this.mainPositioner.copy();
-   }
+    public Positioner copyPositioner() {
+        return this.mainPositioner.copy();
+    }
 
-   public Positioner getMainPositioner() {
-      return this.mainPositioner;
-   }
+    public Positioner getMainPositioner() {
+        return this.mainPositioner;
+    }
 
-   public void refreshPositions() {
-      super.refreshPositions();
-      int i = this.minWidth;
-      int j = this.minHeight;
+    public void refreshPositions() {
+        super.refreshPositions();
+        int i = this.minWidth;
+        int j = this.minHeight;
+        for (Element element : this.elements) {
+            i = Math.max(i, element.getWidth());
+            j = Math.max(j, element.getHeight());
+        }
+        for (Element element : this.elements) {
+            element.setX(this.getX(), i);
+            element.setY(this.getY(), j);
+        }
+        this.width = i;
+        this.height = j;
+    }
 
-      Iterator var3;
-      Element element;
-      for(var3 = this.elements.iterator(); var3.hasNext(); j = Math.max(j, element.getHeight())) {
-         element = (Element)var3.next();
-         i = Math.max(i, element.getWidth());
-      }
+    public <T extends Widget> T add(T widget) {
+        return (T)this.add(widget, this.copyPositioner());
+    }
 
-      var3 = this.elements.iterator();
+    public <T extends Widget> T add(T widget, Positioner positioner) {
+        this.elements.add(new Element(widget, positioner));
+        return widget;
+    }
 
-      while(var3.hasNext()) {
-         element = (Element)var3.next();
-         element.setX(this.getX(), i);
-         element.setY(this.getY(), j);
-      }
+    public <T extends Widget> T add(T widget, Consumer<Positioner> callback) {
+        return (T)this.add(widget, (Positioner)Util.make((Object)this.copyPositioner(), callback));
+    }
 
-      this.width = i;
-      this.height = j;
-   }
+    public void forEachElement(Consumer<Widget> consumer) {
+        this.elements.forEach(element -> consumer.accept(element.widget));
+    }
 
-   public Widget add(Widget widget) {
-      return this.add(widget, this.copyPositioner());
-   }
+    public static void setPos(Widget widget, int left, int top, int right, int bottom) {
+        SimplePositioningWidget.setPos((Widget)widget, (int)left, (int)top, (int)right, (int)bottom, (float)0.5f, (float)0.5f);
+    }
 
-   public Widget add(Widget widget, Positioner positioner) {
-      this.elements.add(new Element(widget, positioner));
-      return widget;
-   }
+    public static void setPos(Widget widget, ScreenRect rect) {
+        SimplePositioningWidget.setPos((Widget)widget, (int)rect.position().x(), (int)rect.position().y(), (int)rect.width(), (int)rect.height());
+    }
 
-   public Widget add(Widget widget, Consumer callback) {
-      return this.add(widget, (Positioner)Util.make(this.copyPositioner(), callback));
-   }
+    public static void setPos(Widget widget, ScreenRect rect, float relativeX, float relativeY) {
+        SimplePositioningWidget.setPos((Widget)widget, (int)rect.getLeft(), (int)rect.getTop(), (int)rect.width(), (int)rect.height(), (float)relativeX, (float)relativeY);
+    }
 
-   public void forEachElement(Consumer consumer) {
-      this.elements.forEach((element) -> {
-         consumer.accept(element.widget);
-      });
-   }
+    public static void setPos(Widget widget, int left, int top, int right, int bottom, float relativeX, float relativeY) {
+        SimplePositioningWidget.setPos((int)left, (int)right, (int)widget.getWidth(), arg_0 -> ((Widget)widget).setX(arg_0), (float)relativeX);
+        SimplePositioningWidget.setPos((int)top, (int)bottom, (int)widget.getHeight(), arg_0 -> ((Widget)widget).setY(arg_0), (float)relativeY);
+    }
 
-   public static void setPos(Widget widget, int left, int top, int right, int bottom) {
-      setPos(widget, left, top, right, bottom, 0.5F, 0.5F);
-   }
-
-   public static void setPos(Widget widget, ScreenRect rect) {
-      setPos(widget, rect.position().x(), rect.position().y(), rect.width(), rect.height());
-   }
-
-   public static void setPos(Widget widget, ScreenRect rect, float relativeX, float relativeY) {
-      setPos(widget, rect.getLeft(), rect.getTop(), rect.width(), rect.height(), relativeX, relativeY);
-   }
-
-   public static void setPos(Widget widget, int left, int top, int right, int bottom, float relativeX, float relativeY) {
-      int var10002 = widget.getWidth();
-      Objects.requireNonNull(widget);
-      setPos(left, right, var10002, widget::setX, relativeX);
-      var10002 = widget.getHeight();
-      Objects.requireNonNull(widget);
-      setPos(top, bottom, var10002, widget::setY, relativeY);
-   }
-
-   public static void setPos(int low, int high, int length, Consumer setter, float relative) {
-      int i = (int)MathHelper.lerp(relative, 0.0F, (float)(high - length));
-      setter.accept(low + i);
-   }
-
-   @Environment(EnvType.CLIENT)
-   private static class Element extends WrapperWidget.WrappedElement {
-      protected Element(Widget widget, Positioner positioner) {
-         super(widget, positioner);
-      }
-   }
+    public static void setPos(int low, int high, int length, Consumer<Integer> setter, float relative) {
+        int i = (int)MathHelper.lerp((float)relative, (float)0.0f, (float)(high - length));
+        setter.accept(low + i);
+    }
 }
+

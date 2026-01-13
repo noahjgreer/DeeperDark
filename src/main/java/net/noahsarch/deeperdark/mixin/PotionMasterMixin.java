@@ -51,7 +51,7 @@ public abstract class PotionMasterMixin implements PotionMasterDuck {
     }
 
     @Inject(method = "fillRecipes", at = @At("HEAD"), cancellable = true)
-    public void fillRecipes(CallbackInfo ci) {
+    public void fillRecipes(ServerWorld world, CallbackInfo ci) {
         if (this.isPotionMaster) {
             VillagerEntity villager = (VillagerEntity) (Object) this;
             VillagerData villagerData = this.getVillagerData();
@@ -60,7 +60,7 @@ public abstract class PotionMasterMixin implements PotionMasterDuck {
                 TradeOffers.Factory[] factories = ModVillagers.POTION_MASTER_TRADES.get(villagerData.level());
                 if (factories != null) {
                     TradeOfferList tradeOfferList = villager.getOffers();
-                    ((VillagerEntityAccessor)villager).deeperdark$fillRecipesFromPool(tradeOfferList, factories, 2);
+                    ((VillagerEntityAccessor)villager).deeperdark$fillRecipesFromPool(world, tradeOfferList, factories, 2);
                 }
             }
             ci.cancel(); // Prevent vanilla logic which might look for profession-based trades

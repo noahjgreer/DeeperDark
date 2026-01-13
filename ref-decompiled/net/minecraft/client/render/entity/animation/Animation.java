@@ -1,126 +1,93 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.model.ModelPart
+ *  net.minecraft.client.render.entity.animation.Animation
+ *  net.minecraft.client.render.entity.animation.Animation$TransformationEntry
+ *  net.minecraft.client.render.entity.animation.AnimationDefinition
+ *  net.minecraft.client.render.entity.animation.Transformation
+ *  net.minecraft.entity.AnimationState
+ *  org.joml.Vector3f
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.render.entity.animation;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.model.ModelPart;
+import net.minecraft.client.render.entity.animation.Animation;
+import net.minecraft.client.render.entity.animation.AnimationDefinition;
+import net.minecraft.client.render.entity.animation.Transformation;
 import net.minecraft.entity.AnimationState;
-import net.minecraft.util.math.MathHelper;
 import org.joml.Vector3f;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 public class Animation {
-   private final AnimationDefinition definition;
-   private final List entries;
-   private final Vector3f field_60866 = new Vector3f();
+    private final AnimationDefinition definition;
+    private final List<TransformationEntry> entries;
 
-   private Animation(AnimationDefinition definition, List entries) {
-      this.definition = definition;
-      this.entries = entries;
-   }
+    private Animation(AnimationDefinition definition, List<TransformationEntry> entries) {
+        this.definition = definition;
+        this.entries = entries;
+    }
 
-   static Animation of(ModelPart root, AnimationDefinition definition) {
-      List list = new ArrayList();
-      Function function = root.createPartGetter();
-      Iterator var4 = definition.boneAnimations().entrySet().iterator();
+    /*
+     * Issues handling annotations - annotations may be inaccurate
+     */
+    static Animation of(ModelPart root, AnimationDefinition definition) {
+        ArrayList<TransformationEntry> list = new ArrayList<TransformationEntry>();
+        @Nullable Function function = root.createPartGetter();
+        for (Map.Entry entry : definition.boneAnimations().entrySet()) {
+            String string = (String)entry.getKey();
+            List list2 = (List)entry.getValue();
+            ModelPart modelPart = (ModelPart)function.apply(string);
+            if (modelPart == null) {
+                throw new IllegalArgumentException("Cannot animate " + string + ", which does not exist in model");
+            }
+            for (Transformation transformation : list2) {
+                list.add(new TransformationEntry(modelPart, transformation.target(), transformation.keyframes()));
+            }
+        }
+        return new Animation(definition, List.copyOf(list));
+    }
 
-      while(var4.hasNext()) {
-         Map.Entry entry = (Map.Entry)var4.next();
-         String string = (String)entry.getKey();
-         List list2 = (List)entry.getValue();
-         ModelPart modelPart = (ModelPart)function.apply(string);
-         if (modelPart == null) {
-            throw new IllegalArgumentException("Cannot animate " + string + ", which does not exist in model");
-         }
+    public void applyStatic() {
+        this.apply(0L, 1.0f);
+    }
 
-         Iterator var9 = list2.iterator();
+    public void applyWalking(float limbSwingAnimationProgress, float limbSwingAmplitude, float f, float g) {
+        long l = (long)(limbSwingAnimationProgress * 50.0f * f);
+        float h = Math.min(limbSwingAmplitude * g, 1.0f);
+        this.apply(l, h);
+    }
 
-         while(var9.hasNext()) {
-            Transformation transformation = (Transformation)var9.next();
-            list.add(new TransformationEntry(modelPart, transformation.target(), transformation.keyframes()));
-         }
-      }
+    public void apply(AnimationState animationState, float age) {
+        this.apply(animationState, age, 1.0f);
+    }
 
-      return new Animation(definition, List.copyOf(list));
-   }
+    public void apply(AnimationState animationState, float age, float speedMultiplier) {
+        animationState.run(state -> this.apply((long)((float)state.getTimeInMilliseconds(age) * speedMultiplier), 1.0f));
+    }
 
-   public void applyStatic() {
-      this.apply(0L, 1.0F);
-   }
+    public void apply(long timeInMilliseconds, float scale) {
+        float f = this.getRunningSeconds(timeInMilliseconds);
+        Vector3f vector3f = new Vector3f();
+        for (TransformationEntry transformationEntry : this.entries) {
+            transformationEntry.apply(f, scale, vector3f);
+        }
+    }
 
-   public void applyWalking(float limbSwingAnimationProgress, float limbSwingAmplitude, float f, float g) {
-      long l = (long)(limbSwingAnimationProgress * 50.0F * f);
-      float h = Math.min(limbSwingAmplitude * g, 1.0F);
-      this.apply(l, h);
-   }
-
-   public void apply(AnimationState animationState, float age) {
-      this.apply(animationState, age, 1.0F);
-   }
-
-   public void apply(AnimationState animationState, float age, float speedMultiplier) {
-      animationState.run((state) -> {
-         this.apply((long)((float)state.getTimeInMilliseconds(age) * speedMultiplier), 1.0F);
-      });
-   }
-
-   public void apply(long timeInMilliseconds, float scale) {
-      float f = this.getRunningSeconds(timeInMilliseconds);
-      Iterator var5 = this.entries.iterator();
-
-      while(var5.hasNext()) {
-         TransformationEntry transformationEntry = (TransformationEntry)var5.next();
-         transformationEntry.apply(f, scale, this.field_60866);
-      }
-
-   }
-
-   private float getRunningSeconds(long timeInMilliseconds) {
-      float f = (float)timeInMilliseconds / 1000.0F;
-      return this.definition.looping() ? f % this.definition.lengthInSeconds() : f;
-   }
-
-   @Environment(EnvType.CLIENT)
-   static record TransformationEntry(ModelPart part, Transformation.Target target, Keyframe[] keyframes) {
-      TransformationEntry(ModelPart modelPart, Transformation.Target target, Keyframe[] keyframes) {
-         this.part = modelPart;
-         this.target = target;
-         this.keyframes = keyframes;
-      }
-
-      public void apply(float runningSeconds, float scale, Vector3f vec) {
-         int i = Math.max(0, MathHelper.binarySearch(0, this.keyframes.length, (index) -> {
-            return runningSeconds <= this.keyframes[index].timestamp();
-         }) - 1);
-         int j = Math.min(this.keyframes.length - 1, i + 1);
-         Keyframe keyframe = this.keyframes[i];
-         Keyframe keyframe2 = this.keyframes[j];
-         float f = runningSeconds - keyframe.timestamp();
-         float g;
-         if (j != i) {
-            g = MathHelper.clamp(f / (keyframe2.timestamp() - keyframe.timestamp()), 0.0F, 1.0F);
-         } else {
-            g = 0.0F;
-         }
-
-         keyframe2.interpolation().apply(vec, g, this.keyframes, i, j, scale);
-         this.target.apply(this.part, vec);
-      }
-
-      public ModelPart part() {
-         return this.part;
-      }
-
-      public Transformation.Target target() {
-         return this.target;
-      }
-
-      public Keyframe[] keyframes() {
-         return this.keyframes;
-      }
-   }
+    private float getRunningSeconds(long timeInMilliseconds) {
+        float f = (float)timeInMilliseconds / 1000.0f;
+        return this.definition.looping() ? f % this.definition.lengthInSeconds() : f;
+    }
 }
+

@@ -1,18 +1,30 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.realms.RealmsError
+ *  net.minecraft.client.realms.exception.RealmsServiceException
+ */
 package net.minecraft.client.realms.exception;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.realms.RealmsError;
 
-@Environment(EnvType.CLIENT)
-public class RealmsServiceException extends Exception {
-   public final RealmsError error;
+@Environment(value=EnvType.CLIENT)
+public class RealmsServiceException
+extends Exception {
+    public final RealmsError error;
 
-   public RealmsServiceException(RealmsError error) {
-      this.error = error;
-   }
+    public RealmsServiceException(RealmsError error) {
+        this.error = error;
+    }
 
-   public String getMessage() {
-      return this.error.getErrorMessage();
-   }
+    @Override
+    public String getMessage() {
+        return this.error.getErrorMessage();
+    }
 }
+

@@ -1,84 +1,88 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.font.BakedGlyphImpl
+ *  net.minecraft.client.font.BuiltinEmptyGlyph
+ *  net.minecraft.client.font.BuiltinEmptyGlyph$ColorSupplier
+ *  net.minecraft.client.font.GlyphBaker
+ *  net.minecraft.client.font.GlyphMetrics
+ *  net.minecraft.client.font.UploadableGlyph
+ *  net.minecraft.client.texture.NativeImage
+ *  net.minecraft.client.texture.NativeImage$Format
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.font;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.textures.GpuTexture;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.font.BakedGlyphImpl;
+import net.minecraft.client.font.BuiltinEmptyGlyph;
+import net.minecraft.client.font.GlyphBaker;
+import net.minecraft.client.font.GlyphMetrics;
+import net.minecraft.client.font.UploadableGlyph;
 import net.minecraft.client.texture.NativeImage;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
-public enum BuiltinEmptyGlyph implements Glyph {
-   WHITE(() -> {
-      return createRectImage(5, 8, (x, y) -> {
-         return -1;
-      });
-   }),
-   MISSING(() -> {
-      int i = true;
-      int j = true;
-      return createRectImage(5, 8, (x, y) -> {
-         boolean bl = x == 0 || x + 1 == 5 || y == 0 || y + 1 == 8;
-         return bl ? -1 : 0;
-      });
-   });
+/*
+ * Exception performing whole class analysis ignored.
+ */
+@Environment(value=EnvType.CLIENT)
+public final class BuiltinEmptyGlyph
+extends Enum<BuiltinEmptyGlyph>
+implements GlyphMetrics {
+    public static final /* enum */ BuiltinEmptyGlyph WHITE = new BuiltinEmptyGlyph("WHITE", 0, () -> BuiltinEmptyGlyph.createRectImage((int)5, (int)8, (x, y) -> -1));
+    public static final /* enum */ BuiltinEmptyGlyph MISSING = new BuiltinEmptyGlyph("MISSING", 1, () -> {
+        int i = 5;
+        int j = 8;
+        return BuiltinEmptyGlyph.createRectImage((int)5, (int)8, (x, y) -> {
+            boolean bl = x == 0 || x + 1 == 5 || y == 0 || y + 1 == 8;
+            return bl ? -1 : 0;
+        });
+    });
+    final NativeImage image;
+    private static final /* synthetic */ BuiltinEmptyGlyph[] field_37901;
 
-   final NativeImage image;
+    public static BuiltinEmptyGlyph[] values() {
+        return (BuiltinEmptyGlyph[])field_37901.clone();
+    }
 
-   private static NativeImage createRectImage(int width, int height, ColorSupplier colorSupplier) {
-      NativeImage nativeImage = new NativeImage(NativeImage.Format.RGBA, width, height, false);
+    public static BuiltinEmptyGlyph valueOf(String string) {
+        return Enum.valueOf(BuiltinEmptyGlyph.class, string);
+    }
 
-      for(int i = 0; i < height; ++i) {
-         for(int j = 0; j < width; ++j) {
-            nativeImage.setColorArgb(j, i, colorSupplier.getColor(j, i));
-         }
-      }
+    private static NativeImage createRectImage(int width, int height, ColorSupplier colorSupplier) {
+        NativeImage nativeImage = new NativeImage(NativeImage.Format.RGBA, width, height, false);
+        for (int i = 0; i < height; ++i) {
+            for (int j = 0; j < width; ++j) {
+                nativeImage.setColorArgb(j, i, colorSupplier.getColor(j, i));
+            }
+        }
+        nativeImage.untrack();
+        return nativeImage;
+    }
 
-      nativeImage.untrack();
-      return nativeImage;
-   }
+    private BuiltinEmptyGlyph(Supplier<NativeImage> imageSupplier) {
+        this.image = imageSupplier.get();
+    }
 
-   private BuiltinEmptyGlyph(final Supplier imageSupplier) {
-      this.image = (NativeImage)imageSupplier.get();
-   }
+    public float getAdvance() {
+        return this.image.getWidth() + 1;
+    }
 
-   public float getAdvance() {
-      return (float)(this.image.getWidth() + 1);
-   }
+    public @Nullable BakedGlyphImpl bake(GlyphBaker glyphBaker) {
+        return glyphBaker.bake((GlyphMetrics)this, (UploadableGlyph)new /* Unavailable Anonymous Inner Class!! */);
+    }
 
-   public BakedGlyph bake(Function function) {
-      return (BakedGlyph)function.apply(new RenderableGlyph() {
-         public int getWidth() {
-            return BuiltinEmptyGlyph.this.image.getWidth();
-         }
+    private static /* synthetic */ BuiltinEmptyGlyph[] method_41838() {
+        return new BuiltinEmptyGlyph[]{WHITE, MISSING};
+    }
 
-         public int getHeight() {
-            return BuiltinEmptyGlyph.this.image.getHeight();
-         }
-
-         public float getOversample() {
-            return 1.0F;
-         }
-
-         public void upload(int x, int y, GpuTexture texture) {
-            RenderSystem.getDevice().createCommandEncoder().writeToTexture(texture, BuiltinEmptyGlyph.this.image, 0, 0, x, y, BuiltinEmptyGlyph.this.image.getWidth(), BuiltinEmptyGlyph.this.image.getHeight(), 0, 0);
-         }
-
-         public boolean hasColor() {
-            return true;
-         }
-      });
-   }
-
-   // $FF: synthetic method
-   private static BuiltinEmptyGlyph[] method_41838() {
-      return new BuiltinEmptyGlyph[]{WHITE, MISSING};
-   }
-
-   @FunctionalInterface
-   @Environment(EnvType.CLIENT)
-   interface ColorSupplier {
-      int getColor(int x, int y);
-   }
+    static {
+        field_37901 = BuiltinEmptyGlyph.method_41838();
+    }
 }
+

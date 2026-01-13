@@ -1,118 +1,71 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.render.model.ModelBakeSettings
+ *  net.minecraft.client.render.model.ModelRotation
+ *  net.minecraft.client.render.model.ModelRotation$UVModel
+ *  net.minecraft.util.Util
+ *  net.minecraft.util.math.AffineTransformation
+ *  net.minecraft.util.math.AffineTransformations
+ *  net.minecraft.util.math.Direction
+ *  net.minecraft.util.math.DirectionTransformation
+ *  org.joml.Matrix4f
+ *  org.joml.Matrix4fc
+ */
 package net.minecraft.client.render.model;
 
 import java.util.EnumMap;
 import java.util.Map;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.render.model.ModelBakeSettings;
+import net.minecraft.client.render.model.ModelRotation;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.AffineTransformation;
 import net.minecraft.util.math.AffineTransformations;
-import net.minecraft.util.math.AxisRotation;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.DirectionTransformation;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 
-@Environment(EnvType.CLIENT)
-public enum ModelRotation implements ModelBakeSettings {
-   X0_Y0(AxisRotation.R0, AxisRotation.R0),
-   X0_Y90(AxisRotation.R0, AxisRotation.R90),
-   X0_Y180(AxisRotation.R0, AxisRotation.R180),
-   X0_Y270(AxisRotation.R0, AxisRotation.R270),
-   X90_Y0(AxisRotation.R90, AxisRotation.R0),
-   X90_Y90(AxisRotation.R90, AxisRotation.R90),
-   X90_Y180(AxisRotation.R90, AxisRotation.R180),
-   X90_Y270(AxisRotation.R90, AxisRotation.R270),
-   X180_Y0(AxisRotation.R180, AxisRotation.R0),
-   X180_Y90(AxisRotation.R180, AxisRotation.R90),
-   X180_Y180(AxisRotation.R180, AxisRotation.R180),
-   X180_Y270(AxisRotation.R180, AxisRotation.R270),
-   X270_Y0(AxisRotation.R270, AxisRotation.R0),
-   X270_Y90(AxisRotation.R270, AxisRotation.R90),
-   X270_Y180(AxisRotation.R270, AxisRotation.R180),
-   X270_Y270(AxisRotation.R270, AxisRotation.R270);
+@Environment(value=EnvType.CLIENT)
+public class ModelRotation
+implements ModelBakeSettings {
+    private static final Map<DirectionTransformation, ModelRotation> BY_DIRECTION_TRANSFORMATION = Util.mapEnum(DirectionTransformation.class, ModelRotation::new);
+    public static final ModelRotation IDENTITY = ModelRotation.fromDirectionTransformation((DirectionTransformation)DirectionTransformation.IDENTITY);
+    final DirectionTransformation transformation;
+    final AffineTransformation rotation;
+    final Map<Direction, Matrix4fc> faces = new EnumMap(Direction.class);
+    final Map<Direction, Matrix4fc> invertedFaces = new EnumMap(Direction.class);
+    private final UVModel uvModel = new UVModel(this);
 
-   private static final ModelRotation[][] ROTATION_MAP = (ModelRotation[][])Util.make(new ModelRotation[AxisRotation.values().length][AxisRotation.values().length], (modelRotations) -> {
-      ModelRotation[] var1 = values();
-      int var2 = var1.length;
+    private ModelRotation(DirectionTransformation transformation) {
+        this.transformation = transformation;
+        this.rotation = transformation != DirectionTransformation.IDENTITY ? new AffineTransformation((Matrix4fc)new Matrix4f(transformation.getMatrix())) : AffineTransformation.identity();
+        for (Direction direction : Direction.values()) {
+            Matrix4fc matrix4fc = AffineTransformations.getTransformed((AffineTransformation)this.rotation, (Direction)direction).getMatrix();
+            this.faces.put(direction, matrix4fc);
+            this.invertedFaces.put(direction, matrix4fc.invertAffine(new Matrix4f()));
+        }
+    }
 
-      for(int var3 = 0; var3 < var2; ++var3) {
-         ModelRotation modelRotation = var1[var3];
-         modelRotations[modelRotation.xRotation.ordinal()][modelRotation.yRotation.ordinal()] = modelRotation;
-      }
+    public AffineTransformation getRotation() {
+        return this.rotation;
+    }
 
-   });
-   private final AxisRotation xRotation;
-   private final AxisRotation yRotation;
-   final AffineTransformation rotation;
-   private final DirectionTransformation directionTransformation;
-   final Map faces = new EnumMap(Direction.class);
-   final Map invertedFaces = new EnumMap(Direction.class);
-   private final UVModel uvModel = new UVModel(this);
+    public static ModelRotation fromDirectionTransformation(DirectionTransformation directionTransformation) {
+        return (ModelRotation)BY_DIRECTION_TRANSFORMATION.get(directionTransformation);
+    }
 
-   private ModelRotation(final AxisRotation x, final AxisRotation y) {
-      this.xRotation = x;
-      this.yRotation = y;
-      this.directionTransformation = DirectionTransformation.fromRotations(x, y);
-      if (this.directionTransformation != DirectionTransformation.IDENTITY) {
-         this.rotation = new AffineTransformation(new Matrix4f(this.directionTransformation.getMatrix()));
-      } else {
-         this.rotation = AffineTransformation.identity();
-      }
+    public ModelBakeSettings getUVModel() {
+        return this.uvModel;
+    }
 
-      Direction[] var5 = Direction.values();
-      int var6 = var5.length;
-
-      for(int var7 = 0; var7 < var6; ++var7) {
-         Direction direction = var5[var7];
-         Matrix4fc matrix4fc = AffineTransformations.getTransformed(this.rotation, direction).getMatrix();
-         this.faces.put(direction, matrix4fc);
-         this.invertedFaces.put(direction, matrix4fc.invertAffine(new Matrix4f()));
-      }
-
-   }
-
-   public AffineTransformation getRotation() {
-      return this.rotation;
-   }
-
-   public static ModelRotation rotate(AxisRotation xRotation, AxisRotation yRotation) {
-      return ROTATION_MAP[xRotation.ordinal()][yRotation.ordinal()];
-   }
-
-   public DirectionTransformation getDirectionTransformation() {
-      return this.directionTransformation;
-   }
-
-   public ModelBakeSettings getUVModel() {
-      return this.uvModel;
-   }
-
-   // $FF: synthetic method
-   private static ModelRotation[] method_36925() {
-      return new ModelRotation[]{X0_Y0, X0_Y90, X0_Y180, X0_Y270, X90_Y0, X90_Y90, X90_Y180, X90_Y270, X180_Y0, X180_Y90, X180_Y180, X180_Y270, X270_Y0, X270_Y90, X270_Y180, X270_Y270};
-   }
-
-   @Environment(EnvType.CLIENT)
-   static record UVModel(ModelRotation parent) implements ModelBakeSettings {
-      UVModel(ModelRotation modelRotation) {
-         this.parent = modelRotation;
-      }
-
-      public AffineTransformation getRotation() {
-         return this.parent.rotation;
-      }
-
-      public Matrix4fc forward(Direction facing) {
-         return (Matrix4fc)this.parent.faces.getOrDefault(facing, TRANSFORM_NONE);
-      }
-
-      public Matrix4fc reverse(Direction facing) {
-         return (Matrix4fc)this.parent.invertedFaces.getOrDefault(facing, TRANSFORM_NONE);
-      }
-
-      public ModelRotation parent() {
-         return this.parent;
-      }
-   }
+    public String toString() {
+        return "simple[" + this.transformation.asString() + "]";
+    }
 }
+

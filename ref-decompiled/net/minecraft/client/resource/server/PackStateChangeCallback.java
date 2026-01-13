@@ -1,37 +1,24 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.resource.server.PackStateChangeCallback
+ *  net.minecraft.client.resource.server.PackStateChangeCallback$FinishState
+ *  net.minecraft.client.resource.server.PackStateChangeCallback$State
+ */
 package net.minecraft.client.resource.server;
 
 import java.util.UUID;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.resource.server.PackStateChangeCallback;
 
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 public interface PackStateChangeCallback {
-   void onStateChanged(UUID id, State state);
+    public void onStateChanged(UUID var1, State var2);
 
-   void onFinish(UUID id, FinishState state);
-
-   @Environment(EnvType.CLIENT)
-   public static enum FinishState {
-      DECLINED,
-      APPLIED,
-      DISCARDED,
-      DOWNLOAD_FAILED,
-      ACTIVATION_FAILED;
-
-      // $FF: synthetic method
-      private static FinishState[] method_55548() {
-         return new FinishState[]{DECLINED, APPLIED, DISCARDED, DOWNLOAD_FAILED, ACTIVATION_FAILED};
-      }
-   }
-
-   @Environment(EnvType.CLIENT)
-   public static enum State {
-      ACCEPTED,
-      DOWNLOADED;
-
-      // $FF: synthetic method
-      private static State[] method_55621() {
-         return new State[]{ACCEPTED, DOWNLOADED};
-      }
-   }
+    public void onFinish(UUID var1, FinishState var2);
 }
+

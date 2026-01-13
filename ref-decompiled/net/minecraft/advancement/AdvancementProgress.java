@@ -1,225 +1,193 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.google.common.collect.Lists
+ *  com.google.common.collect.Maps
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
+ *  net.minecraft.advancement.AdvancementProgress
+ *  net.minecraft.advancement.AdvancementRequirements
+ *  net.minecraft.advancement.criterion.CriterionProgress
+ *  net.minecraft.network.PacketByteBuf
+ *  net.minecraft.text.Text
+ *  net.minecraft.util.Util
+ *  net.minecraft.util.dynamic.Codecs
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.advancement;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import net.minecraft.advancement.AdvancementRequirements;
 import net.minecraft.advancement.criterion.CriterionProgress;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import net.minecraft.util.dynamic.Codecs;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-public class AdvancementProgress implements Comparable {
-   private static final DateTimeFormatter TIME_FORMATTER;
-   private static final Codec TIME_CODEC;
-   private static final Codec MAP_CODEC;
-   public static final Codec CODEC;
-   private final Map criteriaProgresses;
-   private AdvancementRequirements requirements;
+public class AdvancementProgress
+implements Comparable<AdvancementProgress> {
+    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss Z", Locale.ROOT);
+    private static final Codec<Instant> TIME_CODEC = Codecs.formattedTime((DateTimeFormatter)TIME_FORMATTER).xmap(Instant::from, instant -> instant.atZone(ZoneId.systemDefault()));
+    private static final Codec<Map<String, CriterionProgress>> MAP_CODEC = Codec.unboundedMap((Codec)Codec.STRING, (Codec)TIME_CODEC).xmap(map -> Util.transformMapValues((Map)map, CriterionProgress::new), map -> map.entrySet().stream().filter(entry -> ((CriterionProgress)entry.getValue()).isObtained()).collect(Collectors.toMap(Map.Entry::getKey, entry -> Objects.requireNonNull(((CriterionProgress)entry.getValue()).getObtainedTime()))));
+    public static final Codec<AdvancementProgress> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)MAP_CODEC.optionalFieldOf("criteria", Map.of()).forGetter(advancementProgress -> advancementProgress.criteriaProgresses), (App)Codec.BOOL.fieldOf("done").orElse((Object)true).forGetter(AdvancementProgress::isDone)).apply((Applicative)instance, (criteriaProgresses, done) -> new AdvancementProgress(new HashMap(criteriaProgresses))));
+    private final Map<String, CriterionProgress> criteriaProgresses;
+    private AdvancementRequirements requirements = AdvancementRequirements.EMPTY;
 
-   private AdvancementProgress(Map criteriaProgresses) {
-      this.requirements = AdvancementRequirements.EMPTY;
-      this.criteriaProgresses = criteriaProgresses;
-   }
+    private AdvancementProgress(Map<String, CriterionProgress> criteriaProgresses) {
+        this.criteriaProgresses = criteriaProgresses;
+    }
 
-   public AdvancementProgress() {
-      this.requirements = AdvancementRequirements.EMPTY;
-      this.criteriaProgresses = Maps.newHashMap();
-   }
+    public AdvancementProgress() {
+        this.criteriaProgresses = Maps.newHashMap();
+    }
 
-   public void init(AdvancementRequirements requirements) {
-      Set set = requirements.getNames();
-      this.criteriaProgresses.entrySet().removeIf((progress) -> {
-         return !set.contains(progress.getKey());
-      });
-      Iterator var3 = set.iterator();
+    public void init(AdvancementRequirements requirements) {
+        Set set = requirements.getNames();
+        this.criteriaProgresses.entrySet().removeIf(progress -> !set.contains(progress.getKey()));
+        for (String string : set) {
+            this.criteriaProgresses.putIfAbsent(string, new CriterionProgress());
+        }
+        this.requirements = requirements;
+    }
 
-      while(var3.hasNext()) {
-         String string = (String)var3.next();
-         this.criteriaProgresses.putIfAbsent(string, new CriterionProgress());
-      }
+    public boolean isDone() {
+        return this.requirements.matches(arg_0 -> this.isCriterionObtained(arg_0));
+    }
 
-      this.requirements = requirements;
-   }
+    public boolean isAnyObtained() {
+        for (CriterionProgress criterionProgress : this.criteriaProgresses.values()) {
+            if (!criterionProgress.isObtained()) continue;
+            return true;
+        }
+        return false;
+    }
 
-   public boolean isDone() {
-      return this.requirements.matches(this::isCriterionObtained);
-   }
+    public boolean obtain(String name) {
+        CriterionProgress criterionProgress = (CriterionProgress)this.criteriaProgresses.get(name);
+        if (criterionProgress != null && !criterionProgress.isObtained()) {
+            criterionProgress.obtain();
+            return true;
+        }
+        return false;
+    }
 
-   public boolean isAnyObtained() {
-      Iterator var1 = this.criteriaProgresses.values().iterator();
+    public boolean reset(String name) {
+        CriterionProgress criterionProgress = (CriterionProgress)this.criteriaProgresses.get(name);
+        if (criterionProgress != null && criterionProgress.isObtained()) {
+            criterionProgress.reset();
+            return true;
+        }
+        return false;
+    }
 
-      CriterionProgress criterionProgress;
-      do {
-         if (!var1.hasNext()) {
-            return false;
-         }
+    public String toString() {
+        return "AdvancementProgress{criteria=" + String.valueOf(this.criteriaProgresses) + ", requirements=" + String.valueOf(this.requirements) + "}";
+    }
 
-         criterionProgress = (CriterionProgress)var1.next();
-      } while(!criterionProgress.isObtained());
+    public void toPacket(PacketByteBuf buf) {
+        buf.writeMap(this.criteriaProgresses, PacketByteBuf::writeString, (bufx, progresses) -> progresses.toPacket(bufx));
+    }
 
-      return true;
-   }
+    public static AdvancementProgress fromPacket(PacketByteBuf buf) {
+        Map map = buf.readMap(PacketByteBuf::readString, CriterionProgress::fromPacket);
+        return new AdvancementProgress(map);
+    }
 
-   public boolean obtain(String name) {
-      CriterionProgress criterionProgress = (CriterionProgress)this.criteriaProgresses.get(name);
-      if (criterionProgress != null && !criterionProgress.isObtained()) {
-         criterionProgress.obtain();
-         return true;
-      } else {
-         return false;
-      }
-   }
+    public @Nullable CriterionProgress getCriterionProgress(String name) {
+        return (CriterionProgress)this.criteriaProgresses.get(name);
+    }
 
-   public boolean reset(String name) {
-      CriterionProgress criterionProgress = (CriterionProgress)this.criteriaProgresses.get(name);
-      if (criterionProgress != null && criterionProgress.isObtained()) {
-         criterionProgress.reset();
-         return true;
-      } else {
-         return false;
-      }
-   }
+    private boolean isCriterionObtained(String name) {
+        CriterionProgress criterionProgress = this.getCriterionProgress(name);
+        return criterionProgress != null && criterionProgress.isObtained();
+    }
 
-   public String toString() {
-      String var10000 = String.valueOf(this.criteriaProgresses);
-      return "AdvancementProgress{criteria=" + var10000 + ", requirements=" + String.valueOf(this.requirements) + "}";
-   }
+    public float getProgressBarPercentage() {
+        if (this.criteriaProgresses.isEmpty()) {
+            return 0.0f;
+        }
+        float f = this.requirements.getLength();
+        float g = this.countObtainedRequirements();
+        return g / f;
+    }
 
-   public void toPacket(PacketByteBuf buf) {
-      buf.writeMap(this.criteriaProgresses, PacketByteBuf::writeString, (bufx, progresses) -> {
-         progresses.toPacket(bufx);
-      });
-   }
-
-   public static AdvancementProgress fromPacket(PacketByteBuf buf) {
-      Map map = buf.readMap(PacketByteBuf::readString, CriterionProgress::fromPacket);
-      return new AdvancementProgress(map);
-   }
-
-   @Nullable
-   public CriterionProgress getCriterionProgress(String name) {
-      return (CriterionProgress)this.criteriaProgresses.get(name);
-   }
-
-   private boolean isCriterionObtained(String name) {
-      CriterionProgress criterionProgress = this.getCriterionProgress(name);
-      return criterionProgress != null && criterionProgress.isObtained();
-   }
-
-   public float getProgressBarPercentage() {
-      if (this.criteriaProgresses.isEmpty()) {
-         return 0.0F;
-      } else {
-         float f = (float)this.requirements.getLength();
-         float g = (float)this.countObtainedRequirements();
-         return g / f;
-      }
-   }
-
-   @Nullable
-   public Text getProgressBarFraction() {
-      if (this.criteriaProgresses.isEmpty()) {
-         return null;
-      } else {
-         int i = this.requirements.getLength();
-         if (i <= 1) {
+    public @Nullable Text getProgressBarFraction() {
+        if (this.criteriaProgresses.isEmpty()) {
             return null;
-         } else {
-            int j = this.countObtainedRequirements();
-            return Text.translatable("advancements.progress", j, i);
-         }
-      }
-   }
+        }
+        int i = this.requirements.getLength();
+        if (i <= 1) {
+            return null;
+        }
+        int j = this.countObtainedRequirements();
+        return Text.translatable((String)"advancements.progress", (Object[])new Object[]{j, i});
+    }
 
-   private int countObtainedRequirements() {
-      return this.requirements.countMatches(this::isCriterionObtained);
-   }
+    private int countObtainedRequirements() {
+        return this.requirements.countMatches(arg_0 -> this.isCriterionObtained(arg_0));
+    }
 
-   public Iterable getUnobtainedCriteria() {
-      List list = Lists.newArrayList();
-      Iterator var2 = this.criteriaProgresses.entrySet().iterator();
-
-      while(var2.hasNext()) {
-         Map.Entry entry = (Map.Entry)var2.next();
-         if (!((CriterionProgress)entry.getValue()).isObtained()) {
+    public Iterable<String> getUnobtainedCriteria() {
+        ArrayList list = Lists.newArrayList();
+        for (Map.Entry entry : this.criteriaProgresses.entrySet()) {
+            if (((CriterionProgress)entry.getValue()).isObtained()) continue;
             list.add((String)entry.getKey());
-         }
-      }
+        }
+        return list;
+    }
 
-      return list;
-   }
-
-   public Iterable getObtainedCriteria() {
-      List list = Lists.newArrayList();
-      Iterator var2 = this.criteriaProgresses.entrySet().iterator();
-
-      while(var2.hasNext()) {
-         Map.Entry entry = (Map.Entry)var2.next();
-         if (((CriterionProgress)entry.getValue()).isObtained()) {
+    public Iterable<String> getObtainedCriteria() {
+        ArrayList list = Lists.newArrayList();
+        for (Map.Entry entry : this.criteriaProgresses.entrySet()) {
+            if (!((CriterionProgress)entry.getValue()).isObtained()) continue;
             list.add((String)entry.getKey());
-         }
-      }
+        }
+        return list;
+    }
 
-      return list;
-   }
+    public @Nullable Instant getEarliestProgressObtainDate() {
+        return this.criteriaProgresses.values().stream().map(CriterionProgress::getObtainedTime).filter(Objects::nonNull).min(Comparator.naturalOrder()).orElse(null);
+    }
 
-   @Nullable
-   public Instant getEarliestProgressObtainDate() {
-      return (Instant)this.criteriaProgresses.values().stream().map(CriterionProgress::getObtainedTime).filter(Objects::nonNull).min(Comparator.naturalOrder()).orElse((Object)null);
-   }
+    @Override
+    public int compareTo(AdvancementProgress advancementProgress) {
+        Instant instant = this.getEarliestProgressObtainDate();
+        Instant instant2 = advancementProgress.getEarliestProgressObtainDate();
+        if (instant == null && instant2 != null) {
+            return 1;
+        }
+        if (instant != null && instant2 == null) {
+            return -1;
+        }
+        if (instant == null && instant2 == null) {
+            return 0;
+        }
+        return instant.compareTo(instant2);
+    }
 
-   public int compareTo(AdvancementProgress advancementProgress) {
-      Instant instant = this.getEarliestProgressObtainDate();
-      Instant instant2 = advancementProgress.getEarliestProgressObtainDate();
-      if (instant == null && instant2 != null) {
-         return 1;
-      } else if (instant != null && instant2 == null) {
-         return -1;
-      } else {
-         return instant == null && instant2 == null ? 0 : instant.compareTo(instant2);
-      }
-   }
-
-   // $FF: synthetic method
-   public int compareTo(final Object other) {
-      return this.compareTo((AdvancementProgress)other);
-   }
-
-   static {
-      TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss Z", Locale.ROOT);
-      TIME_CODEC = Codecs.formattedTime(TIME_FORMATTER).xmap(Instant::from, (instant) -> {
-         return instant.atZone(ZoneId.systemDefault());
-      });
-      MAP_CODEC = Codec.unboundedMap(Codec.STRING, TIME_CODEC).xmap((map) -> {
-         return Util.transformMapValues(map, CriterionProgress::new);
-      }, (map) -> {
-         return (Map)map.entrySet().stream().filter((entry) -> {
-            return ((CriterionProgress)entry.getValue()).isObtained();
-         }).collect(Collectors.toMap(Map.Entry::getKey, (entry) -> {
-            return (Instant)Objects.requireNonNull(((CriterionProgress)entry.getValue()).getObtainedTime());
-         }));
-      });
-      CODEC = RecordCodecBuilder.create((instance) -> {
-         return instance.group(MAP_CODEC.optionalFieldOf("criteria", Map.of()).forGetter((advancementProgress) -> {
-            return advancementProgress.criteriaProgresses;
-         }), Codec.BOOL.fieldOf("done").orElse(true).forGetter(AdvancementProgress::isDone)).apply(instance, (criteriaProgresses, done) -> {
-            return new AdvancementProgress(new HashMap(criteriaProgresses));
-         });
-      });
-   }
+    @Override
+    public /* synthetic */ int compareTo(Object other) {
+        return this.compareTo((AdvancementProgress)other);
+    }
 }
+

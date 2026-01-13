@@ -20,19 +20,20 @@ public class PlayerTickHandler {
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
                 // Check if player is in The Slip dimension
-                if (player.getWorld().getRegistryKey().equals(THE_SLIP)) {
+                net.minecraft.world.World world = ((net.noahsarch.deeperdark.duck.EntityAccessor)player).deeperdark$getWorld();
+                if (world.getRegistryKey().equals(THE_SLIP)) {
                     // Handle freezing mechanics
                     handleFreezingMechanics(player);
 
                     // Handle elytra freezing while flying
                     handleElytraDamage(player);
-                } else if (player.getWorld().getRegistryKey().equals(World.NETHER)) {
+                } else if (world.getRegistryKey().equals(World.NETHER)) {
                     // Check if player is on the Nether roof (above Y=127)
                     if (player.getY() > 127.0) {
                         if (handleElytraDamage(player)) {
                             // Play sizzling sound occasionally
                             if (player.age % 2 == 0) {
-                                player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
+                                ((net.noahsarch.deeperdark.duck.EntityAccessor)player).deeperdark$getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
                                         SoundEvents.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.PLAYERS, 5f, 1.7f);
                             }
                         }
@@ -63,7 +64,7 @@ public class PlayerTickHandler {
             // Manually trigger freeze damage when threshold is exceeded
             // Damage every 40 ticks (2 seconds) like vanilla freezing
             if (currentFrozen >= minFreezeDamage && player.age % 40 == 0) {
-                player.damage(player.getWorld(), player.getDamageSources().freeze(), 1.0F);
+                player.damage((net.minecraft.server.world.ServerWorld)((net.noahsarch.deeperdark.duck.EntityAccessor)player).deeperdark$getWorld(), player.getDamageSources().freeze(), 1.0F);
             }
         }
     }

@@ -1,106 +1,122 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.block.entity.BannerPattern
+ *  net.minecraft.block.entity.BannerPatterns
+ *  net.minecraft.registry.Registerable
+ *  net.minecraft.registry.RegistryKey
+ *  net.minecraft.registry.RegistryKeys
+ *  net.minecraft.util.Identifier
+ */
 package net.minecraft.block.entity;
 
+import net.minecraft.block.entity.BannerPattern;
 import net.minecraft.registry.Registerable;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
 
+/*
+ * Exception performing whole class analysis ignored.
+ */
 public class BannerPatterns {
-   public static final RegistryKey BASE = of("base");
-   public static final RegistryKey SQUARE_BOTTOM_LEFT = of("square_bottom_left");
-   public static final RegistryKey SQUARE_BOTTOM_RIGHT = of("square_bottom_right");
-   public static final RegistryKey SQUARE_TOP_LEFT = of("square_top_left");
-   public static final RegistryKey SQUARE_TOP_RIGHT = of("square_top_right");
-   public static final RegistryKey STRIPE_BOTTOM = of("stripe_bottom");
-   public static final RegistryKey STRIPE_TOP = of("stripe_top");
-   public static final RegistryKey STRIPE_LEFT = of("stripe_left");
-   public static final RegistryKey STRIPE_RIGHT = of("stripe_right");
-   public static final RegistryKey STRIPE_CENTER = of("stripe_center");
-   public static final RegistryKey STRIPE_MIDDLE = of("stripe_middle");
-   public static final RegistryKey STRIPE_DOWNRIGHT = of("stripe_downright");
-   public static final RegistryKey STRIPE_DOWNLEFT = of("stripe_downleft");
-   public static final RegistryKey SMALL_STRIPES = of("small_stripes");
-   public static final RegistryKey CROSS = of("cross");
-   public static final RegistryKey STRAIGHT_CROSS = of("straight_cross");
-   public static final RegistryKey TRIANGLE_BOTTOM = of("triangle_bottom");
-   public static final RegistryKey TRIANGLE_TOP = of("triangle_top");
-   public static final RegistryKey TRIANGLES_BOTTOM = of("triangles_bottom");
-   public static final RegistryKey TRIANGLES_TOP = of("triangles_top");
-   public static final RegistryKey DIAGONAL_LEFT = of("diagonal_left");
-   public static final RegistryKey DIAGONAL_UP_RIGHT = of("diagonal_up_right");
-   public static final RegistryKey DIAGONAL_UP_LEFT = of("diagonal_up_left");
-   public static final RegistryKey DIAGONAL_RIGHT = of("diagonal_right");
-   public static final RegistryKey CIRCLE = of("circle");
-   public static final RegistryKey RHOMBUS = of("rhombus");
-   public static final RegistryKey HALF_VERTICAL = of("half_vertical");
-   public static final RegistryKey HALF_HORIZONTAL = of("half_horizontal");
-   public static final RegistryKey HALF_VERTICAL_RIGHT = of("half_vertical_right");
-   public static final RegistryKey HALF_HORIZONTAL_BOTTOM = of("half_horizontal_bottom");
-   public static final RegistryKey BORDER = of("border");
-   public static final RegistryKey CURLY_BORDER = of("curly_border");
-   public static final RegistryKey GRADIENT = of("gradient");
-   public static final RegistryKey GRADIENT_UP = of("gradient_up");
-   public static final RegistryKey BRICKS = of("bricks");
-   public static final RegistryKey GLOBE = of("globe");
-   public static final RegistryKey CREEPER = of("creeper");
-   public static final RegistryKey SKULL = of("skull");
-   public static final RegistryKey FLOWER = of("flower");
-   public static final RegistryKey MOJANG = of("mojang");
-   public static final RegistryKey PIGLIN = of("piglin");
-   public static final RegistryKey FLOW = of("flow");
-   public static final RegistryKey GUSTER = of("guster");
+    public static final RegistryKey<BannerPattern> BASE = BannerPatterns.of((String)"base");
+    public static final RegistryKey<BannerPattern> SQUARE_BOTTOM_LEFT = BannerPatterns.of((String)"square_bottom_left");
+    public static final RegistryKey<BannerPattern> SQUARE_BOTTOM_RIGHT = BannerPatterns.of((String)"square_bottom_right");
+    public static final RegistryKey<BannerPattern> SQUARE_TOP_LEFT = BannerPatterns.of((String)"square_top_left");
+    public static final RegistryKey<BannerPattern> SQUARE_TOP_RIGHT = BannerPatterns.of((String)"square_top_right");
+    public static final RegistryKey<BannerPattern> STRIPE_BOTTOM = BannerPatterns.of((String)"stripe_bottom");
+    public static final RegistryKey<BannerPattern> STRIPE_TOP = BannerPatterns.of((String)"stripe_top");
+    public static final RegistryKey<BannerPattern> STRIPE_LEFT = BannerPatterns.of((String)"stripe_left");
+    public static final RegistryKey<BannerPattern> STRIPE_RIGHT = BannerPatterns.of((String)"stripe_right");
+    public static final RegistryKey<BannerPattern> STRIPE_CENTER = BannerPatterns.of((String)"stripe_center");
+    public static final RegistryKey<BannerPattern> STRIPE_MIDDLE = BannerPatterns.of((String)"stripe_middle");
+    public static final RegistryKey<BannerPattern> STRIPE_DOWNRIGHT = BannerPatterns.of((String)"stripe_downright");
+    public static final RegistryKey<BannerPattern> STRIPE_DOWNLEFT = BannerPatterns.of((String)"stripe_downleft");
+    public static final RegistryKey<BannerPattern> SMALL_STRIPES = BannerPatterns.of((String)"small_stripes");
+    public static final RegistryKey<BannerPattern> CROSS = BannerPatterns.of((String)"cross");
+    public static final RegistryKey<BannerPattern> STRAIGHT_CROSS = BannerPatterns.of((String)"straight_cross");
+    public static final RegistryKey<BannerPattern> TRIANGLE_BOTTOM = BannerPatterns.of((String)"triangle_bottom");
+    public static final RegistryKey<BannerPattern> TRIANGLE_TOP = BannerPatterns.of((String)"triangle_top");
+    public static final RegistryKey<BannerPattern> TRIANGLES_BOTTOM = BannerPatterns.of((String)"triangles_bottom");
+    public static final RegistryKey<BannerPattern> TRIANGLES_TOP = BannerPatterns.of((String)"triangles_top");
+    public static final RegistryKey<BannerPattern> DIAGONAL_LEFT = BannerPatterns.of((String)"diagonal_left");
+    public static final RegistryKey<BannerPattern> DIAGONAL_UP_RIGHT = BannerPatterns.of((String)"diagonal_up_right");
+    public static final RegistryKey<BannerPattern> DIAGONAL_UP_LEFT = BannerPatterns.of((String)"diagonal_up_left");
+    public static final RegistryKey<BannerPattern> DIAGONAL_RIGHT = BannerPatterns.of((String)"diagonal_right");
+    public static final RegistryKey<BannerPattern> CIRCLE = BannerPatterns.of((String)"circle");
+    public static final RegistryKey<BannerPattern> RHOMBUS = BannerPatterns.of((String)"rhombus");
+    public static final RegistryKey<BannerPattern> HALF_VERTICAL = BannerPatterns.of((String)"half_vertical");
+    public static final RegistryKey<BannerPattern> HALF_HORIZONTAL = BannerPatterns.of((String)"half_horizontal");
+    public static final RegistryKey<BannerPattern> HALF_VERTICAL_RIGHT = BannerPatterns.of((String)"half_vertical_right");
+    public static final RegistryKey<BannerPattern> HALF_HORIZONTAL_BOTTOM = BannerPatterns.of((String)"half_horizontal_bottom");
+    public static final RegistryKey<BannerPattern> BORDER = BannerPatterns.of((String)"border");
+    public static final RegistryKey<BannerPattern> CURLY_BORDER = BannerPatterns.of((String)"curly_border");
+    public static final RegistryKey<BannerPattern> GRADIENT = BannerPatterns.of((String)"gradient");
+    public static final RegistryKey<BannerPattern> GRADIENT_UP = BannerPatterns.of((String)"gradient_up");
+    public static final RegistryKey<BannerPattern> BRICKS = BannerPatterns.of((String)"bricks");
+    public static final RegistryKey<BannerPattern> GLOBE = BannerPatterns.of((String)"globe");
+    public static final RegistryKey<BannerPattern> CREEPER = BannerPatterns.of((String)"creeper");
+    public static final RegistryKey<BannerPattern> SKULL = BannerPatterns.of((String)"skull");
+    public static final RegistryKey<BannerPattern> FLOWER = BannerPatterns.of((String)"flower");
+    public static final RegistryKey<BannerPattern> MOJANG = BannerPatterns.of((String)"mojang");
+    public static final RegistryKey<BannerPattern> PIGLIN = BannerPatterns.of((String)"piglin");
+    public static final RegistryKey<BannerPattern> FLOW = BannerPatterns.of((String)"flow");
+    public static final RegistryKey<BannerPattern> GUSTER = BannerPatterns.of((String)"guster");
 
-   private static RegistryKey of(String id) {
-      return RegistryKey.of(RegistryKeys.BANNER_PATTERN, Identifier.ofVanilla(id));
-   }
+    private static RegistryKey<BannerPattern> of(String id) {
+        return RegistryKey.of((RegistryKey)RegistryKeys.BANNER_PATTERN, (Identifier)Identifier.ofVanilla((String)id));
+    }
 
-   public static void bootstrap(Registerable registry) {
-      register(registry, BASE);
-      register(registry, SQUARE_BOTTOM_LEFT);
-      register(registry, SQUARE_BOTTOM_RIGHT);
-      register(registry, SQUARE_TOP_LEFT);
-      register(registry, SQUARE_TOP_RIGHT);
-      register(registry, STRIPE_BOTTOM);
-      register(registry, STRIPE_TOP);
-      register(registry, STRIPE_LEFT);
-      register(registry, STRIPE_RIGHT);
-      register(registry, STRIPE_CENTER);
-      register(registry, STRIPE_MIDDLE);
-      register(registry, STRIPE_DOWNRIGHT);
-      register(registry, STRIPE_DOWNLEFT);
-      register(registry, SMALL_STRIPES);
-      register(registry, CROSS);
-      register(registry, STRAIGHT_CROSS);
-      register(registry, TRIANGLE_BOTTOM);
-      register(registry, TRIANGLE_TOP);
-      register(registry, TRIANGLES_BOTTOM);
-      register(registry, TRIANGLES_TOP);
-      register(registry, DIAGONAL_LEFT);
-      register(registry, DIAGONAL_UP_RIGHT);
-      register(registry, DIAGONAL_UP_LEFT);
-      register(registry, DIAGONAL_RIGHT);
-      register(registry, CIRCLE);
-      register(registry, RHOMBUS);
-      register(registry, HALF_VERTICAL);
-      register(registry, HALF_HORIZONTAL);
-      register(registry, HALF_VERTICAL_RIGHT);
-      register(registry, HALF_HORIZONTAL_BOTTOM);
-      register(registry, BORDER);
-      register(registry, GRADIENT);
-      register(registry, GRADIENT_UP);
-      register(registry, BRICKS);
-      register(registry, CURLY_BORDER);
-      register(registry, GLOBE);
-      register(registry, CREEPER);
-      register(registry, SKULL);
-      register(registry, FLOWER);
-      register(registry, MOJANG);
-      register(registry, PIGLIN);
-      register(registry, FLOW);
-      register(registry, GUSTER);
-   }
+    public static void bootstrap(Registerable<BannerPattern> registry) {
+        BannerPatterns.register(registry, (RegistryKey)BASE);
+        BannerPatterns.register(registry, (RegistryKey)SQUARE_BOTTOM_LEFT);
+        BannerPatterns.register(registry, (RegistryKey)SQUARE_BOTTOM_RIGHT);
+        BannerPatterns.register(registry, (RegistryKey)SQUARE_TOP_LEFT);
+        BannerPatterns.register(registry, (RegistryKey)SQUARE_TOP_RIGHT);
+        BannerPatterns.register(registry, (RegistryKey)STRIPE_BOTTOM);
+        BannerPatterns.register(registry, (RegistryKey)STRIPE_TOP);
+        BannerPatterns.register(registry, (RegistryKey)STRIPE_LEFT);
+        BannerPatterns.register(registry, (RegistryKey)STRIPE_RIGHT);
+        BannerPatterns.register(registry, (RegistryKey)STRIPE_CENTER);
+        BannerPatterns.register(registry, (RegistryKey)STRIPE_MIDDLE);
+        BannerPatterns.register(registry, (RegistryKey)STRIPE_DOWNRIGHT);
+        BannerPatterns.register(registry, (RegistryKey)STRIPE_DOWNLEFT);
+        BannerPatterns.register(registry, (RegistryKey)SMALL_STRIPES);
+        BannerPatterns.register(registry, (RegistryKey)CROSS);
+        BannerPatterns.register(registry, (RegistryKey)STRAIGHT_CROSS);
+        BannerPatterns.register(registry, (RegistryKey)TRIANGLE_BOTTOM);
+        BannerPatterns.register(registry, (RegistryKey)TRIANGLE_TOP);
+        BannerPatterns.register(registry, (RegistryKey)TRIANGLES_BOTTOM);
+        BannerPatterns.register(registry, (RegistryKey)TRIANGLES_TOP);
+        BannerPatterns.register(registry, (RegistryKey)DIAGONAL_LEFT);
+        BannerPatterns.register(registry, (RegistryKey)DIAGONAL_UP_RIGHT);
+        BannerPatterns.register(registry, (RegistryKey)DIAGONAL_UP_LEFT);
+        BannerPatterns.register(registry, (RegistryKey)DIAGONAL_RIGHT);
+        BannerPatterns.register(registry, (RegistryKey)CIRCLE);
+        BannerPatterns.register(registry, (RegistryKey)RHOMBUS);
+        BannerPatterns.register(registry, (RegistryKey)HALF_VERTICAL);
+        BannerPatterns.register(registry, (RegistryKey)HALF_HORIZONTAL);
+        BannerPatterns.register(registry, (RegistryKey)HALF_VERTICAL_RIGHT);
+        BannerPatterns.register(registry, (RegistryKey)HALF_HORIZONTAL_BOTTOM);
+        BannerPatterns.register(registry, (RegistryKey)BORDER);
+        BannerPatterns.register(registry, (RegistryKey)GRADIENT);
+        BannerPatterns.register(registry, (RegistryKey)GRADIENT_UP);
+        BannerPatterns.register(registry, (RegistryKey)BRICKS);
+        BannerPatterns.register(registry, (RegistryKey)CURLY_BORDER);
+        BannerPatterns.register(registry, (RegistryKey)GLOBE);
+        BannerPatterns.register(registry, (RegistryKey)CREEPER);
+        BannerPatterns.register(registry, (RegistryKey)SKULL);
+        BannerPatterns.register(registry, (RegistryKey)FLOWER);
+        BannerPatterns.register(registry, (RegistryKey)MOJANG);
+        BannerPatterns.register(registry, (RegistryKey)PIGLIN);
+        BannerPatterns.register(registry, (RegistryKey)FLOW);
+        BannerPatterns.register(registry, (RegistryKey)GUSTER);
+    }
 
-   public static void register(Registerable registry, RegistryKey key) {
-      registry.register(key, new BannerPattern(key.getValue(), "block.minecraft.banner." + key.getValue().toShortTranslationKey()));
-   }
+    public static void register(Registerable<BannerPattern> registry, RegistryKey<BannerPattern> key) {
+        registry.register(key, (Object)new BannerPattern(key.getValue(), "block.minecraft.banner." + key.getValue().toShortTranslationKey()));
+    }
 }
+

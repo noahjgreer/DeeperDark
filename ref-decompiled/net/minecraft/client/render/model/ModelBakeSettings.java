@@ -1,3 +1,15 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.render.model.ModelBakeSettings
+ *  net.minecraft.util.math.AffineTransformation
+ *  net.minecraft.util.math.Direction
+ *  org.joml.Matrix4f
+ *  org.joml.Matrix4fc
+ */
 package net.minecraft.client.render.model;
 
 import net.fabricmc.api.EnvType;
@@ -7,19 +19,20 @@ import net.minecraft.util.math.Direction;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 
-@Environment(EnvType.CLIENT)
+@Environment(value=EnvType.CLIENT)
 public interface ModelBakeSettings {
-   Matrix4fc TRANSFORM_NONE = new Matrix4f();
+    public static final Matrix4fc TRANSFORM_NONE = new Matrix4f();
 
-   default AffineTransformation getRotation() {
-      return AffineTransformation.identity();
-   }
+    default public AffineTransformation getRotation() {
+        return AffineTransformation.identity();
+    }
 
-   default Matrix4fc forward(Direction facing) {
-      return TRANSFORM_NONE;
-   }
+    default public Matrix4fc forward(Direction facing) {
+        return TRANSFORM_NONE;
+    }
 
-   default Matrix4fc reverse(Direction facing) {
-      return TRANSFORM_NONE;
-   }
+    default public Matrix4fc reverse(Direction facing) {
+        return TRANSFORM_NONE;
+    }
 }
+

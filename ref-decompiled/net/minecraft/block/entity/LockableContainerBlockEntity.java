@@ -1,6 +1,42 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.block.BlockState
+ *  net.minecraft.block.entity.BlockEntity
+ *  net.minecraft.block.entity.BlockEntityType
+ *  net.minecraft.block.entity.LockableContainerBlockEntity
+ *  net.minecraft.component.ComponentMap$Builder
+ *  net.minecraft.component.ComponentsAccess
+ *  net.minecraft.component.DataComponentTypes
+ *  net.minecraft.component.type.ContainerComponent
+ *  net.minecraft.entity.player.PlayerEntity
+ *  net.minecraft.entity.player.PlayerInventory
+ *  net.minecraft.inventory.ContainerLock
+ *  net.minecraft.inventory.Inventories
+ *  net.minecraft.inventory.Inventory
+ *  net.minecraft.item.ItemStack
+ *  net.minecraft.screen.NamedScreenHandlerFactory
+ *  net.minecraft.screen.ScreenHandler
+ *  net.minecraft.sound.SoundCategory
+ *  net.minecraft.sound.SoundEvents
+ *  net.minecraft.storage.ReadView
+ *  net.minecraft.storage.WriteView
+ *  net.minecraft.text.Text
+ *  net.minecraft.text.TextCodecs
+ *  net.minecraft.util.Nameable
+ *  net.minecraft.util.collection.DefaultedList
+ *  net.minecraft.util.math.BlockPos
+ *  net.minecraft.util.math.Vec3d
+ *  net.minecraft.world.World
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.block.entity;
 
+import java.util.List;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.component.ComponentMap;
 import net.minecraft.component.ComponentsAccess;
 import net.minecraft.component.DataComponentTypes;
@@ -22,136 +58,142 @@ import net.minecraft.text.TextCodecs;
 import net.minecraft.util.Nameable;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
+import org.jspecify.annotations.Nullable;
 
-public abstract class LockableContainerBlockEntity extends BlockEntity implements Inventory, NamedScreenHandlerFactory, Nameable {
-   private ContainerLock lock;
-   @Nullable
-   private Text customName;
+/*
+ * Exception performing whole class analysis ignored.
+ */
+public abstract class LockableContainerBlockEntity
+extends BlockEntity
+implements Inventory,
+NamedScreenHandlerFactory,
+Nameable {
+    private ContainerLock lock = ContainerLock.EMPTY;
+    private @Nullable Text customName;
 
-   protected LockableContainerBlockEntity(BlockEntityType blockEntityType, BlockPos blockPos, BlockState blockState) {
-      super(blockEntityType, blockPos, blockState);
-      this.lock = ContainerLock.EMPTY;
-   }
+    protected LockableContainerBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
+        super(blockEntityType, blockPos, blockState);
+    }
 
-   protected void readData(ReadView view) {
-      super.readData(view);
-      this.lock = ContainerLock.read(view);
-      this.customName = tryParseCustomName(view, "CustomName");
-   }
+    protected void readData(ReadView view) {
+        super.readData(view);
+        this.lock = ContainerLock.read((ReadView)view);
+        this.customName = LockableContainerBlockEntity.tryParseCustomName((ReadView)view, (String)"CustomName");
+    }
 
-   protected void writeData(WriteView view) {
-      super.writeData(view);
-      this.lock.write(view);
-      view.putNullable("CustomName", TextCodecs.CODEC, this.customName);
-   }
+    protected void writeData(WriteView view) {
+        super.writeData(view);
+        this.lock.write(view);
+        view.putNullable("CustomName", TextCodecs.CODEC, (Object)this.customName);
+    }
 
-   public Text getName() {
-      return this.customName != null ? this.customName : this.getContainerName();
-   }
+    public Text getName() {
+        if (this.customName != null) {
+            return this.customName;
+        }
+        return this.getContainerName();
+    }
 
-   public Text getDisplayName() {
-      return this.getName();
-   }
+    public Text getDisplayName() {
+        return this.getName();
+    }
 
-   @Nullable
-   public Text getCustomName() {
-      return this.customName;
-   }
+    public @Nullable Text getCustomName() {
+        return this.customName;
+    }
 
-   protected abstract Text getContainerName();
+    protected abstract Text getContainerName();
 
-   public boolean checkUnlocked(PlayerEntity player) {
-      return checkUnlocked(player, this.lock, this.getDisplayName());
-   }
+    public boolean checkUnlocked(PlayerEntity player) {
+        return this.lock.checkUnlocked(player);
+    }
 
-   public static boolean checkUnlocked(PlayerEntity player, ContainerLock lock, Text containerName) {
-      if (!player.isSpectator() && !lock.canOpen(player.getMainHandStack())) {
-         player.sendMessage(Text.translatable("container.isLocked", containerName), true);
-         player.playSoundToPlayer(SoundEvents.BLOCK_CHEST_LOCKED, SoundCategory.BLOCKS, 1.0F, 1.0F);
-         return false;
-      } else {
-         return true;
-      }
-   }
+    public static void handleLocked(Vec3d containerPos, PlayerEntity player, Text name) {
+        World world = player.getEntityWorld();
+        player.sendMessage((Text)Text.translatable((String)"container.isLocked", (Object[])new Object[]{name}), true);
+        if (!world.isClient()) {
+            world.playSound(null, containerPos.getX(), containerPos.getY(), containerPos.getZ(), SoundEvents.BLOCK_CHEST_LOCKED, SoundCategory.BLOCKS, 1.0f, 1.0f);
+        }
+    }
 
-   protected abstract DefaultedList getHeldStacks();
+    public boolean isLocked() {
+        return !this.lock.equals((Object)ContainerLock.EMPTY);
+    }
 
-   protected abstract void setHeldStacks(DefaultedList inventory);
+    protected abstract DefaultedList<ItemStack> getHeldStacks();
 
-   public boolean isEmpty() {
-      java.util.Iterator var1 = this.getHeldStacks().iterator();
+    protected abstract void setHeldStacks(DefaultedList<ItemStack> var1);
 
-      ItemStack itemStack;
-      do {
-         if (!var1.hasNext()) {
-            return true;
-         }
+    public boolean isEmpty() {
+        for (ItemStack itemStack : this.getHeldStacks()) {
+            if (itemStack.isEmpty()) continue;
+            return false;
+        }
+        return true;
+    }
 
-         itemStack = (ItemStack)var1.next();
-      } while(itemStack.isEmpty());
+    public ItemStack getStack(int slot) {
+        return (ItemStack)this.getHeldStacks().get(slot);
+    }
 
-      return false;
-   }
+    public ItemStack removeStack(int slot, int amount) {
+        ItemStack itemStack = Inventories.splitStack((List)this.getHeldStacks(), (int)slot, (int)amount);
+        if (!itemStack.isEmpty()) {
+            this.markDirty();
+        }
+        return itemStack;
+    }
 
-   public ItemStack getStack(int slot) {
-      return (ItemStack)this.getHeldStacks().get(slot);
-   }
+    public ItemStack removeStack(int slot) {
+        return Inventories.removeStack((List)this.getHeldStacks(), (int)slot);
+    }
 
-   public ItemStack removeStack(int slot, int amount) {
-      ItemStack itemStack = Inventories.splitStack(this.getHeldStacks(), slot, amount);
-      if (!itemStack.isEmpty()) {
-         this.markDirty();
-      }
+    public void setStack(int slot, ItemStack stack) {
+        this.getHeldStacks().set(slot, (Object)stack);
+        stack.capCount(this.getMaxCount(stack));
+        this.markDirty();
+    }
 
-      return itemStack;
-   }
+    public boolean canPlayerUse(PlayerEntity player) {
+        return Inventory.canPlayerUse((BlockEntity)this, (PlayerEntity)player);
+    }
 
-   public ItemStack removeStack(int slot) {
-      return Inventories.removeStack(this.getHeldStacks(), slot);
-   }
+    public void clear() {
+        this.getHeldStacks().clear();
+    }
 
-   public void setStack(int slot, ItemStack stack) {
-      this.getHeldStacks().set(slot, stack);
-      stack.capCount(this.getMaxCount(stack));
-      this.markDirty();
-   }
+    public @Nullable ScreenHandler createMenu(int i, PlayerInventory playerInventory, PlayerEntity playerEntity) {
+        if (this.checkUnlocked(playerEntity)) {
+            return this.createScreenHandler(i, playerInventory);
+        }
+        LockableContainerBlockEntity.handleLocked((Vec3d)this.getPos().toCenterPos(), (PlayerEntity)playerEntity, (Text)this.getDisplayName());
+        return null;
+    }
 
-   public boolean canPlayerUse(PlayerEntity player) {
-      return Inventory.canPlayerUse(this, player);
-   }
+    protected abstract ScreenHandler createScreenHandler(int var1, PlayerInventory var2);
 
-   public void clear() {
-      this.getHeldStacks().clear();
-   }
+    protected void readComponents(ComponentsAccess components) {
+        super.readComponents(components);
+        this.customName = (Text)components.get(DataComponentTypes.CUSTOM_NAME);
+        this.lock = (ContainerLock)components.getOrDefault(DataComponentTypes.LOCK, (Object)ContainerLock.EMPTY);
+        ((ContainerComponent)components.getOrDefault(DataComponentTypes.CONTAINER, (Object)ContainerComponent.DEFAULT)).copyTo(this.getHeldStacks());
+    }
 
-   @Nullable
-   public ScreenHandler createMenu(int i, PlayerInventory playerInventory, PlayerEntity playerEntity) {
-      return this.checkUnlocked(playerEntity) ? this.createScreenHandler(i, playerInventory) : null;
-   }
+    protected void addComponents(ComponentMap.Builder builder) {
+        super.addComponents(builder);
+        builder.add(DataComponentTypes.CUSTOM_NAME, (Object)this.customName);
+        if (this.isLocked()) {
+            builder.add(DataComponentTypes.LOCK, (Object)this.lock);
+        }
+        builder.add(DataComponentTypes.CONTAINER, (Object)ContainerComponent.fromStacks((List)this.getHeldStacks()));
+    }
 
-   protected abstract ScreenHandler createScreenHandler(int syncId, PlayerInventory playerInventory);
-
-   protected void readComponents(ComponentsAccess components) {
-      super.readComponents(components);
-      this.customName = (Text)components.get(DataComponentTypes.CUSTOM_NAME);
-      this.lock = (ContainerLock)components.getOrDefault(DataComponentTypes.LOCK, ContainerLock.EMPTY);
-      ((ContainerComponent)components.getOrDefault(DataComponentTypes.CONTAINER, ContainerComponent.DEFAULT)).copyTo(this.getHeldStacks());
-   }
-
-   protected void addComponents(ComponentMap.Builder builder) {
-      super.addComponents(builder);
-      builder.add(DataComponentTypes.CUSTOM_NAME, this.customName);
-      if (!this.lock.equals(ContainerLock.EMPTY)) {
-         builder.add(DataComponentTypes.LOCK, this.lock);
-      }
-
-      builder.add(DataComponentTypes.CONTAINER, ContainerComponent.fromStacks(this.getHeldStacks()));
-   }
-
-   public void removeFromCopiedStackData(WriteView view) {
-      view.remove("CustomName");
-      view.remove("lock");
-      view.remove("Items");
-   }
+    public void removeFromCopiedStackData(WriteView view) {
+        view.remove("CustomName");
+        view.remove("lock");
+        view.remove("Items");
+    }
 }
+

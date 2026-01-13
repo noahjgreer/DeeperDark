@@ -1,14 +1,26 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.sound.SoundContainer
+ *  net.minecraft.client.sound.SoundSystem
+ *  net.minecraft.util.math.random.Random
+ */
 package net.minecraft.client.sound;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.sound.SoundSystem;
 import net.minecraft.util.math.random.Random;
 
-@Environment(EnvType.CLIENT)
-public interface SoundContainer {
-   int getWeight();
+@Environment(value=EnvType.CLIENT)
+public interface SoundContainer<T> {
+    public int getWeight();
 
-   Object getSound(Random random);
+    public T getSound(Random var1);
 
-   void preload(SoundSystem soundSystem);
+    public void preload(SoundSystem var1);
 }
+

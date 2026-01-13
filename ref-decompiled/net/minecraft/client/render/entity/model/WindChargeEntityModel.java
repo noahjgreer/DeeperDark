@@ -1,3 +1,21 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.client.model.Dilation
+ *  net.minecraft.client.model.ModelData
+ *  net.minecraft.client.model.ModelPart
+ *  net.minecraft.client.model.ModelPartBuilder
+ *  net.minecraft.client.model.ModelPartData
+ *  net.minecraft.client.model.ModelTransform
+ *  net.minecraft.client.model.TexturedModelData
+ *  net.minecraft.client.render.RenderLayers
+ *  net.minecraft.client.render.entity.model.EntityModel
+ *  net.minecraft.client.render.entity.model.WindChargeEntityModel
+ *  net.minecraft.client.render.entity.state.EntityRenderState
+ */
 package net.minecraft.client.render.entity.model;
 
 import net.fabricmc.api.EnvType;
@@ -9,35 +27,38 @@ import net.minecraft.client.model.ModelPartBuilder;
 import net.minecraft.client.model.ModelPartData;
 import net.minecraft.client.model.ModelTransform;
 import net.minecraft.client.model.TexturedModelData;
-import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.RenderLayers;
+import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.render.entity.state.EntityRenderState;
 
-@Environment(EnvType.CLIENT)
-public class WindChargeEntityModel extends EntityModel {
-   private static final int field_48704 = 16;
-   private final ModelPart bone;
-   private final ModelPart windCharge;
-   private final ModelPart wind;
+@Environment(value=EnvType.CLIENT)
+public class WindChargeEntityModel
+extends EntityModel<EntityRenderState> {
+    private static final int field_48704 = 16;
+    private final ModelPart bone;
+    private final ModelPart windCharge;
+    private final ModelPart wind;
 
-   public WindChargeEntityModel(ModelPart modelPart) {
-      super(modelPart, RenderLayer::getEntityTranslucent);
-      this.bone = modelPart.getChild("bone");
-      this.wind = this.bone.getChild("wind");
-      this.windCharge = this.bone.getChild("wind_charge");
-   }
+    public WindChargeEntityModel(ModelPart modelPart) {
+        super(modelPart, RenderLayers::entityTranslucent);
+        this.bone = modelPart.getChild("bone");
+        this.wind = this.bone.getChild("wind");
+        this.windCharge = this.bone.getChild("wind_charge");
+    }
 
-   public static TexturedModelData getTexturedModelData() {
-      ModelData modelData = new ModelData();
-      ModelPartData modelPartData = modelData.getRoot();
-      ModelPartData modelPartData2 = modelPartData.addChild("bone", ModelPartBuilder.create(), ModelTransform.origin(0.0F, 0.0F, 0.0F));
-      modelPartData2.addChild("wind", ModelPartBuilder.create().uv(15, 20).cuboid(-4.0F, -1.0F, -4.0F, 8.0F, 2.0F, 8.0F, new Dilation(0.0F)).uv(0, 9).cuboid(-3.0F, -2.0F, -3.0F, 6.0F, 4.0F, 6.0F, new Dilation(0.0F)), ModelTransform.of(0.0F, 0.0F, 0.0F, 0.0F, -0.7854F, 0.0F));
-      modelPartData2.addChild("wind_charge", ModelPartBuilder.create().uv(0, 0).cuboid(-2.0F, -2.0F, -2.0F, 4.0F, 4.0F, 4.0F, new Dilation(0.0F)), ModelTransform.origin(0.0F, 0.0F, 0.0F));
-      return TexturedModelData.of(modelData, 64, 32);
-   }
+    public static TexturedModelData getTexturedModelData() {
+        ModelData modelData = new ModelData();
+        ModelPartData modelPartData = modelData.getRoot();
+        ModelPartData modelPartData2 = modelPartData.addChild("bone", ModelPartBuilder.create(), ModelTransform.origin((float)0.0f, (float)0.0f, (float)0.0f));
+        modelPartData2.addChild("wind", ModelPartBuilder.create().uv(15, 20).cuboid(-4.0f, -1.0f, -4.0f, 8.0f, 2.0f, 8.0f, new Dilation(0.0f)).uv(0, 9).cuboid(-3.0f, -2.0f, -3.0f, 6.0f, 4.0f, 6.0f, new Dilation(0.0f)), ModelTransform.of((float)0.0f, (float)0.0f, (float)0.0f, (float)0.0f, (float)-0.7854f, (float)0.0f));
+        modelPartData2.addChild("wind_charge", ModelPartBuilder.create().uv(0, 0).cuboid(-2.0f, -2.0f, -2.0f, 4.0f, 4.0f, 4.0f, new Dilation(0.0f)), ModelTransform.origin((float)0.0f, (float)0.0f, (float)0.0f));
+        return TexturedModelData.of((ModelData)modelData, (int)64, (int)32);
+    }
 
-   public void setAngles(EntityRenderState state) {
-      super.setAngles(state);
-      this.windCharge.yaw = -state.age * 16.0F * 0.017453292F;
-      this.wind.yaw = state.age * 16.0F * 0.017453292F;
-   }
+    public void setAngles(EntityRenderState entityRenderState) {
+        super.setAngles((Object)entityRenderState);
+        this.windCharge.yaw = -entityRenderState.age * 16.0f * ((float)Math.PI / 180);
+        this.wind.yaw = entityRenderState.age * 16.0f * ((float)Math.PI / 180);
+    }
 }
+

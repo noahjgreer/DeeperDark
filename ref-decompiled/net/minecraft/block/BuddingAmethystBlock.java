@@ -1,50 +1,80 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.serialization.MapCodec
+ *  net.minecraft.block.AbstractBlock$Settings
+ *  net.minecraft.block.AmethystBlock
+ *  net.minecraft.block.AmethystClusterBlock
+ *  net.minecraft.block.Block
+ *  net.minecraft.block.BlockState
+ *  net.minecraft.block.Blocks
+ *  net.minecraft.block.BuddingAmethystBlock
+ *  net.minecraft.fluid.Fluids
+ *  net.minecraft.server.world.ServerWorld
+ *  net.minecraft.state.property.Property
+ *  net.minecraft.util.math.BlockPos
+ *  net.minecraft.util.math.Direction
+ *  net.minecraft.util.math.random.Random
+ */
 package net.minecraft.block;
 
 import com.mojang.serialization.MapCodec;
+import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.AmethystBlock;
+import net.minecraft.block.AmethystClusterBlock;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.state.property.Property;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.random.Random;
 
-public class BuddingAmethystBlock extends AmethystBlock {
-   public static final MapCodec CODEC = createCodec(BuddingAmethystBlock::new);
-   public static final int GROW_CHANCE = 5;
-   private static final Direction[] DIRECTIONS = Direction.values();
+/*
+ * Exception performing whole class analysis ignored.
+ */
+public class BuddingAmethystBlock
+extends AmethystBlock {
+    public static final MapCodec<BuddingAmethystBlock> CODEC = BuddingAmethystBlock.createCodec(BuddingAmethystBlock::new);
+    public static final int GROW_CHANCE = 5;
+    private static final Direction[] DIRECTIONS = Direction.values();
 
-   public MapCodec getCodec() {
-      return CODEC;
-   }
+    public MapCodec<BuddingAmethystBlock> getCodec() {
+        return CODEC;
+    }
 
-   public BuddingAmethystBlock(AbstractBlock.Settings settings) {
-      super(settings);
-   }
+    public BuddingAmethystBlock(AbstractBlock.Settings settings) {
+        super(settings);
+    }
 
-   protected void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-      if (random.nextInt(5) == 0) {
-         Direction direction = DIRECTIONS[random.nextInt(DIRECTIONS.length)];
-         BlockPos blockPos = pos.offset(direction);
-         BlockState blockState = world.getBlockState(blockPos);
-         Block block = null;
-         if (canGrowIn(blockState)) {
+    protected void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        if (random.nextInt(5) != 0) {
+            return;
+        }
+        Direction direction = DIRECTIONS[random.nextInt(DIRECTIONS.length)];
+        BlockPos blockPos = pos.offset(direction);
+        BlockState blockState = world.getBlockState(blockPos);
+        Block block = null;
+        if (BuddingAmethystBlock.canGrowIn((BlockState)blockState)) {
             block = Blocks.SMALL_AMETHYST_BUD;
-         } else if (blockState.isOf(Blocks.SMALL_AMETHYST_BUD) && blockState.get(AmethystClusterBlock.FACING) == direction) {
+        } else if (blockState.isOf(Blocks.SMALL_AMETHYST_BUD) && blockState.get((Property)AmethystClusterBlock.FACING) == direction) {
             block = Blocks.MEDIUM_AMETHYST_BUD;
-         } else if (blockState.isOf(Blocks.MEDIUM_AMETHYST_BUD) && blockState.get(AmethystClusterBlock.FACING) == direction) {
+        } else if (blockState.isOf(Blocks.MEDIUM_AMETHYST_BUD) && blockState.get((Property)AmethystClusterBlock.FACING) == direction) {
             block = Blocks.LARGE_AMETHYST_BUD;
-         } else if (blockState.isOf(Blocks.LARGE_AMETHYST_BUD) && blockState.get(AmethystClusterBlock.FACING) == direction) {
+        } else if (blockState.isOf(Blocks.LARGE_AMETHYST_BUD) && blockState.get((Property)AmethystClusterBlock.FACING) == direction) {
             block = Blocks.AMETHYST_CLUSTER;
-         }
-
-         if (block != null) {
-            BlockState blockState2 = (BlockState)((BlockState)block.getDefaultState().with(AmethystClusterBlock.FACING, direction)).with(AmethystClusterBlock.WATERLOGGED, blockState.getFluidState().getFluid() == Fluids.WATER);
+        }
+        if (block != null) {
+            BlockState blockState2 = (BlockState)((BlockState)block.getDefaultState().with((Property)AmethystClusterBlock.FACING, (Comparable)direction)).with((Property)AmethystClusterBlock.WATERLOGGED, (Comparable)Boolean.valueOf(blockState.getFluidState().getFluid() == Fluids.WATER));
             world.setBlockState(blockPos, blockState2);
-         }
+        }
+    }
 
-      }
-   }
-
-   public static boolean canGrowIn(BlockState state) {
-      return state.isAir() || state.isOf(Blocks.WATER) && state.getFluidState().getLevel() == 8;
-   }
+    public static boolean canGrowIn(BlockState state) {
+        return state.isAir() || state.isOf(Blocks.WATER) && state.getFluidState().getLevel() == 8;
+    }
 }
+

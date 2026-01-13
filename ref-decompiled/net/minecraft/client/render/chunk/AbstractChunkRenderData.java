@@ -1,42 +1,61 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  net.minecraft.block.entity.BlockEntity
+ *  net.minecraft.client.render.BlockRenderLayer
+ *  net.minecraft.client.render.chunk.AbstractChunkRenderData
+ *  net.minecraft.client.render.chunk.Buffers
+ *  net.minecraft.client.render.chunk.NormalizedRelativePos
+ *  net.minecraft.util.math.Direction
+ *  org.jspecify.annotations.Nullable
+ */
 package net.minecraft.client.render.chunk;
 
 import java.util.Collections;
 import java.util.List;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.render.BlockRenderLayer;
+import net.minecraft.client.render.chunk.Buffers;
+import net.minecraft.client.render.chunk.NormalizedRelativePos;
 import net.minecraft.util.math.Direction;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
-public interface AbstractChunkRenderData extends AutoCloseable {
-   default boolean hasPosition(NormalizedRelativePos pos) {
-      return false;
-   }
+@Environment(value=EnvType.CLIENT)
+public interface AbstractChunkRenderData
+extends AutoCloseable {
+    default public boolean hasPosition(NormalizedRelativePos pos) {
+        return false;
+    }
 
-   default boolean hasData() {
-      return false;
-   }
+    default public boolean hasData() {
+        return false;
+    }
 
-   default boolean hasTranslucentLayers() {
-      return false;
-   }
+    default public boolean hasTranslucentLayers() {
+        return false;
+    }
 
-   default boolean containsLayer(BlockRenderLayer layer) {
-      return true;
-   }
+    default public boolean containsLayer(BlockRenderLayer layer) {
+        return true;
+    }
 
-   default List getBlockEntities() {
-      return Collections.emptyList();
-   }
+    default public List<BlockEntity> getBlockEntities() {
+        return Collections.emptyList();
+    }
 
-   boolean isVisibleThrough(Direction from, Direction to);
+    public boolean isVisibleThrough(Direction var1, Direction var2);
 
-   @Nullable
-   default Buffers getBuffersForLayer(BlockRenderLayer layer) {
-      return null;
-   }
+    default public @Nullable Buffers getBuffersForLayer(BlockRenderLayer layer) {
+        return null;
+    }
 
-   default void close() {
-   }
+    @Override
+    default public void close() {
+    }
 }
+
