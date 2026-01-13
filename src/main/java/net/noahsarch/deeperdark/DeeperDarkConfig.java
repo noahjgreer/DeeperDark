@@ -26,6 +26,7 @@ public class DeeperDarkConfig {
         public int originZ = 0;
         public double safeRadius = 1000.0;
         public double forceMultiplier = 0.5;
+        public boolean allowEntitySpawning = false;
         // creeper effect duration bounds in seconds
         public int creeperEffectMinSeconds = 15;
         public int creeperEffectMaxSeconds = 60;
@@ -76,6 +77,7 @@ public class DeeperDarkConfig {
                     # originX/originZ: center of the safe area (integers)
                     # safeRadius: radius (blocks) considered safe
                     # forceMultiplier: how strongly the border pushes players (multiplier)
+                    # allowEntitySpawning: if false, mobs cannot spawn outside border and are pushed back
                     # creeperEffectMinSeconds / creeperEffectMaxSeconds (seconds): when a creeper with an infinite-duration effect explodes,
                     #   the effect given by the explosion will have a random duration between these values (seconds).
                     #

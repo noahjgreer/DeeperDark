@@ -274,17 +274,8 @@ public class CustomBlockTracker {
                 if (displayStack.contains(net.minecraft.component.DataComponentTypes.ITEM_NAME)) {
                     net.minecraft.text.Text itemName = displayStack.get(net.minecraft.component.DataComponentTypes.ITEM_NAME);
                     if (itemName != null) {
-                        // Get the content to check if it's translatable
-                        var content = itemName.getContent();
-                        if (content instanceof net.minecraft.text.TranslatableTextContent translatableContent) {
-                            // Store as translation key
-                            stackNbt.putString("itemNameKey", translatableContent.getKey());
-                            stackNbt.putBoolean("itemNameTranslatable", true);
-                        } else {
-                            // Store the rendered text content as fallback
-                            stackNbt.putString("itemName", itemName.getString());
-                            stackNbt.putBoolean("itemNameTranslatable", false);
-                        }
+                        // Serialize the Text component as JSON
+                        stackNbt.putString("itemName", net.minecraft.text.Text.Serialization.toJsonString(itemName));
                     }
                 }
             }
@@ -361,18 +352,15 @@ public class CustomBlockTracker {
                 }
 
                 // Restore item name if present
-                boolean isTranslatable = stackNbt.getBoolean("itemNameTranslatable").orElse(false);
-                if (isTranslatable) {
-                    String translationKey = stackNbt.getString("itemNameKey").orElse(null);
-                    if (translationKey != null && !translationKey.isEmpty()) {
-                        displayStack.set(net.minecraft.component.DataComponentTypes.ITEM_NAME,
-                            net.minecraft.text.Text.translatable(translationKey));
-                    }
-                } else {
-                    String itemNameStr = stackNbt.getString("itemName").orElse(null);
-                    if (itemNameStr != null && !itemNameStr.isEmpty()) {
-                        displayStack.set(net.minecraft.component.DataComponentTypes.ITEM_NAME,
-                            net.minecraft.text.Text.literal(itemNameStr));
+                String itemNameStr = stackNbt.getString("itemName").orElse(null);
+                if (itemNameStr != null) {
+                    try {
+                        net.minecraft.text.Text itemName = net.minecraft.text.Text.Serialization.fromJson(itemNameStr);
+                        if (itemName != null) {
+                            displayStack.set(net.minecraft.component.DataComponentTypes.ITEM_NAME, itemName);
+                        }
+                    } catch (Exception e) {
+                        // If deserialization fails, just skip the name
                     }
                 }
 

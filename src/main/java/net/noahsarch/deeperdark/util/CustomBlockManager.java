@@ -126,9 +126,6 @@ public class CustomBlockManager {
 
              if (modelId != null && modelId.equals(targetModelId)) {
                  if (!world.isClient()) {
-                     // Set air FIRST to prevent vanilla break sound/particles
-                     world.setBlockState(pos, net.minecraft.block.Blocks.AIR.getDefaultState(), 2);
-
                      // Drops
                      if (!player.isCreative() && player.canHarvest(state)) {
                          ItemStack dropStack = stack;
@@ -143,11 +140,8 @@ public class CustomBlockManager {
                          customAction.run();
                      }
 
-                     // Play break sound
-                     if (breakSound != null) {
-                        world.playSound(null, pos, breakSound.getBreakSound(), SoundCategory.BLOCKS,
-                            breakSound.getVolume(), breakSound.getPitch());
-                     }
+                     // Set air to prevent vanilla drop logic
+                     world.setBlockState(pos, net.minecraft.block.Blocks.AIR.getDefaultState());
                  }
 
                  // Clean up entity
@@ -159,6 +153,4 @@ public class CustomBlockManager {
         return false;
     }
 }
-
-
 

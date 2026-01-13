@@ -18,6 +18,11 @@ public class AbstractSkeletonEntityMixin {
 
     @Inject(method = "createArrowProjectile", at = @At("RETURN"))
     private void onCreateArrowProjectile(ItemStack arrow, float damageModifier, ItemStack shotFrom, CallbackInfoReturnable<PersistentProjectileEntity> cir) {
+        // Check if this entity actually implements MobEntityExtension before casting
+        if (!(this instanceof MobEntityExtension)) {
+            return;
+        }
+
         MobEntityExtension self = (MobEntityExtension) this;
         RegistryEntry<StatusEffect> effect = self.deeperdark$getStoredEffect();
 

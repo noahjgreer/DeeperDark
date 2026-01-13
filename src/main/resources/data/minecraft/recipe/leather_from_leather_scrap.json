@@ -1,0 +1,91 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "fabric:type": "deeperdark:component_ingredient",
+      "stack": {
+        "id": "minecraft:sugar",
+        "components": {
+          "minecraft:item_model": "leather_scrap"
+        }
+      }
+    },
+    {
+      "fabric:type": "deeperdark:component_ingredient",
+      "stack": {
+        "id": "minecraft:sugar",
+        "components": {
+          "minecraft:item_model": "leather_scrap"
+        }
+      }
+    },
+    {
+      "fabric:type": "deeperdark:component_ingredient",
+      "stack": {
+        "id": "minecraft:sugar",
+        "components": {
+          "minecraft:item_model": "leather_scrap"
+        }
+      }
+    },
+    {
+      "fabric:type": "deeperdark:component_ingredient",
+      "stack": {
+        "id": "minecraft:sugar",
+        "components": {
+          "minecraft:item_model": "leather_scrap"
+        }
+      }
+    },
+    {
+      "fabric:type": "deeperdark:component_ingredient",
+      "stack": {
+        "id": "minecraft:sugar",
+        "components": {
+          "minecraft:item_model": "leather_scrap"
+        }
+      }
+    },
+    {
+      "fabric:type": "deeperdark:component_ingredient",
+      "stack": {
+        "id": "minecraft:sugar",
+        "components": {
+          "minecraft:item_model": "leather_scrap"
+        }
+      }
+    },
+    {
+      "fabric:type": "deeperdark:component_ingredient",
+      "stack": {
+        "id": "minecraft:sugar",
+        "components": {
+          "minecraft:item_model": "leather_scrap"
+        }
+      }
+    },
+    {
+      "fabric:type": "deeperdark:component_ingredient",
+      "stack": {
+        "id": "minecraft:sugar",
+        "components": {
+          "minecraft:item_model": "leather_scrap"
+        }
+      }
+    },
+    {
+      "fabric:type": "deeperdark:component_ingredient",
+      "stack": {
+        "id": "minecraft:sugar",
+        "components": {
+          "minecraft:item_model": "leather_scrap"
+        }
+      }
+    }
+  ],
+  "result": {
+    "id": "minecraft:leather",
+    "count": 2
+  }
+}

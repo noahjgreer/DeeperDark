@@ -52,6 +52,7 @@ public class Deeperdark implements ModInitializer {
 		net.noahsarch.deeperdark.event.LeatherBlockEvents.register();
 		net.noahsarch.deeperdark.event.FlintBlockEvents.register();
 		net.noahsarch.deeperdark.event.RottenFleshBlockEvents.register();
+		net.noahsarch.deeperdark.event.CustomBlockPickBlock.register();
 
 		// Register custom ingredient for crafting
 		net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredientSerializer.register(net.noahsarch.deeperdark.recipe.ComponentIngredient.Serializer.INSTANCE);
