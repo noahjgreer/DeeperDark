@@ -4,12 +4,6 @@
  * Could not load the following classes:
  *  it.unimi.dsi.fastutil.Stack
  *  it.unimi.dsi.fastutil.objects.ObjectArrayList
- *  net.minecraft.advancement.Advancement
- *  net.minecraft.advancement.AdvancementDisplay
- *  net.minecraft.advancement.AdvancementDisplays
- *  net.minecraft.advancement.AdvancementDisplays$ResultConsumer
- *  net.minecraft.advancement.AdvancementDisplays$Status
- *  net.minecraft.advancement.PlacedAdvancement
  */
 package net.minecraft.advancement;
 
@@ -19,24 +13,20 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.AdvancementDisplay;
-import net.minecraft.advancement.AdvancementDisplays;
 import net.minecraft.advancement.PlacedAdvancement;
 
-/*
- * Exception performing whole class analysis ignored.
- */
 public class AdvancementDisplays {
     private static final int DISPLAY_DEPTH = 2;
 
     private static Status getStatus(Advancement advancement, boolean force) {
-        Optional optional = advancement.display();
+        Optional<AdvancementDisplay> optional = advancement.display();
         if (optional.isEmpty()) {
             return Status.HIDE;
         }
         if (force) {
             return Status.SHOW;
         }
-        if (((AdvancementDisplay)optional.get()).isHidden()) {
+        if (optional.get().isHidden()) {
             return Status.HIDE;
         }
         return Status.NO_CHANGE;
@@ -44,7 +34,7 @@ public class AdvancementDisplays {
 
     private static boolean shouldDisplay(Stack<Status> statuses) {
         for (int i = 0; i <= 2; ++i) {
-            Status status = (Status)statuses.peek(i);
+            Status status = (Status)((Object)statuses.peek(i));
             if (status == Status.SHOW) {
                 return true;
             }
@@ -56,11 +46,11 @@ public class AdvancementDisplays {
 
     private static boolean shouldDisplay(PlacedAdvancement advancement, Stack<Status> statuses, Predicate<PlacedAdvancement> donePredicate, ResultConsumer consumer) {
         boolean bl = donePredicate.test(advancement);
-        Status status = AdvancementDisplays.getStatus((Advancement)advancement.getAdvancement(), (boolean)bl);
+        Status status = AdvancementDisplays.getStatus(advancement.getAdvancement(), bl);
         boolean bl2 = bl;
         statuses.push((Object)status);
         for (PlacedAdvancement placedAdvancement : advancement.getChildren()) {
-            bl2 |= AdvancementDisplays.shouldDisplay((PlacedAdvancement)placedAdvancement, statuses, donePredicate, (ResultConsumer)consumer);
+            bl2 |= AdvancementDisplays.shouldDisplay(placedAdvancement, statuses, donePredicate, consumer);
         }
         boolean bl3 = bl2 || AdvancementDisplays.shouldDisplay(statuses);
         statuses.pop();
@@ -74,7 +64,35 @@ public class AdvancementDisplays {
         for (int i = 0; i <= 2; ++i) {
             stack.push((Object)Status.NO_CHANGE);
         }
-        AdvancementDisplays.shouldDisplay((PlacedAdvancement)placedAdvancement, (Stack)stack, donePredicate, (ResultConsumer)consumer);
+        AdvancementDisplays.shouldDisplay(placedAdvancement, (Stack<Status>)stack, donePredicate, consumer);
+    }
+
+    static final class Status
+    extends Enum<Status> {
+        public static final /* enum */ Status SHOW = new Status();
+        public static final /* enum */ Status HIDE = new Status();
+        public static final /* enum */ Status NO_CHANGE = new Status();
+        private static final /* synthetic */ Status[] field_41741;
+
+        public static Status[] values() {
+            return (Status[])field_41741.clone();
+        }
+
+        public static Status valueOf(String string) {
+            return Enum.valueOf(Status.class, string);
+        }
+
+        private static /* synthetic */ Status[] method_48034() {
+            return new Status[]{SHOW, HIDE, NO_CHANGE};
+        }
+
+        static {
+            field_41741 = Status.method_48034();
+        }
+    }
+
+    @FunctionalInterface
+    public static interface ResultConsumer {
+        public void accept(PlacedAdvancement var1, boolean var2);
     }
 }
-

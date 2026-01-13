@@ -1,0 +1,43 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ */
+package net.minecraft.client.render.command;
+
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.command.OrderedRenderCommandQueueImpl;
+
+@Environment(value=EnvType.CLIENT)
+public static class ModelPartCommandRenderer.Commands {
+    final Map<RenderLayer, List<OrderedRenderCommandQueueImpl.ModelPartCommand>> modelPartCommands = new HashMap<RenderLayer, List<OrderedRenderCommandQueueImpl.ModelPartCommand>>();
+    private final Set<RenderLayer> modelPartLayers = new ObjectOpenHashSet();
+
+    public void add(RenderLayer renderLayer2, OrderedRenderCommandQueueImpl.ModelPartCommand command) {
+        this.modelPartCommands.computeIfAbsent(renderLayer2, renderLayer -> new ArrayList()).add(command);
+    }
+
+    public void clear() {
+        for (Map.Entry<RenderLayer, List<OrderedRenderCommandQueueImpl.ModelPartCommand>> entry : this.modelPartCommands.entrySet()) {
+            if (entry.getValue().isEmpty()) continue;
+            this.modelPartLayers.add(entry.getKey());
+            entry.getValue().clear();
+        }
+    }
+
+    public void nextFrame() {
+        this.modelPartCommands.keySet().removeIf(renderLayer -> !this.modelPartLayers.contains(renderLayer));
+        this.modelPartLayers.clear();
+    }
+}

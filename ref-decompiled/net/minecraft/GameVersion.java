@@ -1,11 +1,5 @@
 /*
  * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  net.minecraft.GameVersion
- *  net.minecraft.SaveVersion
- *  net.minecraft.resource.PackVersion
- *  net.minecraft.resource.ResourceType
  */
 package net.minecraft;
 
@@ -28,5 +22,16 @@ public interface GameVersion {
     public Date buildTime();
 
     public boolean stable();
-}
 
+    public record Impl(String id, String name, SaveVersion dataVersion, int protocolVersion, PackVersion resourcePackVersion, PackVersion datapackVersion, Date buildTime, boolean stable) implements GameVersion
+    {
+        @Override
+        public PackVersion packVersion(ResourceType type) {
+            return switch (type) {
+                default -> throw new MatchException(null, null);
+                case ResourceType.CLIENT_RESOURCES -> this.resourcePackVersion;
+                case ResourceType.SERVER_DATA -> this.datapackVersion;
+            };
+        }
+    }
+}

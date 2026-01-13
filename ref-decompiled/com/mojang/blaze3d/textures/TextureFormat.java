@@ -2,10 +2,8 @@
  * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
- *  com.mojang.blaze3d.textures.TextureFormat
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
- *  net.minecraft.util.annotation.DeobfuscateClass
  */
 package com.mojang.blaze3d.textures;
 
@@ -39,4 +37,3 @@ public enum TextureFormat {
         return this == DEPTH32;
     }
 }
-

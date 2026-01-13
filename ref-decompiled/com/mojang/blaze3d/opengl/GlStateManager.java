@@ -2,22 +2,10 @@
  * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
- *  com.mojang.blaze3d.opengl.GlStateManager
- *  com.mojang.blaze3d.opengl.GlStateManager$BlendFuncState
- *  com.mojang.blaze3d.opengl.GlStateManager$ColorMask
- *  com.mojang.blaze3d.opengl.GlStateManager$CullFaceState
- *  com.mojang.blaze3d.opengl.GlStateManager$DepthTestState
- *  com.mojang.blaze3d.opengl.GlStateManager$LogicOpState
- *  com.mojang.blaze3d.opengl.GlStateManager$PolygonOffsetState
- *  com.mojang.blaze3d.opengl.GlStateManager$ScissorTestState
- *  com.mojang.blaze3d.opengl.GlStateManager$Texture2DState
- *  com.mojang.blaze3d.systems.RenderSystem
  *  com.mojang.jtracy.Plot
  *  com.mojang.jtracy.TracyClient
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
- *  net.minecraft.client.util.MacWindowUtil
- *  net.minecraft.util.annotation.DeobfuscateClass
  *  org.jspecify.annotations.Nullable
  *  org.lwjgl.PointerBuffer
  *  org.lwjgl.opengl.GL11
@@ -33,7 +21,6 @@
  */
 package com.mojang.blaze3d.opengl;
 
-import com.mojang.blaze3d.opengl.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.jtracy.Plot;
 import com.mojang.jtracy.TracyClient;
@@ -58,9 +45,6 @@ import org.lwjgl.opengl.GL32;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 
-/*
- * Exception performing whole class analysis ignored.
- */
 @Environment(value=EnvType.CLIENT)
 @DeobfuscateClass
 public class GlStateManager {
@@ -139,7 +123,7 @@ public class GlStateManager {
             GlStateManager.BLEND.dstFactorRgb = dstFactorRgb;
             GlStateManager.BLEND.srcFactorAlpha = srcFactorAlpha;
             GlStateManager.BLEND.dstFactorAlpha = dstFactorAlpha;
-            GlStateManager.glBlendFuncSeparate((int)srcFactorRGB, (int)dstFactorRgb, (int)srcFactorAlpha, (int)dstFactorAlpha);
+            GlStateManager.glBlendFuncSeparate(srcFactorRGB, dstFactorRgb, srcFactorAlpha, dstFactorAlpha);
         }
     }
 
@@ -552,5 +536,110 @@ public class GlStateManager {
         TEXTURES = (Texture2DState[])IntStream.range(0, 12).mapToObj(index -> new Texture2DState()).toArray(Texture2DState[]::new);
         COLOR_MASK = new ColorMask();
     }
-}
 
+    @Environment(value=EnvType.CLIENT)
+    static class ScissorTestState {
+        public final CapabilityTracker capState = new CapabilityTracker(3089);
+
+        ScissorTestState() {
+        }
+    }
+
+    @Environment(value=EnvType.CLIENT)
+    static class CapabilityTracker {
+        private final int cap;
+        private boolean state;
+
+        public CapabilityTracker(int cap) {
+            this.cap = cap;
+        }
+
+        public void disable() {
+            this.setState(false);
+        }
+
+        public void enable() {
+            this.setState(true);
+        }
+
+        public void setState(boolean state) {
+            RenderSystem.assertOnRenderThread();
+            if (state != this.state) {
+                this.state = state;
+                if (state) {
+                    GL11.glEnable((int)this.cap);
+                } else {
+                    GL11.glDisable((int)this.cap);
+                }
+            }
+        }
+    }
+
+    @Environment(value=EnvType.CLIENT)
+    static class DepthTestState {
+        public final CapabilityTracker capState = new CapabilityTracker(2929);
+        public boolean mask = true;
+        public int func = 513;
+
+        DepthTestState() {
+        }
+    }
+
+    @Environment(value=EnvType.CLIENT)
+    static class BlendFuncState {
+        public final CapabilityTracker capState = new CapabilityTracker(3042);
+        public int srcFactorRgb = 1;
+        public int dstFactorRgb = 0;
+        public int srcFactorAlpha = 1;
+        public int dstFactorAlpha = 0;
+
+        BlendFuncState() {
+        }
+    }
+
+    @Environment(value=EnvType.CLIENT)
+    static class CullFaceState {
+        public final CapabilityTracker capState = new CapabilityTracker(2884);
+
+        CullFaceState() {
+        }
+    }
+
+    @Environment(value=EnvType.CLIENT)
+    static class PolygonOffsetState {
+        public final CapabilityTracker capFill = new CapabilityTracker(32823);
+        public float factor;
+        public float units;
+
+        PolygonOffsetState() {
+        }
+    }
+
+    @Environment(value=EnvType.CLIENT)
+    static class LogicOpState {
+        public final CapabilityTracker capState = new CapabilityTracker(3058);
+        public int op = 5379;
+
+        LogicOpState() {
+        }
+    }
+
+    @Environment(value=EnvType.CLIENT)
+    static class Texture2DState {
+        public int boundTexture;
+
+        Texture2DState() {
+        }
+    }
+
+    @Environment(value=EnvType.CLIENT)
+    static class ColorMask {
+        public boolean red = true;
+        public boolean green = true;
+        public boolean blue = true;
+        public boolean alpha = true;
+
+        ColorMask() {
+        }
+    }
+}

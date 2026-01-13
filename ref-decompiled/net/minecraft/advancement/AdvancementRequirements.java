@@ -7,8 +7,6 @@
  *  com.mojang.serialization.Codec
  *  com.mojang.serialization.DataResult
  *  it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
- *  net.minecraft.advancement.AdvancementRequirements
- *  net.minecraft.network.PacketByteBuf
  */
 package net.minecraft.advancement;
 
@@ -22,11 +20,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 import net.minecraft.network.PacketByteBuf;
 
-/*
- * Exception performing whole class analysis ignored.
- */
 public record AdvancementRequirements(List<List<String>> requirements) {
-    private final List<List<String>> requirements;
     public static final Codec<AdvancementRequirements> CODEC = Codec.STRING.listOf().listOf().xmap(AdvancementRequirements::new, AdvancementRequirements::requirements);
     public static final AdvancementRequirements EMPTY = new AdvancementRequirements(List.of());
 
@@ -34,12 +28,8 @@ public record AdvancementRequirements(List<List<String>> requirements) {
         this(buf.readList(bufx -> bufx.readList(PacketByteBuf::readString)));
     }
 
-    public AdvancementRequirements(List<List<String>> requirements) {
-        this.requirements = requirements;
-    }
-
     public void writeRequirements(PacketByteBuf buf) {
-        buf.writeCollection((Collection)this.requirements, (bufx, requirements) -> bufx.writeCollection((Collection)requirements, PacketByteBuf::writeString));
+        buf.writeCollection(this.requirements, (bufx, requirements) -> bufx.writeCollection(requirements, PacketByteBuf::writeString));
     }
 
     public static AdvancementRequirements allOf(Collection<String> requirements) {
@@ -58,8 +48,8 @@ public record AdvancementRequirements(List<List<String>> requirements) {
         if (this.requirements.isEmpty()) {
             return false;
         }
-        for (List list : this.requirements) {
-            if (AdvancementRequirements.anyMatch((List)list, predicate)) continue;
+        for (List<String> list : this.requirements) {
+            if (AdvancementRequirements.anyMatch(list, predicate)) continue;
             return false;
         }
         return true;
@@ -67,8 +57,8 @@ public record AdvancementRequirements(List<List<String>> requirements) {
 
     public int countMatches(Predicate<String> predicate) {
         int i = 0;
-        for (List list : this.requirements) {
-            if (!AdvancementRequirements.anyMatch((List)list, predicate)) continue;
+        for (List<String> list : this.requirements) {
+            if (!AdvancementRequirements.anyMatch(list, predicate)) continue;
             ++i;
         }
         return i;
@@ -84,7 +74,7 @@ public record AdvancementRequirements(List<List<String>> requirements) {
 
     public DataResult<AdvancementRequirements> validate(Set<String> requirements) {
         ObjectOpenHashSet set = new ObjectOpenHashSet();
-        for (List list : this.requirements) {
+        for (List<String> list : this.requirements) {
             if (list.isEmpty() && requirements.isEmpty()) {
                 return DataResult.error(() -> "Requirement entry cannot be empty");
             }
@@ -109,18 +99,20 @@ public record AdvancementRequirements(List<List<String>> requirements) {
 
     public Set<String> getNames() {
         ObjectOpenHashSet set = new ObjectOpenHashSet();
-        for (List list : this.requirements) {
+        for (List<String> list : this.requirements) {
             set.addAll(list);
         }
         return set;
     }
 
-    public List<List<String>> requirements() {
-        return this.requirements;
-    }
-
     private static /* synthetic */ String method_54926(Set set, Set set2) {
         return "Advancement completion requirements did not exactly match specified criteria. Missing: " + String.valueOf(set) + ". Unknown: " + String.valueOf(set2);
     }
-}
 
+    public static interface CriterionMerger {
+        public static final CriterionMerger AND = AdvancementRequirements::allOf;
+        public static final CriterionMerger OR = AdvancementRequirements::anyOf;
+
+        public AdvancementRequirements create(Collection<String> var1);
+    }
+}

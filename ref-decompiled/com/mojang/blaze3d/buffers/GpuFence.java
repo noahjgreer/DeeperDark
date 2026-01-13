@@ -2,10 +2,8 @@
  * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
- *  com.mojang.blaze3d.buffers.GpuFence
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
- *  net.minecraft.util.annotation.DeobfuscateClass
  */
 package com.mojang.blaze3d.buffers;
 
@@ -22,4 +20,3 @@ extends AutoCloseable {
 
     public boolean awaitCompletion(long var1);
 }
-

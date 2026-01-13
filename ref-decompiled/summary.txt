@@ -1,46 +1,14 @@
-Summary for ref_classes_fast.jar
-Decompiled with CFR 0.152
+Minecraft Sources Extraction Summary
+Generated: 01/13/2026 16:04:17
 
+Minecraft Version: 1.21.11
+Yarn Mappings: 1.21.11+build.4
+Source Jar: C:\Users\Admin\.gradle\caches\fabric-loom\minecraftMaven\net\minecraft\minecraft-merged-intermediary\1.21.11-net.fabricmc.yarn.1_21_11.1.21.11+build.4-v2\minecraft-merged-intermediary-1.21.11-net.fabricmc.yarn.1_21_11.1.21.11+build.4-v2.jar
+Output: F:\DeeperDark\ref-decompiled
 
-net.minecraft.block.BeehiveBlock
-----------------------------
+Total .class files: 10291
+Total .java files: 5196
+Time taken: 44.4 minutes
 
-onUseWithItem(net.minecraft.item.ItemStack net.minecraft.block.BlockState net.minecraft.world.World net.minecraft.util.math.BlockPos net.minecraft.entity.player.PlayerEntity net.minecraft.util.Hand net.minecraft.util.hit.BlockHitResult )
-  Unable to fully structure code
-
-
-net.minecraft.client.gl.GlCommandEncoder
-----------------------------
-
-setupRenderPass(net.minecraft.client.gl.RenderPassImpl java.util.Collection<java.lang.String> )
-  Could not resolve type clashes
-  Unable to fully structure code
-
-
-net.minecraft.client.gui.screen.Screen
-----------------------------
-
-handleBasicClickEvent(net.minecraft.text.ClickEvent net.minecraft.client.MinecraftClient net.minecraft.client.gui.screen.Screen )
-  Unable to fully structure code
-  Could not resolve type clashes
-
-
-net.minecraft.client.gui.screen.StatsScreen
-----------------------------
-
-refreshTab(int )
-  Unable to fully structure code
-
-
-net.minecraft.client.gui.screen.world.CreateWorldScreen
-----------------------------
-
-createSession(net.minecraft.client.MinecraftClient java.lang.String java.nio.file.Path )
-  WARNING - bad return control flow
-
-
-net.minecraft.client.sound.SoundSystem
-----------------------------
-
-play(net.minecraft.client.sound.SoundInstance )
-  Exception : java.lang.NullPointerException: Cannot invoke "org.benf.cfr.reader.bytecode.analysis.types.JavaRefTypeInstance$Annotated.pathIterator()" because the return value of "org.benf.cfr.reader.bytecode.analysis.types.JavaRefTypeInstance$Annotated.access$300(org.benf.cfr.reader.bytecode.analysis.types.JavaRefTypeInstance$Annotated)" is null
+These sources are decompiled from the Yarn-mapped Minecraft jar,
+making them readable for mod development reference.

@@ -4,9 +4,6 @@
  * Could not load the following classes:
  *  com.google.common.annotations.VisibleForTesting
  *  it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
- *  net.minecraft.advancement.Advancement
- *  net.minecraft.advancement.AdvancementEntry
- *  net.minecraft.advancement.PlacedAdvancement
  *  org.jspecify.annotations.Nullable
  */
 package net.minecraft.advancement;
@@ -18,9 +15,6 @@ import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.AdvancementEntry;
 import org.jspecify.annotations.Nullable;
 
-/*
- * Exception performing whole class analysis ignored.
- */
 public class PlacedAdvancement {
     private final AdvancementEntry advancementEntry;
     private final @Nullable PlacedAdvancement parent;
@@ -45,7 +39,7 @@ public class PlacedAdvancement {
     }
 
     public PlacedAdvancement getRoot() {
-        return PlacedAdvancement.findRoot((PlacedAdvancement)this);
+        return PlacedAdvancement.findRoot(this);
     }
 
     public static PlacedAdvancement findRoot(PlacedAdvancement advancement) {
@@ -76,7 +70,7 @@ public class PlacedAdvancement {
         }
         if (!(o instanceof PlacedAdvancement)) return false;
         PlacedAdvancement placedAdvancement = (PlacedAdvancement)o;
-        if (!this.advancementEntry.equals((Object)placedAdvancement.advancementEntry)) return false;
+        if (!this.advancementEntry.equals(placedAdvancement.advancementEntry)) return false;
         return true;
     }
 
@@ -88,4 +82,3 @@ public class PlacedAdvancement {
         return this.advancementEntry.id().toString();
     }
 }
-

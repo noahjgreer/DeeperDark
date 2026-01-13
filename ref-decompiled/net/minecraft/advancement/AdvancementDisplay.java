@@ -6,15 +6,6 @@
  *  com.mojang.datafixers.kinds.Applicative
  *  com.mojang.serialization.Codec
  *  com.mojang.serialization.codecs.RecordCodecBuilder
- *  net.minecraft.advancement.AdvancementDisplay
- *  net.minecraft.advancement.AdvancementFrame
- *  net.minecraft.item.ItemStack
- *  net.minecraft.network.RegistryByteBuf
- *  net.minecraft.network.codec.PacketCodec
- *  net.minecraft.text.Text
- *  net.minecraft.text.TextCodecs
- *  net.minecraft.util.AssetInfo
- *  net.minecraft.util.AssetInfo$TextureAssetInfo
  */
 package net.minecraft.advancement;
 
@@ -102,10 +93,10 @@ public class AdvancementDisplay {
     }
 
     private void toPacket(RegistryByteBuf buf) {
-        TextCodecs.UNLIMITED_REGISTRY_PACKET_CODEC.encode((Object)buf, (Object)this.title);
-        TextCodecs.UNLIMITED_REGISTRY_PACKET_CODEC.encode((Object)buf, (Object)this.description);
-        ItemStack.PACKET_CODEC.encode((Object)buf, (Object)this.icon);
-        buf.writeEnumConstant((Enum)this.frame);
+        TextCodecs.UNLIMITED_REGISTRY_PACKET_CODEC.encode(buf, this.title);
+        TextCodecs.UNLIMITED_REGISTRY_PACKET_CODEC.encode(buf, this.description);
+        ItemStack.PACKET_CODEC.encode(buf, this.icon);
+        buf.writeEnumConstant(this.frame);
         int i = 0;
         if (this.background.isPresent()) {
             i |= 1;
@@ -117,18 +108,18 @@ public class AdvancementDisplay {
             i |= 4;
         }
         buf.writeInt(i);
-        this.background.map(AssetInfo::id).ifPresent(arg_0 -> ((RegistryByteBuf)buf).writeIdentifier(arg_0));
+        this.background.map(AssetInfo::id).ifPresent(buf::writeIdentifier);
         buf.writeFloat(this.x);
         buf.writeFloat(this.y);
     }
 
     private static AdvancementDisplay fromPacket(RegistryByteBuf buf) {
-        Text text = (Text)TextCodecs.UNLIMITED_REGISTRY_PACKET_CODEC.decode((Object)buf);
-        Text text2 = (Text)TextCodecs.UNLIMITED_REGISTRY_PACKET_CODEC.decode((Object)buf);
-        ItemStack itemStack = (ItemStack)ItemStack.PACKET_CODEC.decode((Object)buf);
-        AdvancementFrame advancementFrame = (AdvancementFrame)buf.readEnumConstant(AdvancementFrame.class);
+        Text text = (Text)TextCodecs.UNLIMITED_REGISTRY_PACKET_CODEC.decode(buf);
+        Text text2 = (Text)TextCodecs.UNLIMITED_REGISTRY_PACKET_CODEC.decode(buf);
+        ItemStack itemStack = (ItemStack)ItemStack.PACKET_CODEC.decode(buf);
+        AdvancementFrame advancementFrame = buf.readEnumConstant(AdvancementFrame.class);
         int i = buf.readInt();
-        Optional optional = (i & 1) != 0 ? Optional.of(new AssetInfo.TextureAssetInfo(buf.readIdentifier())) : Optional.empty();
+        Optional<AssetInfo.TextureAssetInfo> optional = (i & 1) != 0 ? Optional.of(new AssetInfo.TextureAssetInfo(buf.readIdentifier())) : Optional.empty();
         boolean bl = (i & 2) != 0;
         boolean bl2 = (i & 4) != 0;
         AdvancementDisplay advancementDisplay = new AdvancementDisplay(itemStack, text, text2, optional, advancementFrame, bl, false, bl2);
@@ -136,4 +127,3 @@ public class AdvancementDisplay {
         return advancementDisplay;
     }
 }
-

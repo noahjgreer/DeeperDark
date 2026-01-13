@@ -2,19 +2,10 @@
  * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
- *  com.mojang.blaze3d.buffers.GpuBuffer
- *  com.mojang.blaze3d.buffers.GpuBuffer$MappedView
- *  com.mojang.blaze3d.platform.TextureUtil
- *  com.mojang.blaze3d.systems.CommandEncoder
- *  com.mojang.blaze3d.systems.RenderSystem
- *  com.mojang.blaze3d.textures.GpuTexture
  *  com.mojang.logging.LogUtils
  *  it.unimi.dsi.fastutil.ints.IntArrayFIFOQueue
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
- *  net.minecraft.client.texture.NativeImage
- *  net.minecraft.util.annotation.DeobfuscateClass
- *  net.minecraft.util.math.ColorHelper
  *  org.lwjgl.system.MemoryUtil
  *  org.slf4j.Logger
  */
@@ -45,9 +36,6 @@ import net.minecraft.util.math.ColorHelper;
 import org.lwjgl.system.MemoryUtil;
 import org.slf4j.Logger;
 
-/*
- * Exception performing whole class analysis ignored.
- */
 @Environment(value=EnvType.CLIENT)
 @DeobfuscateClass
 public class TextureUtil {
@@ -60,9 +48,9 @@ public class TextureUtil {
         ReadableByteChannel readableByteChannel = Channels.newChannel(inputStream);
         if (readableByteChannel instanceof SeekableByteChannel) {
             SeekableByteChannel seekableByteChannel = (SeekableByteChannel)readableByteChannel;
-            return TextureUtil.readResource((ReadableByteChannel)readableByteChannel, (int)((int)seekableByteChannel.size() + 1));
+            return TextureUtil.readResource(readableByteChannel, (int)seekableByteChannel.size() + 1);
         }
-        return TextureUtil.readResource((ReadableByteChannel)readableByteChannel, (int)8192);
+        return TextureUtil.readResource(readableByteChannel, 8192);
     }
 
     private static ByteBuffer readResource(ReadableByteChannel channel, int bufSize) throws IOException {
@@ -120,7 +108,7 @@ public class TextureUtil {
         AtomicInteger atomicInteger = new AtomicInteger();
         int j = 0;
         for (int k = 0; k <= scales; ++k) {
-            commandEncoder.copyTextureToBuffer(texture, gpuBuffer, (long)j, () -> {
+            commandEncoder.copyTextureToBuffer(texture, gpuBuffer, j, () -> {
                 if (atomicInteger.getAndIncrement() == scales) {
                     runnable.run();
                 }
@@ -134,7 +122,7 @@ public class TextureUtil {
     }
 
     public static Path getDebugTexturePath() {
-        return TextureUtil.getDebugTexturePath((Path)Path.of(".", new String[0]));
+        return TextureUtil.getDebugTexturePath(Path.of(".", new String[0]));
     }
 
     public static void solidify(NativeImage image) {
@@ -150,8 +138,8 @@ public class TextureUtil {
         for (k = 0; k < i; ++k) {
             for (l = 0; l < j; ++l) {
                 m = image.getColorArgb(k, l);
-                if (ColorHelper.getAlpha((int)m) == 0) continue;
-                int n = TextureUtil.pack((int)k, (int)l, (int)i);
+                if (ColorHelper.getAlpha(m) == 0) continue;
+                int n = TextureUtil.pack(k, l, i);
                 js[n] = 0;
                 is[n] = m;
                 intArrayFIFOQueue.enqueue(n);
@@ -159,12 +147,12 @@ public class TextureUtil {
         }
         while (!intArrayFIFOQueue.isEmpty()) {
             k = intArrayFIFOQueue.dequeueInt();
-            l = TextureUtil.x((int)k, (int)i);
-            m = TextureUtil.y((int)k, (int)i);
+            l = TextureUtil.x(k, i);
+            m = TextureUtil.y(k, i);
             for (int[] ks : DIRECTIONS) {
                 int o = l + ks[0];
                 int p = m + ks[1];
-                int q = TextureUtil.pack((int)o, (int)p, (int)i);
+                int q = TextureUtil.pack(o, p, i);
                 if (o < 0 || p < 0 || o >= i || p >= j || js[q] <= js[k] + 1) continue;
                 js[q] = js[k] + 1;
                 is[q] = is[k];
@@ -174,8 +162,8 @@ public class TextureUtil {
         for (k = 0; k < i; ++k) {
             for (l = 0; l < j; ++l) {
                 m = image.getColorArgb(k, l);
-                if (ColorHelper.getAlpha((int)m) == 0) {
-                    image.setColorArgb(k, l, ColorHelper.withAlpha((int)0, (int)is[TextureUtil.pack((int)k, (int)l, (int)i)]));
+                if (ColorHelper.getAlpha(m) == 0) {
+                    image.setColorArgb(k, l, ColorHelper.withAlpha(0, is[TextureUtil.pack(k, l, i)]));
                     continue;
                 }
                 image.setColorArgb(k, l, m);
@@ -199,20 +187,20 @@ public class TextureUtil {
             for (n = 0; n < j; ++n) {
                 int t;
                 o = image.getColorArgb(m, n);
-                p = ColorHelper.getAlpha((int)o);
-                if (p == 0 || (t = (q = ColorHelper.getRed((int)o)) + (r = ColorHelper.getGreen((int)o)) + (s = ColorHelper.getBlue((int)o))) >= l) continue;
+                p = ColorHelper.getAlpha(o);
+                if (p == 0 || (t = (q = ColorHelper.getRed(o)) + (r = ColorHelper.getGreen(o)) + (s = ColorHelper.getBlue(o))) >= l) continue;
                 l = t;
                 k = o;
             }
         }
-        m = 3 * ColorHelper.getRed((int)k) / 4;
-        n = 3 * ColorHelper.getGreen((int)k) / 4;
-        o = 3 * ColorHelper.getBlue((int)k) / 4;
-        p = ColorHelper.getArgb((int)0, (int)m, (int)n, (int)o);
+        m = 3 * ColorHelper.getRed(k) / 4;
+        n = 3 * ColorHelper.getGreen(k) / 4;
+        o = 3 * ColorHelper.getBlue(k) / 4;
+        p = ColorHelper.getArgb(0, m, n, o);
         for (q = 0; q < i; ++q) {
             for (r = 0; r < j; ++r) {
                 s = image.getColorArgb(q, r);
-                if (ColorHelper.getAlpha((int)s) != 0) continue;
+                if (ColorHelper.getAlpha(s) != 0) continue;
                 image.setColorArgb(q, r, p);
             }
         }
@@ -230,4 +218,3 @@ public class TextureUtil {
         return packed / width;
     }
 }
-

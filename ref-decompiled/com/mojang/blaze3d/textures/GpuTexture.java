@@ -2,17 +2,16 @@
  * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
- *  com.mojang.blaze3d.textures.GpuTexture
- *  com.mojang.blaze3d.textures.GpuTexture$Usage
- *  com.mojang.blaze3d.textures.TextureFormat
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
- *  net.minecraft.util.annotation.DeobfuscateClass
  */
 package com.mojang.blaze3d.textures;
 
-import com.mojang.blaze3d.textures.GpuTexture;
 import com.mojang.blaze3d.textures.TextureFormat;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.util.annotation.DeobfuscateClass;
@@ -78,5 +77,10 @@ implements AutoCloseable {
     public abstract void close();
 
     public abstract boolean isClosed();
-}
 
+    @Retention(value=RetentionPolicy.CLASS)
+    @Target(value={ElementType.FIELD, ElementType.PARAMETER, ElementType.LOCAL_VARIABLE, ElementType.METHOD, ElementType.TYPE_USE})
+    @Environment(value=EnvType.CLIENT)
+    public static @interface Usage {
+    }
+}

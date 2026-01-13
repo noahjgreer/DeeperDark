@@ -2,20 +2,8 @@
  * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
- *  com.mojang.blaze3d.buffers.GpuBuffer
- *  com.mojang.blaze3d.buffers.GpuBuffer$MappedView
- *  com.mojang.blaze3d.buffers.GpuBufferSlice
- *  com.mojang.blaze3d.buffers.GpuFence
- *  com.mojang.blaze3d.systems.CommandEncoder
- *  com.mojang.blaze3d.systems.GpuQuery
- *  com.mojang.blaze3d.systems.RenderPass
- *  com.mojang.blaze3d.textures.GpuTexture
- *  com.mojang.blaze3d.textures.GpuTextureView
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
- *  net.minecraft.client.texture.NativeImage
- *  net.minecraft.client.texture.NativeImage$Format
- *  net.minecraft.util.annotation.DeobfuscateClass
  *  org.jspecify.annotations.Nullable
  */
 package com.mojang.blaze3d.systems;
@@ -80,4 +68,3 @@ public interface CommandEncoder {
 
     public void timerQueryEnd(GpuQuery var1);
 }
-

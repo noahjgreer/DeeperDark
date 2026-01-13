@@ -2,12 +2,8 @@
  * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
- *  com.mojang.blaze3d.shaders.ShaderType
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
- *  net.minecraft.resource.ResourceFinder
- *  net.minecraft.util.Identifier
- *  net.minecraft.util.annotation.DeobfuscateClass
  *  org.jspecify.annotations.Nullable
  */
 package com.mojang.blaze3d.shaders;
@@ -19,9 +15,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.annotation.DeobfuscateClass;
 import org.jspecify.annotations.Nullable;
 
-/*
- * Exception performing whole class analysis ignored.
- */
 @Environment(value=EnvType.CLIENT)
 @DeobfuscateClass
 public enum ShaderType {
@@ -57,4 +50,3 @@ public enum ShaderType {
         TYPES = ShaderType.values();
     }
 }
-

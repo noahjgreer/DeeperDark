@@ -3,35 +3,11 @@
  * 
  * Could not load the following classes:
  *  com.mojang.logging.LogUtils
- *  net.minecraft.Bootstrap
- *  net.minecraft.SharedConstants
- *  net.minecraft.block.AbstractBlock
- *  net.minecraft.block.ComposterBlock
- *  net.minecraft.block.FireBlock
- *  net.minecraft.block.cauldron.CauldronBehavior
- *  net.minecraft.block.dispenser.DispenserBehavior
- *  net.minecraft.command.EntitySelectorOptions
- *  net.minecraft.entity.EntityType
- *  net.minecraft.entity.attribute.DefaultAttributeRegistry
- *  net.minecraft.entity.attribute.EntityAttribute
- *  net.minecraft.entity.effect.StatusEffect
- *  net.minecraft.item.Item
- *  net.minecraft.item.ItemGroups
- *  net.minecraft.registry.Registries
- *  net.minecraft.resource.featuretoggle.FeatureFlags
- *  net.minecraft.server.command.CommandManager
- *  net.minecraft.util.Language
- *  net.minecraft.util.annotation.SuppressLinter
- *  net.minecraft.util.logging.DebugLoggerPrintStream
- *  net.minecraft.util.logging.LoggerPrintStream
- *  net.minecraft.world.rule.GameRuleVisitor
- *  net.minecraft.world.rule.GameRules
  *  org.slf4j.Logger
  */
 package net.minecraft;
 
 import com.mojang.logging.LogUtils;
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.time.Duration;
 import java.time.Instant;
@@ -60,13 +36,11 @@ import net.minecraft.util.Language;
 import net.minecraft.util.annotation.SuppressLinter;
 import net.minecraft.util.logging.DebugLoggerPrintStream;
 import net.minecraft.util.logging.LoggerPrintStream;
+import net.minecraft.world.rule.GameRule;
 import net.minecraft.world.rule.GameRuleVisitor;
 import net.minecraft.world.rule.GameRules;
 import org.slf4j.Logger;
 
-/*
- * Exception performing whole class analysis ignored.
- */
 @SuppressLinter(reason="System.out setup")
 public class Bootstrap {
     public static final PrintStream SYSOUT = System.out;
@@ -85,7 +59,7 @@ public class Bootstrap {
         }
         FireBlock.registerDefaultFlammables();
         ComposterBlock.registerDefaultCompostableItems();
-        if (EntityType.getId((EntityType)EntityType.PLAYER) == null) {
+        if (EntityType.getId(EntityType.PLAYER) == null) {
             throw new IllegalStateException("Failed loading EntityTypes");
         }
         EntitySelectorOptions.register();
@@ -107,20 +81,28 @@ public class Bootstrap {
         });
     }
 
-    private static void collectMissingGameRuleTranslations(Set<String> translations) {
-        Language language = Language.getInstance();
+    private static void collectMissingGameRuleTranslations(final Set<String> translations) {
+        final Language language = Language.getInstance();
         GameRules gameRules = new GameRules(FeatureFlags.FEATURE_MANAGER.getFeatureSet());
-        gameRules.accept((GameRuleVisitor)new /* Unavailable Anonymous Inner Class!! */);
+        gameRules.accept(new GameRuleVisitor(){
+
+            @Override
+            public <T> void visit(GameRule<T> rule) {
+                if (!language.hasTranslation(rule.getTranslationKey())) {
+                    translations.add(rule.toShortString());
+                }
+            }
+        });
     }
 
     public static Set<String> getMissingTranslations() {
         TreeSet<String> set = new TreeSet<String>();
-        Bootstrap.collectMissingTranslations((Iterable)Registries.ATTRIBUTE, EntityAttribute::getTranslationKey, set);
-        Bootstrap.collectMissingTranslations((Iterable)Registries.ENTITY_TYPE, EntityType::getTranslationKey, set);
-        Bootstrap.collectMissingTranslations((Iterable)Registries.STATUS_EFFECT, StatusEffect::getTranslationKey, set);
-        Bootstrap.collectMissingTranslations((Iterable)Registries.ITEM, Item::getTranslationKey, set);
-        Bootstrap.collectMissingTranslations((Iterable)Registries.BLOCK, AbstractBlock::getTranslationKey, set);
-        Bootstrap.collectMissingTranslations((Iterable)Registries.CUSTOM_STAT, (T stat) -> "stat." + stat.toString().replace(':', '.'), set);
+        Bootstrap.collectMissingTranslations(Registries.ATTRIBUTE, EntityAttribute::getTranslationKey, set);
+        Bootstrap.collectMissingTranslations(Registries.ENTITY_TYPE, EntityType::getTranslationKey, set);
+        Bootstrap.collectMissingTranslations(Registries.STATUS_EFFECT, StatusEffect::getTranslationKey, set);
+        Bootstrap.collectMissingTranslations(Registries.ITEM, Item::getTranslationKey, set);
+        Bootstrap.collectMissingTranslations(Registries.BLOCK, AbstractBlock::getTranslationKey, set);
+        Bootstrap.collectMissingTranslations(Registries.CUSTOM_STAT, stat -> "stat." + stat.toString().replace(':', '.'), set);
         Bootstrap.collectMissingGameRuleTranslations(set);
         return set;
     }
@@ -154,11 +136,11 @@ public class Bootstrap {
 
     private static void setOutputStreams() {
         if (LOGGER.isDebugEnabled()) {
-            System.setErr((PrintStream)new DebugLoggerPrintStream("STDERR", (OutputStream)System.err));
-            System.setOut((PrintStream)new DebugLoggerPrintStream("STDOUT", (OutputStream)SYSOUT));
+            System.setErr(new DebugLoggerPrintStream("STDERR", System.err));
+            System.setOut(new DebugLoggerPrintStream("STDOUT", SYSOUT));
         } else {
-            System.setErr((PrintStream)new LoggerPrintStream("STDERR", (OutputStream)System.err));
-            System.setOut((PrintStream)new LoggerPrintStream("STDOUT", (OutputStream)SYSOUT));
+            System.setErr(new LoggerPrintStream("STDERR", System.err));
+            System.setOut(new LoggerPrintStream("STDOUT", SYSOUT));
         }
     }
 
@@ -171,4 +153,3 @@ public class Bootstrap {
         LOAD_TIME = new AtomicLong(-1L);
     }
 }
-

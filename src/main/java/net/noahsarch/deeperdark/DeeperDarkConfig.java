@@ -30,16 +30,42 @@ public class DeeperDarkConfig {
         // creeper effect duration bounds in seconds
         public int creeperEffectMinSeconds = 15;
         public int creeperEffectMaxSeconds = 60;
+
+        // Anvil configuration
+        public int anvilRepairCost = 0; // Cost in levels for item repairs (diamond + diamond pickaxe)
+        public int anvilEnchantCost = 5; // Flat cost in levels for any enchanting combination
+
+        // Fortune enchantment configuration
+        public boolean customFortuneEnabled = true;
+        public double fortune1DropChance = 0.1666; // 16.66% chance to drop 2 items
+        public double fortune2DropChance = 0.3333; // 33.33% chance to drop 2 items
+        public double fortune3DropChance = 0.50; // 50% chance to drop 2 items
+        public int fortuneMaxDrops = 2; // Maximum drops with custom Fortune (never more than 2)
     }
 
     public static void load() {
         // prefer YAML, fallback to JSON for backwards compatibility
         if (CONFIG_FILE_YAML.exists()) {
             try (FileReader reader = new FileReader(CONFIG_FILE_YAML)) {
-                Yaml yaml = new Yaml();
-                instance = yaml.loadAs(reader, ConfigInstance.class);
-            } catch (IOException e) {
-                LOGGER.error("Failed to load config", e);
+                DumperOptions options = new DumperOptions();
+                options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+
+                // Configure LoaderOptions to allow global tags (for backwards compatibility with old configs)
+                org.yaml.snakeyaml.LoaderOptions loaderOptions = new org.yaml.snakeyaml.LoaderOptions();
+                loaderOptions.setTagInspector(tag -> true); // Allow all tags
+
+                org.yaml.snakeyaml.constructor.Constructor constructor = new org.yaml.snakeyaml.constructor.Constructor(ConfigInstance.class, loaderOptions);
+                Yaml yaml = new Yaml(constructor);
+                instance = yaml.load(reader);
+            } catch (Exception e) {
+                LOGGER.error("Failed to load config, creating new one", e);
+                // If loading fails, delete corrupted file and create new one
+                try {
+                    java.nio.file.Files.deleteIfExists(CONFIG_FILE_YAML.toPath());
+                } catch (IOException ex) {
+                    LOGGER.warn("Failed to delete corrupted config", ex);
+                }
+                instance = null; // Will trigger creation of new config below
             }
         } else if (CONFIG_FILE_JSON.exists()) {
             try {
@@ -81,13 +107,30 @@ public class DeeperDarkConfig {
                     # creeperEffectMinSeconds / creeperEffectMaxSeconds (seconds): when a creeper with an infinite-duration effect explodes,
                     #   the effect given by the explosion will have a random duration between these values (seconds).
                     #
+                    # Anvil Configuration:
+                    # anvilRepairCost: XP level cost for repairing items with materials (e.g., diamond + diamond pickaxe). Set to 0 for free repairs.
+                    # anvilEnchantCost: Flat XP level cost for any enchanting combination (book + tool, book + book, etc.)
+                    #
+                    # Fortune Enchantment Configuration:
+                    # customFortuneEnabled: if true, uses custom Fortune behavior; if false, uses vanilla
+                    # fortune1DropChance: probability (0.0-1.0) that Fortune I drops 2 items instead of 1 (default: 0.1666 = 16.66%)
+                    # fortune2DropChance: probability (0.0-1.0) that Fortune II drops 2 items instead of 1 (default: 0.3333 = 33.33%)
+                    # fortune3DropChance: probability (0.0-1.0) that Fortune III drops 2 items instead of 1 (default: 0.50 = 50%)
+                    # fortuneMaxDrops: maximum number of items Fortune can drop (vanilla Fortune III can drop 4+ items, this limits it)
+                    # NOTE: This affects ALL fortune-based drops (ores, crops, gravel, glowstone, etc.)
+                    #
                     """;
 
             DumperOptions options = new DumperOptions();
             options.setIndent(2);
             options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
             options.setPrettyFlow(true);
-            Yaml yaml = new Yaml(options);
+
+            // Use a representer to avoid global tag issues with nested classes
+            org.yaml.snakeyaml.representer.Representer representer = new org.yaml.snakeyaml.representer.Representer(options);
+            representer.addClassTag(ConfigInstance.class, org.yaml.snakeyaml.nodes.Tag.MAP);
+
+            Yaml yaml = new Yaml(representer, options);
 
             try (FileWriter writer = new FileWriter(CONFIG_FILE_YAML)) {
                 writer.write(header);

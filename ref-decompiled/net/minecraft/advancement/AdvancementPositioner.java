@@ -3,8 +3,6 @@
  * 
  * Could not load the following classes:
  *  com.google.common.collect.Lists
- *  net.minecraft.advancement.AdvancementPositioner
- *  net.minecraft.advancement.PlacedAdvancement
  *  org.jspecify.annotations.Nullable
  */
 package net.minecraft.advancement;
@@ -68,7 +66,7 @@ public class AdvancementPositioner {
             advancementPositioner = advancementPositioner2.onFinishCalculation(advancementPositioner == null ? advancementPositioner2 : advancementPositioner);
         }
         this.onFinishChildrenCalculation();
-        float f = (((AdvancementPositioner)this.children.get((int)0)).row + ((AdvancementPositioner)this.children.get((int)(this.children.size() - 1))).row) / 2.0f;
+        float f = (this.children.get((int)0).row + this.children.get((int)(this.children.size() - 1)).row) / 2.0f;
         if (this.previousSibling != null) {
             this.row = this.previousSibling.row + 1.0f;
             this.relativeRowInSiblings = this.row - f;
@@ -100,7 +98,7 @@ public class AdvancementPositioner {
         float f = 0.0f;
         float g = 0.0f;
         for (int i = this.children.size() - 1; i >= 0; --i) {
-            AdvancementPositioner advancementPositioner = (AdvancementPositioner)this.children.get(i);
+            AdvancementPositioner advancementPositioner = this.children.get(i);
             advancementPositioner.row += f;
             advancementPositioner.relativeRowInSiblings += f;
             f += advancementPositioner.field_1265 + (g += advancementPositioner.field_1266);
@@ -112,7 +110,7 @@ public class AdvancementPositioner {
             return this.substituteChild;
         }
         if (!this.children.isEmpty()) {
-            return (AdvancementPositioner)this.children.get(0);
+            return this.children.get(0);
         }
         return null;
     }
@@ -122,7 +120,7 @@ public class AdvancementPositioner {
             return this.substituteChild;
         }
         if (!this.children.isEmpty()) {
-            return (AdvancementPositioner)this.children.get(this.children.size() - 1);
+            return this.children.get(this.children.size() - 1);
         }
         return null;
     }
@@ -134,7 +132,7 @@ public class AdvancementPositioner {
         AdvancementPositioner advancementPositioner = this;
         AdvancementPositioner advancementPositioner2 = this;
         AdvancementPositioner advancementPositioner3 = this.previousSibling;
-        AdvancementPositioner advancementPositioner4 = (AdvancementPositioner)this.parent.children.get(0);
+        AdvancementPositioner advancementPositioner4 = this.parent.children.get(0);
         float f = this.relativeRowInSiblings;
         float g = this.relativeRowInSiblings;
         float h = advancementPositioner3.relativeRowInSiblings;
@@ -188,7 +186,7 @@ public class AdvancementPositioner {
     }
 
     private void apply() {
-        this.advancement.getAdvancement().display().ifPresent(display -> display.setPos((float)this.depth, this.row));
+        this.advancement.getAdvancement().display().ifPresent(display -> display.setPos(this.depth, this.row));
         if (!this.children.isEmpty()) {
             for (AdvancementPositioner advancementPositioner : this.children) {
                 advancementPositioner.apply();
@@ -209,4 +207,3 @@ public class AdvancementPositioner {
         advancementPositioner.apply();
     }
 }
-

@@ -2,17 +2,17 @@
  * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
- *  com.mojang.blaze3d.buffers.GpuBuffer
- *  com.mojang.blaze3d.buffers.GpuBuffer$Usage
- *  com.mojang.blaze3d.buffers.GpuBufferSlice
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
- *  net.minecraft.util.annotation.DeobfuscateClass
  */
 package com.mojang.blaze3d.buffers;
 
-import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.nio.ByteBuffer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.util.annotation.DeobfuscateClass;
@@ -63,5 +63,20 @@ implements AutoCloseable {
     public GpuBufferSlice slice() {
         return new GpuBufferSlice(this, 0L, this.size);
     }
-}
 
+    @Retention(value=RetentionPolicy.CLASS)
+    @Target(value={ElementType.FIELD, ElementType.PARAMETER, ElementType.LOCAL_VARIABLE, ElementType.METHOD, ElementType.TYPE_USE})
+    @Environment(value=EnvType.CLIENT)
+    public static @interface Usage {
+    }
+
+    @Environment(value=EnvType.CLIENT)
+    @DeobfuscateClass
+    public static interface MappedView
+    extends AutoCloseable {
+        public ByteBuffer data();
+
+        @Override
+        public void close();
+    }
+}

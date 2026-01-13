@@ -5,10 +5,6 @@
  *  com.mojang.logging.LogUtils
  *  it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
  *  it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet
- *  net.minecraft.advancement.AdvancementEntry
- *  net.minecraft.advancement.AdvancementManager
- *  net.minecraft.advancement.PlacedAdvancement
- *  net.minecraft.util.Identifier
  *  org.jspecify.annotations.Nullable
  *  org.slf4j.Logger
  */
@@ -33,8 +29,7 @@ public class AdvancementManager {
     private final Map<Identifier, PlacedAdvancement> advancements = new Object2ObjectOpenHashMap();
     private final Set<PlacedAdvancement> roots = new ObjectLinkedOpenHashSet();
     private final Set<PlacedAdvancement> dependents = new ObjectLinkedOpenHashSet();
-    private // Could not load outer class - annotation placement on inner may be incorrect
-    @Nullable AdvancementManager.Listener listener;
+    private @Nullable Listener listener;
 
     private void remove(PlacedAdvancement advancement) {
         for (PlacedAdvancement placedAdvancement : advancement.getChildren()) {
@@ -57,7 +52,7 @@ public class AdvancementManager {
 
     public void removeAll(Set<Identifier> advancements) {
         for (Identifier identifier : advancements) {
-            PlacedAdvancement placedAdvancement = (PlacedAdvancement)this.advancements.get(identifier);
+            PlacedAdvancement placedAdvancement = this.advancements.get(identifier);
             if (placedAdvancement == null) {
                 LOGGER.warn("Told to remove advancement {} but I don't know what that is", (Object)identifier);
                 continue;
@@ -69,7 +64,7 @@ public class AdvancementManager {
     public void addAll(Collection<AdvancementEntry> advancements) {
         ArrayList<AdvancementEntry> list = new ArrayList<AdvancementEntry>(advancements);
         while (!list.isEmpty()) {
-            if (list.removeIf(arg_0 -> this.tryAdd(arg_0))) continue;
+            if (list.removeIf(this::tryAdd)) continue;
             LOGGER.error("Couldn't load advancements: {}", list);
             break;
         }
@@ -77,7 +72,7 @@ public class AdvancementManager {
     }
 
     private boolean tryAdd(AdvancementEntry advancement) {
-        Optional optional = advancement.value().parent();
+        Optional<Identifier> optional = advancement.value().parent();
         PlacedAdvancement placedAdvancement = optional.map(this.advancements::get).orElse(null);
         if (placedAdvancement == null && optional.isPresent()) {
             return false;
@@ -119,15 +114,14 @@ public class AdvancementManager {
     }
 
     public @Nullable PlacedAdvancement get(Identifier id) {
-        return (PlacedAdvancement)this.advancements.get(id);
+        return this.advancements.get(id);
     }
 
     public @Nullable PlacedAdvancement get(AdvancementEntry advancement) {
-        return (PlacedAdvancement)this.advancements.get(advancement.id());
+        return this.advancements.get(advancement.id());
     }
 
-    public void setListener(// Could not load outer class - annotation placement on inner may be incorrect
-    @Nullable AdvancementManager.Listener listener) {
+    public void setListener(@Nullable Listener listener) {
         this.listener = listener;
         if (listener != null) {
             for (PlacedAdvancement placedAdvancement : this.roots) {
@@ -138,5 +132,16 @@ public class AdvancementManager {
             }
         }
     }
-}
 
+    public static interface Listener {
+        public void onRootAdded(PlacedAdvancement var1);
+
+        public void onRootRemoved(PlacedAdvancement var1);
+
+        public void onDependentAdded(PlacedAdvancement var1);
+
+        public void onDependentRemoved(PlacedAdvancement var1);
+
+        public void onClear();
+    }
+}

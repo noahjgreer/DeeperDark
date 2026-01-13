@@ -12,32 +12,6 @@
  *  com.mojang.serialization.Codec
  *  com.mojang.serialization.DynamicOps
  *  com.mojang.serialization.JsonOps
- *  net.minecraft.advancement.Advancement
- *  net.minecraft.advancement.AdvancementCriterion
- *  net.minecraft.advancement.AdvancementDisplays
- *  net.minecraft.advancement.AdvancementEntry
- *  net.minecraft.advancement.AdvancementManager
- *  net.minecraft.advancement.AdvancementProgress
- *  net.minecraft.advancement.PlacedAdvancement
- *  net.minecraft.advancement.PlayerAdvancementTracker
- *  net.minecraft.advancement.PlayerAdvancementTracker$ProgressMap
- *  net.minecraft.advancement.criterion.Criterion
- *  net.minecraft.advancement.criterion.Criterion$ConditionsContainer
- *  net.minecraft.advancement.criterion.CriterionConditions
- *  net.minecraft.advancement.criterion.CriterionProgress
- *  net.minecraft.datafixer.DataFixTypes
- *  net.minecraft.network.packet.Packet
- *  net.minecraft.network.packet.s2c.play.AdvancementUpdateS2CPacket
- *  net.minecraft.network.packet.s2c.play.SelectAdvancementTabS2CPacket
- *  net.minecraft.registry.Registries
- *  net.minecraft.server.PlayerManager
- *  net.minecraft.server.ServerAdvancementLoader
- *  net.minecraft.server.network.ServerPlayerEntity
- *  net.minecraft.text.Text
- *  net.minecraft.util.Identifier
- *  net.minecraft.util.StrictJsonParser
- *  net.minecraft.util.path.PathUtil
- *  net.minecraft.world.rule.GameRules
  *  org.jspecify.annotations.Nullable
  *  org.slf4j.Logger
  */
@@ -56,7 +30,6 @@ import com.mojang.serialization.JsonOps;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -68,6 +41,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.AdvancementCriterion;
 import net.minecraft.advancement.AdvancementDisplays;
@@ -75,19 +49,16 @@ import net.minecraft.advancement.AdvancementEntry;
 import net.minecraft.advancement.AdvancementManager;
 import net.minecraft.advancement.AdvancementProgress;
 import net.minecraft.advancement.PlacedAdvancement;
-import net.minecraft.advancement.PlayerAdvancementTracker;
 import net.minecraft.advancement.criterion.Criterion;
 import net.minecraft.advancement.criterion.CriterionConditions;
 import net.minecraft.advancement.criterion.CriterionProgress;
 import net.minecraft.datafixer.DataFixTypes;
-import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.AdvancementUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.SelectAdvancementTabS2CPacket;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.ServerAdvancementLoader;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.StrictJsonParser;
 import net.minecraft.util.path.PathUtil;
@@ -101,10 +72,10 @@ public class PlayerAdvancementTracker {
     private final PlayerManager playerManager;
     private final Path filePath;
     private AdvancementManager advancementManager;
-    private final Map<AdvancementEntry, AdvancementProgress> progress = new LinkedHashMap();
-    private final Set<AdvancementEntry> visibleAdvancements = new HashSet();
-    private final Set<AdvancementEntry> progressUpdates = new HashSet();
-    private final Set<PlacedAdvancement> updatedRoots = new HashSet();
+    private final Map<AdvancementEntry, AdvancementProgress> progress = new LinkedHashMap<AdvancementEntry, AdvancementProgress>();
+    private final Set<AdvancementEntry> visibleAdvancements = new HashSet<AdvancementEntry>();
+    private final Set<AdvancementEntry> progressUpdates = new HashSet<AdvancementEntry>();
+    private final Set<PlacedAdvancement> updatedRoots = new HashSet<PlacedAdvancement>();
     private ServerPlayerEntity owner;
     private @Nullable AdvancementEntry currentDisplayTab;
     private boolean dirty = true;
@@ -160,7 +131,7 @@ public class PlayerAdvancementTracker {
     private void load(ServerAdvancementLoader advancementLoader) {
         if (Files.isRegularFile(this.filePath, new LinkOption[0])) {
             try (BufferedReader reader = Files.newBufferedReader(this.filePath, StandardCharsets.UTF_8);){
-                JsonElement jsonElement = StrictJsonParser.parse((Reader)reader);
+                JsonElement jsonElement = StrictJsonParser.parse(reader);
                 ProgressMap progressMap = (ProgressMap)this.progressMapCodec.parse((DynamicOps)JsonOps.INSTANCE, (Object)jsonElement).getOrThrow(JsonParseException::new);
                 this.loadProgressMap(advancementLoader, progressMap);
             }
@@ -178,7 +149,7 @@ public class PlayerAdvancementTracker {
     public void save() {
         JsonElement jsonElement = (JsonElement)this.progressMapCodec.encodeStart((DynamicOps)JsonOps.INSTANCE, (Object)this.createProgressMap()).getOrThrow();
         try {
-            PathUtil.createDirectories((Path)this.filePath.getParent());
+            PathUtil.createDirectories(this.filePath.getParent());
             try (BufferedWriter writer = Files.newBufferedWriter(this.filePath, StandardCharsets.UTF_8, new OpenOption[0]);){
                 GSON.toJson(jsonElement, GSON.newJsonWriter((Writer)writer));
             }
@@ -190,22 +161,22 @@ public class PlayerAdvancementTracker {
 
     private void loadProgressMap(ServerAdvancementLoader loader, ProgressMap progressMap) {
         progressMap.forEach((id, progress) -> {
-            AdvancementEntry advancementEntry = loader.get(id);
+            AdvancementEntry advancementEntry = loader.get((Identifier)id);
             if (advancementEntry == null) {
                 LOGGER.warn("Ignored advancement '{}' in progress file {} - it doesn't exist anymore?", id, (Object)this.filePath);
                 return;
             }
-            this.initProgress(advancementEntry, progress);
+            this.initProgress(advancementEntry, (AdvancementProgress)progress);
             this.progressUpdates.add(advancementEntry);
             this.onStatusUpdate(advancementEntry);
         });
     }
 
     private ProgressMap createProgressMap() {
-        LinkedHashMap map = new LinkedHashMap();
+        LinkedHashMap<Identifier, AdvancementProgress> map = new LinkedHashMap<Identifier, AdvancementProgress>();
         this.progress.forEach((entry, progress) -> {
             if (progress.isAnyObtained()) {
-                map.put(entry.id(), progress);
+                map.put(entry.id(), (AdvancementProgress)progress);
             }
         });
         return new ProgressMap(map);
@@ -222,8 +193,8 @@ public class PlayerAdvancementTracker {
             if (!bl2 && advancementProgress.isDone()) {
                 advancement.value().rewards().apply(this.owner);
                 advancement.value().display().ifPresent(display -> {
-                    if (display.shouldAnnounceToChat() && ((Boolean)this.owner.getEntityWorld().getGameRules().getValue(GameRules.ANNOUNCE_ADVANCEMENTS)).booleanValue()) {
-                        this.playerManager.broadcast((Text)display.getFrame().getChatAnnouncementText(advancement, this.owner), false);
+                    if (display.shouldAnnounceToChat() && this.owner.getEntityWorld().getGameRules().getValue(GameRules.ANNOUNCE_ADVANCEMENTS).booleanValue()) {
+                        this.playerManager.broadcast(display.getFrame().getChatAnnouncementText(advancement, this.owner), false);
                     }
                 });
             }
@@ -261,46 +232,46 @@ public class PlayerAdvancementTracker {
         if (advancementProgress.isDone()) {
             return;
         }
-        for (Map.Entry entry : advancement.value().criteria().entrySet()) {
-            CriterionProgress criterionProgress = advancementProgress.getCriterionProgress((String)entry.getKey());
+        for (Map.Entry<String, AdvancementCriterion<?>> entry : advancement.value().criteria().entrySet()) {
+            CriterionProgress criterionProgress = advancementProgress.getCriterionProgress(entry.getKey());
             if (criterionProgress == null || criterionProgress.isObtained()) continue;
-            this.beginTracking(advancement, (String)entry.getKey(), (AdvancementCriterion)entry.getValue());
+            this.beginTracking(advancement, entry.getKey(), entry.getValue());
         }
     }
 
     private <T extends CriterionConditions> void beginTracking(AdvancementEntry advancement, String id, AdvancementCriterion<T> criterion) {
-        criterion.trigger().beginTrackingCondition(this, new Criterion.ConditionsContainer(criterion.conditions(), advancement, id));
+        criterion.trigger().beginTrackingCondition(this, new Criterion.ConditionsContainer<T>(criterion.conditions(), advancement, id));
     }
 
     private void endTrackingCompleted(AdvancementEntry advancement) {
         AdvancementProgress advancementProgress = this.getProgress(advancement);
-        for (Map.Entry entry : advancement.value().criteria().entrySet()) {
-            CriterionProgress criterionProgress = advancementProgress.getCriterionProgress((String)entry.getKey());
+        for (Map.Entry<String, AdvancementCriterion<?>> entry : advancement.value().criteria().entrySet()) {
+            CriterionProgress criterionProgress = advancementProgress.getCriterionProgress(entry.getKey());
             if (criterionProgress == null || !criterionProgress.isObtained() && !advancementProgress.isDone()) continue;
-            this.endTrackingCompleted(advancement, (String)entry.getKey(), (AdvancementCriterion)entry.getValue());
+            this.endTrackingCompleted(advancement, entry.getKey(), entry.getValue());
         }
     }
 
     private <T extends CriterionConditions> void endTrackingCompleted(AdvancementEntry advancement, String id, AdvancementCriterion<T> criterion) {
-        criterion.trigger().endTrackingCondition(this, new Criterion.ConditionsContainer(criterion.conditions(), advancement, id));
+        criterion.trigger().endTrackingCondition(this, new Criterion.ConditionsContainer<T>(criterion.conditions(), advancement, id));
     }
 
     public void sendUpdate(ServerPlayerEntity player, boolean showToast) {
         if (this.dirty || !this.updatedRoots.isEmpty() || !this.progressUpdates.isEmpty()) {
             HashMap<Identifier, AdvancementProgress> map = new HashMap<Identifier, AdvancementProgress>();
-            HashSet set = new HashSet();
-            HashSet set2 = new HashSet();
+            HashSet<AdvancementEntry> set = new HashSet<AdvancementEntry>();
+            HashSet<Identifier> set2 = new HashSet<Identifier>();
             for (PlacedAdvancement placedAdvancement : this.updatedRoots) {
                 this.calculateDisplay(placedAdvancement, set, set2);
             }
             this.updatedRoots.clear();
             for (AdvancementEntry advancementEntry : this.progressUpdates) {
                 if (!this.visibleAdvancements.contains(advancementEntry)) continue;
-                map.put(advancementEntry.id(), (AdvancementProgress)this.progress.get(advancementEntry));
+                map.put(advancementEntry.id(), this.progress.get(advancementEntry));
             }
             this.progressUpdates.clear();
             if (!(map.isEmpty() && set.isEmpty() && set2.isEmpty())) {
-                player.networkHandler.sendPacket((Packet)new AdvancementUpdateS2CPacket(this.dirty, set, set2, map, showToast));
+                player.networkHandler.sendPacket(new AdvancementUpdateS2CPacket(this.dirty, set, set2, map, showToast));
             }
         }
         this.dirty = false;
@@ -310,12 +281,12 @@ public class PlayerAdvancementTracker {
         AdvancementEntry advancementEntry = this.currentDisplayTab;
         this.currentDisplayTab = advancement != null && advancement.value().isRoot() && advancement.value().display().isPresent() ? advancement : null;
         if (advancementEntry != this.currentDisplayTab) {
-            this.owner.networkHandler.sendPacket((Packet)new SelectAdvancementTabS2CPacket(this.currentDisplayTab == null ? null : this.currentDisplayTab.id()));
+            this.owner.networkHandler.sendPacket(new SelectAdvancementTabS2CPacket(this.currentDisplayTab == null ? null : this.currentDisplayTab.id()));
         }
     }
 
     public AdvancementProgress getProgress(AdvancementEntry advancement) {
-        AdvancementProgress advancementProgress = (AdvancementProgress)this.progress.get(advancement);
+        AdvancementProgress advancementProgress = this.progress.get(advancement);
         if (advancementProgress == null) {
             advancementProgress = new AdvancementProgress();
             this.initProgress(advancement, advancementProgress);
@@ -329,7 +300,7 @@ public class PlayerAdvancementTracker {
     }
 
     private void calculateDisplay(PlacedAdvancement root, Set<AdvancementEntry> added, Set<Identifier> removed) {
-        AdvancementDisplays.calculateDisplay((PlacedAdvancement)root, advancement -> this.getProgress(advancement.getAdvancementEntry()).isDone(), (advancement, displayed) -> {
+        AdvancementDisplays.calculateDisplay(root, advancement -> this.getProgress(advancement.getAdvancementEntry()).isDone(), (advancement, displayed) -> {
             AdvancementEntry advancementEntry = advancement.getAdvancementEntry();
             if (displayed) {
                 if (this.visibleAdvancements.add(advancementEntry)) {
@@ -343,5 +314,12 @@ public class PlayerAdvancementTracker {
             }
         });
     }
-}
 
+    record ProgressMap(Map<Identifier, AdvancementProgress> map) {
+        public static final Codec<ProgressMap> CODEC = Codec.unboundedMap(Identifier.CODEC, AdvancementProgress.CODEC).xmap(ProgressMap::new, ProgressMap::map);
+
+        public void forEach(BiConsumer<Identifier, AdvancementProgress> consumer) {
+            this.map.entrySet().stream().sorted(Map.Entry.comparingByValue()).forEach((? super T entry) -> consumer.accept((Identifier)entry.getKey(), (AdvancementProgress)entry.getValue()));
+        }
+    }
+}

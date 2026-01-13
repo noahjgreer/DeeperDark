@@ -4,11 +4,6 @@
  * Could not load the following classes:
  *  com.mojang.serialization.Codec
  *  com.mojang.serialization.MapCodec
- *  net.minecraft.advancement.AdvancementCriterion
- *  net.minecraft.advancement.criterion.Criteria
- *  net.minecraft.advancement.criterion.Criterion
- *  net.minecraft.advancement.criterion.CriterionConditions
- *  net.minecraft.util.dynamic.Codecs
  */
 package net.minecraft.advancement;
 
@@ -22,18 +17,11 @@ import net.minecraft.advancement.criterion.CriterionConditions;
 import net.minecraft.util.dynamic.Codecs;
 
 public record AdvancementCriterion<T extends CriterionConditions>(Criterion<T> trigger, T conditions) {
-    private final Criterion<T> trigger;
-    private final T conditions;
-    private static final MapCodec<AdvancementCriterion<?>> MAP_CODEC = Codecs.parameters((String)"trigger", (String)"conditions", (Codec)Criteria.CODEC, AdvancementCriterion::trigger, AdvancementCriterion::getCodec);
+    private static final MapCodec<AdvancementCriterion<?>> MAP_CODEC = Codecs.parameters("trigger", "conditions", Criteria.CODEC, AdvancementCriterion::trigger, AdvancementCriterion::getCodec);
     public static final Codec<AdvancementCriterion<?>> CODEC = MAP_CODEC.codec();
 
-    public AdvancementCriterion(Criterion<T> trigger, T conditions) {
-        this.trigger = trigger;
-        this.conditions = conditions;
-    }
-
     private static <T extends CriterionConditions> Codec<AdvancementCriterion<T>> getCodec(Criterion<T> criterion) {
-        return criterion.getConditionsCodec().xmap(conditions -> new AdvancementCriterion(criterion, conditions), AdvancementCriterion::conditions);
+        return criterion.getConditionsCodec().xmap(conditions -> new AdvancementCriterion<CriterionConditions>(criterion, (CriterionConditions)conditions), AdvancementCriterion::conditions);
     }
 
     @Override
@@ -50,13 +38,4 @@ public record AdvancementCriterion<T extends CriterionConditions>(Criterion<T> t
     public final boolean equals(Object object) {
         return (boolean)ObjectMethods.bootstrap("equals", new MethodHandle[]{AdvancementCriterion.class, "trigger;triggerInstance", "trigger", "conditions"}, this, object);
     }
-
-    public Criterion<T> trigger() {
-        return this.trigger;
-    }
-
-    public T conditions() {
-        return (T)this.conditions;
-    }
 }
-

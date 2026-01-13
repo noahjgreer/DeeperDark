@@ -2,28 +2,12 @@
  * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
- *  com.mojang.blaze3d.buffers.GpuBuffer$Usage
- *  com.mojang.blaze3d.opengl.GlConst
- *  com.mojang.blaze3d.opengl.GlConst$1
- *  com.mojang.blaze3d.platform.DepthTestFunction
- *  com.mojang.blaze3d.platform.DestFactor
- *  com.mojang.blaze3d.platform.PolygonMode
- *  com.mojang.blaze3d.platform.SourceFactor
- *  com.mojang.blaze3d.shaders.ShaderType
- *  com.mojang.blaze3d.textures.AddressMode
- *  com.mojang.blaze3d.textures.TextureFormat
- *  com.mojang.blaze3d.vertex.VertexFormat$DrawMode
- *  com.mojang.blaze3d.vertex.VertexFormat$IndexType
- *  com.mojang.blaze3d.vertex.VertexFormatElement$Type
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
- *  net.minecraft.client.texture.NativeImage$Format
- *  net.minecraft.util.annotation.DeobfuscateClass
  */
 package com.mojang.blaze3d.opengl;
 
 import com.mojang.blaze3d.buffers.GpuBuffer;
-import com.mojang.blaze3d.opengl.GlConst;
 import com.mojang.blaze3d.platform.DepthTestFunction;
 import com.mojang.blaze3d.platform.DestFactor;
 import com.mojang.blaze3d.platform.PolygonMode;
@@ -167,151 +151,151 @@ public class GlConst {
     public static final int GL_OUT_OF_MEMORY = 1285;
 
     public static int toGl(DepthTestFunction function) {
-        return switch (1.field_58121[function.ordinal()]) {
-            case 1 -> 519;
-            case 2 -> 514;
-            case 3 -> 513;
-            case 4 -> 516;
+        return switch (function) {
+            case DepthTestFunction.NO_DEPTH_TEST -> 519;
+            case DepthTestFunction.EQUAL_DEPTH_TEST -> 514;
+            case DepthTestFunction.LESS_DEPTH_TEST -> 513;
+            case DepthTestFunction.GREATER_DEPTH_TEST -> 516;
             default -> 515;
         };
     }
 
     public static int toGl(PolygonMode polygonMode) {
-        return switch (1.field_58122[polygonMode.ordinal()]) {
-            case 1 -> 6913;
+        return switch (polygonMode) {
+            case PolygonMode.WIREFRAME -> 6913;
             default -> 6914;
         };
     }
 
     public static int toGl(DestFactor factor) {
-        return switch (1.field_58123[factor.ordinal()]) {
+        return switch (factor) {
             default -> throw new MatchException(null, null);
-            case 1 -> 32771;
-            case 2 -> 32769;
-            case 3 -> 772;
-            case 4 -> 774;
-            case 5 -> 1;
-            case 6 -> 32772;
-            case 7 -> 32770;
-            case 8 -> 773;
-            case 9 -> 775;
-            case 10 -> 771;
-            case 11 -> 769;
-            case 12 -> 770;
-            case 13 -> 768;
-            case 14 -> 0;
+            case DestFactor.CONSTANT_ALPHA -> 32771;
+            case DestFactor.CONSTANT_COLOR -> 32769;
+            case DestFactor.DST_ALPHA -> 772;
+            case DestFactor.DST_COLOR -> 774;
+            case DestFactor.ONE -> 1;
+            case DestFactor.ONE_MINUS_CONSTANT_ALPHA -> 32772;
+            case DestFactor.ONE_MINUS_CONSTANT_COLOR -> 32770;
+            case DestFactor.ONE_MINUS_DST_ALPHA -> 773;
+            case DestFactor.ONE_MINUS_DST_COLOR -> 775;
+            case DestFactor.ONE_MINUS_SRC_ALPHA -> 771;
+            case DestFactor.ONE_MINUS_SRC_COLOR -> 769;
+            case DestFactor.SRC_ALPHA -> 770;
+            case DestFactor.SRC_COLOR -> 768;
+            case DestFactor.ZERO -> 0;
         };
     }
 
     public static int toGl(SourceFactor factor) {
-        return switch (1.field_58124[factor.ordinal()]) {
+        return switch (factor) {
             default -> throw new MatchException(null, null);
-            case 1 -> 32771;
-            case 2 -> 32769;
-            case 3 -> 772;
-            case 4 -> 774;
-            case 5 -> 1;
-            case 6 -> 32772;
-            case 7 -> 32770;
-            case 8 -> 773;
-            case 9 -> 775;
-            case 10 -> 771;
-            case 11 -> 769;
-            case 12 -> 770;
-            case 13 -> 776;
-            case 14 -> 768;
-            case 15 -> 0;
+            case SourceFactor.CONSTANT_ALPHA -> 32771;
+            case SourceFactor.CONSTANT_COLOR -> 32769;
+            case SourceFactor.DST_ALPHA -> 772;
+            case SourceFactor.DST_COLOR -> 774;
+            case SourceFactor.ONE -> 1;
+            case SourceFactor.ONE_MINUS_CONSTANT_ALPHA -> 32772;
+            case SourceFactor.ONE_MINUS_CONSTANT_COLOR -> 32770;
+            case SourceFactor.ONE_MINUS_DST_ALPHA -> 773;
+            case SourceFactor.ONE_MINUS_DST_COLOR -> 775;
+            case SourceFactor.ONE_MINUS_SRC_ALPHA -> 771;
+            case SourceFactor.ONE_MINUS_SRC_COLOR -> 769;
+            case SourceFactor.SRC_ALPHA -> 770;
+            case SourceFactor.SRC_ALPHA_SATURATE -> 776;
+            case SourceFactor.SRC_COLOR -> 768;
+            case SourceFactor.ZERO -> 0;
         };
     }
 
     public static int toGl(VertexFormat.DrawMode drawMode) {
-        return switch (1.field_58126[drawMode.ordinal()]) {
+        return switch (drawMode) {
             default -> throw new MatchException(null, null);
-            case 1 -> 4;
-            case 2 -> 1;
-            case 3 -> 3;
-            case 4 -> 0;
-            case 5 -> 4;
-            case 6 -> 5;
-            case 7 -> 6;
-            case 8 -> 4;
+            case VertexFormat.DrawMode.LINES -> 4;
+            case VertexFormat.DrawMode.DEBUG_LINES -> 1;
+            case VertexFormat.DrawMode.DEBUG_LINE_STRIP -> 3;
+            case VertexFormat.DrawMode.POINTS -> 0;
+            case VertexFormat.DrawMode.TRIANGLES -> 4;
+            case VertexFormat.DrawMode.TRIANGLE_STRIP -> 5;
+            case VertexFormat.DrawMode.TRIANGLE_FAN -> 6;
+            case VertexFormat.DrawMode.QUADS -> 4;
         };
     }
 
     public static int toGl(VertexFormat.IndexType type) {
-        return switch (1.field_58127[type.ordinal()]) {
+        return switch (type) {
             default -> throw new MatchException(null, null);
-            case 1 -> 5123;
-            case 2 -> 5125;
+            case VertexFormat.IndexType.SHORT -> 5123;
+            case VertexFormat.IndexType.INT -> 5125;
         };
     }
 
     public static int toGl(NativeImage.Format format) {
-        return switch (1.field_58128[format.ordinal()]) {
+        return switch (format) {
             default -> throw new MatchException(null, null);
-            case 1 -> 6408;
-            case 2 -> 6407;
-            case 3 -> 33319;
-            case 4 -> 6403;
+            case NativeImage.Format.RGBA -> 6408;
+            case NativeImage.Format.RGB -> 6407;
+            case NativeImage.Format.LUMINANCE_ALPHA -> 33319;
+            case NativeImage.Format.LUMINANCE -> 6403;
         };
     }
 
     public static int toGl(AddressMode addressMode) {
-        return switch (1.field_58130[addressMode.ordinal()]) {
+        return switch (addressMode) {
             default -> throw new MatchException(null, null);
-            case 1 -> 10497;
-            case 2 -> 33071;
+            case AddressMode.REPEAT -> 10497;
+            case AddressMode.CLAMP_TO_EDGE -> 33071;
         };
     }
 
     public static int toGl(VertexFormatElement.Type type) {
-        return switch (1.field_58131[type.ordinal()]) {
+        return switch (type) {
             default -> throw new MatchException(null, null);
-            case 1 -> 5126;
-            case 2 -> 5121;
-            case 3 -> 5120;
-            case 4 -> 5123;
-            case 5 -> 5122;
-            case 6 -> 5125;
-            case 7 -> 5124;
+            case VertexFormatElement.Type.FLOAT -> 5126;
+            case VertexFormatElement.Type.UBYTE -> 5121;
+            case VertexFormatElement.Type.BYTE -> 5120;
+            case VertexFormatElement.Type.USHORT -> 5123;
+            case VertexFormatElement.Type.SHORT -> 5122;
+            case VertexFormatElement.Type.UINT -> 5125;
+            case VertexFormatElement.Type.INT -> 5124;
         };
     }
 
     public static int toGlInternalId(TextureFormat format) {
-        return switch (1.field_58132[format.ordinal()]) {
+        return switch (format) {
             default -> throw new MatchException(null, null);
-            case 1 -> 32856;
-            case 2 -> 33321;
-            case 3 -> 33329;
-            case 4 -> 33191;
+            case TextureFormat.RGBA8 -> 32856;
+            case TextureFormat.RED8 -> 33321;
+            case TextureFormat.RED8I -> 33329;
+            case TextureFormat.DEPTH32 -> 33191;
         };
     }
 
     public static int toGlExternalId(TextureFormat format) {
-        return switch (1.field_58132[format.ordinal()]) {
+        return switch (format) {
             default -> throw new MatchException(null, null);
-            case 1 -> 6408;
-            case 2 -> 6403;
-            case 3 -> 6403;
-            case 4 -> 6402;
+            case TextureFormat.RGBA8 -> 6408;
+            case TextureFormat.RED8 -> 6403;
+            case TextureFormat.RED8I -> 6403;
+            case TextureFormat.DEPTH32 -> 6402;
         };
     }
 
     public static int toGlType(TextureFormat format) {
-        return switch (1.field_58132[format.ordinal()]) {
+        return switch (format) {
             default -> throw new MatchException(null, null);
-            case 1 -> 5121;
-            case 2 -> 5121;
-            case 3 -> 5121;
-            case 4 -> 5126;
+            case TextureFormat.RGBA8 -> 5121;
+            case TextureFormat.RED8 -> 5121;
+            case TextureFormat.RED8I -> 5121;
+            case TextureFormat.DEPTH32 -> 5126;
         };
     }
 
     public static int toGl(ShaderType type) {
-        return switch (1.field_58133[type.ordinal()]) {
+        return switch (type) {
             default -> throw new MatchException(null, null);
-            case 1 -> 35633;
-            case 2 -> 35632;
+            case ShaderType.VERTEX -> 35633;
+            case ShaderType.FRAGMENT -> 35632;
         };
     }
 
@@ -350,4 +334,3 @@ public class GlConst {
         return 35044;
     }
 }
-

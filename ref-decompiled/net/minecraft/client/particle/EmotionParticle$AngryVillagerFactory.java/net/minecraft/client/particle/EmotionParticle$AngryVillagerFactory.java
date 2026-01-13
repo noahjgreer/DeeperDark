@@ -1,0 +1,35 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ */
+package net.minecraft.client.particle;
+
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.particle.EmotionParticle;
+import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.ParticleFactory;
+import net.minecraft.client.particle.SpriteProvider;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.particle.SimpleParticleType;
+import net.minecraft.util.math.random.Random;
+
+@Environment(value=EnvType.CLIENT)
+public static class EmotionParticle.AngryVillagerFactory
+implements ParticleFactory<SimpleParticleType> {
+    private final SpriteProvider spriteProvider;
+
+    public EmotionParticle.AngryVillagerFactory(SpriteProvider spriteProvider) {
+        this.spriteProvider = spriteProvider;
+    }
+
+    @Override
+    public Particle createParticle(SimpleParticleType simpleParticleType, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i, Random random) {
+        EmotionParticle emotionParticle = new EmotionParticle(clientWorld, d, e + 0.5, f, this.spriteProvider.getSprite(random));
+        emotionParticle.setColor(1.0f, 1.0f, 1.0f);
+        return emotionParticle;
+    }
+}

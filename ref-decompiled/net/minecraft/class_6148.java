@@ -1,8 +1,5 @@
 /*
  * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  net.minecraft.class_6148
  */
 package net.minecraft;
 
@@ -13,4 +10,3 @@ public class class_6148 {
     public static final int field_31828 = 15;
     public static final int field_31829 = 0;
 }
-

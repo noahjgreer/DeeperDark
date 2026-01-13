@@ -2,59 +2,39 @@
  * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
- *  com.mojang.blaze3d.buffers.GpuBuffer
- *  com.mojang.blaze3d.buffers.GpuBufferSlice
- *  com.mojang.blaze3d.buffers.Std140SizeCalculator
- *  com.mojang.blaze3d.platform.GLX
- *  com.mojang.blaze3d.systems.GpuDevice
- *  com.mojang.blaze3d.systems.ProjectionType
- *  com.mojang.blaze3d.systems.RenderPass
- *  com.mojang.blaze3d.systems.RenderSystem
- *  com.mojang.blaze3d.systems.RenderSystem$1
- *  com.mojang.blaze3d.systems.RenderSystem$ShapeIndexBuffer
- *  com.mojang.blaze3d.systems.RenderSystem$Task
- *  com.mojang.blaze3d.textures.GpuTextureView
- *  com.mojang.blaze3d.vertex.VertexFormat$DrawMode
  *  com.mojang.logging.LogUtils
+ *  it.unimi.dsi.fastutil.ints.IntConsumer
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
- *  net.minecraft.client.MinecraftClient
- *  net.minecraft.client.gl.DynamicUniforms
- *  net.minecraft.client.gl.GlBackend
- *  net.minecraft.client.gl.SamplerCache
- *  net.minecraft.client.gl.ScissorState
- *  net.minecraft.client.gl.ShaderSourceGetter
- *  net.minecraft.client.render.Tessellator
- *  net.minecraft.client.util.Window
- *  net.minecraft.client.util.tracy.TracyFrameCapturer
- *  net.minecraft.util.TimeSupplier$Nanoseconds
- *  net.minecraft.util.Util
- *  net.minecraft.util.annotation.DeobfuscateClass
- *  net.minecraft.util.collection.ArrayListDeque
  *  org.joml.Matrix4f
  *  org.joml.Matrix4fStack
  *  org.jspecify.annotations.Nullable
  *  org.lwjgl.glfw.GLFW
  *  org.lwjgl.glfw.GLFWErrorCallbackI
+ *  org.lwjgl.system.MemoryUtil
  *  org.slf4j.Logger
  */
 package com.mojang.blaze3d.systems;
 
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
+import com.mojang.blaze3d.buffers.GpuFence;
 import com.mojang.blaze3d.buffers.Std140SizeCalculator;
 import com.mojang.blaze3d.platform.GLX;
 import com.mojang.blaze3d.systems.GpuDevice;
 import com.mojang.blaze3d.systems.ProjectionType;
 import com.mojang.blaze3d.systems.RenderPass;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.GpuTextureView;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.logging.LogUtils;
+import it.unimi.dsi.fastutil.ints.IntConsumer;
+import java.lang.invoke.MethodHandle;
+import java.lang.runtime.ObjectMethods;
+import java.nio.Buffer;
+import java.nio.ByteBuffer;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.IntConsumer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -70,16 +50,15 @@ import net.minecraft.util.TimeSupplier;
 import net.minecraft.util.Util;
 import net.minecraft.util.annotation.DeobfuscateClass;
 import net.minecraft.util.collection.ArrayListDeque;
+import net.minecraft.util.math.MathHelper;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
 import org.jspecify.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallbackI;
+import org.lwjgl.system.MemoryUtil;
 import org.slf4j.Logger;
 
-/*
- * Exception performing whole class analysis ignored.
- */
 @Environment(value=EnvType.CLIENT)
 @DeobfuscateClass
 public class RenderSystem {
@@ -216,7 +195,7 @@ public class RenderSystem {
     }
 
     public static void setErrorCallback(GLFWErrorCallbackI callback) {
-        GLX._setGlfwErrorCallback((GLFWErrorCallbackI)callback);
+        GLX._setGlfwErrorCallback(callback);
     }
 
     public static void setupDefaultState() {
@@ -258,9 +237,9 @@ public class RenderSystem {
 
     public static ShapeIndexBuffer getSequentialBuffer(VertexFormat.DrawMode drawMode) {
         RenderSystem.assertOnRenderThread();
-        return switch (1.field_38976[drawMode.ordinal()]) {
-            case 1 -> sharedSequentialQuad;
-            case 2 -> sharedSequentialLines;
+        return switch (drawMode) {
+            case VertexFormat.DrawMode.QUADS -> sharedSequentialQuad;
+            case VertexFormat.DrawMode.LINES -> sharedSequentialLines;
             default -> sharedSequential;
         };
     }
@@ -279,11 +258,11 @@ public class RenderSystem {
     }
 
     public static void queueFencedTask(Runnable task) {
-        PENDING_FENCES.addLast((Object)new Task(task, RenderSystem.getDevice().createCommandEncoder().createFence()));
+        PENDING_FENCES.addLast(new Task(task, RenderSystem.getDevice().createCommandEncoder().createFence()));
     }
 
     public static void executePendingTasks() {
-        Task task = (Task)PENDING_FENCES.peekFirst();
+        Task task = PENDING_FENCES.peekFirst();
         while (task != null) {
             if (task.fence.awaitCompletion(0L)) {
                 try {
@@ -293,7 +272,7 @@ public class RenderSystem {
                     task.fence.close();
                 }
                 PENDING_FENCES.removeFirst();
-                task = (Task)PENDING_FENCES.peekFirst();
+                task = PENDING_FENCES.peekFirst();
                 continue;
             }
             return;
@@ -339,7 +318,7 @@ public class RenderSystem {
 
     static {
         lastDrawTime = Double.MIN_VALUE;
-        sharedSequential = new ShapeIndexBuffer(1, 1, IntConsumer::accept);
+        sharedSequential = new ShapeIndexBuffer(1, 1, java.util.function.IntConsumer::accept);
         sharedSequentialQuad = new ShapeIndexBuffer(4, 6, (indexConsumer, firstVertexIndex) -> {
             indexConsumer.accept(firstVertexIndex);
             indexConsumer.accept(firstVertexIndex + 1);
@@ -367,5 +346,114 @@ public class RenderSystem {
         scissorStateForRenderTypeDraws = new ScissorState();
         samplerCache = new SamplerCache();
     }
-}
 
+    @Environment(value=EnvType.CLIENT)
+    public static final class ShapeIndexBuffer {
+        private final int vertexCountInShape;
+        private final int vertexCountInTriangulated;
+        private final Triangulator triangulator;
+        private @Nullable GpuBuffer indexBuffer;
+        private VertexFormat.IndexType indexType = VertexFormat.IndexType.SHORT;
+        private int size;
+
+        ShapeIndexBuffer(int vertexCountInShape, int vertexCountInTriangulated, Triangulator triangulator) {
+            this.vertexCountInShape = vertexCountInShape;
+            this.vertexCountInTriangulated = vertexCountInTriangulated;
+            this.triangulator = triangulator;
+        }
+
+        public boolean isLargeEnough(int requiredSize) {
+            return requiredSize <= this.size;
+        }
+
+        public GpuBuffer getIndexBuffer(int requiredSize) {
+            this.grow(requiredSize);
+            return this.indexBuffer;
+        }
+
+        /*
+         * WARNING - Removed try catching itself - possible behaviour change.
+         */
+        private void grow(int requiredSize) {
+            if (this.isLargeEnough(requiredSize)) {
+                return;
+            }
+            requiredSize = MathHelper.roundUpToMultiple(requiredSize * 2, this.vertexCountInTriangulated);
+            LOGGER.debug("Growing IndexBuffer: Old limit {}, new limit {}.", (Object)this.size, (Object)requiredSize);
+            int i = requiredSize / this.vertexCountInTriangulated;
+            int j = i * this.vertexCountInShape;
+            VertexFormat.IndexType indexType = VertexFormat.IndexType.smallestFor(j);
+            int k = MathHelper.roundUpToMultiple(requiredSize * indexType.size, 4);
+            ByteBuffer byteBuffer = MemoryUtil.memAlloc((int)k);
+            try {
+                this.indexType = indexType;
+                IntConsumer intConsumer = this.getIndexConsumer(byteBuffer);
+                for (int l = 0; l < requiredSize; l += this.vertexCountInTriangulated) {
+                    this.triangulator.accept(intConsumer, l * this.vertexCountInShape / this.vertexCountInTriangulated);
+                }
+                byteBuffer.flip();
+                if (this.indexBuffer != null) {
+                    this.indexBuffer.close();
+                }
+                this.indexBuffer = RenderSystem.getDevice().createBuffer(() -> "Auto Storage index buffer", 64, byteBuffer);
+            }
+            finally {
+                MemoryUtil.memFree((Buffer)byteBuffer);
+            }
+            this.size = requiredSize;
+        }
+
+        private IntConsumer getIndexConsumer(ByteBuffer indexBuffer) {
+            switch (this.indexType) {
+                case SHORT: {
+                    return index -> indexBuffer.putShort((short)index);
+                }
+            }
+            return indexBuffer::putInt;
+        }
+
+        public VertexFormat.IndexType getIndexType() {
+            return this.indexType;
+        }
+
+        @Environment(value=EnvType.CLIENT)
+        static interface Triangulator {
+            public void accept(IntConsumer var1, int var2);
+        }
+    }
+
+    @Environment(value=EnvType.CLIENT)
+    static final class Task
+    extends Record {
+        final Runnable callback;
+        final GpuFence fence;
+
+        Task(Runnable callback, GpuFence fence) {
+            this.callback = callback;
+            this.fence = fence;
+        }
+
+        @Override
+        public final String toString() {
+            return ObjectMethods.bootstrap("toString", new MethodHandle[]{Task.class, "callback;fence", "callback", "fence"}, this);
+        }
+
+        @Override
+        public final int hashCode() {
+            return (int)ObjectMethods.bootstrap("hashCode", new MethodHandle[]{Task.class, "callback;fence", "callback", "fence"}, this);
+        }
+
+        @Override
+        public final boolean equals(Object object) {
+            return (boolean)ObjectMethods.bootstrap("equals", new MethodHandle[]{Task.class, "callback;fence", "callback", "fence"}, this, object);
+        }
+
+        public Runnable callback() {
+            return this.callback;
+        }
+
+        public GpuFence fence() {
+            return this.fence;
+        }
+    }
+}

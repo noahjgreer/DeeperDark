@@ -2,11 +2,8 @@
  * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
- *  com.mojang.blaze3d.buffers.Std140Builder
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
- *  net.minecraft.util.annotation.DeobfuscateClass
- *  net.minecraft.util.math.MathHelper
  *  org.joml.Matrix4fc
  *  org.joml.Vector2fc
  *  org.joml.Vector2ic
@@ -57,7 +54,7 @@ public class Std140Builder {
 
     public Std140Builder align(int alignedSize) {
         int i = this.buffer.position();
-        this.buffer.position(this.start + MathHelper.roundUpToMultiple((int)(i - this.start), (int)alignedSize));
+        this.buffer.position(this.start + MathHelper.roundUpToMultiple(i - this.start, alignedSize));
         return this;
     }
 
@@ -172,4 +169,3 @@ public class Std140Builder {
         return this;
     }
 }
-

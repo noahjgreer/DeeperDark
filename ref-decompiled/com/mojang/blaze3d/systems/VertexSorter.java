@@ -3,19 +3,15 @@
  * 
  * Could not load the following classes:
  *  com.google.common.primitives.Floats
- *  com.mojang.blaze3d.systems.VertexSorter
- *  com.mojang.blaze3d.systems.VertexSorter$SortKeyMapper
  *  it.unimi.dsi.fastutil.ints.IntArrays
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
- *  net.minecraft.client.util.math.Vec3fArray
  *  org.joml.Vector3f
  *  org.joml.Vector3fc
  */
 package com.mojang.blaze3d.systems;
 
 import com.google.common.primitives.Floats;
-import com.mojang.blaze3d.systems.VertexSorter;
 import it.unimi.dsi.fastutil.ints.IntArrays;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -23,12 +19,9 @@ import net.minecraft.client.util.math.Vec3fArray;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
-/*
- * Exception performing whole class analysis ignored.
- */
 @Environment(value=EnvType.CLIENT)
 public interface VertexSorter {
-    public static final VertexSorter BY_DISTANCE = VertexSorter.byDistance((float)0.0f, (float)0.0f, (float)0.0f);
+    public static final VertexSorter BY_DISTANCE = VertexSorter.byDistance(0.0f, 0.0f, 0.0f);
     public static final VertexSorter BY_Z = VertexSorter.of(vec -> -vec.z());
 
     public static VertexSorter byDistance(float originX, float originY, float originZ) {
@@ -54,5 +47,10 @@ public interface VertexSorter {
     }
 
     public int[] sort(Vec3fArray var1);
-}
 
+    @FunctionalInterface
+    @Environment(value=EnvType.CLIENT)
+    public static interface SortKeyMapper {
+        public float apply(Vector3f var1);
+    }
+}

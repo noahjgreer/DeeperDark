@@ -2,11 +2,8 @@
  * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
- *  com.mojang.blaze3d.buffers.Std140SizeCalculator
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
- *  net.minecraft.util.annotation.DeobfuscateClass
- *  net.minecraft.util.math.MathHelper
  */
 package com.mojang.blaze3d.buffers;
 
@@ -25,7 +22,7 @@ public class Std140SizeCalculator {
     }
 
     public Std140SizeCalculator align(int alignedSize) {
-        this.size = MathHelper.roundUpToMultiple((int)this.size, (int)alignedSize);
+        this.size = MathHelper.roundUpToMultiple(this.size, alignedSize);
         return this;
     }
 
@@ -83,4 +80,3 @@ public class Std140SizeCalculator {
         return this;
     }
 }
-

@@ -2,23 +2,8 @@
  * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
- *  com.mojang.blaze3d.buffers.GpuBuffer
- *  com.mojang.blaze3d.buffers.GpuBuffer$Usage
- *  com.mojang.blaze3d.pipeline.CompiledRenderPipeline
- *  com.mojang.blaze3d.pipeline.RenderPipeline
- *  com.mojang.blaze3d.systems.CommandEncoder
- *  com.mojang.blaze3d.systems.GpuDevice
- *  com.mojang.blaze3d.textures.AddressMode
- *  com.mojang.blaze3d.textures.FilterMode
- *  com.mojang.blaze3d.textures.GpuTexture
- *  com.mojang.blaze3d.textures.GpuTexture$Usage
- *  com.mojang.blaze3d.textures.GpuTextureView
- *  com.mojang.blaze3d.textures.TextureFormat
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
- *  net.minecraft.client.gl.GpuSampler
- *  net.minecraft.client.gl.ShaderSourceGetter
- *  net.minecraft.util.annotation.DeobfuscateClass
  *  org.jspecify.annotations.Nullable
  */
 package com.mojang.blaze3d.systems;
@@ -94,4 +79,3 @@ public interface GpuDevice {
 
     public void close();
 }
-

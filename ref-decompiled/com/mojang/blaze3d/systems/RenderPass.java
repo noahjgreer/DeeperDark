@@ -2,17 +2,8 @@
  * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
- *  com.mojang.blaze3d.buffers.GpuBuffer
- *  com.mojang.blaze3d.buffers.GpuBufferSlice
- *  com.mojang.blaze3d.pipeline.RenderPipeline
- *  com.mojang.blaze3d.systems.RenderPass
- *  com.mojang.blaze3d.systems.RenderPass$RenderObject
- *  com.mojang.blaze3d.textures.GpuTextureView
- *  com.mojang.blaze3d.vertex.VertexFormat$IndexType
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
- *  net.minecraft.client.gl.GpuSampler
- *  net.minecraft.util.annotation.DeobfuscateClass
  *  org.jspecify.annotations.Nullable
  */
 package com.mojang.blaze3d.systems;
@@ -20,10 +11,10 @@ package com.mojang.blaze3d.systems;
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
-import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.textures.GpuTextureView;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import java.util.Collection;
+import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -57,12 +48,22 @@ extends AutoCloseable {
 
     public void drawIndexed(int var1, int var2, int var3, int var4);
 
-    public <T> void drawMultipleIndexed(Collection<RenderObject<T>> var1, @Nullable GpuBuffer var2, // Could not load outer class - annotation placement on inner may be incorrect
-     @Nullable VertexFormat.IndexType var3, Collection<String> var4, T var5);
+    public <T> void drawMultipleIndexed(Collection<RenderObject<T>> var1, @Nullable GpuBuffer var2,  @Nullable VertexFormat.IndexType var3, Collection<String> var4, T var5);
 
     public void draw(int var1, int var2);
 
     @Override
     public void close();
-}
 
+    @Environment(value=EnvType.CLIENT)
+    public static interface UniformUploader {
+        public void upload(String var1, GpuBufferSlice var2);
+    }
+
+    @Environment(value=EnvType.CLIENT)
+    public record RenderObject<T>(int slot, GpuBuffer vertexBuffer, @Nullable GpuBuffer indexBuffer,  @Nullable VertexFormat.IndexType indexType, int firstIndex, int indexCount, @Nullable BiConsumer<T, UniformUploader> uniformUploaderConsumer) {
+        public RenderObject(int slot, GpuBuffer vertexBuffer, GpuBuffer indexBuffer, VertexFormat.IndexType indexType, int firstIndex, int indexCount) {
+            this(slot, vertexBuffer, indexBuffer, indexType, firstIndex, indexCount, null);
+        }
+    }
+}

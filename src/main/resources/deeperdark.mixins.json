@@ -6,6 +6,7 @@
     "AbstractBoatEntityMixin",
     "AbstractSkeletonEntityMixin",
     "AnvilScreenHandlerMixin",
+    "ApplyBonusLootFunctionOreDropsMixin",
     "AxeItemAccessor",
     "AxeItemMixin",
     "BiomeAccessMixin",

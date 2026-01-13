@@ -2,17 +2,12 @@
  * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
- *  com.mojang.blaze3d.vertex.VertexFormatElement
- *  com.mojang.blaze3d.vertex.VertexFormatElement$Type
- *  com.mojang.blaze3d.vertex.VertexFormatElement$Usage
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
- *  net.minecraft.util.annotation.DeobfuscateClass
  *  org.jspecify.annotations.Nullable
  */
 package com.mojang.blaze3d.vertex;
 
-import com.mojang.blaze3d.vertex.VertexFormatElement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -21,22 +16,14 @@ import net.fabricmc.api.Environment;
 import net.minecraft.util.annotation.DeobfuscateClass;
 import org.jspecify.annotations.Nullable;
 
-/*
- * Exception performing whole class analysis ignored.
- */
 @Environment(value=EnvType.CLIENT)
 @DeobfuscateClass
 public record VertexFormatElement(int id, int index, Type type, Usage usage, int count) {
-    private final int id;
-    private final int index;
-    private final Type type;
-    private final Usage usage;
-    private final int count;
     public static final int MAX_COUNT = 32;
     private static final @Nullable VertexFormatElement[] BY_ID = new VertexFormatElement[32];
-    private static final List<VertexFormatElement> ELEMENTS = new ArrayList(32);
-    public static final VertexFormatElement POSITION = VertexFormatElement.register((int)0, (int)0, (Type)Type.FLOAT, (Usage)Usage.POSITION, (int)3);
-    public static final VertexFormatElement COLOR = VertexFormatElement.register((int)1, (int)0, (Type)Type.UBYTE, (Usage)Usage.COLOR, (int)4);
+    private static final List<VertexFormatElement> ELEMENTS = new ArrayList<VertexFormatElement>(32);
+    public static final VertexFormatElement POSITION = VertexFormatElement.register(0, 0, Type.FLOAT, Usage.POSITION, 3);
+    public static final VertexFormatElement COLOR = VertexFormatElement.register(1, 0, Type.UBYTE, Usage.COLOR, 4);
     public static final VertexFormatElement UV0;
     public static final VertexFormatElement UV;
     public static final VertexFormatElement UV1;
@@ -74,7 +61,7 @@ public record VertexFormatElement(int id, int index, Type type, Usage usage, int
 
     @Override
     public String toString() {
-        return this.count + "," + String.valueOf(this.usage) + "," + String.valueOf(this.type) + " (" + this.id + ")";
+        return this.count + "," + String.valueOf((Object)this.usage) + "," + String.valueOf((Object)this.type) + " (" + this.id + ")";
     }
 
     public int mask() {
@@ -93,32 +80,59 @@ public record VertexFormatElement(int id, int index, Type type, Usage usage, int
         return ELEMENTS.stream().filter(element -> (mask & element.mask()) != 0);
     }
 
-    public int id() {
-        return this.id;
-    }
-
-    public int index() {
-        return this.index;
-    }
-
-    public Type type() {
-        return this.type;
-    }
-
-    public Usage usage() {
-        return this.usage;
-    }
-
-    public int count() {
-        return this.count;
-    }
-
     static {
-        UV = UV0 = VertexFormatElement.register((int)2, (int)0, (Type)Type.FLOAT, (Usage)Usage.UV, (int)2);
-        UV1 = VertexFormatElement.register((int)3, (int)1, (Type)Type.SHORT, (Usage)Usage.UV, (int)2);
-        UV2 = VertexFormatElement.register((int)4, (int)2, (Type)Type.SHORT, (Usage)Usage.UV, (int)2);
-        NORMAL = VertexFormatElement.register((int)5, (int)0, (Type)Type.BYTE, (Usage)Usage.NORMAL, (int)3);
-        LINE_WIDTH = VertexFormatElement.register((int)6, (int)0, (Type)Type.FLOAT, (Usage)Usage.GENERIC, (int)1);
+        UV = UV0 = VertexFormatElement.register(2, 0, Type.FLOAT, Usage.UV, 2);
+        UV1 = VertexFormatElement.register(3, 1, Type.SHORT, Usage.UV, 2);
+        UV2 = VertexFormatElement.register(4, 2, Type.SHORT, Usage.UV, 2);
+        NORMAL = VertexFormatElement.register(5, 0, Type.BYTE, Usage.NORMAL, 3);
+        LINE_WIDTH = VertexFormatElement.register(6, 0, Type.FLOAT, Usage.GENERIC, 1);
+    }
+
+    @Environment(value=EnvType.CLIENT)
+    @DeobfuscateClass
+    public static enum Type {
+        FLOAT(4, "Float"),
+        UBYTE(1, "Unsigned Byte"),
+        BYTE(1, "Byte"),
+        USHORT(2, "Unsigned Short"),
+        SHORT(2, "Short"),
+        UINT(4, "Unsigned Int"),
+        INT(4, "Int");
+
+        private final int size;
+        private final String name;
+
+        private Type(int size, String name) {
+            this.size = size;
+            this.name = name;
+        }
+
+        public int size() {
+            return this.size;
+        }
+
+        public String toString() {
+            return this.name;
+        }
+    }
+
+    @Environment(value=EnvType.CLIENT)
+    @DeobfuscateClass
+    public static enum Usage {
+        POSITION("Position"),
+        NORMAL("Normal"),
+        COLOR("Vertex Color"),
+        UV("UV"),
+        GENERIC("Generic");
+
+        private final String name;
+
+        private Usage(String name) {
+            this.name = name;
+        }
+
+        public String toString() {
+            return this.name;
+        }
     }
 }
-

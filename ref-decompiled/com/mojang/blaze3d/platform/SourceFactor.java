@@ -2,10 +2,8 @@
  * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
- *  com.mojang.blaze3d.platform.SourceFactor
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
- *  net.minecraft.util.annotation.DeobfuscateClass
  */
 package com.mojang.blaze3d.platform;
 
@@ -33,4 +31,3 @@ public enum SourceFactor {
     ZERO;
 
 }
-

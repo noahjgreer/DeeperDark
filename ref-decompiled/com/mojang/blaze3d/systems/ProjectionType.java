@@ -2,29 +2,22 @@
  * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
- *  com.mojang.blaze3d.systems.ProjectionType
- *  com.mojang.blaze3d.systems.ProjectionType$Applier
- *  com.mojang.blaze3d.systems.VertexSorter
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
  *  org.joml.Matrix4f
  */
 package com.mojang.blaze3d.systems;
 
-import com.mojang.blaze3d.systems.ProjectionType;
 import com.mojang.blaze3d.systems.VertexSorter;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import org.joml.Matrix4f;
 
-/*
- * Exception performing whole class analysis ignored.
- */
 @Environment(value=EnvType.CLIENT)
 public final class ProjectionType
 extends Enum<ProjectionType> {
-    public static final /* enum */ ProjectionType PERSPECTIVE = new ProjectionType("PERSPECTIVE", 0, VertexSorter.BY_DISTANCE, (matrix, direction) -> matrix.scale(1.0f - direction / 4096.0f));
-    public static final /* enum */ ProjectionType ORTHOGRAPHIC = new ProjectionType("ORTHOGRAPHIC", 1, VertexSorter.BY_Z, (matrix, direction) -> matrix.translate(0.0f, 0.0f, direction / 512.0f));
+    public static final /* enum */ ProjectionType PERSPECTIVE = new ProjectionType(VertexSorter.BY_DISTANCE, (matrix, direction) -> matrix.scale(1.0f - direction / 4096.0f));
+    public static final /* enum */ ProjectionType ORTHOGRAPHIC = new ProjectionType(VertexSorter.BY_Z, (matrix, direction) -> matrix.translate(0.0f, 0.0f, direction / 512.0f));
     private final VertexSorter vertexSorter;
     private final Applier applier;
     private static final /* synthetic */ ProjectionType[] field_54957;
@@ -57,5 +50,10 @@ extends Enum<ProjectionType> {
     static {
         field_54957 = ProjectionType.method_65047();
     }
-}
 
+    @FunctionalInterface
+    @Environment(value=EnvType.CLIENT)
+    static interface Applier {
+        public void apply(Matrix4f var1, float var2);
+    }
+}

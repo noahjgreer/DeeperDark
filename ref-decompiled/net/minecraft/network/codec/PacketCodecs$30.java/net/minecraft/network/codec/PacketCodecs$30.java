@@ -1,0 +1,36 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  io.netty.buffer.ByteBuf
+ */
+package net.minecraft.network.codec;
+
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.PacketCodec;
+
+class PacketCodecs.30
+implements PacketCodec<ByteBuf, Integer> {
+    PacketCodecs.30() {
+    }
+
+    @Override
+    public Integer decode(ByteBuf byteBuf) {
+        return byteBuf.readUnsignedShort();
+    }
+
+    @Override
+    public void encode(ByteBuf byteBuf, Integer integer) {
+        byteBuf.writeShort(integer.intValue());
+    }
+
+    @Override
+    public /* synthetic */ void encode(Object object, Object object2) {
+        this.encode((ByteBuf)object, (Integer)object2);
+    }
+
+    @Override
+    public /* synthetic */ Object decode(Object object) {
+        return this.decode((ByteBuf)object);
+    }
+}

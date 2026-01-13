@@ -4,13 +4,9 @@
  * Could not load the following classes:
  *  com.google.common.base.Joiner
  *  com.google.common.collect.Lists
- *  com.mojang.blaze3d.platform.GLX
- *  com.mojang.blaze3d.systems.RenderSystem
  *  com.mojang.logging.LogUtils
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
- *  net.minecraft.client.util.Window
- *  net.minecraft.util.annotation.DeobfuscateClass
  *  org.jspecify.annotations.Nullable
  *  org.lwjgl.Version
  *  org.lwjgl.glfw.GLFW
@@ -124,4 +120,3 @@ public class GLX {
         return object;
     }
 }
-
