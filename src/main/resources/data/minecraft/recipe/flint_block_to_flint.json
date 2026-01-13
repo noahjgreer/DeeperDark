@@ -7,14 +7,14 @@
       "stack": {
         "id": "minecraft:sugar",
         "components": {
-          "minecraft:item_model": "leather_block"
+          "minecraft:item_model": "flint_block"
         }
       }
     }
   ],
   "result": {
     "count": 9,
-    "id": "minecraft:leather"
+    "id": "minecraft:flint"
   }
 }
 

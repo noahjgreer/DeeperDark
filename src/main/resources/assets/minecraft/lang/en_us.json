@@ -73,6 +73,8 @@
   "effect.deeperdark.scentless.desc.2": "the Warden's sniff attack.",
   "item.deeperdark.gunpowder_block": "Block of Gunpowder",
   "item.deeperdark.leather_block": "Block of Leather",
+  "item.deeperdark.flint_block": "Block of Flint",
+  "item.deeperdark.rotten_flesh_block": "Block of Rotten Flesh",
   "item.deeperdark.golden_cauldron": "Golden Cauldron",
   "container.stonecutter": "Circular Saw",
   "block.minecraft.stonecutter": "Circular Saw"

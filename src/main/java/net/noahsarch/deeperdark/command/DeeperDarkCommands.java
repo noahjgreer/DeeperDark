@@ -43,19 +43,31 @@ public class DeeperDarkCommands {
         REGISTRY.put("gunpowder_block", gunpowderBlock);
 
         // Leather Block (Brown Wool base)
-        ItemStack leatherBlock = new ItemStack(Items.BROWN_WOOL);
+        ItemStack leatherBlock = new ItemStack(Items.SUGAR);
         leatherBlock.set(DataComponentTypes.ITEM_MODEL, net.noahsarch.deeperdark.event.LeatherBlockEvents.LEATHER_BLOCK_MODEL_ID);
         leatherBlock.set(DataComponentTypes.ITEM_NAME, Text.translatable("item.deeperdark.leather_block"));
         REGISTRY.put("leather_block", leatherBlock);
 
+        // Flint Block (Cobbled Deepslate base)
+        ItemStack flintBlock = new ItemStack(Items.SUGAR);
+        flintBlock.set(DataComponentTypes.ITEM_MODEL, net.noahsarch.deeperdark.event.FlintBlockEvents.FLINT_BLOCK_MODEL_ID);
+        flintBlock.set(DataComponentTypes.ITEM_NAME, Text.translatable("item.deeperdark.flint_block"));
+        REGISTRY.put("flint_block", flintBlock);
+
+        // Rotten Flesh Block (Nether Wart Block base)
+        ItemStack rottenFleshBlock = new ItemStack(Items.SUGAR);
+        rottenFleshBlock.set(DataComponentTypes.ITEM_MODEL, net.noahsarch.deeperdark.event.RottenFleshBlockEvents.ROTTEN_FLESH_BLOCK_MODEL_ID);
+        rottenFleshBlock.set(DataComponentTypes.ITEM_NAME, Text.translatable("item.deeperdark.rotten_flesh_block"));
+        REGISTRY.put("rotten_flesh_block", rottenFleshBlock);
+
         // Golden Cauldron (Cauldron base, item model)
-        ItemStack goldenCauldron = new ItemStack(Items.CAULDRON);
+        ItemStack goldenCauldron = new ItemStack(Items.SUGAR);
         goldenCauldron.set(DataComponentTypes.ITEM_MODEL, GoldenCauldronEvents.GOLDEN_CAULDRON_ITEM_MODEL_ID);
         goldenCauldron.set(DataComponentTypes.ITEM_NAME, Text.translatable("item.deeperdark.golden_cauldron"));
         REGISTRY.put("golden_cauldron", goldenCauldron);
 
         // Siphon (Hopper base)
-        ItemStack siphon = new ItemStack(Items.HOPPER);
+        ItemStack siphon = new ItemStack(Items.SUGAR);
         siphon.set(DataComponentTypes.ITEM_MODEL, SiphonEvents.SIPHON_MODEL_ID);
         siphon.set(DataComponentTypes.ITEM_NAME, Text.translatable("item.deeperdark.siphon"));
         REGISTRY.put("siphon", siphon);

@@ -42,6 +42,20 @@ public class WorldBorderHandler {
         double distZ = Math.abs(dz);
 
         if (distX > radius || distZ > radius) {
+            // Mobs logic: Prevent spawning outside and cleanup far outliers
+            if (entity instanceof net.minecraft.entity.mob.MobEntity) {
+                // If just spawned (low age) and outside, remove immediately
+                if (entity.age < 200) {
+                    entity.discard();
+                    return;
+                }
+                // If significantly outside (teleported/glitched/spawned far), remove
+                if (distX > radius + 32 || distZ > radius + 32) {
+                    entity.discard();
+                    return;
+                }
+            }
+
             double overlapX = Math.max(0, distX - radius);
             double overlapZ = Math.max(0, distZ - radius);
 
