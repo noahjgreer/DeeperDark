@@ -14,5 +14,8 @@
       "minecraft:yellow_wool"
     ]
   },
-  "result": "minecraft:sponge"
+  "result": {
+    "id": "minecraft:sponge",
+    "count": 1
+  }
 }
