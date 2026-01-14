@@ -1,1 +1,1 @@
-gamerule keepInventory true
+gamerule keep_inventory true

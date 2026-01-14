@@ -27,9 +27,13 @@ public class DeeperDarkConfig {
         public double safeRadius = 1000.0;
         public double forceMultiplier = 0.5;
         public boolean allowEntitySpawning = false;
+        public boolean pushSurvivalModeOnly = true; // If true, only survival mode players get pushed by border
         // creeper effect duration bounds in seconds
         public int creeperEffectMinSeconds = 15;
         public int creeperEffectMaxSeconds = 60;
+
+        // Nether coordinate multiplier (1.0 = 1:1, 8.0 = vanilla 1:8)
+        public double netherCoordinateMultiplier = 1.0;
 
         // Anvil configuration
         public int anvilRepairCost = 0; // Cost in levels for item repairs (diamond + diamond pickaxe)
@@ -41,6 +45,10 @@ public class DeeperDarkConfig {
         public double fortune2DropChance = 0.3333; // 33.33% chance to drop 2 items
         public double fortune3DropChance = 0.50; // 50% chance to drop 2 items
         public int fortuneMaxDrops = 2; // Maximum drops with custom Fortune (never more than 2)
+
+        // Explosion item knockback configuration
+        public boolean explosionItemKnockbackEnabled = false; // If true, items get extra velocity from explosions
+        public double explosionItemKnockbackMultiplier = 3.0; // Multiplier for explosion knockback on items (1.0 = normal, 3.0 = 3x farther)
     }
 
     public static void load() {
@@ -104,6 +112,8 @@ public class DeeperDarkConfig {
                     # safeRadius: radius (blocks) considered safe
                     # forceMultiplier: how strongly the border pushes players (multiplier)
                     # allowEntitySpawning: if false, mobs cannot spawn outside border and are pushed back
+                    # pushSurvivalModeOnly: if true, only survival mode players get pushed by border (creative players ignored)
+                    # netherCoordinateMultiplier: coordinate scale between overworld and nether (1.0 = 1:1, 8.0 = vanilla 1:8)
                     # creeperEffectMinSeconds / creeperEffectMaxSeconds (seconds): when a creeper with an infinite-duration effect explodes,
                     #   the effect given by the explosion will have a random duration between these values (seconds).
                     #
@@ -118,6 +128,11 @@ public class DeeperDarkConfig {
                     # fortune3DropChance: probability (0.0-1.0) that Fortune III drops 2 items instead of 1 (default: 0.50 = 50%)
                     # fortuneMaxDrops: maximum number of items Fortune can drop (vanilla Fortune III can drop 4+ items, this limits it)
                     # NOTE: This affects ALL fortune-based drops (ores, crops, gravel, glowstone, etc.)
+                    #
+                    # Explosion Item Knockback Configuration:
+                    # explosionItemKnockbackEnabled: if true, items are amplified by explosions and fly farther (default: false)
+                    # explosionItemKnockbackMultiplier: how much to multiply explosion knockback on items (1.0 = normal, 3.0 = 3x farther, 5.0 = extreme)
+                    # NOTE: Items are never destroyed by explosions, but this makes them scatter more dramatically when enabled
                     #
                     """;
 

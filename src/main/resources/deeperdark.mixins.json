@@ -35,6 +35,7 @@
     "EntityAccessorMixin",
     "MultiNoiseBiomeSourceMixin",
     "NetherPortalAccessor",
+    "NetherPortalBlockMixin",
     "NetherPortalMixin",
     "NoiseChunkGeneratorMixin",
     "OctavePerlinNoiseSamplerMixin",

@@ -14,9 +14,15 @@ public class WorldBorderHandler {
 
     public static void register() {
         ServerTickEvents.END_SERVER_TICK.register(server -> {
+            DeeperDarkConfig.ConfigInstance config = DeeperDarkConfig.get();
+
             // Handle players
             for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
-                if (player.isSpectator() || player.isCreative()) continue;
+                if (player.isSpectator()) continue;
+
+                // If pushSurvivalModeOnly is true, skip creative players
+                if (config.pushSurvivalModeOnly && player.isCreative()) continue;
+
                 applyBorderForce(player);
             }
 
