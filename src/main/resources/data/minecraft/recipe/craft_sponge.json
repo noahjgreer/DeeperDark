@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "xwx",
+    "wxw",
+    "xwx"
+  ],
+  "key": {
+    "x": [
+      "minecraft:pufferfish"
+    ],
+    "w": [
+      "minecraft:yellow_wool"
+    ]
+  },
+  "result": "minecraft:sponge"
+}

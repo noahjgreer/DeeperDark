@@ -59,7 +59,8 @@
     "ZombieVillagerEntityMixin",
     "SimpleStructurePieceAccessor",
     "StructurePiecesCollectorAccessor",
-    "WoodlandMansionStructureMixin"
+    "WoodlandMansionStructureMixin",
+    "ExplosionImplMixin"
   ],
   "injectors": {
     "defaultRequire": 1
