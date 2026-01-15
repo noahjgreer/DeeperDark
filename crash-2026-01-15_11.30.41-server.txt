@@ -1,0 +1,269 @@
+---- Minecraft Crash Report ----
+// You're mean.
+
+Time: 2026-01-15 11:30:41
+Description: Ticking block entity
+
+java.lang.RuntimeException: Mixin transformation of net.noahsarch.deeperdark.mixin.BlastFurnaceBlockEntityAccessor failed
+	at net.fabricmc.loader.impl.launch.knot.KnotClassDelegate.getPostMixinClassByteArray(KnotClassDelegate.java:440)
+	at net.fabricmc.loader.impl.launch.knot.KnotClassDelegate.tryLoadClass(KnotClassDelegate.java:336)
+	at net.fabricmc.loader.impl.launch.knot.KnotClassDelegate.loadClass(KnotClassDelegate.java:231)
+	at net.fabricmc.loader.impl.launch.knot.KnotClassLoader.loadClass(KnotClassLoader.java:119)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:490)
+	at knot//net.minecraft.class_2609.handler$zkk000$deeperdark$allowSmeltableBlocks(class_2609.java:536)
+	at knot//net.minecraft.class_2609.method_31651(class_2609.java)
+	at knot//net.minecraft.class_2363.method_64763(class_2363.java:83)
+	at knot//net.minecraft.class_2818$class_5563.method_31703(class_2818.java:766)
+	at knot//net.minecraft.class_2818$class_5564.method_31703(class_2818.java:820)
+	at knot//net.minecraft.class_1937.method_18471(class_1937.java:481)
+	at knot//net.minecraft.class_3218.method_18765(class_3218.java:437)
+	at knot//net.minecraft.server.MinecraftServer.method_3813(MinecraftServer.java:1145)
+	at knot//net.minecraft.server.MinecraftServer.method_3748(MinecraftServer.java:1016)
+	at knot//net.minecraft.class_3176.method_3748(class_3176.java:318)
+	at knot//net.minecraft.server.MinecraftServer.method_76677(MinecraftServer.java:1049)
+	at knot//net.minecraft.server.MinecraftServer.method_29741(MinecraftServer.java:771)
+	at knot//net.minecraft.server.MinecraftServer.method_29739(MinecraftServer.java:301)
+	at java.base/java.lang.Thread.run(Thread.java:1447)
+Caused by: org.spongepowered.asm.mixin.transformer.throwables.IllegalClassLoadError: Illegal classload request for accessor mixin net.noahsarch.deeperdark.mixin.BlastFurnaceBlockEntityAccessor. The mixin is missing from deeperdark.mixins.json which owns package net.noahsarch.deeperdark.mixin.* and the mixin has not been applied.
+	at org.spongepowered.asm.mixin.transformer.MixinProcessor.applyMixins(MixinProcessor.java:323)
+	at org.spongepowered.asm.mixin.transformer.MixinTransformer.transformClass(MixinTransformer.java:237)
+	at org.spongepowered.asm.mixin.transformer.MixinTransformer.transformClassBytes(MixinTransformer.java:202)
+	at net.fabricmc.loader.impl.launch.knot.KnotClassDelegate.getPostMixinClassByteArray(KnotClassDelegate.java:435)
+	... 18 more
+
+
+A detailed walkthrough of the error, its code path and all known details is as follows:
+---------------------------------------------------------------------------------------
+
+-- Head --
+Thread: Server thread
+Stacktrace:
+	at net.fabricmc.loader.impl.launch.knot.KnotClassDelegate.getPostMixinClassByteArray(KnotClassDelegate.java:440)
+	at net.fabricmc.loader.impl.launch.knot.KnotClassDelegate.tryLoadClass(KnotClassDelegate.java:336)
+	at net.fabricmc.loader.impl.launch.knot.KnotClassDelegate.loadClass(KnotClassDelegate.java:231)
+	at net.fabricmc.loader.impl.launch.knot.KnotClassLoader.loadClass(KnotClassLoader.java:119)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:490)
+	at knot//net.minecraft.class_2609.handler$zkk000$deeperdark$allowSmeltableBlocks(class_2609.java:536)
+	at knot//net.minecraft.class_2609.method_31651(class_2609.java)
+	at knot//net.minecraft.class_2363.method_64763(class_2363.java:83)
+	at knot//net.minecraft.class_2818$class_5563.method_31703(class_2818.java:766)
+	at knot//net.minecraft.class_2818$class_5564.method_31703(class_2818.java:820)
+	at knot//net.minecraft.class_1937.method_18471(class_1937.java:481)
+
+-- Block entity being ticked --
+Details:
+	Name: minecraft:blast_furnace // net.minecraft.class_3720
+	Cached block: Block{minecraft:blast_furnace}[facing=west,lit=false]
+	Actual block: Block{minecraft:blast_furnace}[facing=west,lit=false]
+	Block location: World: (19,65,45), Section: (at 3,1,13 in 1,4,2; chunk contains blocks 16,-64,32 to 31,511,47), Region: (0,0; contains chunks 0,0 to 31,31, blocks 0,-64,0 to 511,511,511)
+Stacktrace:
+	at knot//net.minecraft.class_2818$class_5563.method_31703(class_2818.java:766)
+	at knot//net.minecraft.class_2818$class_5564.method_31703(class_2818.java:820)
+	at knot//net.minecraft.class_1937.method_18471(class_1937.java:481)
+	at knot//net.minecraft.class_3218.method_18765(class_3218.java:437)
+	at knot//net.minecraft.server.MinecraftServer.method_3813(MinecraftServer.java:1145)
+	at knot//net.minecraft.server.MinecraftServer.method_3748(MinecraftServer.java:1016)
+	at knot//net.minecraft.class_3176.method_3748(class_3176.java:318)
+	at knot//net.minecraft.server.MinecraftServer.method_76677(MinecraftServer.java:1049)
+	at knot//net.minecraft.server.MinecraftServer.method_29741(MinecraftServer.java:771)
+	at knot//net.minecraft.server.MinecraftServer.method_29739(MinecraftServer.java:301)
+	at java.base/java.lang.Thread.run(Thread.java:1447)
+
+-- Affected level --
+Details:
+	All players: 1 total; class_3222{name=FinniTheFox, id=15, pos=(17.576460727524836, 65.0, 45.15114164079387), mode=SURVIVAL, permission=permission level: OWNERS}
+	Chunk stats: 5329, 2601
+	Level dimension: minecraft:overworld
+	Level spawn location: World: (32,66,-16), Section: (at 0,2,0 in 2,4,-1; chunk contains blocks 32,-64,-16 to 47,511,-1), Region: (0,-1; contains chunks 0,-32 to 31,-1, blocks 0,-64,-512 to 511,511,-1)
+	Level time: 2508 game time, 2508 day time
+	Level name: world
+	Level game mode: Game mode: survival (ID 0). Hardcore: false. Commands: false
+	Level weather: Rain time: 35924 (now: false), thunder time: 157186 (now: false)
+	Known server brands: fabric
+	Removed feature flags: 
+	Level was modded: true
+	Level storage version: 0x04ABD - Anvil
+	Loaded entity count: 300
+Stacktrace:
+	at knot//net.minecraft.class_3218.method_8538(class_3218.java:1878)
+	at knot//net.minecraft.server.MinecraftServer.method_3813(MinecraftServer.java:1148)
+	at knot//net.minecraft.server.MinecraftServer.method_3748(MinecraftServer.java:1016)
+	at knot//net.minecraft.class_3176.method_3748(class_3176.java:318)
+	at knot//net.minecraft.server.MinecraftServer.method_76677(MinecraftServer.java:1049)
+	at knot//net.minecraft.server.MinecraftServer.method_29741(MinecraftServer.java:771)
+	at knot//net.minecraft.server.MinecraftServer.method_29739(MinecraftServer.java:301)
+	at java.base/java.lang.Thread.run(Thread.java:1447)
+
+-- System Details --
+Details:
+	Minecraft Version: 1.21.11
+	Minecraft Version ID: 1.21.11
+	Operating System: Windows 11 (amd64) version 10.0
+	Java Version: 24.0.1, Oracle Corporation
+	Java VM Version: Java HotSpot(TM) 64-Bit Server VM (mixed mode, sharing), Oracle Corporation
+	Memory: 394465920 bytes (376 MiB) / 2961178624 bytes (2824 MiB) up to 12884901888 bytes (12288 MiB)
+	CPUs: 8
+	Processor Vendor: AuthenticAMD
+	Processor Name: AMD Ryzen 3 3100 4-Core Processor              
+	Identifier: AuthenticAMD Family 23 Model 113 Stepping 0
+	Microarchitecture: Zen 2
+	Frequency (GHz): 3.60
+	Number of physical packages: 1
+	Number of physical CPUs: 4
+	Number of logical CPUs: 8
+	Graphics card #0 name: NVIDIA GeForce RTX 2060 SUPER
+	Graphics card #0 vendor: NVIDIA
+	Graphics card #0 VRAM (MiB): 8192.00
+	Graphics card #0 deviceId: VideoController1
+	Graphics card #0 versionInfo: 32.0.15.9159
+	Memory slot #0 capacity (MiB): 16384.00
+	Memory slot #0 clockSpeed (GHz): 2.67
+	Memory slot #0 type: DDR4
+	Memory slot #1 capacity (MiB): 16384.00
+	Memory slot #1 clockSpeed (GHz): 2.67
+	Memory slot #1 type: DDR4
+	Virtual memory max (MiB): 39345.64
+	Virtual memory used (MiB): 32568.91
+	Swap memory total (MiB): 6656.00
+	Swap memory used (MiB): 434.07
+	Space in storage for jna.tmpdir (MiB): <path not set>
+	Space in storage for org.lwjgl.system.SharedLibraryExtractPath (MiB): <path not set>
+	Space in storage for io.netty.native.workdir (MiB): <path not set>
+	Space in storage for java.io.tmpdir (MiB): available: 201597.77, total: 476299.00
+	Space in storage for workdir (MiB): available: 335422.19, total: 1907712.00
+	JVM Flags: 1 total; -Xmx12G
+	Debug Flags: 0 total; 
+	Fabric Mods: 
+		c2me: Concurrent Chunk Management Engine 0.3.6.0.0+1.21.11
+			c2me-base: Concurrent Chunk Management Engine (Base) 0.3.6.0.0+1.21.11
+			c2me-fixes-chunkio-threading-issues: Concurrent Chunk Management Engine (Fixes/Chunk IO/Threading Issues) 0.3.6.0.0+1.21.11
+			c2me-fixes-general-threading-issues: Concurrent Chunk Management Engine (Fixes/General/Threading Issues) 0.3.6.0.0+1.21.11
+			c2me-fixes-worldgen-threading-issues: Concurrent Chunk Management Engine (Fixes/WorldGen/Threading Issues) 0.3.6.0.0+1.21.11
+			c2me-fixes-worldgen-vanilla-bugs: Concurrent Chunk Management Engine (Fixes/WorldGen/Vanilla Bugs) 0.3.6.0.0+1.21.11
+			c2me-notickvd: Concurrent Chunk Management Engine (No Tick View Distance) 0.3.6.0.0+1.21.11
+			c2me-opts-allocs: Concurrent Chunk Management Engine (Optimizations/Memory Allocations) 0.3.6.0.0+1.21.11
+			c2me-opts-chunkio: Concurrent Chunk Management Engine (Optimizations/Chunk IO) 0.3.6.0.0+1.21.11
+			c2me-opts-dfc: Concurrent Chunk Management Engine (Optimizations/Density Function Compiler) 0.3.6.0.0+1.21.11
+			c2me-opts-math: Concurrent Chunk Management Engine (Optimizations/Math) 0.3.6.0.0+1.21.11
+			c2me-opts-natives-math: Concurrent Chunk Management Engine (Optimizations/Natives Math) 0.3.6.0.0+1.21.11
+			c2me-opts-scheduling: Concurrent Chunk Management Engine (Optimizations/Scheduling) 0.3.6.0.0+1.21.11
+			c2me-opts-worldgen-general: Concurrent Chunk Management Engine (Optimizations/General WorldGen) 0.3.6.0.0+1.21.11
+			c2me-opts-worldgen-vanilla: Concurrent Chunk Management Engine (Optimizations/Vanilla WorldGen) 0.3.6.0.0+1.21.11
+			c2me-rewrites-chunk-serializer: Concurrent Chunk Management Engine (Rewrites/Chunk Serializer) 0.3.6.0.0+1.21.11
+			c2me-rewrites-chunk-system: Concurrent Chunk Management Engine (Rewrites/Chunk System) 0.3.6.0.0+1.21.11
+			c2me-rewrites-chunkio: Concurrent Chunk Management Engine (Rewrites/Chunk IO) 0.3.6.0.0+1.21.11
+			c2me-server-utils: Concurrent Chunk Management Engine (Server Utils) 0.3.6.0.0+1.21.11
+			c2me-threading-lighting: Concurrent Chunk Management Engine (Threading/Lighting) 0.3.6.0.0+1.21.11
+			com_ibm_async_asyncutil: asyncutil 0.1.0
+			io_reactivex_rxjava3_rxjava: rxjava 3.1.12
+			mixinsquared: MixinSquared 0.2.0-beta.6
+			net_objecthunter_exp4j: exp4j 0.4.8
+			org_jctools_jctools-core: jctools-core 4.0.5
+			org_reactivestreams_reactive-streams: reactive-streams 1.0.4
+		chunky: Chunky 1.4.55
+		collective: Collective 8.13
+		cpm: Customizable Player Models 0.6.25c
+		deeperdark: Deeperdark 1.5.1-2a
+		fabric-api: Fabric API 0.141.1+1.21.11
+			fabric-api-base: Fabric API Base 1.0.5+4ebb5c083e
+			fabric-api-lookup-api-v1: Fabric API Lookup API (v1) 1.6.113+1fb1cde93e
+			fabric-biome-api-v1: Fabric Biome API (v1) 17.1.1+4fc5413f3e
+			fabric-block-api-v1: Fabric Block API (v1) 1.1.10+4ebb5c083e
+			fabric-block-view-api-v2: Fabric BlockView API (v2) 1.0.39+4ebb5c083e
+			fabric-command-api-v2: Fabric Command API (v2) 2.4.7+6b42a6003e
+			fabric-content-registries-v0: Fabric Content Registries (v0) 10.2.14+4fc5413f3e
+			fabric-convention-tags-v1: Fabric Convention Tags 2.1.55+7f945d5b3e
+			fabric-convention-tags-v2: Fabric Convention Tags (v2) 2.17.3+8ef948ba3e
+			fabric-crash-report-info-v1: Fabric Crash Report Info (v1) 0.3.23+4ebb5c083e
+			fabric-data-attachment-api-v1: Fabric Data Attachment API (v1) 1.8.46+b6ef3aec3e
+			fabric-data-generation-api-v1: Fabric Data Generation API (v1) 23.4.0+69974c4e3e
+			fabric-dimensions-v1: Fabric Dimensions API (v1) 4.0.28+4fc5413f3e
+			fabric-entity-events-v1: Fabric Entity Events (v1) 3.1.1+1d0ab4303e
+			fabric-events-interaction-v0: Fabric Events Interaction (v0) 4.1.0+3b89ecf63e
+			fabric-game-rule-api-v1: Fabric Game Rule API (v1) 2.0.3+4fc5413f3e
+			fabric-item-api-v1: Fabric Item API (v1) 11.5.20+d0c46b9e3e
+			fabric-item-group-api-v1: Fabric Item Group API (v1) 4.2.36+4fc5413f3e
+			fabric-lifecycle-events-v1: Fabric Lifecycle Events (v1) 2.6.15+4ebb5c083e
+			fabric-loot-api-v2: Fabric Loot API (v2) 3.0.73+3f89f5a53e
+			fabric-loot-api-v3: Fabric Loot API (v3) 2.0.20+78c8b4663e
+			fabric-message-api-v1: Fabric Message API (v1) 6.1.12+4ebb5c083e
+			fabric-networking-api-v1: Fabric Networking API (v1) 5.1.5+ae1e07683e
+			fabric-object-builder-api-v1: Fabric Object Builder API (v1) 21.1.39+4fc5413f3e
+			fabric-particles-v1: Fabric Particles (v1) 4.2.11+4fc5413f3e
+			fabric-recipe-api-v1: Fabric Recipe API (v1) 8.2.3+4ebb5c083e
+			fabric-registry-sync-v0: Fabric Registry Sync (v0) 6.2.5+1718722b3e
+			fabric-rendering-fluids-v1: Fabric Rendering Fluids (v1) 3.1.43+4ebb5c083e
+			fabric-resource-conditions-api-v1: Fabric Resource Conditions API (v1) 5.0.35+4fc5413f3e
+			fabric-resource-loader-v0: Fabric Resource Loader (v0) 3.3.4+4fc5413f3e
+			fabric-resource-loader-v1: Fabric Resource Loader (v1) 1.0.10+78c8b4663e
+			fabric-screen-handler-api-v1: Fabric Screen Handler API (v1) 1.3.161+4fc5413f3e
+			fabric-serialization-api-v1: Fabric Serialization API (v1) 1.0.5+4ebb5c083e
+			fabric-tag-api-v1: Fabric Tag API (v1) 1.2.20+4fc5413f3e
+			fabric-transfer-api-v1: Fabric Transfer API (v1) 6.0.24+4fc5413f3e
+			fabric-transitive-access-wideners-v1: Fabric Transitive Access Wideners (v1) 7.1.0+014c8cec3e
+		fabricloader: Fabric Loader 0.18.4
+			mixinextras: MixinExtras 0.5.0
+		ferritecore: FerriteCore 8.0.3
+		forgeconfigapiport: Forge Config API Port 21.11.1
+			com_electronwill_night-config_core: core 3.8.3
+			com_electronwill_night-config_toml: toml 3.8.3
+		healingcampfire: Healing Campfire 6.2
+		java: Java HotSpot(TM) 64-Bit Server VM 24
+		leavesbegone: Leaves Be Gone 21.11.0
+		lithium: Lithium 0.21.2+mc1.21.11
+		minecraft: Minecraft 1.21.11
+		puzzleslib: Puzzles Lib 21.11.6
+		servercore: ServerCore 1.5.15+1.21.11
+			org_yaml_snakeyaml: snakeyaml 2.5
+			placeholder-api: Placeholder API 2.8.1+1.21.10
+			space_arim_dazzleconf_dazzleconf-core: dazzleconf-core 1.3.0-M2
+			space_arim_dazzleconf_dazzleconf-ext-snakeyaml: dazzleconf-ext-snakeyaml 1.3.0-M2
+		squaremap: squaremap 1.3.12
+			adventure-platform-fabric: adventure-platform-fabric 6.8.0
+				net_kyori_adventure-api: adventure-api 4.25.0
+				net_kyori_adventure-key: adventure-key 4.25.0
+				net_kyori_adventure-platform-api: adventure-platform-api 4.4.1
+				net_kyori_adventure-platform-mod-shared-fabric-repack: adventure-platform-mod-shared-fabric-repack 6.8.0
+				net_kyori_adventure-text-logger-slf4j: adventure-text-logger-slf4j 4.25.0
+				net_kyori_adventure-text-minimessage: adventure-text-minimessage 4.25.0
+				net_kyori_adventure-text-serializer-ansi: adventure-text-serializer-ansi 4.25.0
+				net_kyori_adventure-text-serializer-gson: adventure-text-serializer-gson 4.25.0
+				net_kyori_adventure-text-serializer-json: adventure-text-serializer-json 4.25.0
+				net_kyori_adventure-text-serializer-plain: adventure-text-serializer-plain 4.25.0
+				net_kyori_ansi: ansi 1.1.1
+				net_kyori_examination-api: examination-api 1.3.0
+				net_kyori_examination-string: examination-string 1.3.0
+				net_kyori_option: option 1.1.0
+			cardinal-components-base: Cardinal Components API (base) 7.3.0
+			cardinal-components-entity: Cardinal Components API (entities) 7.3.0
+			cloud: Cloud 2.0.0-beta.15
+				io_leangen_geantyref_geantyref: geantyref 1.3.15
+				org_incendo_cloud-brigadier: cloud-brigadier 2.0.0-beta.14
+				org_incendo_cloud-core: cloud-core 2.0.0
+				org_incendo_cloud-minecraft-modded-common-fabric-repack: cloud-minecraft-modded-common-fabric-repack 2.0.0-beta.15
+				org_incendo_cloud-services: cloud-services 2.0.0
+			fabric-permissions-api-v0: fabric-permissions-api 0.6.1
+			org_incendo_cloud-minecraft-extras: cloud-minecraft-extras 2.0.0-beta.14
+			org_incendo_cloud-processors-common: cloud-processors-common 1.0.0-rc.1
+			org_incendo_cloud-processors-confirmation: cloud-processors-confirmation 1.0.0-rc.1
+		unloadedactivity: Unloaded Activity 0.6.10
+		vcinteraction: Voice Chat Interaction 1.21.11-1.0.8
+			polymer-registry-sync-manipulator: Polymer (Registry Sync Manipulator) 0.15.0-beta.4+1.21.11-rc2
+		viabackwards: ViaBackwards 5.7.1-SNAPSHOT
+		viafabric: ViaFabric 0.4.21+133-main
+			viafabric-mc12111: ViaFabric for 1.21.11 0.4.21+133-main
+		viaversion: ViaVersion 5.7.1-SNAPSHOT
+		voicechat: Simple Voice Chat 1.21.11-2.6.11
+			voicechat_api: Simple Voice Chat API 2.6.0
+		worldedit: WorldEdit 7.4.0-rc-01+f3ecb26c6
+			worldeditcui_protocol: WorldEditCUI Protocol (Fabric) 4.0.2
+	Server Running: true
+	Player Count: 1 / 4; [class_3222['FinniTheFox'/15, l='ServerLevel[world]', x=17.58, y=65.00, z=45.15]]
+	Active Data Packs: vanilla, collective, deeperdark (incompatible), fabric-convention-tags-v2, leavesbegone, vcinteraction
+	Available Data Packs: collective, deeperdark (incompatible), fabric-convention-tags-v2, leavesbegone, minecart_improvements, redstone_experiments, trade_rebalance, vanilla, vcinteraction
+	Enabled Feature Flags: minecraft:vanilla
+	World Generation: Experimental
+	World Seed: 6023333883339936302
+	Suppressed Exceptions: ~~NONE~~
+	Is Modded: Definitely; Server brand changed to 'fabric'
+	Type: Dedicated Server (map_server.txt)

@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:blasting",
+  "category": "misc",
+  "cookingtime": 100,
+  "experience": 0.3,
+  "group": "",
+  "ingredient": "minecraft:clay_ball",
+  "result": {
+    "id": "minecraft:brick"
+  }
+}

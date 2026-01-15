@@ -10,6 +10,8 @@
     "AxeItemAccessor",
     "AxeItemMixin",
     "BiomeAccessMixin",
+    "BlastFurnaceBlockEntityMixin",
+    "BlastFurnaceBlockEntityAccessor",
     "BrewingStandMixin",
     "BundleContentsComponentMixin",
     "ConsumableComponentsMixin",
