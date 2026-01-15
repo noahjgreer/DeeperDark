@@ -19,6 +19,7 @@ import net.noahsarch.deeperdark.event.GoldenCauldronEvents;
 import net.noahsarch.deeperdark.event.GunpowderBlockEvents;
 import net.noahsarch.deeperdark.event.WorldBorderHandler;
 import net.noahsarch.deeperdark.worldgen.PaleMansionProcessor;
+import net.noahsarch.deeperdark.event.BoneHeadEvents;
 
 public class Deeperdark implements ModInitializer {
 	public static final String MOD_ID = "deeperdark";
@@ -115,6 +116,8 @@ public class Deeperdark implements ModInitializer {
 
         // Register Slip portal mechanic
         SlipPortalHandler.register();
+
+        BoneHeadEvents.register();
 
 	}
 }
