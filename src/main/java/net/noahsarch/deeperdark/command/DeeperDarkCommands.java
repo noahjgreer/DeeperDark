@@ -203,11 +203,49 @@ public class DeeperDarkCommands {
                 .then(CommandManager.literal("explosionItemKnockbackMultiplier")
                     .executes(ctx -> executeConfigQuery(ctx, "explosionItemKnockbackMultiplier"))
                     .then(CommandManager.argument("value", DoubleArgumentType.doubleArg(1.0))
-                        .executes(ctx -> executeConfigDouble(ctx, "explosionItemKnockbackMultiplier")))))
+                        .executes(ctx -> executeConfigDouble(ctx, "explosionItemKnockbackMultiplier"))))
+
+                // Beacon settings
+                .then(CommandManager.literal("beaconIronTime")
+                    .executes(ctx -> executeConfigQuery(ctx, "beaconIronTime"))
+                    .then(CommandManager.argument("value", IntegerArgumentType.integer(1))
+                        .executes(ctx -> executeConfigInt(ctx, "beaconIronTime"))))
+                .then(CommandManager.literal("beaconGoldTime")
+                    .executes(ctx -> executeConfigQuery(ctx, "beaconGoldTime"))
+                    .then(CommandManager.argument("value", IntegerArgumentType.integer(1))
+                        .executes(ctx -> executeConfigInt(ctx, "beaconGoldTime"))))
+                .then(CommandManager.literal("beaconEmeraldTime")
+                    .executes(ctx -> executeConfigQuery(ctx, "beaconEmeraldTime"))
+                    .then(CommandManager.argument("value", IntegerArgumentType.integer(1))
+                        .executes(ctx -> executeConfigInt(ctx, "beaconEmeraldTime"))))
+                .then(CommandManager.literal("beaconDiamondTime")
+                    .executes(ctx -> executeConfigQuery(ctx, "beaconDiamondTime"))
+                    .then(CommandManager.argument("value", IntegerArgumentType.integer(1))
+                        .executes(ctx -> executeConfigInt(ctx, "beaconDiamondTime"))))
+                .then(CommandManager.literal("beaconNetheriteTime")
+                    .executes(ctx -> executeConfigQuery(ctx, "beaconNetheriteTime"))
+                    .then(CommandManager.argument("value", IntegerArgumentType.integer(1))
+                        .executes(ctx -> executeConfigInt(ctx, "beaconNetheriteTime"))))
+                .then(CommandManager.literal("beaconLevel1Radius")
+                    .executes(ctx -> executeConfigQuery(ctx, "beaconLevel1Radius"))
+                    .then(CommandManager.argument("value", IntegerArgumentType.integer(1))
+                        .executes(ctx -> executeConfigInt(ctx, "beaconLevel1Radius"))))
+                .then(CommandManager.literal("beaconLevel2Radius")
+                    .executes(ctx -> executeConfigQuery(ctx, "beaconLevel2Radius"))
+                    .then(CommandManager.argument("value", IntegerArgumentType.integer(1))
+                        .executes(ctx -> executeConfigInt(ctx, "beaconLevel2Radius"))))
+                .then(CommandManager.literal("beaconLevel3Radius")
+                    .executes(ctx -> executeConfigQuery(ctx, "beaconLevel3Radius"))
+                    .then(CommandManager.argument("value", IntegerArgumentType.integer(1))
+                        .executes(ctx -> executeConfigInt(ctx, "beaconLevel3Radius"))))
+                .then(CommandManager.literal("beaconLevel4Radius")
+                    .executes(ctx -> executeConfigQuery(ctx, "beaconLevel4Radius"))
+                    .then(CommandManager.argument("value", IntegerArgumentType.integer(1))
+                        .executes(ctx -> executeConfigInt(ctx, "beaconLevel4Radius"))))
 
             // dd reload - Reload configuration from disk
             .then(CommandManager.literal("reload")
-                .executes(DeeperDarkCommands::executeReload)));
+                .executes(DeeperDarkCommands::executeReload))));
     }
 
     // ===== Suggestions =====
@@ -347,6 +385,16 @@ public class DeeperDarkCommands {
             .append(Text.literal("\n\n--- Explosion Settings ---").formatted(Formatting.YELLOW))
             .append(formatConfigLine("explosionItemKnockbackEnabled", config.explosionItemKnockbackEnabled))
             .append(formatConfigLine("explosionItemKnockbackMultiplier", config.explosionItemKnockbackMultiplier))
+            .append(Text.literal("\n\n--- Beacon Settings ---").formatted(Formatting.YELLOW))
+            .append(formatConfigLine("beaconIronTime", config.beaconIronTime))
+            .append(formatConfigLine("beaconGoldTime", config.beaconGoldTime))
+            .append(formatConfigLine("beaconEmeraldTime", config.beaconEmeraldTime))
+            .append(formatConfigLine("beaconDiamondTime", config.beaconDiamondTime))
+            .append(formatConfigLine("beaconNetheriteTime", config.beaconNetheriteTime))
+            .append(formatConfigLine("beaconLevel1Radius", config.beaconLevel1Radius))
+            .append(formatConfigLine("beaconLevel2Radius", config.beaconLevel2Radius))
+            .append(formatConfigLine("beaconLevel3Radius", config.beaconLevel3Radius))
+            .append(formatConfigLine("beaconLevel4Radius", config.beaconLevel4Radius))
             .append(Text.literal("\n\nUse /dd config <setting> [value] to change or query settings").formatted(Formatting.GRAY)), false);
         return 1;
     }
@@ -374,6 +422,15 @@ public class DeeperDarkCommands {
             case "fortune3DropChance" -> config.fortune3DropChance;
             case "explosionItemKnockbackMultiplier" -> config.explosionItemKnockbackMultiplier;
             case "netherCoordinateMultiplier" -> config.netherCoordinateMultiplier;
+            case "beaconIronTime" -> config.beaconIronTime;
+            case "beaconGoldTime" -> config.beaconGoldTime;
+            case "beaconEmeraldTime" -> config.beaconEmeraldTime;
+            case "beaconDiamondTime" -> config.beaconDiamondTime;
+            case "beaconNetheriteTime" -> config.beaconNetheriteTime;
+            case "beaconLevel1Radius" -> config.beaconLevel1Radius;
+            case "beaconLevel2Radius" -> config.beaconLevel2Radius;
+            case "beaconLevel3Radius" -> config.beaconLevel3Radius;
+            case "beaconLevel4Radius" -> config.beaconLevel4Radius;
             default -> {
                 source.sendError(Text.literal("Unknown config key: " + configKey).formatted(Formatting.RED));
                 yield null;
@@ -422,6 +479,15 @@ public class DeeperDarkCommands {
             case "anvilRepairCost" -> config.anvilRepairCost = value;
             case "anvilEnchantCost" -> config.anvilEnchantCost = value;
             case "fortuneMaxDrops" -> config.fortuneMaxDrops = value;
+            case "beaconIronTime" -> config.beaconIronTime = value;
+            case "beaconGoldTime" -> config.beaconGoldTime = value;
+            case "beaconEmeraldTime" -> config.beaconEmeraldTime = value;
+            case "beaconDiamondTime" -> config.beaconDiamondTime = value;
+            case "beaconNetheriteTime" -> config.beaconNetheriteTime = value;
+            case "beaconLevel1Radius" -> config.beaconLevel1Radius = value;
+            case "beaconLevel2Radius" -> config.beaconLevel2Radius = value;
+            case "beaconLevel3Radius" -> config.beaconLevel3Radius = value;
+            case "beaconLevel4Radius" -> config.beaconLevel4Radius = value;
             default -> {
                 source.sendError(Text.literal("Unknown config key: " + configKey).formatted(Formatting.RED));
                 return 0;

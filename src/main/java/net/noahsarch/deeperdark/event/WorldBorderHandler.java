@@ -86,8 +86,8 @@ public class WorldBorderHandler {
             return;
         }
 
-        // If just spawned (low age) and outside, remove immediately
-        if (mob.age < 200 && (distX > radius || distZ > radius)) {
+        // If just spawned (low age) and significantly outside, remove immediately
+        if (mob.age < 200 && (distX > radius + 2 || distZ > radius + 2)) {
             mob.discard();
             return;
         }

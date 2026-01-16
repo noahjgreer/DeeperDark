@@ -9,6 +9,8 @@
     "ApplyBonusLootFunctionOreDropsMixin",
     "AxeItemAccessor",
     "AxeItemMixin",
+    "BeaconBlockEntityMixin",
+    "BeaconScreenHandlerMixin",
     "BiomeAccessMixin",
     "BlastFurnaceBlockEntityMixin",
     "BlastFurnaceBlockEntityAccessor",
