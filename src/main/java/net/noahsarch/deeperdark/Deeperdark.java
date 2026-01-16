@@ -4,7 +4,7 @@ import net.minecraft.block.ComposterBlock;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
-import net.noahsarch.deeperdark.event.PlayerTickHandler;
+import net.noahsarch.deeperdark.event.*;
 import net.noahsarch.deeperdark.portal.SlipPortalHandler;
 import net.noahsarch.deeperdark.potion.CustomBrewingRecipeHandler;
 import net.noahsarch.deeperdark.villager.ModVillagers;
@@ -14,12 +14,7 @@ import net.minecraft.item.Items;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import net.minecraft.structure.processor.StructureProcessorType;
-import net.noahsarch.deeperdark.event.SiphonEvents;
-import net.noahsarch.deeperdark.event.GoldenCauldronEvents;
-import net.noahsarch.deeperdark.event.GunpowderBlockEvents;
-import net.noahsarch.deeperdark.event.WorldBorderHandler;
 import net.noahsarch.deeperdark.worldgen.PaleMansionProcessor;
-import net.noahsarch.deeperdark.event.BoneHeadEvents;
 
 public class Deeperdark implements ModInitializer {
 	public static final String MOD_ID = "deeperdark";
@@ -118,6 +113,7 @@ public class Deeperdark implements ModInitializer {
         SlipPortalHandler.register();
 
         BoneHeadEvents.register();
+		FishHeadEvents.register();
 
 	}
 }
