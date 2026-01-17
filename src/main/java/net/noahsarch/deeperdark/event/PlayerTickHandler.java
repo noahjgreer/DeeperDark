@@ -12,13 +12,52 @@ import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.EntityPose;
+import net.noahsarch.deeperdark.state.ActiveBeaconState;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.server.world.ServerWorld;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class PlayerTickHandler {
     private static final RegistryKey<World> THE_SLIP = RegistryKey.of(RegistryKeys.WORLD, Identifier.of("minecraft", "the_slip"));
+    private static final Map<UUID, Integer> beaconGracePeriodTicks = new HashMap<>();
+    private static final int BEACON_GRACE_PERIOD_TICKS = 140; // 7 seconds
+
+    public static void onPlayerJoin(ServerPlayerEntity player) {
+        beaconGracePeriodTicks.put(player.getUuid(), BEACON_GRACE_PERIOD_TICKS);
+    }
 
     public static void register() {
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
+                UUID uuid = player.getUuid();
+                if (beaconGracePeriodTicks.containsKey(uuid)) {
+                    int ticks = beaconGracePeriodTicks.get(uuid) - 1;
+                    if (ticks <= 0) {
+                        beaconGracePeriodTicks.remove(uuid);
+                        boolean tracked = false;
+                        for (ServerWorld world : server.getWorlds()) {
+                            ActiveBeaconState state = ActiveBeaconState.get(world);
+                            for (ActiveBeaconState.BeaconInfo info : state.getActiveBeacons()) {
+                                if (info.trackedPlayers.contains(uuid)) {
+                                    tracked = true;
+                                    break;
+                                }
+                            }
+                            if (tracked) break;
+                        }
+                        if (!tracked) {
+                            for (StatusEffectInstance effect : player.getStatusEffects()) {
+                                player.removeStatusEffect(effect.getEffectType());
+                            }
+                        }
+                    } else {
+                        beaconGracePeriodTicks.put(uuid, ticks);
+                    }
+                }
+
                 // Check if player is in The Slip dimension
                 net.minecraft.world.World world = ((net.noahsarch.deeperdark.duck.EntityAccessor)player).deeperdark$getWorld();
                 if (world.getRegistryKey().equals(THE_SLIP)) {

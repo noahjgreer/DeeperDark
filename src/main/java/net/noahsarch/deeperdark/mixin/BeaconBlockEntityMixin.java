@@ -57,12 +57,12 @@ public abstract class BeaconBlockEntityMixin extends BlockEntity implements Beac
         ci.cancel();
     }
 
-    @Inject(method = "markRemoved", at = @At("HEAD"))
-    private void deeperDark$onRemoved(CallbackInfo ci) {
-        if (this.world instanceof ServerWorld serverWorld) {
-            ActiveBeaconState.get(serverWorld).removeBeacon(this.pos, serverWorld);
-        }
-    }
+    // @Inject(method = "markRemoved", at = @At("HEAD"))
+    // private void deeperDark$onRemoved(CallbackInfo ci) {
+    //     if (this.world instanceof ServerWorld serverWorld) {
+    //         ActiveBeaconState.get(serverWorld).removeBeacon(this.pos, serverWorld);
+    //     }
+    // }
 
     @Inject(method = "tick", at = @At("TAIL"))
     private static void deeperDark$tick(World world, BlockPos pos, BlockState state, BeaconBlockEntity blockEntity, CallbackInfo ci) {
@@ -169,12 +169,40 @@ public abstract class BeaconBlockEntityMixin extends BlockEntity implements Beac
             long newTime = current + (seconds * 20L);
 
             this.deeperDark$applicationWindow = 100; // 5 seconds
-            this.deeperDark$trackedPlayers.clear(); // Clear local cache to start fresh?
-            if (info != null) {
-                this.deeperDark$trackedPlayers.addAll(info.trackedPlayers);
+            this.deeperDark$trackedPlayers.clear();
+
+            // Add all players currently in range
+            DeeperDarkConfig.ConfigInstance config = DeeperDarkConfig.get();
+            double radius = switch (this.level) {
+                case 1 -> config.beaconLevel1Radius;
+                case 2 -> config.beaconLevel2Radius;
+                case 3 -> config.beaconLevel3Radius;
+                case 4 -> config.beaconLevel4Radius;
+                default -> config.beaconLevel1Radius;
+            };
+            Box box = new Box(this.pos).expand(radius);
+            List<ServerPlayerEntity> players = this.world.getNonSpectatingEntities(ServerPlayerEntity.class, box);
+            for (ServerPlayerEntity player : players) {
+                this.deeperDark$trackedPlayers.add(player.getUuid());
             }
 
+            // Update state and apply effect immediately to all new tracked players
             state.updateBeacon(this.pos, newTime, this.deeperDark$trackedPlayers, this.primary, this.secondary, this.level, serverWorld);
+            for (ServerPlayerEntity player : players) {
+                // Only apply if not already tracked (to avoid redundant reapplication)
+                if (info == null || !info.trackedPlayers.contains(player.getUuid())) {
+                    if (this.primary != null) {
+                        int duration = (int) newTime;
+                        if (duration < 20) duration = 20;
+                        int amplifier = 0;
+                        if (this.level >= 4 && this.primary.equals(this.secondary)) amplifier = 1;
+                        player.addStatusEffect(new net.minecraft.entity.effect.StatusEffectInstance(this.primary, duration, amplifier, true, true));
+                        if (this.level >= 4 && this.secondary != null && !this.primary.equals(this.secondary)) {
+                            player.addStatusEffect(new net.minecraft.entity.effect.StatusEffectInstance(this.secondary, duration, 0, true, true));
+                        }
+                    }
+                }
+            }
 
             this.world.playSound(null, this.pos, SoundEvents.BLOCK_BEACON_POWER_SELECT, SoundCategory.BLOCKS, 1.0f, 1.0f);
         }
@@ -216,5 +244,19 @@ public abstract class BeaconBlockEntityMixin extends BlockEntity implements Beac
         if (info != null) merged.addAll(info.trackedPlayers);
 
         state.updateBeacon(this.pos, time, merged, this.primary, this.secondary, this.level, world);
+    }
+
+    @Inject(method = "readData", at = @At("TAIL"))
+    private void deeperDark$onReadData(net.minecraft.storage.ReadView view, CallbackInfo ci) {
+        if (this.world instanceof ServerWorld serverWorld) {
+            // On world load, ensure the beacon's tracked players are synced to the global state
+            ActiveBeaconState state = ActiveBeaconState.get(serverWorld);
+            Set<UUID> tracked = new HashSet<>(this.deeperDark$trackedPlayers);
+            ActiveBeaconState.BeaconInfo info = state.getBeacon(this.pos);
+            if (info != null) {
+                tracked.addAll(info.trackedPlayers);
+            }
+            state.updateBeacon(this.pos, info != null ? info.remainingTime : 0, tracked, this.primary, this.secondary, this.level, serverWorld);
+        }
     }
 }

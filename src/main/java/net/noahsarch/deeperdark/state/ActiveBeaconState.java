@@ -6,7 +6,6 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.datafixer.DataFixTypes;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -49,7 +48,25 @@ public class ActiveBeaconState extends PersistentState {
                     map.forEach((k, v) -> newMap.put(String.valueOf(k), v));
                     return newMap;
                 }
-            ).fieldOf("beacons").forGetter(state -> state.activeBeacons)
+            ).fieldOf("beacons").forGetter(state -> state.activeBeacons),
+            Codec.unboundedMap(Codec.STRING, StatusEffect.ENTRY_CODEC.listOf()).optionalFieldOf("pending_removals", new HashMap<>()).xmap(
+                map -> {
+                    Map<UUID, List<RegistryEntry<StatusEffect>>> newMap = new HashMap<>();
+                    map.forEach((k, v) -> {
+                        try {
+                            newMap.put(UUID.fromString(k), v);
+                        } catch (IllegalArgumentException e) {
+                            LOGGER.warn("Skipping invalid UUID in pending_removals: {}", k);
+                        }
+                    });
+                    return newMap;
+                },
+                map -> {
+                    Map<String, List<RegistryEntry<StatusEffect>>> newMap = new HashMap<>();
+                    map.forEach((k, v) -> newMap.put(k.toString(), v));
+                    return newMap;
+                }
+            ).forGetter(state -> state.pendingRemovals)
     ).apply(instance, ActiveBeaconState::new));
 
     public static final PersistentStateType<ActiveBeaconState> TYPE = new PersistentStateType<>(
@@ -61,20 +78,28 @@ public class ActiveBeaconState extends PersistentState {
 
     // Map of BlockPos (as Long) to BeaconInfo
     private final Map<Long, BeaconInfo> activeBeacons;
+    // Map of UUID to list of effects that need to be removed (for players who were offline when beacon broke)
+    private final Map<UUID, List<RegistryEntry<StatusEffect>>> pendingRemovals;
 
     public ActiveBeaconState() {
         this.activeBeacons = new HashMap<>();
+        this.pendingRemovals = new HashMap<>();
+        LOGGER.info("ActiveBeaconState constructed (empty)");
     }
 
-    public ActiveBeaconState(Map<Long, BeaconInfo> activeBeacons) {
+    public ActiveBeaconState(Map<Long, BeaconInfo> activeBeacons, Map<UUID, List<RegistryEntry<StatusEffect>>> pendingRemovals) {
         this.activeBeacons = new HashMap<>(activeBeacons);
+        this.pendingRemovals = new HashMap<>(pendingRemovals);
+        LOGGER.info("ActiveBeaconState constructed (from disk): {} beacons, {} pending removals", activeBeacons.size(), pendingRemovals.size());
     }
 
     public static ActiveBeaconState get(ServerWorld world) {
+        // Use the correct signature for your Minecraft version
         return world.getPersistentStateManager().getOrCreate(TYPE);
     }
 
     public void updateBeacon(BlockPos pos, long remainingTime, Set<UUID> trackedPlayers, RegistryEntry<StatusEffect> primary, RegistryEntry<StatusEffect> secondary, int level, ServerWorld world) {
+        LOGGER.info("updateBeacon: pos={}, time={}, tracked={}, primary={}, secondary={}, level={}", pos, remainingTime, trackedPlayers.size(), primary, secondary, level);
         if (remainingTime <= 0) {
             removeBeacon(pos, world);
             return;
@@ -104,6 +129,7 @@ public class ActiveBeaconState extends PersistentState {
             info.trackedPlayers = new HashSet<>(trackedPlayers);
         }
         this.markDirty();
+        LOGGER.info("ActiveBeaconState marked dirty after updateBeacon");
     }
 
     public BeaconInfo getBeacon(BlockPos pos) {
@@ -111,9 +137,11 @@ public class ActiveBeaconState extends PersistentState {
     }
 
     public void removeBeacon(BlockPos pos, ServerWorld world) {
+        LOGGER.info("removeBeacon: pos={}", pos);
         BeaconInfo removed = activeBeacons.remove(pos.asLong());
         if (removed != null) {
             this.markDirty();
+            LOGGER.info("ActiveBeaconState marked dirty after removeBeacon");
             // Clear effects from associated players immediately
             MinecraftServer server = world.getServer();
             if (server != null) {
@@ -122,6 +150,14 @@ public class ActiveBeaconState extends PersistentState {
                     if (player != null) {
                          if (removed.primary != null) player.removeStatusEffect(removed.primary);
                          if (removed.secondary != null) player.removeStatusEffect(removed.secondary);
+                    } else {
+                        // Player is offline, add to pending removals
+                        List<RegistryEntry<StatusEffect>> effects = new ArrayList<>();
+                        if (removed.primary != null) effects.add(removed.primary);
+                        if (removed.secondary != null) effects.add(removed.secondary);
+                        if (!effects.isEmpty()) {
+                            pendingRemovals.computeIfAbsent(uuid, k -> new ArrayList<>()).addAll(effects);
+                        }
                     }
                 }
             }
@@ -165,6 +201,9 @@ public class ActiveBeaconState extends PersistentState {
                      if (info.primary != null) player.removeStatusEffect(info.primary);
                      if (info.secondary != null) player.removeStatusEffect(info.secondary);
                 }
+                // If offline, we can't easily strip "invalid" beacon effects without tracking which beacon gave what.
+                // But typically invalidation happens on tick, which presumes server logic.
+                // We'll leave pending removal for full removal only for now.
              }
              return;
         }
@@ -191,6 +230,45 @@ public class ActiveBeaconState extends PersistentState {
         }
     }
 
+    public void onPlayerJoin(ServerPlayerEntity player) {
+        UUID uuid = player.getUuid();
+
+        // Process pending removals
+        if (pendingRemovals.containsKey(uuid)) {
+            List<RegistryEntry<StatusEffect>> effects = pendingRemovals.remove(uuid);
+            if (effects != null) {
+                LOGGER.info("Processing pending removals for player {}", player.getName().getString());
+                for (RegistryEntry<StatusEffect> effect : effects) {
+                    player.removeStatusEffect(effect);
+                }
+                this.markDirty();
+            }
+        }
+
+        // Only reapply effects if the player is already tracked by a beacon
+        for (BeaconInfo info : activeBeacons.values()) {
+            if (info.trackedPlayers.contains(uuid)) {
+                LOGGER.info("Found tracking for player {} in beacon at {}", player.getName().getString(), info.pos);
+                if (info.level > 0 && info.primary != null) {
+                    int duration = (int) info.remainingTime;
+                    if (duration < 20) duration = 20;
+                    int amplifier = 0;
+                    if (info.level >= 4 && Objects.equals(info.primary, info.secondary)) {
+                        amplifier = 1;
+                    }
+                    player.addStatusEffect(new StatusEffectInstance(info.primary, duration, amplifier, true, true));
+                    if (info.level >= 4 && !Objects.equals(info.primary, info.secondary) && info.secondary != null) {
+                        player.addStatusEffect(new StatusEffectInstance(info.secondary, duration, 0, true, true));
+                    }
+                }
+            }
+        }
+    }
+
+    public Collection<BeaconInfo> getActiveBeacons() {
+        return activeBeacons.values();
+    }
+
     public static class BeaconInfo {
         public BlockPos pos;
         public long remainingTime;
@@ -213,6 +291,26 @@ public class ActiveBeaconState extends PersistentState {
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
