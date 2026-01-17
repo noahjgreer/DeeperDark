@@ -49,20 +49,6 @@ public class DeeperDarkConfig {
         // Explosion item knockback configuration
         public boolean explosionItemKnockbackEnabled = false; // If true, items get extra velocity from explosions
         public double explosionItemKnockbackMultiplier = 3.0; // Multiplier for explosion knockback on items (1.0 = normal, 3.0 = 3x farther)
-
-        // Beacon configuration
-        public int beaconIronTime = 180;
-        public int beaconGoldTime = 300;
-        public int beaconEmeraldTime = 600;
-        public int beaconDiamondTime = 1800;
-        public int beaconNetheriteTime = 21600;
-
-        // Beacon Association Radius by pyramid level
-        public int beaconLevel1Radius = 10;
-        public int beaconLevel2Radius = 20;
-        public int beaconLevel3Radius = 30;
-        public int beaconLevel4Radius = 40;
-
     }
 
     public static void load() {
@@ -147,17 +133,6 @@ public class DeeperDarkConfig {
                     # explosionItemKnockbackEnabled: if true, items are amplified by explosions and fly farther (default: false)
                     # explosionItemKnockbackMultiplier: how much to multiply explosion knockback on items (1.0 = normal, 3.0 = 3x farther, 5.0 = extreme)
                     # NOTE: Items are never destroyed by explosions, but this makes them scatter more dramatically when enabled
-                    #
-                    # Beacon Configuration:
-                    # beaconIronTime: how long (seconds) the Beacon effect lasts when using Iron Ingots (default: 180 seconds)
-                    # beaconGoldTime: how long (seconds) the Beacon effect lasts when using Gold Ingots (default: 300 seconds)
-                    # beaconEmeraldTime: how long (seconds) the Beacon effect lasts when using Emeralds (default: 600 seconds)
-                    # beaconDiamondTime: how long (seconds) the Beacon effect lasts when using Diamonds (default: 1800 seconds)
-                    # beaconNetheriteTime: how long (seconds) the Beacon effect lasts when using Netherite Ingots (default: 21600 seconds)
-                    # beaconLevel1Radius: radius (blocks) of the Beacon's effect at pyramid level 1 (default: 10 blocks)
-                    # beaconLevel2Radius: radius (blocks) of the Beacon's effect at pyramid level 2 (default: 20 blocks)
-                    # beaconLevel3Radius: radius (blocks) of the Beacon's effect at pyramid level 3 (default: 30 blocks)
-                    # beaconLevel4Radius: radius (blocks) of the Beacon's effect at pyramid level 4 (default: 40 blocks)
                     #
                     """;
 
