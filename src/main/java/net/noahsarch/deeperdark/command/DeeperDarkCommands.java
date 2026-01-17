@@ -163,16 +163,6 @@ public class DeeperDarkCommands {
                     .then(CommandManager.argument("value", IntegerArgumentType.integer(1))
                         .executes(ctx -> executeConfigInt(ctx, "creeperEffectMaxSeconds"))))
 
-                // Anvil settings
-                .then(CommandManager.literal("anvilRepairCost")
-                    .executes(ctx -> executeConfigQuery(ctx, "anvilRepairCost"))
-                    .then(CommandManager.argument("value", IntegerArgumentType.integer(0))
-                        .executes(ctx -> executeConfigInt(ctx, "anvilRepairCost"))))
-                .then(CommandManager.literal("anvilEnchantCost")
-                    .executes(ctx -> executeConfigQuery(ctx, "anvilEnchantCost"))
-                    .then(CommandManager.argument("value", IntegerArgumentType.integer(0))
-                        .executes(ctx -> executeConfigInt(ctx, "anvilEnchantCost"))))
-
                 // Fortune settings
                 .then(CommandManager.literal("customFortuneEnabled")
                     .executes(ctx -> executeConfigQuery(ctx, "customFortuneEnabled"))
@@ -335,9 +325,6 @@ public class DeeperDarkCommands {
             .append(Text.literal("\n\n--- Creeper Settings ---").formatted(Formatting.YELLOW))
             .append(formatConfigLine("creeperEffectMinSeconds", config.creeperEffectMinSeconds))
             .append(formatConfigLine("creeperEffectMaxSeconds", config.creeperEffectMaxSeconds))
-            .append(Text.literal("\n\n--- Anvil Settings ---").formatted(Formatting.YELLOW))
-            .append(formatConfigLine("anvilRepairCost", config.anvilRepairCost))
-            .append(formatConfigLine("anvilEnchantCost", config.anvilEnchantCost))
             .append(Text.literal("\n\n--- Fortune Settings ---").formatted(Formatting.YELLOW))
             .append(formatConfigLine("customFortuneEnabled", config.customFortuneEnabled))
             .append(formatConfigLine("fortune1DropChance", config.fortune1DropChance))
@@ -366,8 +353,6 @@ public class DeeperDarkCommands {
             case "explosionItemKnockbackEnabled" -> config.explosionItemKnockbackEnabled;
             case "creeperEffectMinSeconds" -> config.creeperEffectMinSeconds;
             case "creeperEffectMaxSeconds" -> config.creeperEffectMaxSeconds;
-            case "anvilRepairCost" -> config.anvilRepairCost;
-            case "anvilEnchantCost" -> config.anvilEnchantCost;
             case "fortuneMaxDrops" -> config.fortuneMaxDrops;
             case "fortune1DropChance" -> config.fortune1DropChance;
             case "fortune2DropChance" -> config.fortune2DropChance;
@@ -419,8 +404,6 @@ public class DeeperDarkCommands {
         switch (configKey) {
             case "creeperEffectMinSeconds" -> config.creeperEffectMinSeconds = value;
             case "creeperEffectMaxSeconds" -> config.creeperEffectMaxSeconds = value;
-            case "anvilRepairCost" -> config.anvilRepairCost = value;
-            case "anvilEnchantCost" -> config.anvilEnchantCost = value;
             case "fortuneMaxDrops" -> config.fortuneMaxDrops = value;
             default -> {
                 source.sendError(Text.literal("Unknown config key: " + configKey).formatted(Formatting.RED));

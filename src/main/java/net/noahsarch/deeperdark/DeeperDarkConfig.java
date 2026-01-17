@@ -35,10 +35,6 @@ public class DeeperDarkConfig {
         // Nether coordinate multiplier (1.0 = 1:1, 8.0 = vanilla 1:8)
         public double netherCoordinateMultiplier = 1.0;
 
-        // Anvil configuration
-        public int anvilRepairCost = 0; // Cost in levels for item repairs (diamond + diamond pickaxe)
-        public int anvilEnchantCost = 5; // Flat cost in levels for any enchanting combination
-
         // Fortune enchantment configuration
         public boolean customFortuneEnabled = true;
         public double fortune1DropChance = 0.1666; // 16.66% chance to drop 2 items
@@ -116,10 +112,6 @@ public class DeeperDarkConfig {
                     # netherCoordinateMultiplier: coordinate scale between overworld and nether (1.0 = 1:1, 8.0 = vanilla 1:8)
                     # creeperEffectMinSeconds / creeperEffectMaxSeconds (seconds): when a creeper with an infinite-duration effect explodes,
                     #   the effect given by the explosion will have a random duration between these values (seconds).
-                    #
-                    # Anvil Configuration:
-                    # anvilRepairCost: XP level cost for repairing items with materials (e.g., diamond + diamond pickaxe). Set to 0 for free repairs.
-                    # anvilEnchantCost: Flat XP level cost for any enchanting combination (book + tool, book + book, etc.)
                     #
                     # Fortune Enchantment Configuration:
                     # customFortuneEnabled: if true, uses custom Fortune behavior; if false, uses vanilla
