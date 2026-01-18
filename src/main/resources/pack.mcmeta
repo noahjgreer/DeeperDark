@@ -3,7 +3,8 @@
     "description": "Server specific resources",
     "pack_format": 94,
     "min_format": [
-      81
+      82,
+      0
     ],
     "max_format": [
       94,
