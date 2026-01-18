@@ -1,10 +1,15 @@
 {
-    "pack": {
-        "description": "Server Specific Resources",
-        "pack_format": 63,
-        "supported_formats": [
-            63,
-            81
-        ]
-    }
+  "pack": {
+    "description": "Server specific resources",
+    "pack_format": 94,
+    "supported_formats": {
+      "min_inclusive": 81,
+      "max_inclusive": 95
+    },
+    "min_format": [
+      94,
+      1
+    ],
+    "max_format": 94
+  }
 }
