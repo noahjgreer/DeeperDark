@@ -17,9 +17,6 @@
 	"entrypoints": {
 		"main": [
 			"net.noahsarch.deeperdark.Deeperdark"
-		],
-		"fabric-datagen": [
-			"net.noahsarch.deeperdark.DeeperdarkDataGenerator"
 		]
 	},
 	"mixins": [
