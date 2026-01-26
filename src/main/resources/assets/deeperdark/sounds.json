@@ -1,0 +1,8 @@
+{
+  "block.note_block.organ": {
+    "sounds": [
+      "deeperdark:block/note_block/organ"
+    ],
+    "subtitle": "subtitles.block.note_block.note"
+  }
+}

@@ -78,5 +78,6 @@
   "item.deeperdark.golden_cauldron": "Golden Cauldron",
   "item.deeperdark.leather_scrap": "Leather Scrap",
   "container.stonecutter": "Circular Saw",
-  "block.minecraft.stonecutter": "Circular Saw"
+  "block.minecraft.stonecutter": "Circular Saw",
+  "subtitles.block.note_block.organ": "Organ plays"
 }

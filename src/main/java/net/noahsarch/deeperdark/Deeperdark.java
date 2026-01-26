@@ -7,6 +7,7 @@ import net.minecraft.util.Identifier;
 import net.noahsarch.deeperdark.event.*;
 import net.noahsarch.deeperdark.portal.SlipPortalHandler;
 import net.noahsarch.deeperdark.potion.CustomBrewingRecipeHandler;
+import net.noahsarch.deeperdark.sound.ModSounds;
 import net.noahsarch.deeperdark.villager.ModVillagers;
 import net.noahsarch.deeperdark.worldgen.SlipChunkGenerator;
 import net.fabricmc.api.ModInitializer;
@@ -34,6 +35,9 @@ public class Deeperdark implements ModInitializer {
 
 		// Initialize Config
 		DeeperDarkConfig.load();
+
+		// Register custom sounds
+		ModSounds.registerSounds();
 
 		// Register the Slip chunk generator
 		Registry.register(Registries.CHUNK_GENERATOR,
