@@ -36,7 +36,7 @@ public class Deeperdark implements ModInitializer {
 		// Initialize Config
 		DeeperDarkConfig.load();
 
-		// Register custom sounds
+		// Register custom sounds (not in registry, just creates SoundEvent objects)
 		ModSounds.registerSounds();
 
 		// Register the Slip chunk generator

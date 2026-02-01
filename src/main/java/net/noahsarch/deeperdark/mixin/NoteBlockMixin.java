@@ -5,12 +5,18 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.NoteBlock;
 import net.minecraft.block.enums.NoteBlockInstrument;
+import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.state.property.Properties;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.noahsarch.deeperdark.sound.ModSounds;
+import net.noahsarch.deeperdark.Deeperdark;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -22,6 +28,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  */
 @Mixin(NoteBlock.class)
 public class NoteBlockMixin {
+
+    @Unique
+    private static final Identifier ORGAN_SOUND_ID = Identifier.of(Deeperdark.MOD_ID, "block.note_block.organ");
 
     /**
      * Inject into onSyncedBlockEvent to play organ sound when copper is below
@@ -42,16 +51,50 @@ public class NoteBlockMixin {
                     pos.getX() + 0.5, pos.getY() + 1.2, pos.getZ() + 0.5,
                     note / 24.0, 0.0, 0.0);
 
-                // Play organ sound
-                world.playSound(null,
-                    pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
-                    ModSounds.BLOCK_NOTE_BLOCK_ORGAN,
-                    SoundCategory.RECORDS,
-                    3.0F, pitch, world.random.nextLong());
+                // Play organ sound by manually sending the packet (like /playsound does)
+                // This avoids Fabric registry sync issues since we use a Direct RegistryEntry
+                if (world instanceof ServerWorld serverWorld) {
+                    deeperdark$sendOrganSound(serverWorld, pos, pitch);
+                }
 
                 cir.setReturnValue(true);
             } else {
                 cir.setReturnValue(false);
+            }
+        }
+    }
+
+    /**
+     * Send the organ sound packet to all nearby players using Direct RegistryEntry.
+     * This mirrors how the vanilla /playsound command works, bypassing registry sync.
+     */
+    @Unique
+    private void deeperdark$sendOrganSound(ServerWorld world, BlockPos pos, float pitch) {
+        // Create a Direct RegistryEntry (not Reference) - same as /playsound command does
+        // This bypasses Fabric's registry sync because Direct entries aren't synced
+        RegistryEntry<SoundEvent> soundEntry = RegistryEntry.of(SoundEvent.of(ORGAN_SOUND_ID));
+
+        double x = pos.getX() + 0.5;
+        double y = pos.getY() + 0.5;
+        double z = pos.getZ() + 0.5;
+        float volume = 3.0F;
+        long seed = world.getRandom().nextLong();
+
+        // Calculate max hearing distance (volume affects range)
+        double maxDistSq = Math.pow(soundEntry.value().getDistanceToTravel(volume), 2);
+
+        // Send packet to all players within hearing range
+        for (ServerPlayerEntity player : world.getPlayers()) {
+            double distSq = player.squaredDistanceTo(x, y, z);
+            if (distSq < maxDistSq) {
+                player.networkHandler.sendPacket(new PlaySoundS2CPacket(
+                    soundEntry,
+                    SoundCategory.RECORDS,
+                    x, y, z,
+                    volume,
+                    pitch,
+                    seed
+                ));
             }
         }
     }

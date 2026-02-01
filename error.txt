@@ -1,0 +1,27 @@
+Feb 01, 2026 2:13:23 PM com.replaymod.replaystudio.lib.viaversion.protocols.v1_12_2to1_13.blockconnections.ConnectionData init
+INFO: Loading block connection mappings ...
+Feb 01, 2026 2:13:24 PM com.replaymod.replaystudio.lib.viaversion.protocols.v1_12_2to1_13.storage.BlockConnectionStorage <clinit>
+INFO: Using FastUtil Long2ObjectOpenHashMap for block connections
+[14:13:29] [Render thread/ERROR]: Received unknown remote registry entries from server
+[14:13:29] [Render thread/ERROR]: Registry entry (deeperdark:block.note_block.organ) is missing from local registry (minecraft:sound_event)
+[14:13:29] [Render thread/ERROR]: Registry remapping failed!
+net.fabricmc.fabric.impl.registry.sync.RemapException: Received a registry entry that is unknown to this client.
+This is usually caused by a mismatched mod set between the client and server. See the client logs for more details.
+The following registry entry namespaces may be related:
+deeperdark
+	at knot//net.fabricmc.fabric.impl.client.registry.sync.ClientRegistrySyncHandler.checkRemoteRemap(ClientRegistrySyncHandler.java:154)
+	at knot//net.fabricmc.fabric.impl.client.registry.sync.ClientRegistrySyncHandler.apply(ClientRegistrySyncHandler.java:74)
+	at knot//net.fabricmc.fabric.impl.client.registry.sync.ClientRegistrySyncHandler.lambda$receivePacket$0(ClientRegistrySyncHandler.java:61)
+	at knot//net.minecraft.class_1255.method_18859(class_1255.java:169)
+	at knot//net.minecraft.class_4093.method_18859(class_4093.java:23)
+	at knot//net.minecraft.class_1255.method_16075(class_1255.java:143)
+	at knot//net.minecraft.class_1255.method_5383(class_1255.java:124)
+	at knot//net.minecraft.class_310.method_1523(class_310.java:1339)
+	at knot//net.minecraft.class_310.method_1514(class_310.java:966)
+	at knot//net.minecraft.client.main.Main.main(Main.java:250)
+	at net.fabricmc.loader.impl.game.minecraft.MinecraftGameProvider.launch(MinecraftGameProvider.java:514)
+	at net.fabricmc.loader.impl.launch.knot.Knot.launch(Knot.java:72)
+	at net.fabricmc.loader.impl.launch.knot.KnotClient.main(KnotClient.java:23)
+	at org.prismlauncher.launcher.impl.StandardLauncher.launch(StandardLauncher.java:115)
+	at org.prismlauncher.EntryPoint.listen(EntryPoint.java:129)
+	at org.prismlauncher.EntryPoint.main(EntryPoint.java:70)
