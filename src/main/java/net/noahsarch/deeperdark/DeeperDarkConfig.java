@@ -66,6 +66,9 @@ public class DeeperDarkConfig {
         public double mossNearbyBonus = 0.05; // Additional chance per nearby mossy block
         public double mossUnderwaterMultiplier = 3.0; // Multiplier for mossing speed when underwater
         public double stoneBrickMossMultiplier = 0.5; // Multiplier for stone brick mossing speed (slower than cobble)
+
+        // Zombie behavior configuration
+        public double zombieFollowRange = 35.0; // How far zombies can detect and track players (vanilla default: 35.0)
     }
 
     public static void load() {
@@ -168,6 +171,9 @@ public class DeeperDarkConfig {
                     # mossNearbyBonus: additional chance per adjacent mossy block (default: 0.05)
                     # mossUnderwaterMultiplier: multiplier for mossing speed when underwater (default: 3.0)
                     # stoneBrickMossMultiplier: multiplier for stone brick mossing (default: 0.5, twice as slow as cobble)
+                    #
+                    # Zombie Behavior Configuration:
+                    # zombieFollowRange: how far zombies can detect and track players (vanilla default: 35.0)
                     #
                     """;
 

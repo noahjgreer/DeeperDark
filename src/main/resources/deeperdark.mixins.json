@@ -68,7 +68,8 @@
     "PistonHandlerMixin",
     "EndermanPickUpBlockMixin",
     "FishingBobberEntityMixin",
-    "CraftingResultSlotMixin"
+    "CraftingResultSlotMixin",
+    "ZombieEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1

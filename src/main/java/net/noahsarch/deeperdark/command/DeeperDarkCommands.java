@@ -247,7 +247,13 @@ public class DeeperDarkCommands {
                 .then(CommandManager.literal("stoneBrickMossMultiplier")
                     .executes(ctx -> executeConfigQuery(ctx, "stoneBrickMossMultiplier"))
                     .then(CommandManager.argument("value", DoubleArgumentType.doubleArg(0.0))
-                        .executes(ctx -> executeConfigDouble(ctx, "stoneBrickMossMultiplier")))))
+                        .executes(ctx -> executeConfigDouble(ctx, "stoneBrickMossMultiplier"))))
+
+                // Zombie settings
+                .then(CommandManager.literal("zombieFollowRange")
+                    .executes(ctx -> executeConfigQuery(ctx, "zombieFollowRange"))
+                    .then(CommandManager.argument("value", DoubleArgumentType.doubleArg(1.0, 128.0))
+                        .executes(ctx -> executeConfigDouble(ctx, "zombieFollowRange")))))
 
             // dd reload - Reload configuration from disk
             .then(CommandManager.literal("reload")
@@ -404,6 +410,8 @@ public class DeeperDarkCommands {
             .append(formatConfigLine("mossNearbyBonus", config.mossNearbyBonus))
             .append(formatConfigLine("mossUnderwaterMultiplier", config.mossUnderwaterMultiplier))
             .append(formatConfigLine("stoneBrickMossMultiplier", config.stoneBrickMossMultiplier))
+            .append(Text.literal("\n\n--- Zombie Settings ---").formatted(Formatting.YELLOW))
+            .append(formatConfigLine("zombieFollowRange", config.zombieFollowRange))
             .append(Text.literal("\n\nUse /dd config <setting> [value] to change or query settings").formatted(Formatting.GRAY)), false);
         return 1;
     }
@@ -440,6 +448,7 @@ public class DeeperDarkCommands {
             case "mossNearbyBonus" -> config.mossNearbyBonus;
             case "mossUnderwaterMultiplier" -> config.mossUnderwaterMultiplier;
             case "stoneBrickMossMultiplier" -> config.stoneBrickMossMultiplier;
+            case "zombieFollowRange" -> config.zombieFollowRange;
             default -> {
                 source.sendError(Text.literal("Unknown config key: " + configKey).formatted(Formatting.RED));
                 yield null;
@@ -522,6 +531,7 @@ public class DeeperDarkCommands {
             case "mossNearbyBonus" -> config.mossNearbyBonus = value;
             case "mossUnderwaterMultiplier" -> config.mossUnderwaterMultiplier = value;
             case "stoneBrickMossMultiplier" -> config.stoneBrickMossMultiplier = value;
+            case "zombieFollowRange" -> config.zombieFollowRange = value;
             default -> {
                 source.sendError(Text.literal("Unknown config key: " + configKey).formatted(Formatting.RED));
                 return 0;
