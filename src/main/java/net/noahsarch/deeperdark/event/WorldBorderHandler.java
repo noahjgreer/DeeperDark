@@ -23,7 +23,14 @@ public class WorldBorderHandler {
                 // If pushSurvivalModeOnly is true, skip creative players
                 if (config.pushSurvivalModeOnly && player.isCreative()) continue;
 
-                applyBorderForce(player);
+                if (player.hasVehicle()) {
+                    net.minecraft.entity.Entity vehicle = player.getVehicle();
+                    if (vehicle != null && vehicle.getControllingPassenger() == player) {
+                        applyBorderForce(vehicle);
+                    }
+                } else {
+                    applyBorderForce(player);
+                }
             }
 
             // Handle mobs in all worlds
@@ -39,7 +46,18 @@ public class WorldBorderHandler {
                 // Now process them safely
                 for (MobEntity mob : mobs) {
                     if (!mob.isRemoved()) { // Check if still exists
-                        handleMobBorder(mob);
+                        boolean handled = false;
+                        if (mob.hasVehicle()) {
+                            net.minecraft.entity.Entity vehicle = mob.getVehicle();
+                            if (vehicle != null && vehicle.getControllingPassenger() == mob) {
+                                applyBorderForce(vehicle);
+                                handled = true;
+                            }
+                        }
+
+                        if (!handled) {
+                            handleMobBorder(mob);
+                        }
                     }
                 }
             }
@@ -135,6 +153,8 @@ public class WorldBorderHandler {
 
             if (entity instanceof ServerPlayerEntity player) {
                 player.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(player));
+            } else if (entity.getEntityWorld() instanceof ServerWorld serverWorld) {
+                serverWorld.getChunkManager().sendToNearbyPlayers(entity, new EntityVelocityUpdateS2CPacket(entity));
             }
         }
     }

@@ -79,5 +79,6 @@
   "item.deeperdark.leather_scrap": "Leather Scrap",
   "container.stonecutter": "Circular Saw",
   "block.minecraft.stonecutter": "Circular Saw",
-  "subtitles.block.note_block.organ": "Organ plays"
+  "subtitles.block.note_block.organ": "Organ plays",
+  "subtitles.deeperdark.block.crafting_table.craft": "Crafting"
 }

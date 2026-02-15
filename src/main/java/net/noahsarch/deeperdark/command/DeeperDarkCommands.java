@@ -193,7 +193,61 @@ public class DeeperDarkCommands {
                 .then(CommandManager.literal("explosionItemKnockbackMultiplier")
                     .executes(ctx -> executeConfigQuery(ctx, "explosionItemKnockbackMultiplier"))
                     .then(CommandManager.argument("value", DoubleArgumentType.doubleArg(1.0))
-                        .executes(ctx -> executeConfigDouble(ctx, "explosionItemKnockbackMultiplier")))))
+                        .executes(ctx -> executeConfigDouble(ctx, "explosionItemKnockbackMultiplier"))))
+
+                // Piston settings
+                .then(CommandManager.literal("pistonPushLimit")
+                    .executes(ctx -> executeConfigQuery(ctx, "pistonPushLimit"))
+                    .then(CommandManager.argument("value", IntegerArgumentType.integer(1, 1000))
+                        .executes(ctx -> executeConfigInt(ctx, "pistonPushLimit"))))
+
+                // Enderman settings
+                .then(CommandManager.literal("endermanPickUpAllBlocks")
+                    .executes(ctx -> executeConfigQuery(ctx, "endermanPickUpAllBlocks"))
+                    .then(CommandManager.argument("value", BoolArgumentType.bool())
+                        .executes(ctx -> executeConfigBoolean(ctx, "endermanPickUpAllBlocks"))))
+
+                // Baby mob settings
+                .then(CommandManager.literal("babySkeletonsEnabled")
+                    .executes(ctx -> executeConfigQuery(ctx, "babySkeletonsEnabled"))
+                    .then(CommandManager.argument("value", BoolArgumentType.bool())
+                        .executes(ctx -> executeConfigBoolean(ctx, "babySkeletonsEnabled"))))
+                .then(CommandManager.literal("babyCreepersEnabled")
+                    .executes(ctx -> executeConfigQuery(ctx, "babyCreepersEnabled"))
+                    .then(CommandManager.argument("value", BoolArgumentType.bool())
+                        .executes(ctx -> executeConfigBoolean(ctx, "babyCreepersEnabled"))))
+
+                // Fishing settings
+                .then(CommandManager.literal("fishingChargedCreeperChance")
+                    .executes(ctx -> executeConfigQuery(ctx, "fishingChargedCreeperChance"))
+                    .then(CommandManager.argument("value", IntegerArgumentType.integer(1))
+                        .executes(ctx -> executeConfigInt(ctx, "fishingChargedCreeperChance"))))
+
+                // Moss growth settings
+                .then(CommandManager.literal("mossGrowthEnabled")
+                    .executes(ctx -> executeConfigQuery(ctx, "mossGrowthEnabled"))
+                    .then(CommandManager.argument("value", BoolArgumentType.bool())
+                        .executes(ctx -> executeConfigBoolean(ctx, "mossGrowthEnabled"))))
+                .then(CommandManager.literal("mossTickCheckFrequency")
+                    .executes(ctx -> executeConfigQuery(ctx, "mossTickCheckFrequency"))
+                    .then(CommandManager.argument("value", IntegerArgumentType.integer(1))
+                        .executes(ctx -> executeConfigInt(ctx, "mossTickCheckFrequency"))))
+                .then(CommandManager.literal("mossBaseChance")
+                    .executes(ctx -> executeConfigQuery(ctx, "mossBaseChance"))
+                    .then(CommandManager.argument("value", DoubleArgumentType.doubleArg(0.0, 1.0))
+                        .executes(ctx -> executeConfigDouble(ctx, "mossBaseChance"))))
+                .then(CommandManager.literal("mossNearbyBonus")
+                    .executes(ctx -> executeConfigQuery(ctx, "mossNearbyBonus"))
+                    .then(CommandManager.argument("value", DoubleArgumentType.doubleArg(0.0, 1.0))
+                        .executes(ctx -> executeConfigDouble(ctx, "mossNearbyBonus"))))
+                .then(CommandManager.literal("mossUnderwaterMultiplier")
+                    .executes(ctx -> executeConfigQuery(ctx, "mossUnderwaterMultiplier"))
+                    .then(CommandManager.argument("value", DoubleArgumentType.doubleArg(0.1))
+                        .executes(ctx -> executeConfigDouble(ctx, "mossUnderwaterMultiplier"))))
+                .then(CommandManager.literal("stoneBrickMossMultiplier")
+                    .executes(ctx -> executeConfigQuery(ctx, "stoneBrickMossMultiplier"))
+                    .then(CommandManager.argument("value", DoubleArgumentType.doubleArg(0.0))
+                        .executes(ctx -> executeConfigDouble(ctx, "stoneBrickMossMultiplier")))))
 
             // dd reload - Reload configuration from disk
             .then(CommandManager.literal("reload")
@@ -334,6 +388,22 @@ public class DeeperDarkCommands {
             .append(Text.literal("\n\n--- Explosion Settings ---").formatted(Formatting.YELLOW))
             .append(formatConfigLine("explosionItemKnockbackEnabled", config.explosionItemKnockbackEnabled))
             .append(formatConfigLine("explosionItemKnockbackMultiplier", config.explosionItemKnockbackMultiplier))
+            .append(Text.literal("\n\n--- Piston Settings ---").formatted(Formatting.YELLOW))
+            .append(formatConfigLine("pistonPushLimit", config.pistonPushLimit))
+            .append(Text.literal("\n\n--- Enderman Settings ---").formatted(Formatting.YELLOW))
+            .append(formatConfigLine("endermanPickUpAllBlocks", config.endermanPickUpAllBlocks))
+            .append(Text.literal("\n\n--- Baby Mob Settings ---").formatted(Formatting.YELLOW))
+            .append(formatConfigLine("babySkeletonsEnabled", config.babySkeletonsEnabled))
+            .append(formatConfigLine("babyCreepersEnabled", config.babyCreepersEnabled))
+            .append(Text.literal("\n\n--- Fishing Settings ---").formatted(Formatting.YELLOW))
+            .append(formatConfigLine("fishingChargedCreeperChance", config.fishingChargedCreeperChance))
+            .append(Text.literal("\n\n--- Moss Growth Settings ---").formatted(Formatting.YELLOW))
+            .append(formatConfigLine("mossGrowthEnabled", config.mossGrowthEnabled))
+            .append(formatConfigLine("mossTickCheckFrequency", config.mossTickCheckFrequency))
+            .append(formatConfigLine("mossBaseChance", config.mossBaseChance))
+            .append(formatConfigLine("mossNearbyBonus", config.mossNearbyBonus))
+            .append(formatConfigLine("mossUnderwaterMultiplier", config.mossUnderwaterMultiplier))
+            .append(formatConfigLine("stoneBrickMossMultiplier", config.stoneBrickMossMultiplier))
             .append(Text.literal("\n\nUse /dd config <setting> [value] to change or query settings").formatted(Formatting.GRAY)), false);
         return 1;
     }
@@ -351,14 +421,25 @@ public class DeeperDarkCommands {
             case "pushSurvivalModeOnly" -> config.pushSurvivalModeOnly;
             case "customFortuneEnabled" -> config.customFortuneEnabled;
             case "explosionItemKnockbackEnabled" -> config.explosionItemKnockbackEnabled;
+            case "endermanPickUpAllBlocks" -> config.endermanPickUpAllBlocks;
+            case "babySkeletonsEnabled" -> config.babySkeletonsEnabled;
+            case "babyCreepersEnabled" -> config.babyCreepersEnabled;
+            case "mossGrowthEnabled" -> config.mossGrowthEnabled;
             case "creeperEffectMinSeconds" -> config.creeperEffectMinSeconds;
             case "creeperEffectMaxSeconds" -> config.creeperEffectMaxSeconds;
             case "fortuneMaxDrops" -> config.fortuneMaxDrops;
+            case "pistonPushLimit" -> config.pistonPushLimit;
+            case "fishingChargedCreeperChance" -> config.fishingChargedCreeperChance;
+            case "mossTickCheckFrequency" -> config.mossTickCheckFrequency;
             case "fortune1DropChance" -> config.fortune1DropChance;
             case "fortune2DropChance" -> config.fortune2DropChance;
             case "fortune3DropChance" -> config.fortune3DropChance;
             case "explosionItemKnockbackMultiplier" -> config.explosionItemKnockbackMultiplier;
             case "netherCoordinateMultiplier" -> config.netherCoordinateMultiplier;
+            case "mossBaseChance" -> config.mossBaseChance;
+            case "mossNearbyBonus" -> config.mossNearbyBonus;
+            case "mossUnderwaterMultiplier" -> config.mossUnderwaterMultiplier;
+            case "stoneBrickMossMultiplier" -> config.stoneBrickMossMultiplier;
             default -> {
                 source.sendError(Text.literal("Unknown config key: " + configKey).formatted(Formatting.RED));
                 yield null;
@@ -382,6 +463,10 @@ public class DeeperDarkCommands {
             case "pushSurvivalModeOnly" -> config.pushSurvivalModeOnly = value;
             case "customFortuneEnabled" -> config.customFortuneEnabled = value;
             case "explosionItemKnockbackEnabled" -> config.explosionItemKnockbackEnabled = value;
+            case "endermanPickUpAllBlocks" -> config.endermanPickUpAllBlocks = value;
+            case "babySkeletonsEnabled" -> config.babySkeletonsEnabled = value;
+            case "babyCreepersEnabled" -> config.babyCreepersEnabled = value;
+            case "mossGrowthEnabled" -> config.mossGrowthEnabled = value;
             default -> {
                 source.sendError(Text.literal("Unknown config key: " + configKey).formatted(Formatting.RED));
                 return 0;
@@ -405,6 +490,9 @@ public class DeeperDarkCommands {
             case "creeperEffectMinSeconds" -> config.creeperEffectMinSeconds = value;
             case "creeperEffectMaxSeconds" -> config.creeperEffectMaxSeconds = value;
             case "fortuneMaxDrops" -> config.fortuneMaxDrops = value;
+            case "pistonPushLimit" -> config.pistonPushLimit = value;
+            case "fishingChargedCreeperChance" -> config.fishingChargedCreeperChance = value;
+            case "mossTickCheckFrequency" -> config.mossTickCheckFrequency = value;
             default -> {
                 source.sendError(Text.literal("Unknown config key: " + configKey).formatted(Formatting.RED));
                 return 0;
@@ -430,6 +518,10 @@ public class DeeperDarkCommands {
             case "fortune3DropChance" -> config.fortune3DropChance = value;
             case "explosionItemKnockbackMultiplier" -> config.explosionItemKnockbackMultiplier = value;
             case "netherCoordinateMultiplier" -> config.netherCoordinateMultiplier = value;
+            case "mossBaseChance" -> config.mossBaseChance = value;
+            case "mossNearbyBonus" -> config.mossNearbyBonus = value;
+            case "mossUnderwaterMultiplier" -> config.mossUnderwaterMultiplier = value;
+            case "stoneBrickMossMultiplier" -> config.stoneBrickMossMultiplier = value;
             default -> {
                 source.sendError(Text.literal("Unknown config key: " + configKey).formatted(Formatting.RED));
                 return 0;

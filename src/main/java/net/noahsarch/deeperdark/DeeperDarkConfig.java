@@ -45,6 +45,27 @@ public class DeeperDarkConfig {
         // Explosion item knockback configuration
         public boolean explosionItemKnockbackEnabled = false; // If true, items get extra velocity from explosions
         public double explosionItemKnockbackMultiplier = 3.0; // Multiplier for explosion knockback on items (1.0 = normal, 3.0 = 3x farther)
+
+        // Piston push limit (vanilla default is 12)
+        public int pistonPushLimit = 12;
+
+        // Enderman configuration
+        public boolean endermanPickUpAllBlocks = false; // If true, endermen can pick up any non-bedrock block
+
+        // Baby mob spawning configuration
+        public boolean babySkeletonsEnabled = true; // If true, baby skeletons can spawn
+        public boolean babyCreepersEnabled = true; // If true, baby creepers can spawn
+
+        // Fishing configuration
+        public int fishingChargedCreeperChance = 5000; // 1 in X chance to fish up a charged creeper
+
+        // Cobblestone/stone brick mossing configuration
+        public boolean mossGrowthEnabled = true; // If true, cobblestone and stone bricks slowly moss over time
+        public int mossTickCheckFrequency = 3; // How many random ticks to skip between checks (higher = slower)
+        public double mossBaseChance = 0.001; // Base chance per valid tick to moss (very low for 5-10 day timing)
+        public double mossNearbyBonus = 0.05; // Additional chance per nearby mossy block
+        public double mossUnderwaterMultiplier = 3.0; // Multiplier for mossing speed when underwater
+        public double stoneBrickMossMultiplier = 0.5; // Multiplier for stone brick mossing speed (slower than cobble)
     }
 
     public static void load() {
@@ -125,6 +146,28 @@ public class DeeperDarkConfig {
                     # explosionItemKnockbackEnabled: if true, items are amplified by explosions and fly farther (default: false)
                     # explosionItemKnockbackMultiplier: how much to multiply explosion knockback on items (1.0 = normal, 3.0 = 3x farther, 5.0 = extreme)
                     # NOTE: Items are never destroyed by explosions, but this makes them scatter more dramatically when enabled
+                    #
+                    # Piston Configuration:
+                    # pistonPushLimit: maximum number of blocks a piston can push (vanilla default: 12)
+                    #
+                    # Enderman Configuration:
+                    # endermanPickUpAllBlocks: if true, endermen can pick up any block except bedrock (default: false)
+                    #
+                    # Baby Mob Configuration:
+                    # babySkeletonsEnabled: if true, skeletons have a 5% chance to spawn as babies (default: true)
+                    # babyCreepersEnabled: if true, creepers have a 5% chance to spawn as babies (default: true)
+                    # NOTE: Baby creepers have 1/5 explosion radius, pitched-up sounds, and poof particles instead of explosion
+                    #
+                    # Fishing Configuration:
+                    # fishingChargedCreeperChance: 1 in X chance to fish up a charged creeper instead of loot (default: 5000)
+                    #
+                    # Moss Growth Configuration:
+                    # mossGrowthEnabled: if true, cobblestone and stone bricks slowly moss over time (default: true)
+                    # mossTickCheckFrequency: how many random ticks to skip between moss checks (higher = slower, default: 3)
+                    # mossBaseChance: base probability per valid tick to convert to mossy (default: 0.001 for ~5-10 in-game days)
+                    # mossNearbyBonus: additional chance per adjacent mossy block (default: 0.05)
+                    # mossUnderwaterMultiplier: multiplier for mossing speed when underwater (default: 3.0)
+                    # stoneBrickMossMultiplier: multiplier for stone brick mossing (default: 0.5, twice as slow as cobble)
                     #
                     """;
 

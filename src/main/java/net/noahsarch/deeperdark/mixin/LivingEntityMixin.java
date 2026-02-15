@@ -3,7 +3,9 @@ package net.noahsarch.deeperdark.mixin;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.entity.mob.CreeperEntity;
 import net.minecraft.entity.mob.SkeletonEntity;
+import net.noahsarch.deeperdark.util.BabyCreeperAccessor;
 import net.noahsarch.deeperdark.util.BabySkeletonAccessor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -48,8 +50,18 @@ public class LivingEntityMixin {
     @Inject(method = "getSoundPitch", at = @At("RETURN"), cancellable = true)
     private void deeperdark$getSoundPitch(CallbackInfoReturnable<Float> cir) {
         LivingEntity self = (LivingEntity) (Object) this;
+
+        // Baby skeleton sounds
         if (self instanceof SkeletonEntity && self instanceof BabySkeletonAccessor accessor) {
             if (accessor.deeperdark$isBaby()) {
+                // Baby pitch logic: (random.nextFloat() - random.nextFloat()) * 0.2F + 1.5F
+                cir.setReturnValue((self.getRandom().nextFloat() - self.getRandom().nextFloat()) * 0.2F + 1.5F);
+            }
+        }
+
+        // Baby creeper sounds
+        if (self instanceof CreeperEntity && self instanceof BabyCreeperAccessor accessor) {
+            if (accessor.deeperdark$isBabyCreeper()) {
                 // Baby pitch logic: (random.nextFloat() - random.nextFloat()) * 0.2F + 1.5F
                 cir.setReturnValue((self.getRandom().nextFloat() - self.getRandom().nextFloat()) * 0.2F + 1.5F);
             }

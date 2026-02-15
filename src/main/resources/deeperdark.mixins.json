@@ -64,7 +64,11 @@
     "SimpleStructurePieceAccessor",
     "StructurePiecesCollectorAccessor",
     "WoodlandMansionStructureMixin",
-    "ExplosionImplMixin"
+    "ExplosionImplMixin",
+    "PistonHandlerMixin",
+    "EndermanPickUpBlockMixin",
+    "FishingBobberEntityMixin",
+    "CraftingResultSlotMixin"
   ],
   "injectors": {
     "defaultRequire": 1

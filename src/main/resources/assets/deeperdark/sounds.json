@@ -4,5 +4,13 @@
       "deeperdark:block/note_block/organ"
     ],
     "subtitle": "subtitles.block.note_block.note"
+  },
+  "block.crafting_table.craft": {
+    "sounds": [
+      "deeperdark:block/crafting_table/craft1",
+      "deeperdark:block/crafting_table/craft2",
+      "deeperdark:block/crafting_table/craft3"
+    ],
+    "subtitle": "subtitles.deeperdark.block.crafting_table.craft"
   }
 }
