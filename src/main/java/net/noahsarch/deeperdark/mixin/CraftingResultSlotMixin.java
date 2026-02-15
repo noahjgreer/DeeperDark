@@ -21,6 +21,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.Map;
+import java.util.UUID;
+import java.util.WeakHashMap;
+
 /**
  * Mixin to play a sound when players craft items on the crafting table.
  * Uses the same Direct RegistryEntry approach as the organ noteblock sound.
@@ -34,13 +38,36 @@ public class CraftingResultSlotMixin {
     private static final Identifier CRAFTING_SOUND_ID = Identifier.of(Deeperdark.MOD_ID, "block.crafting_table.craft");
 
     /**
-     * Play crafting sound when item is taken from crafting result slot
+     * Debounce map to track last craft time per player UUID.
+     * Prevents sound spam when shift-clicking to craft multiple items.
+     */
+    @Unique
+    private static final Map<UUID, Long> LAST_CRAFT_TIME = new WeakHashMap<>();
+
+    /**
+     * Minimum time between craft sounds in milliseconds.
+     * 200ms is enough to prevent spam while still feeling responsive.
+     */
+    @Unique
+    private static final long CRAFT_SOUND_COOLDOWN_MS = 200;
+
+    /**
+     * Play crafting sound when item is taken from crafting result slot.
+     * Uses debouncing to prevent sound spam when shift-clicking to craft multiple items.
      */
     @Inject(method = "onTakeItem", at = @At("HEAD"))
     private void deeperdark$playCraftingSound(PlayerEntity player, ItemStack stack, CallbackInfo ci) {
         World world = ((EntityAccessor)player).deeperdark$getWorld();
         if (player instanceof ServerPlayerEntity serverPlayer && world instanceof ServerWorld serverWorld) {
-            deeperdark$sendCraftingSound(serverWorld, serverPlayer);
+            // Check debounce - only play sound if enough time has passed since last craft
+            UUID playerUUID = player.getUuid();
+            long currentTime = System.currentTimeMillis();
+            Long lastCraftTime = LAST_CRAFT_TIME.get(playerUUID);
+
+            if (lastCraftTime == null || (currentTime - lastCraftTime) >= CRAFT_SOUND_COOLDOWN_MS) {
+                LAST_CRAFT_TIME.put(playerUUID, currentTime);
+                deeperdark$sendCraftingSound(serverWorld, serverPlayer);
+            }
         }
     }
 
