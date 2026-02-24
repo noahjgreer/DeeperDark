@@ -15,7 +15,7 @@ The creature comes in four different variants. They are found in the mod's asset
 Regardless of the file chosen, the png will always be in a 1:2 ratio, (usually at a resolution of 512 x 1024).
 
 ## Entity
-The creature entity appears as a billboard, (no pitch, only yaw.) The creature will be 3 blocks in height, so scaled 1 + 1/3 it's default item model height, which is a 1 x 2 block or 16 x 32 pixel model. 
+The creature entity appears as a billboard, (no pitch, only yaw.) (Utilizing an Item Display Entity) The creature will be 3 blocks in height, so scaled 1 + 1/3 it's default item model height, which is a 1 x 2 block or 16 x 32 pixel model. 
 
 # Behavior
 ## Spawning
@@ -176,6 +176,7 @@ All functions of the creature system will be configurable through the Deeper Dar
 | | - projectile_rejection_chance [1.0]
 | | - projectile_rejection_delay [4 ticks]
 | | - despawn_delay [12000]
+| | - enable_debug_logging
 | - clear (Removes all creatures in the world)
 | - list (Lists all creatures and their behaviors)
 |   [Creature UUID]

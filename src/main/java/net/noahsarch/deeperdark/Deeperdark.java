@@ -122,5 +122,8 @@ public class Deeperdark implements ModInitializer {
 		// Register moss growth handler for cobblestone/stone brick mossing
 		net.noahsarch.deeperdark.event.MossGrowthHandler.register();
 
+		// Register creature system
+		net.noahsarch.deeperdark.creature.CreatureManager.register();
+
 	}
 }

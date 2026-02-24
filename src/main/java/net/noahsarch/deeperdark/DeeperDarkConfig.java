@@ -69,6 +69,9 @@ public class DeeperDarkConfig {
 
         // Zombie behavior configuration
         public double zombieFollowRange = 35.0; // How far zombies can detect and track players (vanilla default: 35.0)
+
+        // Creature configuration
+        public net.noahsarch.deeperdark.creature.CreatureConfig creature = new net.noahsarch.deeperdark.creature.CreatureConfig();
     }
 
     public static void load() {

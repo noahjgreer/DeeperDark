@@ -257,7 +257,10 @@ public class DeeperDarkCommands {
 
             // dd reload - Reload configuration from disk
             .then(CommandManager.literal("reload")
-                .executes(DeeperDarkCommands::executeReload)));
+                .executes(DeeperDarkCommands::executeReload))
+
+            // dd creature - Creature system commands
+            .then(net.noahsarch.deeperdark.creature.CreatureCommands.buildCreatureCommand()));
     }
 
     // ===== Suggestions =====
