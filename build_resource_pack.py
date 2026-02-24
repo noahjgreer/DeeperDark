@@ -36,9 +36,9 @@ RESOURCE_PACK_URL_BASE = "https://muffinmode.net/"
 # File extensions to exclude from the resource pack
 EXCLUDED_EXTENSIONS = {
     # Audio source files
-    '.wav', '.aup', '.aup3', '.aup3-shm', '.aup3-wal', '.mp3', '.flac', '.au', '.aiff', '.wma', '.m4a',
+    '.wav', '.aup', '.aup3', '.aup3-shm', '.aup3-wal', '.mp3', '.flac', '.au', '.aiff', '.wma', '.m4a', '.opus',
     # Image source files
-    '.psd', '.xcf', '.ai', '.svg', '.raw', '.ase', '.aseprite',
+    '.psd', '.xcf', '.ai', '.svg', '.raw', '.ase', '.aseprite', '.pdn',
     # 3D model source files
     '.bbmodel', '.blend', '.blend1', '.fbx', '.obj', '.mtl',
     # Temporary files

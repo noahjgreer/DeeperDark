@@ -1,0 +1,15 @@
+I have been working on a Minecraft mod that is completely serverside, only dependent on a client resource pack, for quite a while. My friends have been enjoying it a lot, and now I want to start adding some more spooky undertones. 
+
+I want you to add a spooky creature into the game. Now, I know this will be challenging given that we have to basically use vanilla tricks in order to accomplish everything, since we can't add new entities since that would require client registries. 
+
+I want a creature that appears only in caves. I want him to be pretty rare. I want all of his settings to be configurable using the 'dd creature' command. I want the creature to be 3 blocks tall, and appear far away from the player, almost unnoticable. I want it to disappear as soon as it is looked at. I want the creature to play one of the ambient sounds in the deeperdark/sounds/ambient/creature folder, that will be bundled in the resource pack. For playing sounds, we have used a workaround before (for custom noteblocks and crafting table sounds) that doesn't include registering the sound. I would also appreciate if you edited the language file so that these ambient files appear as "eerie noise" if a player has captions on. I only want the sound to be played when a player is within 50 blocks of the creature. I only want it to play to *one* player. Not more than one, even if there are several in the radius. 
+
+I want the creature to kind of hide behind corners and stuff. Or, against walls. I don't want him just standing out in the open. I want him to be trying to conceal himself.
+
+I want the entity itself to be like, and item display I think? Basically, I have a texture in assets/minecraft/textures/entity/creature.png that I want to be a billboard, so it always faces the player. 
+
+Please try and implement all of these things, and I'll test it out and give it ago. Can you also make sure there are some basic debug features, like, a 'dd creature generateNearPlayer' command where it will immediately run the function that spawns the entity within a valid position within a radius of a random player (unless a playername is specified in the generateNearPlayer arguments), instead of having to wait for the random appearance? Another debug boolean, could you make it so that there is the option of making the entity have the "glowing effect" so that its position can be seen for debugging purposes? Please also make sure the entity doesn't disappear if spectators are looking at it. It doesn't care about them.
+
+Please also implement any other debug features, and features in general, that you think would be useful. Thanks!
+
+For your convenience and understanding, I have attached the entire project's source code so you can get an understanding of the project structure. I have also attached ref-decompiled, which is a decompiled version of the minecraft code base. Please reference it thoroughly to ensure we have the best approach for certain tasks. Execute terminal commands as you need to as well. Thank you!

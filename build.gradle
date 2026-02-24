@@ -44,6 +44,17 @@ processResources {
 	filesMatching("fabric.mod.json") {
 		expand "version": inputs.properties.version
 	}
+
+	// Exclude workflow/source files that bloat the jar (mirrors build_resource_pack.py exclusions)
+	exclude "**/*.wav", "**/*.aup", "**/*.aup3", "**/*.aup3-shm", "**/*.aup3-wal"
+	exclude "**/*.mp3", "**/*.flac", "**/*.au", "**/*.aiff", "**/*.wma", "**/*.m4a", "**/*.opus"
+	exclude "**/*.psd", "**/*.xcf", "**/*.ai", "**/*.svg", "**/*.raw"
+	exclude "**/*.ase", "**/*.aseprite", "**/*.pdn"
+	exclude "**/*.bbmodel", "**/*.blend", "**/*.blend1", "**/*.fbx", "**/*.obj", "**/*.mtl"
+	exclude "**/*.bak", "**/*.tmp", "**/*.temp", "**/*.swp", "**/*.swo"
+	exclude "**/*.py", "**/*.ps1", "**/*.sh", "**/*.bat", "**/*.cmd"
+	exclude "**/*.md", "**/*.log"
+	exclude "**/Thumbs.db", "**/.DS_Store", "**/desktop.ini"
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -54,7 +65,7 @@ java {
 	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
 	// if it is present.
 	// If you remove this line, sources will not be generated.
-	withSourcesJar()
+	//	withSourcesJar()
 
 	sourceCompatibility = JavaVersion.VERSION_21
 	targetCompatibility = JavaVersion.VERSION_21

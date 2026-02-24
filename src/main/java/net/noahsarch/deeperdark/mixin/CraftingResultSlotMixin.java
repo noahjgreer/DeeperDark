@@ -84,7 +84,7 @@ public class CraftingResultSlotMixin {
         double x = crafter.getX();
         double y = crafter.getY();
         double z = crafter.getZ();
-        float volume = 0.8F;
+        float volume = 0.5F;
         float pitch = 0.9F + world.getRandom().nextFloat() * 0.2F; // Slight random pitch variation
         long seed = world.getRandom().nextLong();
 

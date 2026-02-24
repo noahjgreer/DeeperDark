@@ -12,5 +12,77 @@
       "deeperdark:block/crafting_table/craft3"
     ],
     "subtitle": "subtitles.deeperdark.block.crafting_table.craft"
+  },
+  "ambient.creature.ambience0": {
+    "sounds": [
+      {
+        "name": "deeperdark:ambient/creature/ambience0",
+        "attenuation_distance": 50
+      }
+    ],
+    "subtitle": "subtitles.deeperdark.ambient.creature"
+  },
+  "ambient.creature.ambience1": {
+    "sounds": [
+      {
+        "name": "deeperdark:ambient/creature/ambience1",
+        "attenuation_distance": 50
+      }
+    ],
+    "subtitle": "subtitles.deeperdark.ambient.creature"
+  },
+  "ambient.creature.ambience2": {
+    "sounds": [
+      {
+        "name": "deeperdark:ambient/creature/ambience2",
+        "attenuation_distance": 50
+      }
+    ],
+    "subtitle": "subtitles.deeperdark.ambient.creature"
+  },
+  "ambient.creature.ambience3": {
+    "sounds": [
+      {
+        "name": "deeperdark:ambient/creature/ambience3",
+        "attenuation_distance": 50
+      }
+    ],
+    "subtitle": "subtitles.deeperdark.ambient.creature"
+  },
+  "ambient.creature.ambience4": {
+    "sounds": [
+      {
+        "name": "deeperdark:ambient/creature/ambience4",
+        "attenuation_distance": 50
+      }
+    ],
+    "subtitle": "subtitles.deeperdark.ambient.creature"
+  },
+  "ambient.creature.ambience5": {
+    "sounds": [
+      {
+        "name": "deeperdark:ambient/creature/ambience5",
+        "attenuation_distance": 50
+      }
+    ],
+    "subtitle": "subtitles.deeperdark.ambient.creature"
+  },
+  "ambient.creature.ambience6": {
+    "sounds": [
+      {
+        "name": "deeperdark:ambient/creature/ambience6",
+        "attenuation_distance": 50
+      }
+    ],
+    "subtitle": "subtitles.deeperdark.ambient.creature"
+  },
+  "entity.creature.hush0": {
+    "sounds": [
+      {
+        "name": "deeperdark:entity/creature/hush/hush0",
+        "attenuation_distance": 16
+      }
+    ],
+    "subtitle": "subtitles.deeperdark.entity.creature.hush"
   }
 }
