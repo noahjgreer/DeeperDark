@@ -71,6 +71,9 @@ public class CreatureInstance {
     private boolean willEcho = true;
     private boolean willRejectProjectiles = true;
 
+    // ===== On-Screen Tracking =====
+    private int onScreenTicks = 0;
+
     // ===== Chase State =====
     private UUID targetPlayerUuid = null;
     private String targetPlayerName = null;
@@ -126,6 +129,7 @@ public class CreatureInstance {
     public int getDespawnTimer() { return despawnTimer; }
     public double getCurrentJitterX() { return currentJitterX; }
     public double getCurrentJitterZ() { return currentJitterZ; }
+    public int getOnScreenTicks() { return onScreenTicks; }
 
     // ===== Setters =====
 
@@ -168,6 +172,8 @@ public class CreatureInstance {
     public void setDespawnTimer(int timer) { this.despawnTimer = timer; }
     public void setCurrentJitterX(double jitter) { this.currentJitterX = jitter; }
     public void setCurrentJitterZ(double jitter) { this.currentJitterZ = jitter; }
+    public void setOnScreenTicks(int ticks) { this.onScreenTicks = ticks; }
+    public void incrementOnScreenTicks() { this.onScreenTicks++; }
 
     // ===== Tick Helpers =====
 

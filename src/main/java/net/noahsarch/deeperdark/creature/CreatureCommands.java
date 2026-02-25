@@ -81,6 +81,7 @@ public class CreatureCommands {
                 .then(configInt("evasion_timer", 1, 100000))
                 .then(configInt("projectile_rejection_delay", 0, 200))
                 .then(configInt("despawn_delay", 1, 1000000))
+                .then(configInt("on_screen_tolerance", 1, 1000))
                 .then(configInt("debug_path_duration", 1, 60))
 
                 // Double configs
@@ -279,6 +280,7 @@ public class CreatureCommands {
             case "evasion_timer" -> config.evasionTimer;
             case "projectile_rejection_delay" -> config.projectileRejectionDelay;
             case "despawn_delay" -> config.despawnDelay;
+            case "on_screen_tolerance" -> config.onScreenTolerance;
             case "debug_path_duration" -> config.debugPathDuration;
             default -> 0;
         };
@@ -298,6 +300,7 @@ public class CreatureCommands {
             case "evasion_timer" -> config.evasionTimer = value;
             case "projectile_rejection_delay" -> config.projectileRejectionDelay = value;
             case "despawn_delay" -> config.despawnDelay = value;
+            case "on_screen_tolerance" -> config.onScreenTolerance = value;
             case "debug_path_duration" -> config.debugPathDuration = value;
         }
     }

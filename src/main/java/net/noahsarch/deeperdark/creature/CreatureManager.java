@@ -365,6 +365,9 @@ public class CreatureManager {
     private static void tickIdle(CreatureInstance creature, MinecraftServer server, CreatureConfig config, boolean debug) {
         ServerWorld world = creature.getWorld();
         Vec3d creaturePos = creature.getPosition();
+        boolean creatureOnAnyScreen = false;
+        ServerPlayerEntity closestScreenPlayer = null;
+        double closestScreenDist = Double.MAX_VALUE;
 
         // Check all players for proximity triggers
         for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
@@ -373,22 +376,31 @@ public class CreatureManager {
 
             double distance = player.getEntityPos().distanceTo(creaturePos);
 
-            // Direct interaction check: player within tolerance distance or looking directly at creature
+            // Direct interaction check: player within tolerance distance
             if (distance <= config.playerDistanceTolerance) {
                 triggerInteraction(creature, player, config, debug);
                 return;
             }
 
-            // Line of sight check
+            // Direct look = immediate interaction for all creature types
             if (isPlayerLookingAtCreature(player, creaturePos, world)) {
                 triggerInteraction(creature, player, config, debug);
                 return;
             }
 
+            // On-screen check for non-chase creatures (view tolerance)
+            if (!creature.willChase() && isCreatureOnPlayerScreen(player, creaturePos, world)) {
+                creatureOnAnyScreen = true;
+                if (distance < closestScreenDist) {
+                    closestScreenDist = distance;
+                    closestScreenPlayer = player;
+                }
+            }
+
             // Ambience sound trigger
             if (!creature.isAmbienceSoundPlayed() && distance <= config.pathfindingMinDist) {
                 if (debug) LOGGER.info("[Creature] Player {} within ambience range ({} blocks)", player.getName().getString(), distance);
-                int variant = world.getRandom().nextInt(7);
+                int variant = world.getRandom().nextInt(8);
                 creature.setAmbienceSoundVariant(variant);
                 float volume = CreatureSoundHelper.calculateAmbienceVolume(distance, config.pathfindingMinDist);
                 CreatureSoundHelper.playAmbienceSound(player, variant, creaturePos, volume);
@@ -396,6 +408,19 @@ public class CreatureManager {
                 creature.setCurrentSequence(CreatureInstance.Sequence.AMBIENT_SOUND);
                 if (debug) LOGGER.info("[Creature] Playing ambience{} to {} at volume {}", variant, player.getName().getString(), volume);
             }
+        }
+
+        // On-screen tolerance: non-chase creatures despawn after being visible for too long
+        if (creatureOnAnyScreen) {
+            creature.incrementOnScreenTicks();
+            if (creature.getOnScreenTicks() >= config.onScreenTolerance && closestScreenPlayer != null) {
+                if (debug) LOGGER.info("[Creature] Non-chase creature {} despawning after {} ticks on screen",
+                        creature.getCreatureId().toString().substring(0, 8), creature.getOnScreenTicks());
+                triggerDefaultDisappear(creature, closestScreenPlayer, config, debug);
+                return;
+            }
+        } else {
+            creature.setOnScreenTicks(0);
         }
 
         // Handle shaking/jitter based on player visibility
@@ -407,6 +432,9 @@ public class CreatureManager {
     private static void tickIdleBehaviors(CreatureInstance creature, MinecraftServer server, CreatureConfig config, boolean debug) {
         ServerWorld world = creature.getWorld();
         Vec3d creaturePos = creature.getPosition();
+        boolean creatureOnAnyScreen = false;
+        ServerPlayerEntity closestScreenPlayer = null;
+        double closestScreenDist = Double.MAX_VALUE;
 
         for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
             if (player.getEntityWorld() != world) continue;
@@ -420,10 +448,19 @@ public class CreatureManager {
                 return;
             }
 
-            // Line of sight check
+            // Direct look = immediate interaction for all creature types
             if (isPlayerLookingAtCreature(player, creaturePos, world)) {
                 triggerInteraction(creature, player, config, debug);
                 return;
+            }
+
+            // On-screen check for non-chase creatures (view tolerance)
+            if (!creature.willChase() && isCreatureOnPlayerScreen(player, creaturePos, world)) {
+                creatureOnAnyScreen = true;
+                if (distance < closestScreenDist) {
+                    closestScreenDist = distance;
+                    closestScreenPlayer = player;
+                }
             }
 
             // Copper nugget trail trigger: player within 2/3 of pathfinding radius
@@ -448,6 +485,19 @@ public class CreatureManager {
                     }
                 }
             }
+        }
+
+        // On-screen tolerance: non-chase creatures despawn after being visible for too long
+        if (creatureOnAnyScreen) {
+            creature.incrementOnScreenTicks();
+            if (creature.getOnScreenTicks() >= config.onScreenTolerance && closestScreenPlayer != null) {
+                if (debug) LOGGER.info("[Creature] Non-chase creature {} despawning after {} ticks on screen",
+                        creature.getCreatureId().toString().substring(0, 8), creature.getOnScreenTicks());
+                triggerDefaultDisappear(creature, closestScreenPlayer, config, debug);
+                return;
+            }
+        } else {
+            creature.setOnScreenTicks(0);
         }
 
         // Handle shaking/jitter
@@ -546,9 +596,9 @@ public class CreatureManager {
             return;
         }
 
-        // Jitter logarithmic falloff over 1 second (20 ticks)
-        if (prepTicks <= 20) {
-            double jitterFactor = 1.0 - Math.log(1 + prepTicks) / Math.log(21);
+        // Jitter logarithmic falloff over 2 seconds (40 ticks)
+        if (prepTicks <= 40) {
+            double jitterFactor = 1.0 - Math.log(1 + prepTicks) / Math.log(41);
             creature.setCurrentJitterX(creature.getCurrentJitterX() * jitterFactor);
             creature.setCurrentJitterZ(creature.getCurrentJitterZ() * jitterFactor);
             updateDisplayEntityPosition(creature);
@@ -671,6 +721,12 @@ public class CreatureManager {
         // Play rapid footstep sounds every 2 ticks
         if (creature.getChaseTicks() % 2 == 0) {
             CreatureSoundHelper.playFootstepSound(player, newPos, creature.getWorld());
+        }
+
+        // Continuously suppress ambient/music/weather/hostile/neutral/records sounds every 20 ticks
+        // so any new sounds that start during the chase are immediately silenced
+        if (creature.getChaseTicks() % 20 == 0) {
+            CreatureSoundHelper.stopAllAmbientSoundsForChase(player);
         }
 
         // Check if creature caught the player (within 1.5 blocks)
@@ -809,7 +865,7 @@ public class CreatureManager {
             activeEchoZones.add(new EchoZone(
                     lastPos,
                     creature.getWorld(),
-                    creature.getAmbienceSoundVariant() >= 0 ? creature.getAmbienceSoundVariant() : rand.nextInt(7),
+                    creature.getAmbienceSoundVariant() >= 0 ? creature.getAmbienceSoundVariant() : rand.nextInt(8),
                     600,  // 30 seconds
                     false
             ));
@@ -1129,7 +1185,8 @@ public class CreatureManager {
         }
 
         Vec3d pos = creature.getPosition();
-        display.setPosition(pos.x + creature.getCurrentJitterX(), pos.y, pos.z + creature.getCurrentJitterZ());
+        // Offset Y by +1 so the billboard feet align with the ground level
+        display.setPosition(pos.x + creature.getCurrentJitterX(), pos.y + 0.85, pos.z + creature.getCurrentJitterZ());
 
         // Set up the creature's item model
         ItemStack displayStack = new ItemStack(Items.STICK);
@@ -1205,7 +1262,7 @@ public class CreatureManager {
             Vec3d pos = creature.getPosition();
             display.setPosition(
                     pos.x + creature.getCurrentJitterX(),
-                    pos.y,
+                    pos.y + 0.85,
                     pos.z + creature.getCurrentJitterZ()
             );
             // Re-trigger interpolation for smooth movement
@@ -1282,6 +1339,42 @@ public class CreatureManager {
             double blockDist = eyePos.distanceTo(blockHit.getPos());
             if (blockDist < distance - 0.5) {
                 return false; // View obstructed by a block
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Checks if a creature is visible on a player's screen (within ~55 degree cone and not obscured by blocks),
+     * but NOT necessarily directly looked at. Used for on-screen tolerance timing on non-chase creatures.
+     */
+    private static boolean isCreatureOnPlayerScreen(ServerPlayerEntity player, Vec3d creaturePos, ServerWorld world) {
+        Vec3d eyePos = player.getEyePos();
+        Vec3d toCreature = creaturePos.add(0, 1.5, 0).subtract(eyePos);
+        double distance = toCreature.length();
+        if (distance > 128 || distance < 1) return false;
+
+        Vec3d lookVec = player.getRotationVec(1.0f);
+        Vec3d toCreatureNorm = toCreature.normalize();
+        double dot = lookVec.dotProduct(toCreatureNorm);
+
+        // On screen ≈ within ~55° of look direction (dot > 0.55)
+        if (dot <= 0.55) return false;
+
+        // Check for block obstruction
+        net.minecraft.util.hit.BlockHitResult blockHit = world.raycast(new RaycastContext(
+                eyePos,
+                creaturePos.add(0, 1.5, 0),
+                RaycastContext.ShapeType.COLLIDER,
+                RaycastContext.FluidHandling.NONE,
+                player
+        ));
+
+        if (blockHit.getType() == net.minecraft.util.hit.HitResult.Type.BLOCK) {
+            double blockDist = eyePos.distanceTo(blockHit.getPos());
+            if (blockDist < distance - 0.5) {
+                return false; // View obstructed
             }
         }
 

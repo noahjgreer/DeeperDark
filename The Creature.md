@@ -90,16 +90,20 @@ The chase behavior is an alternate behavior that occurs `40%` of the time.
 #### Preparation Sequence
 When the chase behavior occurs, the following actions are triggered:
 - The player will freeze positionally with their gaze locked at the origin of the creature. 
-- Any jitter present from the creature will logarithmically fall off to 0, in a matter of `1` second.
+- Any jitter present from the creature will logarithmically fall off to 0, in a matter of `2` seconds.
 - The `hush` sound will play.
 - The player will recieve heavy blindness that lasts for `3` seconds.
 
 #### Chase Sequence
 At the end of the preparation sequence, the player will recieve darkness for 30 seconds. The creature will disappear from its original position. During this time, the Pathfinding Algorithm will search for any valid position within a `50` to `80` block chase range and move the creature to there. The creature will then persue the player with adaptive pathfinding, (adapting to updated player positions through movement). The creature will pursue the specific player that looked at it at a rate of `5` blocks per second. 
 
+At the beginning of the chase sequence, a stopsound packet will be sent to the client for all `AMBIENT, MUSIC, WEATHER, HOSTILE, NEUTRAL, and RECORDS` categories. 
+
+During the chase sequence, either to being caught or the end of the 30 seconds, any `AMBIENT, MUSIC, WEATHER, HOSTILE, NEUTRAL, and RECORDS` sounds will be either intercepted from being sent to the client, or stopped immediately through a stopsound packet. 
+
 Rapid, high pitched footstep sounds will play at a loud volume from the current position of the creature. The footstep sounds will be dependant on whatever block is below the creature during playtime. 
 
-During the chase sequence, the player's view will be nudged down continuously, wherein the pitch of the player's viewing angle is reduced by a `0.5` degrees every tick. This will force the player to run while looking at the floor.
+During the chase sequence, the player's view jitter continously, at `+/-1.5`° on the yaw and `+/-1.0`°. During this time, the player still retains full control of the camera, but their mouse will be jittered continuously until the chase sequence is finished.
 
 If the player is able to evade the creature for 30 seconds, the following will occur:
 - The creature will despawn, and in it's final position, a single diamond will be dropped
@@ -108,9 +112,16 @@ In the event that the player is caught, there is a 50/50 chance of either of the
 - The player dies, and the chat says: `PLAYERNAME was slain by something` (present in the language file).
 - The player is teleported to their spawnpoint. (e.g. their bed, or world spawn as fallback)
 
-Regardless of the oucome, the following two events will happen upon either condition being met (being caught or escaping.):
-- The server will send a stopsound packet for both the `hush` and `ambient` creature sounds.
+Regardless of the outcome, the following two events will happen upon either condition being met (being caught or escaping.):
+- The server will send a stopsound packet for both the `hush` and `ambience` creature sounds.
 - The player will be cleared of all status effects, and the player view pitch influence will cease.
+
+## View Tolerance
+There is an important distinction between the two interaction behaviors when it comes to view tolerance. 
+
+Creatures that have the chase behavior will tolerate being on a players screen, until they are directly looked at, in which case the chase sequence will begin.
+
+Creatures with the default behavior are more shy. In these cases, if the creature is on the screen of the player for more than `2` seconds, even if not being directly looked at, the creature will despawn. If the creature with the default behavior is looked at directly, it will disappear immediately. 
 
 ## Side Effects 
 Below are some additional side effects that have the possibility of occuring following the interaction sequence. 
@@ -145,6 +156,7 @@ The audio files for the creature are stored in the following directories for the
 - `assets\deeperdark\sounds\ambient\creature\ambience4.ogg`
 - `assets\deeperdark\sounds\ambient\creature\ambience5.ogg`
 - `assets\deeperdark\sounds\ambient\creature\ambience6.ogg`
+- `assets\deeperdark\sounds\ambient\creature\ambience7.ogg`
 
 ## `hush`
 - `assets\deeperdark\sounds\entity\creature\hush\hush0.ogg`
@@ -176,7 +188,10 @@ All functions of the creature system will be configurable through the Deeper Dar
 | | - projectile_rejection_chance [1.0]
 | | - projectile_rejection_delay [4 ticks]
 | | - despawn_delay [12000]
-| | - enable_debug_logging
+| | - on_screen_tolerance [40 ticks]
+| | - enable_debug_logging (Extensive debug logging for the creature)
+| | - enable_debug_glow (Makes all creatures have the "glowing" effect)
+| | - enable_debug_path (Spawns particles along the path traced route(s))
 | - clear (Removes all creatures in the world)
 | - list (Lists all creatures and their behaviors)
 |   [Creature UUID]
@@ -184,6 +199,9 @@ All functions of the creature system will be configurable through the Deeper Dar
 | - summon (X, Y, Z)
 | - spawn [PlayerName] [Optional Max Distance Override]
 ```
+
+# Additional Notes
+- Creatures disregard spectator players.
 
 # To Be Organized
 - [x] Player gets blindness when it disappears or when they get closer to it and they also get weakness.

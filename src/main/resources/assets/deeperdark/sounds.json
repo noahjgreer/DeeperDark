@@ -76,6 +76,15 @@
     ],
     "subtitle": "subtitles.deeperdark.ambient.creature"
   },
+  "ambient.creature.ambience7": {
+    "sounds": [
+      {
+        "name": "deeperdark:ambient/creature/ambience7",
+        "attenuation_distance": 50
+      }
+    ],
+    "subtitle": "subtitles.deeperdark.ambient.creature"
+  },
   "entity.creature.hush0": {
     "sounds": [
       {

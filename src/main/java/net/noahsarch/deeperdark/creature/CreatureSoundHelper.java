@@ -18,13 +18,13 @@ public class CreatureSoundHelper {
 
     private static final String MOD_ID = "deeperdark";
 
-    /** Ambience sound identifiers (ambience0 through ambience6) */
-    private static final Identifier[] AMBIENCE_IDS = new Identifier[7];
+    /** Ambience sound identifiers (ambience0 through ambience7) */
+    private static final Identifier[] AMBIENCE_IDS = new Identifier[8];
     /** Hush sound identifier */
     private static final Identifier HUSH_ID;
 
     static {
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < 8; i++) {
             AMBIENCE_IDS[i] = Identifier.of(MOD_ID, "ambient.creature.ambience" + i);
         }
         HUSH_ID = Identifier.of(MOD_ID, "entity.creature.hush0");
@@ -39,7 +39,7 @@ public class CreatureSoundHelper {
      * @param volume  Volume of the sound (distance-dependent)
      */
     public static void playAmbienceSound(ServerPlayerEntity player, int variant, Vec3d pos, float volume) {
-        if (variant < 0 || variant > 6) variant = 0;
+        if (variant < 0 || variant > 7) variant = 0;
         Identifier soundId = AMBIENCE_IDS[variant];
         RegistryEntry<SoundEvent> soundEntry = RegistryEntry.of(SoundEvent.of(soundId));
 
@@ -99,7 +99,7 @@ public class CreatureSoundHelper {
      */
     public static void stopAllCreatureSounds(ServerPlayerEntity player) {
         // Stop all ambience sounds
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < 8; i++) {
             player.networkHandler.sendPacket(new StopSoundS2CPacket(AMBIENCE_IDS[i], SoundCategory.AMBIENT));
         }
         // Stop hush sound
@@ -110,7 +110,7 @@ public class CreatureSoundHelper {
      * Stops a specific ambience sound for a player.
      */
     public static void stopAmbienceSound(ServerPlayerEntity player, int variant) {
-        if (variant < 0 || variant > 6) return;
+        if (variant < 0 || variant > 7) return;
         player.networkHandler.sendPacket(new StopSoundS2CPacket(AMBIENCE_IDS[variant], SoundCategory.AMBIENT));
     }
 
@@ -127,13 +127,13 @@ public class CreatureSoundHelper {
      * only hears their own footsteps (PLAYERS) and the creature's footsteps (HOSTILE steps are re-played each tick).
      */
     public static void stopAllAmbientSoundsForChase(ServerPlayerEntity player) {
-        // Stop broad categories — creature footsteps are continuously re-sent so they won't stay muted
+        // Stop broad categories per spec: AMBIENT, MUSIC, WEATHER, HOSTILE, NEUTRAL, RECORDS
+        // Creature footsteps are continuously re-sent so they won't stay muted
         player.networkHandler.sendPacket(new StopSoundS2CPacket(null, SoundCategory.AMBIENT));
         player.networkHandler.sendPacket(new StopSoundS2CPacket(null, SoundCategory.MUSIC));
         player.networkHandler.sendPacket(new StopSoundS2CPacket(null, SoundCategory.WEATHER));
         player.networkHandler.sendPacket(new StopSoundS2CPacket(null, SoundCategory.HOSTILE));
         player.networkHandler.sendPacket(new StopSoundS2CPacket(null, SoundCategory.NEUTRAL));
-        player.networkHandler.sendPacket(new StopSoundS2CPacket(null, SoundCategory.BLOCKS));
         player.networkHandler.sendPacket(new StopSoundS2CPacket(null, SoundCategory.RECORDS));
     }
 

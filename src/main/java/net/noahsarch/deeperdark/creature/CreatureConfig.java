@@ -42,6 +42,9 @@ public class CreatureConfig {
     public double projectileRejectionChance = 1.0;
     public int projectileRejectionDelay = 4;
 
+    // View tolerance
+    public int onScreenTolerance = 40; // ticks before non-chase creature despawns when on screen
+
     // Despawn
     public int despawnDelay = 12000;
 
