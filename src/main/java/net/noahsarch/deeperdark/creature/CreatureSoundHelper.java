@@ -18,6 +18,13 @@ public class CreatureSoundHelper {
 
     private static final String MOD_ID = "deeperdark";
 
+    /**
+     * When true, the SoundFilterMixin will allow the current PlaySoundS2CPacket through
+     * even for chase-suppressed players. Set before sending creature footstep sounds,
+     * cleared immediately after. Safe because game logic runs on a single thread.
+     */
+    public static boolean bypassSoundFilter = false;
+
     /** Ambience sound identifiers (ambience0 through ambience7) */
     private static final Identifier[] AMBIENCE_IDS = new Identifier[8];
     /** Hush sound identifier */
@@ -84,14 +91,20 @@ public class CreatureSoundHelper {
 
         RegistryEntry<SoundEvent> stepSound = RegistryEntry.of(soundGroup.getStepSound());
 
-        player.networkHandler.sendPacket(new PlaySoundS2CPacket(
-                stepSound,
-                SoundCategory.HOSTILE,
-                pos.x, pos.y, pos.z,
-                2.0f,  // Loud volume
-                1.8f,  // Higher pitch for rapid, scary footsteps
-                world.getRandom().nextLong()
-        ));
+        // Bypass the mixin sound filter so creature footsteps reach the chased player
+        bypassSoundFilter = true;
+        try {
+            player.networkHandler.sendPacket(new PlaySoundS2CPacket(
+                    stepSound,
+                    SoundCategory.HOSTILE,
+                    pos.x, pos.y, pos.z,
+                    2.0f,  // Loud volume
+                    1.8f,  // Higher pitch for rapid, scary footsteps
+                    world.getRandom().nextLong()
+            ));
+        } finally {
+            bypassSoundFilter = false;
+        }
     }
 
     /**

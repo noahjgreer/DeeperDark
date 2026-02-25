@@ -17,7 +17,7 @@
     "sounds": [
       {
         "name": "deeperdark:ambient/creature/ambience0",
-        "attenuation_distance": 50
+        "attenuation_distance": 16
       }
     ],
     "subtitle": "subtitles.deeperdark.ambient.creature"
@@ -26,7 +26,7 @@
     "sounds": [
       {
         "name": "deeperdark:ambient/creature/ambience1",
-        "attenuation_distance": 50
+        "attenuation_distance": 16
       }
     ],
     "subtitle": "subtitles.deeperdark.ambient.creature"
@@ -35,7 +35,7 @@
     "sounds": [
       {
         "name": "deeperdark:ambient/creature/ambience2",
-        "attenuation_distance": 50
+        "attenuation_distance": 16
       }
     ],
     "subtitle": "subtitles.deeperdark.ambient.creature"
@@ -44,7 +44,7 @@
     "sounds": [
       {
         "name": "deeperdark:ambient/creature/ambience3",
-        "attenuation_distance": 50
+        "attenuation_distance": 16
       }
     ],
     "subtitle": "subtitles.deeperdark.ambient.creature"
@@ -53,7 +53,7 @@
     "sounds": [
       {
         "name": "deeperdark:ambient/creature/ambience4",
-        "attenuation_distance": 50
+        "attenuation_distance": 16
       }
     ],
     "subtitle": "subtitles.deeperdark.ambient.creature"
@@ -62,7 +62,7 @@
     "sounds": [
       {
         "name": "deeperdark:ambient/creature/ambience5",
-        "attenuation_distance": 50
+        "attenuation_distance": 16
       }
     ],
     "subtitle": "subtitles.deeperdark.ambient.creature"
@@ -71,7 +71,7 @@
     "sounds": [
       {
         "name": "deeperdark:ambient/creature/ambience6",
-        "attenuation_distance": 50
+        "attenuation_distance": 16
       }
     ],
     "subtitle": "subtitles.deeperdark.ambient.creature"
@@ -80,7 +80,7 @@
     "sounds": [
       {
         "name": "deeperdark:ambient/creature/ambience7",
-        "attenuation_distance": 50
+        "attenuation_distance": 16
       }
     ],
     "subtitle": "subtitles.deeperdark.ambient.creature"

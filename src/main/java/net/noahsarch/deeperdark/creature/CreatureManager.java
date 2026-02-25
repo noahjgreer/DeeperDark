@@ -81,6 +81,9 @@ public class CreatureManager {
     /** Players being chased (to track view jitter per tick) */
     private static final Map<UUID, UUID> playerChaseMap = new HashMap<>(); // playerUUID -> creatureUUID
 
+    /** Players whose non-essential sound categories should be suppressed (used by SoundFilterMixin) */
+    private static final Set<UUID> soundSuppressedPlayers = new HashSet<>();
+
     /** Custom damage type registry key for creature kills */
     private static final RegistryKey<DamageType> CREATURE_DAMAGE_TYPE = RegistryKey.of(
             RegistryKeys.DAMAGE_TYPE, Identifier.of("deeperdark", "creature")
@@ -93,6 +96,14 @@ public class CreatureManager {
     public static void register() {
         ServerTickEvents.END_SERVER_TICK.register(CreatureManager::onServerTick);
         Deeperdark.LOGGER.info("[Deeper Dark] Creature system registered");
+    }
+
+    /**
+     * Checks if a player's non-essential sounds should be suppressed (during chase).
+     * Called by SoundFilterMixin to decide whether to cancel PlaySoundS2CPackets.
+     */
+    public static boolean isPlayerSoundSuppressed(UUID playerUuid) {
+        return soundSuppressedPlayers.contains(playerUuid);
     }
 
     // ===== Debug Messaging =====
@@ -209,6 +220,7 @@ public class CreatureManager {
         activeEchoZones.clear();
         frozenPlayers.clear();
         playerChaseMap.clear();
+        soundSuppressedPlayers.clear();
         return count;
     }
 
@@ -647,6 +659,9 @@ public class CreatureManager {
         // Stop all ambient/hostile/music/weather sounds so the player only hears footsteps
         CreatureSoundHelper.stopAllAmbientSoundsForChase(player);
 
+        // Register this player for server-side sound suppression (mixin will intercept packets)
+        soundSuppressedPlayers.add(player.getUuid());
+
         // Move creature to a new position within chase range
         ServerWorld world = creature.getWorld();
         BlockPos chasePos = CreaturePathfinder.findChasePosition(
@@ -721,12 +736,6 @@ public class CreatureManager {
         // Play rapid footstep sounds every 2 ticks
         if (creature.getChaseTicks() % 2 == 0) {
             CreatureSoundHelper.playFootstepSound(player, newPos, creature.getWorld());
-        }
-
-        // Continuously suppress ambient/music/weather/hostile/neutral/records sounds every 20 ticks
-        // so any new sounds that start during the chase are immediately silenced
-        if (creature.getChaseTicks() % 20 == 0) {
-            CreatureSoundHelper.stopAllAmbientSoundsForChase(player);
         }
 
         // Check if creature caught the player (within 1.5 blocks)
@@ -830,10 +839,11 @@ public class CreatureManager {
             player.clearStatusEffects();
         }
 
-        // Remove chase tracking
+        // Remove chase tracking and sound suppression
         if (creature.getTargetPlayerUuid() != null) {
             frozenPlayers.remove(creature.getTargetPlayerUuid());
             playerChaseMap.remove(creature.getTargetPlayerUuid());
+            soundSuppressedPlayers.remove(creature.getTargetPlayerUuid());
         }
 
         // Remove creature from world

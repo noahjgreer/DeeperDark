@@ -69,7 +69,8 @@
     "EndermanPickUpBlockMixin",
     "FishingBobberEntityMixin",
     "CraftingResultSlotMixin",
-    "ZombieEntityMixin"
+    "ZombieEntityMixin",
+    "SoundFilterMixin"
   ],
   "injectors": {
     "defaultRequire": 1
