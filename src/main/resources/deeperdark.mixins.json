@@ -70,7 +70,10 @@
     "FishingBobberEntityMixin",
     "CraftingResultSlotMixin",
     "ZombieEntityMixin",
-    "SoundFilterMixin"
+    "SoundFilterMixin",
+    "ServerPlayNetworkHandlerChatSoundMixin",
+    "PlayerManagerJoinSoundMixin",
+    "ServerPlayerEntityDeathSoundMixin"
   ],
   "injectors": {
     "defaultRequire": 1

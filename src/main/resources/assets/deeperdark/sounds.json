@@ -85,6 +85,77 @@
     ],
     "subtitle": "subtitles.deeperdark.ambient.creature"
   },
+  "entity.snake.ambient": {
+    "sounds": [
+      {
+        "name": "deeperdark:entity/snake/ambient0",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "deeperdark:entity/snake/ambient1",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "deeperdark:entity/snake/ambient2",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "deeperdark:entity/snake/ambient3",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "deeperdark:entity/snake/ambient4",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "deeperdark:entity/snake/ambient5",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "deeperdark:entity/snake/ambient6",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "deeperdark:entity/snake/ambient7",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "deeperdark:entity/snake/ambient8",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "deeperdark:entity/snake/ambient9",
+        "attenuation_distance": 16
+      }
+    ],
+    "subtitle": "subtitles.deeperdark.entity.snake.ambient"
+  },
+  "entity.snake.death": {
+    "sounds": [
+      {
+        "name": "deeperdark:entity/snake/death0",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "deeperdark:entity/snake/death1",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "deeperdark:entity/snake/death2",
+        "attenuation_distance": 16
+      }
+    ],
+    "subtitle": "subtitles.deeperdark.entity.snake.death"
+  },
+  "entity.snake.tongue": {
+    "sounds": [
+      {
+        "name": "deeperdark:entity/snake/ambient0",
+        "attenuation_distance": 16
+      }
+    ],
+    "subtitle": "subtitles.deeperdark.entity.snake.tongue"
+  },
   "entity.creature.hush0": {
     "sounds": [
       {

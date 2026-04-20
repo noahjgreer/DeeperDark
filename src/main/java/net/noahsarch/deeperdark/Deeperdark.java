@@ -83,6 +83,7 @@ public class Deeperdark implements ModInitializer {
 
         // Register custom commands
         net.noahsarch.deeperdark.command.DeeperDarkCommands.register();
+		net.noahsarch.deeperdark.command.DeeperDarkClientCommands.register();
 
         ModVillagers.registerVillagers();
 

@@ -11,7 +11,11 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 public class DeeperDarkConfig {
     private static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger("DeeperDarkConfig");
@@ -20,6 +24,110 @@ public class DeeperDarkConfig {
     private static final File CONFIG_FILE_YAML = FabricLoader.getInstance().getConfigDir().resolve("deeperdark.yaml").toFile();
 
     private static ConfigInstance instance;
+
+    public static class ChatSoundProfile {
+        public String sendMessageSound = "";
+        public String deathMessageSound = "";
+        public String joinMessageSound = "";
+        public double pitch = 1.0;
+        public double pitchDeviance = 0.0;
+
+        public ChatSoundProfile() {
+        }
+
+        public ChatSoundProfile(String sendMessageSound, String deathMessageSound, String joinMessageSound, double pitch, double pitchDeviance) {
+            this.sendMessageSound = sendMessageSound;
+            this.deathMessageSound = deathMessageSound;
+            this.joinMessageSound = joinMessageSound;
+            this.pitch = pitch;
+            this.pitchDeviance = pitchDeviance;
+        }
+    }
+
+    private static Map<String, ChatSoundProfile> createDefaultChatSounds() {
+        Map<String, ChatSoundProfile> defaults = new HashMap<>();
+        defaults.put("FinniTheFox", new ChatSoundProfile(
+                "entity.cat.ambient",
+                "entity.cat.death",
+                "entity.cat.stray_ambient",
+                2.0,
+                0.2
+        ));
+        defaults.put("snotbane", new ChatSoundProfile(
+                "entity.parrot.ambient",
+                "entity.parrot.death",
+                "entity.parrot.ambient",
+                0.5,
+                0.2
+        ));
+        defaults.put("NotaNaN", new ChatSoundProfile(
+                "entity.ender_dragon.ambient",
+                "entity.ender_dragon.death",
+                "entity.ender_dragon.hurt",
+                2.0,
+                0.1
+        ));
+        defaults.put("The_Throngler", new ChatSoundProfile(
+                "entity.snake.ambient",
+                "entity.snake.death",
+                "entity.snake.ambient",
+                1.0,
+                0.2
+        ));
+        return defaults;
+    }
+
+    private static boolean containsKeyIgnoreCase(Map<String, ?> map, String key) {
+        for (String existingKey : map.keySet()) {
+            if (existingKey.equalsIgnoreCase(key)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean normalizeLoadedConfig(ConfigInstance config) {
+        boolean changed = false;
+
+        if (config.chatSounds == null) {
+            config.chatSounds = createDefaultChatSounds();
+            changed = true;
+        } else {
+            for (Map.Entry<String, ChatSoundProfile> entry : createDefaultChatSounds().entrySet()) {
+                if (!containsKeyIgnoreCase(config.chatSounds, entry.getKey())) {
+                    config.chatSounds.put(entry.getKey(), entry.getValue());
+                    changed = true;
+                }
+            }
+        }
+
+        if (config.chatSoundExclusions == null) {
+            config.chatSoundExclusions = new ArrayList<>();
+            changed = true;
+        } else {
+            List<String> normalized = new ArrayList<>();
+            for (String excluded : config.chatSoundExclusions) {
+                if (excluded == null || excluded.isBlank()) {
+                    changed = true;
+                    continue;
+                }
+
+                String lowered = excluded.toLowerCase(Locale.ROOT);
+                if (!normalized.contains(lowered)) {
+                    normalized.add(lowered);
+                } else {
+                    changed = true;
+                }
+
+                if (!lowered.equals(excluded)) {
+                    changed = true;
+                }
+            }
+            config.chatSoundExclusions = normalized;
+        }
+
+        return changed;
+    }
 
     public static class ConfigInstance {
         public int originX = 0;
@@ -70,6 +178,10 @@ public class DeeperDarkConfig {
         // Zombie behavior configuration
         public double zombieFollowRange = 35.0; // How far zombies can detect and track players (vanilla default: 35.0)
 
+        // Chat sounds configuration
+        public Map<String, ChatSoundProfile> chatSounds = createDefaultChatSounds();
+        public List<String> chatSoundExclusions = new ArrayList<>();
+
         // Creature configuration
         public net.noahsarch.deeperdark.creature.CreatureConfig creature = new net.noahsarch.deeperdark.creature.CreatureConfig();
     }
@@ -117,6 +229,11 @@ public class DeeperDarkConfig {
         if (instance == null) {
             instance = new ConfigInstance();
             save();
+        } else {
+            // Backfill newly added config sections without overwriting existing user values
+            if (normalizeLoadedConfig(instance)) {
+                save();
+            }
         }
     }
 
@@ -177,6 +294,17 @@ public class DeeperDarkConfig {
                     #
                     # Zombie Behavior Configuration:
                     # zombieFollowRange: how far zombies can detect and track players (vanilla default: 35.0)
+                    #
+                    # Chat Sounds Configuration:
+                    # chatSounds: per-player sound settings used for chat/death/join events.
+                    #   Entry format:
+                    #     PlayerName:
+                    #       sendMessageSound: entity.cat.ambient
+                    #       deathMessageSound: entity.cat.death
+                    #       joinMessageSound: entity.cat.stray_ambient
+                    #       pitch: 1.0
+                    #       pitchDeviance: 0.2
+                    # chatSoundExclusions: lowercase player names who opted out via /ddclient chat_sounds false.
                     #
                     """;
 

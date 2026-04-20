@@ -83,6 +83,9 @@
   "subtitles.deeperdark.block.crafting_table.craft": "Crafting",
   "subtitles.deeperdark.ambient.creature": "Eerie noise",
   "subtitles.deeperdark.entity.creature.hush": "Shushing",
+  "subtitles.deeperdark.entity.snake.ambient": "Snake hisses",
+  "subtitles.deeperdark.entity.snake.death": "Snake dies",
+  "subtitles.deeperdark.entity.snake.tongue": "Snake flicks tongue",
   "death.attack.creature": "%1$s was slain by something",
   "death.attack.creature.player": "%1$s was slain by something"
 }
