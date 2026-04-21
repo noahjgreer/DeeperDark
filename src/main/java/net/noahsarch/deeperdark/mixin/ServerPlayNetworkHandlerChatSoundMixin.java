@@ -1,6 +1,7 @@
 package net.noahsarch.deeperdark.mixin;
 
 import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.noahsarch.deeperdark.sound.ChatSoundManager;
@@ -18,6 +19,11 @@ public abstract class ServerPlayNetworkHandlerChatSoundMixin {
 
     @Inject(method = "onChatMessage", at = @At("TAIL"))
     private void deeperdark$playChatSound(ChatMessageC2SPacket packet, CallbackInfo ci) {
-        ChatSoundManager.playSendMessageSound(this.player);
+        MinecraftServer server = this.player.getEntityWorld().getServer();
+        if (server == null) {
+            return;
+        }
+
+        server.execute(() -> ChatSoundManager.playSendMessageSound(this.player));
     }
 }

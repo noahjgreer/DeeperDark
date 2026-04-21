@@ -30,7 +30,7 @@ from pathlib import Path
 # Configuration
 RESOURCES_DIR = Path(__file__).parent / "src" / "main" / "resources"
 OUTPUT_DIR = Path("F:/MuffinMode")
-SERVER_PROPERTIES_PATH = Path("F:/MuffinMode-LiamServer-Fabric/server.properties")
+SERVER_PROPERTIES_PATH = Path("F:/MuffinMode-LiamServer-Fabric-Testing/server.properties")
 RESOURCE_PACK_URL_BASE = "https://muffinmode.net/"
 
 # File extensions to exclude from the resource pack
