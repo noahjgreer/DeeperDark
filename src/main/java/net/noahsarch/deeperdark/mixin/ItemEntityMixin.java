@@ -1,14 +1,14 @@
 package net.noahsarch.deeperdark.mixin;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.registry.tag.DamageTypeTags;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
-import net.minecraft.world.explosion.Explosion;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.Explosion;
 import net.noahsarch.deeperdark.DeeperDarkConfig;
 import net.noahsarch.deeperdark.duck.EntityAccessor;
 import org.spongepowered.asm.mixin.Mixin;
@@ -23,9 +23,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class ItemEntityMixin extends Entity {
 
     @Unique
-    private Vec3d deeperdark$lastVelocity = Vec3d.ZERO;
+    private Vec3 deeperdark$lastVelocity = Vec3.ZERO;
 
-    public ItemEntityMixin(EntityType<?> type, World world) {
+    public ItemEntityMixin(EntityType<?> type, Level world) {
         super(type, world);
     }
 
@@ -58,8 +58,8 @@ public abstract class ItemEntityMixin extends Entity {
         }
 
         if (!this.getEntityWorld().isClient()) {
-            Vec3d currentVelocity = this.getVelocity();
-            Vec3d velocityChange = currentVelocity.subtract(this.deeperdark$lastVelocity);
+            Vec3 currentVelocity = this.getVelocity();
+            Vec3 velocityChange = currentVelocity.subtract(this.deeperdark$lastVelocity);
 
             // If velocity changed significantly in one tick, it's likely from an explosion
             // (or other external force). Amplify it!
@@ -67,7 +67,7 @@ public abstract class ItemEntityMixin extends Entity {
             if (changeSquared > 0.01) { // Threshold to detect explosion knockback
                 // Multiply the velocity change by the configured multiplier
                 double multiplier = config.explosionItemKnockbackMultiplier;
-                Vec3d amplifiedChange = velocityChange.multiply(multiplier);
+                Vec3 amplifiedChange = velocityChange.multiply(multiplier);
                 this.setVelocity(this.deeperdark$lastVelocity.add(amplifiedChange));
                 this.velocityDirty = true;
             }
@@ -75,7 +75,7 @@ public abstract class ItemEntityMixin extends Entity {
     }
 
     @Inject(method = "damage", at = @At("HEAD"), cancellable = true)
-    private void deeperdark$preventExplosionDamage(ServerWorld world, DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
+    private void deeperdark$preventExplosionDamage(ServerLevel world, DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
         if (source.isIn(DamageTypeTags.IS_EXPLOSION)) {
             cir.setReturnValue(false);
         }

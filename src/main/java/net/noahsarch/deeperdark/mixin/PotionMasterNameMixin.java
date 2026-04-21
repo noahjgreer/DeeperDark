@@ -1,7 +1,7 @@
 package net.noahsarch.deeperdark.mixin;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.text.Text;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.network.chat.Component;
 import net.noahsarch.deeperdark.duck.PotionMasterDuck;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -12,9 +12,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class PotionMasterNameMixin {
 
     @Inject(method = "getDisplayName", at = @At("HEAD"), cancellable = true)
-    public void getDisplayName(CallbackInfoReturnable<Text> cir) {
+    public void getDisplayName(CallbackInfoReturnable<Component> cir) {
         if (this instanceof PotionMasterDuck potionMaster && potionMaster.deeperdark$isPotionMaster()) {
-            cir.setReturnValue(Text.translatable("entity.deeperdark.villager.potion_master"));
+            cir.setReturnValue(Component.translatable("entity.deeperdark.villager.potion_master"));
         }
     }
 }

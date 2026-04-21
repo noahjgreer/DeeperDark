@@ -1,10 +1,10 @@
 package net.noahsarch.deeperdark.mixin;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.entity.mob.CreeperEntity;
-import net.minecraft.entity.mob.SkeletonEntity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.world.entity.monster.skeleton.Skeleton;
 import net.noahsarch.deeperdark.util.BabyCreeperAccessor;
 import net.noahsarch.deeperdark.util.BabySkeletonAccessor;
 import org.spongepowered.asm.mixin.Mixin;
@@ -27,11 +27,11 @@ public class LivingEntityMixin {
         // Only apply if the entity is in lava (not water)
         if (self.isInLava() && !self.isTouchingWater()) {
             // Get the water movement efficiency (modified by Depth Strider enchantment)
-            double waterEfficiency = self.getAttributeValue(EntityAttributes.WATER_MOVEMENT_EFFICIENCY);
+            double waterEfficiency = self.getAttributeValue(Attributes.WATER_MOVEMENT_EFFICIENCY);
 
             // If the entity has Depth Strider (waterEfficiency > 0)
             if (waterEfficiency > 0.0) {
-                Vec3d velocity = self.getVelocity();
+                Vec3 velocity = self.getVelocity();
 
                 // Apply the same speed boost to lava movement as water gets
                 // The boost factor matches how Depth Strider affects water movement
@@ -52,7 +52,7 @@ public class LivingEntityMixin {
         LivingEntity self = (LivingEntity) (Object) this;
 
         // Baby skeleton sounds
-        if (self instanceof SkeletonEntity && self instanceof BabySkeletonAccessor accessor) {
+        if (self instanceof Skeleton && self instanceof BabySkeletonAccessor accessor) {
             if (accessor.deeperdark$isBaby()) {
                 // Baby pitch logic: (random.nextFloat() - random.nextFloat()) * 0.2F + 1.5F
                 cir.setReturnValue((self.getRandom().nextFloat() - self.getRandom().nextFloat()) * 0.2F + 1.5F);
@@ -60,7 +60,7 @@ public class LivingEntityMixin {
         }
 
         // Baby creeper sounds
-        if (self instanceof CreeperEntity && self instanceof BabyCreeperAccessor accessor) {
+        if (self instanceof Creeper && self instanceof BabyCreeperAccessor accessor) {
             if (accessor.deeperdark$isBabyCreeper()) {
                 // Baby pitch logic: (random.nextFloat() - random.nextFloat()) * 0.2F + 1.5F
                 cir.setReturnValue((self.getRandom().nextFloat() - self.getRandom().nextFloat()) * 0.2F + 1.5F);

@@ -2,30 +2,30 @@ package net.noahsarch.deeperdark.event;
 
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.BlockState;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.entity.decoration.DisplayEntity.ItemDisplayEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.sound.BlockSoundGroup;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Items;
-import net.minecraft.item.ItemUsage;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.entity.Display.ItemDisplay;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.resources.Identifier;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.ItemUtils;
 import net.noahsarch.deeperdark.util.CustomBlockManager;
 
 import java.util.List;
 
 public class SiphonEvents {
     // defined constants
-    public static final Identifier SIPHON_MODEL_ID = Identifier.of("minecraft", "siphon");
+    public static final Identifier SIPHON_MODEL_ID = Identifier.fromNamespaceAndPath("minecraft", "siphon");
 
     public static void register() {
         // Placement Logic
@@ -36,10 +36,10 @@ public class SiphonEvents {
 
             // Siphon Interaction (XP Bottling)
             if (stack.isOf(Items.GLASS_BOTTLE) && state.isOf(Blocks.COBBLED_DEEPSLATE_SLAB)) {
-                 Box box = new Box(pos);
+                 AABB box = new AABB(pos);
                  List<ItemDisplayEntity> displays = world.getEntitiesByClass(ItemDisplayEntity.class, box, entity -> {
                      ItemStack item = entity.getItemStack();
-                     Identifier modelId = item.get(DataComponentTypes.ITEM_MODEL);
+                     Identifier modelId = item.get(DataComponents.ITEM_MODEL);
                      return modelId != null && modelId.equals(SIPHON_MODEL_ID);
                  });
 
@@ -52,22 +52,22 @@ public class SiphonEvents {
                                  player.addExperience(-10);
                              }
 
-                             world.playSound(null, pos, SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.BLOCKS, 0.5F, 1.0F);
+                             world.playSound(null, pos, SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundSource.BLOCKS, 0.5F, 1.0F);
 
                              ItemStack bottle = ItemUsage.exchangeStack(stack, player, new ItemStack(Items.EXPERIENCE_BOTTLE));
                              player.setStackInHand(hand, bottle);
                          }
-                         return ActionResult.SUCCESS;
+                         return InteractionResult.SUCCESS;
                      }
                  }
             }
 
-            if (stack.isEmpty()) return ActionResult.PASS;
+            if (stack.isEmpty()) return InteractionResult.PASS;
 
             // Check for item_model component
-            Identifier modelId = stack.get(DataComponentTypes.ITEM_MODEL);
+            Identifier modelId = stack.get(DataComponents.ITEM_MODEL);
             if (modelId == null || !modelId.equals(SIPHON_MODEL_ID)) {
-                return ActionResult.PASS;
+                return InteractionResult.PASS;
             }
 
             // We have a Siphon item. Determine placement.
@@ -75,19 +75,19 @@ public class SiphonEvents {
             BlockPos placePos = pos.offset(side);
 
             // Check if place position is replaceable.
-            if (!world.getBlockState(placePos).canReplace(new ItemPlacementContext(player, hand, stack, hitResult))) {
-                 return ActionResult.PASS;
+            if (!world.getBlockState(placePos).canReplace(new UseOnContext(player, hand, stack, hitResult))) {
+                 return InteractionResult.PASS;
             }
 
             // Prevent accidental placement when using interactable blocks
             if (!player.isSneaking() && isInteractable(state, world, pos)) {
-                 return ActionResult.PASS;
+                 return InteractionResult.PASS;
             }
 
             if (!world.isClient()) {
                 // Place Siphon
                 if (CustomBlockManager.place(world, placePos, stack, Blocks.COBBLED_DEEPSLATE_SLAB, null)) {
-                    world.playSound(null, placePos, BlockSoundGroup.STONE.getPlaceSound(), SoundCategory.BLOCKS, 1f, 1f);
+                    world.playSound(null, placePos, SoundType.STONE.getPlaceSound(), SoundSource.BLOCKS, 1f, 1f);
 
                     if (!player.isCreative()) {
                         stack.decrement(1);
@@ -95,14 +95,14 @@ public class SiphonEvents {
                 }
             }
 
-            return ActionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         });
 
         // Break Logic
         PlayerBlockBreakEvents.BEFORE.register((world, player, pos, state, blockEntity) -> {
             if (state.getBlock() == Blocks.COBBLED_DEEPSLATE_SLAB) {
                 // Pass SIPHON_MODEL_ID
-                if (CustomBlockManager.onBreak(world, pos, state, player, SIPHON_MODEL_ID, BlockSoundGroup.STONE, null, null)) {
+                if (CustomBlockManager.onBreak(world, pos, state, player, SIPHON_MODEL_ID, SoundType.STONE, null, null)) {
                     return false;
                 }
             }
@@ -110,16 +110,16 @@ public class SiphonEvents {
         });
     }
 
-    private static boolean isInteractable(BlockState state, net.minecraft.world.World world, BlockPos pos) {
+    private static boolean isInteractable(BlockState state, net.minecraft.world.level.Level world, BlockPos pos) {
         return state.createScreenHandlerFactory(world, pos) != null ||
-               state.getBlock() instanceof net.minecraft.block.DoorBlock ||
-               state.getBlock() instanceof net.minecraft.block.TrapdoorBlock ||
-               state.getBlock() instanceof net.minecraft.block.FenceGateBlock ||
-               state.getBlock() instanceof net.minecraft.block.ButtonBlock ||
-               state.getBlock() instanceof net.minecraft.block.LeverBlock;
+               state.getBlock() instanceof net.minecraft.world.level.block.DoorBlock ||
+               state.getBlock() instanceof net.minecraft.world.level.block.TrapdoorBlock ||
+               state.getBlock() instanceof net.minecraft.world.level.block.FenceGateBlock ||
+               state.getBlock() instanceof net.minecraft.world.level.block.ButtonBlock ||
+               state.getBlock() instanceof net.minecraft.world.level.block.LeverBlock;
     }
 
-    private static int getTotalExperience(PlayerEntity player) {
+    private static int getTotalExperience(Player player) {
         int level = player.experienceLevel;
         float progress = player.experienceProgress;
 

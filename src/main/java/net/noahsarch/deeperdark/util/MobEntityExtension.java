@@ -1,10 +1,10 @@
 package net.noahsarch.deeperdark.util;
 
-import net.minecraft.entity.effect.StatusEffect;
-import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.core.Holder;
 
 public interface MobEntityExtension {
-    void deeperdark$setStoredEffect(RegistryEntry<StatusEffect> effect);
-    RegistryEntry<StatusEffect> deeperdark$getStoredEffect();
+    void deeperdark$setStoredEffect(Holder<MobEffect> effect);
+    Holder<MobEffect> deeperdark$getStoredEffect();
 }
 

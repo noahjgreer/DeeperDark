@@ -1,12 +1,12 @@
 package net.noahsarch.deeperdark.mixin;
 
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.item.ItemStack;
-import net.minecraft.loot.context.LootContext;
-import net.minecraft.loot.context.LootContextParameters;
-import net.minecraft.loot.function.ApplyBonusLootFunction;
-import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.world.level.storage.loot.functions.ApplyBonusCount;
+import net.minecraft.core.Holder;
 import net.noahsarch.deeperdark.DeeperDarkConfig;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -26,10 +26,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * This affects ALL fortune formulas (OreDrops, UniformBonusCount, BinomialWithBonusCount)
  * so it nerfs Fortune for ores, crops, gravel, glowstone, and everything else.
  */
-@Mixin(ApplyBonusLootFunction.class)
+@Mixin(ApplyBonusCount.class)
 public class ApplyBonusLootFunctionOreDropsMixin {
 
-    @Shadow @Final private RegistryEntry<Enchantment> enchantment;
+    @Shadow @Final private Holder<Enchantment> enchantment;
 
     @Inject(
         method = "process(Lnet/minecraft/item/ItemStack;Lnet/minecraft/loot/context/LootContext;)Lnet/minecraft/item/ItemStack;",
@@ -45,7 +45,7 @@ public class ApplyBonusLootFunctionOreDropsMixin {
         }
 
         // Get the tool that was used
-        ItemStack tool = context.get(LootContextParameters.TOOL);
+        ItemStack tool = context.get(LootContextParams.TOOL);
         if (tool == null) {
             return;
         }

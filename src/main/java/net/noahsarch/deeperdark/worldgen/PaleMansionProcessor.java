@@ -1,18 +1,18 @@
 package net.noahsarch.deeperdark.worldgen;
 
 import com.mojang.serialization.MapCodec;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.state.property.Property;
-import net.minecraft.block.PillarBlock;
-import net.minecraft.structure.StructurePlacementData;
-import net.minecraft.structure.StructureTemplate;
-import net.minecraft.structure.processor.StructureProcessor;
-import net.minecraft.structure.processor.StructureProcessorType;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.WorldView;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.level.block.RotatedPillarBlock;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessor;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.LevelReader;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -47,11 +47,11 @@ public class PaleMansionProcessor extends StructureProcessor {
 
     @Nullable
     @Override
-    public StructureTemplate.StructureBlockInfo process(WorldView world, BlockPos pos, BlockPos pivot, StructureTemplate.StructureBlockInfo originalBlockInfo, StructureTemplate.StructureBlockInfo currentBlockInfo, StructurePlacementData data) {
+    public StructureTemplate.StructureBlockInfo process(LevelReader world, BlockPos pos, BlockPos pivot, StructureTemplate.StructureBlockInfo originalBlockInfo, StructureTemplate.StructureBlockInfo currentBlockInfo, StructurePlaceSettings data) {
         BlockState currentState = currentBlockInfo.state();
 
         if (currentState.isOf(Blocks.BIRCH_PLANKS)) {
-             return new StructureTemplate.StructureBlockInfo(currentBlockInfo.pos(), Blocks.STRIPPED_PALE_OAK_LOG.getDefaultState().with(PillarBlock.AXIS, Direction.Axis.X), currentBlockInfo.nbt());
+             return new StructureTemplate.StructureBlockInfo(currentBlockInfo.pos(), Blocks.STRIPPED_PALE_OAK_LOG.getDefaultState().with(RotatedPillarBlock.AXIS, Direction.Axis.X), currentBlockInfo.nbt());
         }
 
         Block newBlock = REPLACEMENTS.get(currentState.getBlock());

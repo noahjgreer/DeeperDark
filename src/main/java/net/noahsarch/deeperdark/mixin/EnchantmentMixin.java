@@ -1,9 +1,9 @@
 package net.noahsarch.deeperdark.mixin;
 
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.entity.Entity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.world.ServerWorld;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.server.level.ServerLevel;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -44,7 +44,7 @@ public class EnchantmentMixin {
      * Inject into modifyBlockExperience to make Fortune multiply block XP drops
      */
     @Inject(method = "modifyBlockExperience", at = @At("TAIL"))
-    private void deeperdark$multiplyBlockExperience(ServerWorld world, int level, ItemStack stack, MutableFloat blockExperience, CallbackInfo ci) {
+    private void deeperdark$multiplyBlockExperience(ServerLevel world, int level, ItemStack stack, MutableFloat blockExperience, CallbackInfo ci) {
         // Check if this enchantment is Fortune
         if (deeperdark$isFortuneEnchantment()) {
             // Multiply XP by (1 + level), so Fortune I = 2x, Fortune II = 3x, Fortune III = 4x
@@ -59,7 +59,7 @@ public class EnchantmentMixin {
      * Inject into modifyMobExperience to make Fortune multiply mob XP drops
      */
     @Inject(method = "modifyMobExperience", at = @At("TAIL"))
-    private void deeperdark$multiplyMobExperience(ServerWorld world, int level, ItemStack stack, Entity user, MutableFloat mobExperience, CallbackInfo ci) {
+    private void deeperdark$multiplyMobExperience(ServerLevel world, int level, ItemStack stack, Entity user, MutableFloat mobExperience, CallbackInfo ci) {
         // Check if this enchantment is Fortune
         if (deeperdark$isFortuneEnchantment()) {
             // Multiply XP by (1 + level), so Fortune I = 2x, Fortune II = 3x, Fortune III = 4x

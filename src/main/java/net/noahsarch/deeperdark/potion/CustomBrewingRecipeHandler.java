@@ -1,14 +1,14 @@
 package net.noahsarch.deeperdark.potion;
 
-import net.fabricmc.fabric.api.registry.FabricBrewingRecipeRegistryBuilder;
-import net.minecraft.item.Items;
-import net.minecraft.potion.Potions;
-import net.minecraft.recipe.Ingredient;
+import net.fabricmc.fabric.api.registry.FabricPotionBrewingBuilder;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.item.crafting.Ingredient;
 
 public class CustomBrewingRecipeHandler {
     public static void register() {
         // Register specific recipes for creating scentless potions
-        FabricBrewingRecipeRegistryBuilder.BUILD.register(builder -> {
+        FabricPotionBrewingBuilder.BUILD.register(builder -> {
             // Register specific recipes for each base potion type to avoid conflicts
             System.out.println("DEBUG - Registering brewing recipes");
 

@@ -2,31 +2,32 @@ package net.noahsarch.deeperdark.worldgen;
 
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.structure.StructureTemplate;
-import net.minecraft.structure.StructureTemplateManager;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.ChunkRegion;
-import net.minecraft.world.HeightLimitView;
-import net.minecraft.world.Heightmap;
-import net.minecraft.world.biome.source.BiomeSource;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.gen.StructureAccessor;
-import net.minecraft.world.gen.chunk.Blender;
-import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.gen.chunk.VerticalBlockSample;
-import net.minecraft.world.gen.noise.NoiseConfig;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.resources.Identifier;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.world.level.LevelHeightAccessor;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.biome.BiomeSource;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.StructureManager;
+import net.minecraft.world.level.levelgen.blending.Blender;
+import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.levelgen.RandomState;
+import net.minecraft.world.level.NoiseColumn;
+import net.minecraft.server.level.WorldGenRegion;
 import net.noahsarch.deeperdark.Deeperdark;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import net.minecraft.world.level.biome.BiomeManager;
 
 public class SlipChunkGenerator extends ChunkGenerator {
     public static final MapCodec<SlipChunkGenerator> CODEC = RecordCodecBuilder.mapCodec(instance ->
@@ -50,7 +51,7 @@ public class SlipChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    protected MapCodec<? extends ChunkGenerator> getCodec() {
+    protected MapCodec<? extends ChunkGenerator> codec() {
         return CODEC;
     }
 
@@ -74,7 +75,7 @@ public class SlipChunkGenerator extends ChunkGenerator {
                 };
 
                 for (String path : possiblePaths) {
-                    Identifier templateId = Identifier.of("minecraft", path);
+                    Identifier templateId = Identifier.fromNamespaceAndPath("minecraft", path);
                     Deeperdark.LOGGER.info("Trying to load template: {}", templateId);
                     Optional<StructureTemplate> template = manager.getTemplate(templateId);
 
@@ -94,7 +95,7 @@ public class SlipChunkGenerator extends ChunkGenerator {
 
                 // Load room1 (additional common room)
                 for (String path : new String[]{"the_slip/room1", "structure/the_slip/room1"}) {
-                    Identifier room1TemplateId = Identifier.of("minecraft", path);
+                    Identifier room1TemplateId = Identifier.fromNamespaceAndPath("minecraft", path);
                     Deeperdark.LOGGER.info("Trying to load template: {}", room1TemplateId);
                     Optional<StructureTemplate> room1Template = manager.getTemplate(room1TemplateId);
 
@@ -113,7 +114,7 @@ public class SlipChunkGenerator extends ChunkGenerator {
 
                 // Load room_hole (special vertical shaft room)
                 for (String path : new String[]{"the_slip/room_hole", "structure/the_slip/room_hole"}) {
-                    Identifier holeTemplateId = Identifier.of("minecraft", path);
+                    Identifier holeTemplateId = Identifier.fromNamespaceAndPath("minecraft", path);
                     Deeperdark.LOGGER.info("Trying to load template: {}", holeTemplateId);
                     Optional<StructureTemplate> holeTemplate = manager.getTemplate(holeTemplateId);
 
@@ -141,14 +142,14 @@ public class SlipChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    public void carve(ChunkRegion chunkRegion, long seed, NoiseConfig noiseConfig,
-                      net.minecraft.world.biome.source.BiomeAccess biomeAccess,
-                      StructureAccessor structureAccessor, Chunk chunk) {
+    public void applyCarvers(WorldGenRegion chunkRegion, long seed, RandomState noiseConfig,
+                      net.minecraft.world.level.biome.BiomeManager biomeAccess,
+                      StructureManager structureAccessor, ChunkAccess chunk) {
         // No carving needed for room-based generation
     }
 
     @Override
-    public void buildSurface(ChunkRegion region, StructureAccessor structures, NoiseConfig noiseConfig, Chunk chunk) {
+    public void buildSurface(WorldGenRegion region, StructureManager structures, RandomState noiseConfig, ChunkAccess chunk) {
         // Cache the server reference if we don't have it yet
         if (cachedServer == null) {
             cachedServer = region.getServer();
@@ -172,18 +173,18 @@ public class SlipChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    public void populateEntities(ChunkRegion region) {
+    public void spawnOriginalMobs(WorldGenRegion region) {
         // Entity population handled by structure template
     }
 
     @Override
-    public int getWorldHeight() {
+    public int getGenDepth() {
         return 384;
     }
 
     @Override
-    public CompletableFuture<Chunk> populateNoise(Blender blender, NoiseConfig noiseConfig,
-                                                   StructureAccessor structureAccessor, Chunk chunk) {
+    public CompletableFuture<ChunkAccess> fillFromNoise(Blender blender, RandomState noiseConfig,
+                                                   StructureManager structureAccessor, ChunkAccess chunk) {
         // If templates aren't loaded yet, try to get the server and load them
         if (!templatesLoaded) {
             // Try to get server from multiple sources
@@ -227,7 +228,7 @@ public class SlipChunkGenerator extends ChunkGenerator {
         return CompletableFuture.completedFuture(chunk);
     }
 
-    private void fillChunkWithPlaceholder(Chunk chunk) {
+    private void fillChunkWithPlaceholder(ChunkAccess chunk) {
         // Fill with a placeholder block pattern (stone) instead of air
         // This prevents empty air chunks when templates aren't loaded yet
         for (int x = 0; x < 16; x++) {
@@ -235,18 +236,18 @@ public class SlipChunkGenerator extends ChunkGenerator {
                 for (int y = chunk.getBottomY(); y < chunk.getBottomY() + chunk.getHeight(); y++) {
                     // Create a simple pattern
                     if (y < 0) {
-                        chunk.setBlockState(new BlockPos(x, y, z), Blocks.DEEPSLATE.getDefaultState(), 0);
+                        chunk.setBlockState(new BlockPos(x, y, z), Blocks.DEEPSLATE.defaultBlockState(), 0);
                     } else if (y % DEFAULT_ROOM_SIZE < DEFAULT_ROOM_SIZE - 1) {
-                        chunk.setBlockState(new BlockPos(x, y, z), Blocks.STONE.getDefaultState(), 0);
+                        chunk.setBlockState(new BlockPos(x, y, z), Blocks.STONE.defaultBlockState(), 0);
                     } else {
-                        chunk.setBlockState(new BlockPos(x, y, z), Blocks.AIR.getDefaultState(), 0);
+                        chunk.setBlockState(new BlockPos(x, y, z), Blocks.AIR.defaultBlockState(), 0);
                     }
                 }
             }
         }
     }
 
-    private void generateRoomBasedTerrain(Chunk chunk) {
+    private void generateRoomBasedTerrain(ChunkAccess chunk) {
         ChunkPos chunkPos = chunk.getPos();
         int chunkStartX = chunkPos.getStartX();
         int chunkStartZ = chunkPos.getStartZ();
@@ -287,7 +288,7 @@ public class SlipChunkGenerator extends ChunkGenerator {
                         }
 
                         // Get rotation for this specific room instance
-                        BlockRotation rotation = getRoomRotation(roomX, roomY, roomZ);
+                        Rotation rotation = getRoomRotation(roomX, roomY, roomZ);
 
                         placeRoomInChunk(chunk, roomX, roomY, roomZ, selectedTemplate, selectedSize, rotation);
                     }
@@ -313,17 +314,17 @@ public class SlipChunkGenerator extends ChunkGenerator {
      * Gets the rotation for a specific room based on its coordinates.
      * Returns one of: NONE, CLOCKWISE_90, CLOCKWISE_180, COUNTERCLOCKWISE_90
      */
-    private BlockRotation getRoomRotation(int roomX, int roomY, int roomZ) {
+    private Rotation getRoomRotation(int roomX, int roomY, int roomZ) {
         // Use a hash to deterministically select rotation
         long hash = (long) roomX * 1640531527L + (long) roomY * 668265263L + (long) roomZ * 374761393L;
         hash = (hash ^ (hash >>> 13)) * 1274126177L;
 
         int rotationIndex = (int) ((hash & 0x7FFFFFFF) % 4);
         return switch (rotationIndex) {
-            case 0 -> BlockRotation.NONE;
-            case 1 -> BlockRotation.CLOCKWISE_90;
-            case 2 -> BlockRotation.CLOCKWISE_180;
-            default -> BlockRotation.COUNTERCLOCKWISE_90;
+            case 0 -> Rotation.NONE;
+            case 1 -> Rotation.CLOCKWISE_90;
+            case 2 -> Rotation.CLOCKWISE_180;
+            default -> Rotation.COUNTERCLOCKWISE_90;
         };
     }
 
@@ -345,13 +346,13 @@ public class SlipChunkGenerator extends ChunkGenerator {
      * Places the room_hole template vertically throughout the entire world height,
      * creating a deep pit effect. Uses consistent rotation for the entire shaft.
      */
-    private void placeVerticalShaft(Chunk chunk, int roomX, int roomZ) {
+    private void placeVerticalShaft(ChunkAccess chunk, int roomX, int roomZ) {
         if (roomHoleTemplate == null || roomHoleSize == null) return;
 
         int holeRoomSizeY = roomHoleSize.getY();
 
         // Get a consistent rotation for the entire vertical shaft
-        BlockRotation rotation = getRoomRotation(roomX, 0, roomZ);
+        Rotation rotation = getRoomRotation(roomX, 0, roomZ);
 
         // Fill the entire vertical space with hole rooms from -64 to 384
         int minY = -64;
@@ -361,7 +362,7 @@ public class SlipChunkGenerator extends ChunkGenerator {
         }
     }
 
-    private void placeRoomInChunk(Chunk chunk, int roomX, int roomY, int roomZ, StructureTemplate template, Vec3i size, BlockRotation rotation) {
+    private void placeRoomInChunk(ChunkAccess chunk, int roomX, int roomY, int roomZ, StructureTemplate template, Vec3i size, Rotation rotation) {
         if (template == null || size == null) return;
 
         int roomSizeX = size.getX();
@@ -437,7 +438,7 @@ public class SlipChunkGenerator extends ChunkGenerator {
      * Applies rotation to a block position within a structure.
      * Rotates around the center of the structure.
      */
-    private BlockPos applyRotation(BlockPos pos, BlockRotation rotation, Vec3i size) {
+    private BlockPos applyRotation(BlockPos pos, Rotation rotation, Vec3i size) {
         int x = pos.getX();
         int y = pos.getY();
         int z = pos.getZ();
@@ -457,28 +458,27 @@ public class SlipChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    public int getMinimumY() {
+    public int getMinY() {
         return 0;
     }
 
     @Override
-    public int getHeight(int x, int z, Heightmap.Type heightmap, HeightLimitView world, NoiseConfig noiseConfig) {
+    public int getBaseHeight(int x, int z, Heightmap.Types heightmap, LevelHeightAccessor world, RandomState noiseConfig) {
         // Return a reasonable height based on room structure
         return roomSize != null ? roomSize.getY() : DEFAULT_ROOM_SIZE;
     }
 
     @Override
-    public VerticalBlockSample getColumnSample(int x, int z, HeightLimitView world, NoiseConfig noiseConfig) {
-        // Simplified implementation - returns air column
+    public NoiseColumn getBaseColumn(int x, int z, LevelHeightAccessor world, RandomState noiseConfig) {
         BlockState[] states = new BlockState[world.getHeight()];
         for (int i = 0; i < states.length; i++) {
-            states[i] = Blocks.AIR.getDefaultState();
+            states[i] = Blocks.AIR.defaultBlockState();
         }
-        return new VerticalBlockSample(world.getBottomY(), states);
+        return new NoiseColumn(world.getMinY(), states);
     }
 
     @Override
-    public void appendDebugHudText(List<String> text, NoiseConfig noiseConfig, BlockPos pos) {
+    public void addDebugScreenInfo(List<String> text, RandomState noiseConfig, BlockPos pos) {
         text.add("Slip Room Generator");
         if (roomSize != null) {
             int roomX = Math.floorDiv(pos.getX(), roomSize.getX());

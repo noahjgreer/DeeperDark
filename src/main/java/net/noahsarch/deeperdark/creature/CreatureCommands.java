@@ -8,14 +8,14 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.minecraft.command.CommandSource;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
+import net.minecraft.world.phys.Vec3;
 import net.noahsarch.deeperdark.DeeperDarkConfig;
 
 import java.util.concurrent.CompletableFuture;
@@ -37,37 +37,37 @@ public class CreatureCommands {
      * Registers creature commands as a sub-tree to be added to the "dd" command.
      * Called from DeeperDarkCommands during command registration.
      */
-    public static com.mojang.brigadier.builder.LiteralArgumentBuilder<ServerCommandSource> buildCreatureCommand() {
-        return CommandManager.literal("creature")
+    public static com.mojang.brigadier.builder.LiteralArgumentBuilder<CommandSourceStack> buildCreatureCommand() {
+        return Commands.literal("creature")
                 // dd creature clear
-                .then(CommandManager.literal("clear")
+                .then(Commands.literal("clear")
                         .executes(CreatureCommands::executeClear))
 
                 // dd creature list
-                .then(CommandManager.literal("list")
+                .then(Commands.literal("list")
                         .executes(CreatureCommands::executeList))
 
                 // dd creature summon <x> <y> <z>
-                .then(CommandManager.literal("summon")
-                        .then(CommandManager.argument("x", DoubleArgumentType.doubleArg())
-                                .then(CommandManager.argument("y", DoubleArgumentType.doubleArg())
-                                        .then(CommandManager.argument("z", DoubleArgumentType.doubleArg())
+                .then(Commands.literal("summon")
+                        .then(Commands.argument("x", DoubleArgumentType.doubleArg())
+                                .then(Commands.argument("y", DoubleArgumentType.doubleArg())
+                                        .then(Commands.argument("z", DoubleArgumentType.doubleArg())
                                                 .executes(CreatureCommands::executeSummon)))))
 
                 // dd creature spawn <player> [maxDist]
-                .then(CommandManager.literal("spawn")
-                        .then(CommandManager.argument("player", StringArgumentType.word())
+                .then(Commands.literal("spawn")
+                        .then(Commands.argument("player", StringArgumentType.word())
                                 .suggests(CreatureCommands::suggestPlayers)
                                 .executes(CreatureCommands::executeSpawn)
-                                .then(CommandManager.argument("maxDist", IntegerArgumentType.integer(10, 500))
+                                .then(Commands.argument("maxDist", IntegerArgumentType.integer(10, 500))
                                         .executes(CreatureCommands::executeSpawnWithDist))))
 
                 // dd creature config ...
                 .then(buildConfigSubcommand());
     }
 
-    private static com.mojang.brigadier.builder.LiteralArgumentBuilder<ServerCommandSource> buildConfigSubcommand() {
-        return CommandManager.literal("config")
+    private static com.mojang.brigadier.builder.LiteralArgumentBuilder<CommandSourceStack> buildConfigSubcommand() {
+        return Commands.literal("config")
                 // Integer configs
                 .then(configInt("pathfinding_min_dist", 1, 1000))
                 .then(configInt("pathfinding_max_dist", 1, 1000))
@@ -104,163 +104,163 @@ public class CreatureCommands {
 
     // ===== Config Helper Builders =====
 
-    private static com.mojang.brigadier.builder.LiteralArgumentBuilder<ServerCommandSource> configInt(String name, int min, int max) {
-        return CommandManager.literal(name)
+    private static com.mojang.brigadier.builder.LiteralArgumentBuilder<CommandSourceStack> configInt(String name, int min, int max) {
+        return Commands.literal(name)
                 .executes(ctx -> executeConfigQueryInt(ctx, name))
-                .then(CommandManager.argument("value", IntegerArgumentType.integer(min, max))
+                .then(Commands.argument("value", IntegerArgumentType.integer(min, max))
                         .executes(ctx -> executeConfigSetInt(ctx, name)));
     }
 
-    private static com.mojang.brigadier.builder.LiteralArgumentBuilder<ServerCommandSource> configDouble(String name, double min, double max) {
-        return CommandManager.literal(name)
+    private static com.mojang.brigadier.builder.LiteralArgumentBuilder<CommandSourceStack> configDouble(String name, double min, double max) {
+        return Commands.literal(name)
                 .executes(ctx -> executeConfigQueryDouble(ctx, name))
-                .then(CommandManager.argument("value", DoubleArgumentType.doubleArg(min, max))
+                .then(Commands.argument("value", DoubleArgumentType.doubleArg(min, max))
                         .executes(ctx -> executeConfigSetDouble(ctx, name)));
     }
 
-    private static com.mojang.brigadier.builder.LiteralArgumentBuilder<ServerCommandSource> configBool(
+    private static com.mojang.brigadier.builder.LiteralArgumentBuilder<CommandSourceStack> configBool(
             String name,
             java.util.function.Function<CreatureConfig, Boolean> getter,
             java.util.function.BiConsumer<CreatureConfig, Boolean> setter) {
-        return CommandManager.literal(name)
+        return Commands.literal(name)
                 .executes(ctx -> {
                     boolean current = getter.apply(DeeperDarkConfig.get().creature);
-                    ctx.getSource().sendFeedback(() -> Text.literal(name + ": ")
-                            .append(Text.literal(String.valueOf(current)).formatted(current ? Formatting.GREEN : Formatting.RED)), false);
+                    ctx.getSource().sendSuccess(() -> Component.literal(name + ": ")
+                            .append(Component.literal(String.valueOf(current)).withStyle(current ? ChatFormatting.GREEN : ChatFormatting.RED)), false);
                     return 1;
                 })
-                .then(CommandManager.argument("value", BoolArgumentType.bool())
+                .then(Commands.argument("value", BoolArgumentType.bool())
                         .executes(ctx -> {
                             boolean value = BoolArgumentType.getBool(ctx, "value");
                             setter.accept(DeeperDarkConfig.get().creature, value);
                             DeeperDarkConfig.save();
-                            ctx.getSource().sendFeedback(() -> Text.literal("Set ")
-                                    .append(Text.literal(name).formatted(Formatting.AQUA))
-                                    .append(Text.literal(" to "))
-                                    .append(Text.literal(String.valueOf(value)).formatted(value ? Formatting.GREEN : Formatting.RED)), true);
+                            ctx.getSource().sendSuccess(() -> Component.literal("Set ")
+                                    .append(Component.literal(name).withStyle(ChatFormatting.AQUA))
+                                    .append(Component.literal(" to "))
+                                    .append(Component.literal(String.valueOf(value)).withStyle(value ? ChatFormatting.GREEN : ChatFormatting.RED)), true);
                             return 1;
                         }));
     }
 
     // ===== Command Executors =====
 
-    private static int executeClear(CommandContext<ServerCommandSource> ctx) {
+    private static int executeClear(CommandContext<CommandSourceStack> ctx) {
         int count = CreatureManager.clearAllCreatures();
-        ctx.getSource().sendFeedback(() -> Text.literal("Cleared ")
-                .append(Text.literal(String.valueOf(count)).formatted(Formatting.GOLD))
-                .append(Text.literal(" creature(s) from the world")), true);
+        ctx.getSource().sendSuccess(() -> Component.literal("Cleared ")
+                .append(Component.literal(String.valueOf(count)).withStyle(ChatFormatting.GOLD))
+                .append(Component.literal(" creature(s) from the world")), true);
         return count;
     }
 
-    private static int executeList(CommandContext<ServerCommandSource> ctx) {
+    private static int executeList(CommandContext<CommandSourceStack> ctx) {
         var creatures = CreatureManager.getAllCreatures();
         if (creatures.isEmpty()) {
-            ctx.getSource().sendFeedback(() -> Text.literal("No creatures currently active").formatted(Formatting.GRAY), false);
+            ctx.getSource().sendSuccess(() -> Component.literal("No creatures currently active").withStyle(ChatFormatting.GRAY), false);
             return 0;
         }
 
-        ctx.getSource().sendFeedback(() -> Text.literal("===== Active Creatures (" + creatures.size() + ") =====").formatted(Formatting.GOLD), false);
+        ctx.getSource().sendSuccess(() -> Component.literal("===== Active Creatures (" + creatures.size() + ") =====").withStyle(ChatFormatting.GOLD), false);
         for (CreatureInstance creature : creatures) {
             String line = creature.getStatusLine();
-            ctx.getSource().sendFeedback(() -> Text.literal(line), false);
+            ctx.getSource().sendSuccess(() -> Component.literal(line), false);
         }
         return creatures.size();
     }
 
-    private static int executeSummon(CommandContext<ServerCommandSource> ctx) {
+    private static int executeSummon(CommandContext<CommandSourceStack> ctx) {
         double x = DoubleArgumentType.getDouble(ctx, "x");
         double y = DoubleArgumentType.getDouble(ctx, "y");
         double z = DoubleArgumentType.getDouble(ctx, "z");
-        Vec3d pos = new Vec3d(x, y, z);
+        Vec3 pos = new Vec3(x, y, z);
 
-        ServerWorld world;
+        ServerLevel world;
         try {
             world = ctx.getSource().getWorld();
         } catch (Exception e) {
-            ctx.getSource().sendError(Text.literal("Could not determine world").formatted(Formatting.RED));
+            ctx.getSource().sendFailure(Component.literal("Could not determine world").withStyle(ChatFormatting.RED));
             return 0;
         }
 
         CreatureInstance creature = CreatureManager.spawnCreatureAt(world, pos);
-        ctx.getSource().sendFeedback(() -> Text.literal("Summoned creature ")
-                .append(Text.literal(creature.getCreatureId().toString().substring(0, 8)).formatted(Formatting.YELLOW))
-                .append(Text.literal(" at "))
-                .append(Text.literal(String.format("(%.1f, %.1f, %.1f)", x, y, z)).formatted(Formatting.AQUA)), true);
+        ctx.getSource().sendSuccess(() -> Component.literal("Summoned creature ")
+                .append(Component.literal(creature.getCreatureId().toString().substring(0, 8)).withStyle(ChatFormatting.YELLOW))
+                .append(Component.literal(" at "))
+                .append(Component.literal(String.format("(%.1f, %.1f, %.1f)", x, y, z)).withStyle(ChatFormatting.AQUA)), true);
         return 1;
     }
 
-    private static int executeSpawn(CommandContext<ServerCommandSource> ctx) {
+    private static int executeSpawn(CommandContext<CommandSourceStack> ctx) {
         return executeSpawnInternal(ctx, -1);
     }
 
-    private static int executeSpawnWithDist(CommandContext<ServerCommandSource> ctx) {
+    private static int executeSpawnWithDist(CommandContext<CommandSourceStack> ctx) {
         int maxDist = IntegerArgumentType.getInteger(ctx, "maxDist");
         return executeSpawnInternal(ctx, maxDist);
     }
 
-    private static int executeSpawnInternal(CommandContext<ServerCommandSource> ctx, int maxDist) {
+    private static int executeSpawnInternal(CommandContext<CommandSourceStack> ctx, int maxDist) {
         String playerName = StringArgumentType.getString(ctx, "player");
-        ServerPlayerEntity target = ctx.getSource().getServer().getPlayerManager().getPlayer(playerName);
+        ServerPlayer target = ctx.getSource().getServer().getPlayerManager().getPlayer(playerName);
 
         if (target == null) {
-            ctx.getSource().sendError(Text.literal("Player not found: " + playerName).formatted(Formatting.RED));
+            ctx.getSource().sendFailure(Component.literal("Player not found: " + playerName).withStyle(ChatFormatting.RED));
             return 0;
         }
 
         CreatureInstance creature = CreatureManager.spawnCreatureForPlayer(target, maxDist);
         if (creature == null) {
-            ctx.getSource().sendError(Text.literal("Failed to find valid placement for creature near " + playerName).formatted(Formatting.RED));
+            ctx.getSource().sendFailure(Component.literal("Failed to find valid placement for creature near " + playerName).withStyle(ChatFormatting.RED));
             return 0;
         }
 
-        ctx.getSource().sendFeedback(() -> Text.literal("Spawned creature ")
-                .append(Text.literal(creature.getCreatureId().toString().substring(0, 8)).formatted(Formatting.YELLOW))
-                .append(Text.literal(" targeting "))
-                .append(Text.literal(playerName).formatted(Formatting.GREEN))
-                .append(Text.literal(" at "))
-                .append(Text.literal(String.format("(%.1f, %.1f, %.1f)", creature.getPosition().x, creature.getPosition().y, creature.getPosition().z)).formatted(Formatting.AQUA)), true);
+        ctx.getSource().sendSuccess(() -> Component.literal("Spawned creature ")
+                .append(Component.literal(creature.getCreatureId().toString().substring(0, 8)).withStyle(ChatFormatting.YELLOW))
+                .append(Component.literal(" targeting "))
+                .append(Component.literal(playerName).withStyle(ChatFormatting.GREEN))
+                .append(Component.literal(" at "))
+                .append(Component.literal(String.format("(%.1f, %.1f, %.1f)", creature.getPosition().x, creature.getPosition().y, creature.getPosition().z)).withStyle(ChatFormatting.AQUA)), true);
         return 1;
     }
 
     // ===== Config Query/Set =====
 
-    private static int executeConfigQueryInt(CommandContext<ServerCommandSource> ctx, String name) {
+    private static int executeConfigQueryInt(CommandContext<CommandSourceStack> ctx, String name) {
         CreatureConfig config = DeeperDarkConfig.get().creature;
         int value = getIntConfig(config, name);
-        ctx.getSource().sendFeedback(() -> Text.literal(name + ": ")
-                .append(Text.literal(String.valueOf(value)).formatted(Formatting.AQUA)), false);
+        ctx.getSource().sendSuccess(() -> Component.literal(name + ": ")
+                .append(Component.literal(String.valueOf(value)).withStyle(ChatFormatting.AQUA)), false);
         return 1;
     }
 
-    private static int executeConfigSetInt(CommandContext<ServerCommandSource> ctx, String name) {
+    private static int executeConfigSetInt(CommandContext<CommandSourceStack> ctx, String name) {
         int value = IntegerArgumentType.getInteger(ctx, "value");
         CreatureConfig config = DeeperDarkConfig.get().creature;
         setIntConfig(config, name, value);
         DeeperDarkConfig.save();
-        ctx.getSource().sendFeedback(() -> Text.literal("Set ")
-                .append(Text.literal(name).formatted(Formatting.AQUA))
-                .append(Text.literal(" to "))
-                .append(Text.literal(String.valueOf(value)).formatted(Formatting.GOLD)), true);
+        ctx.getSource().sendSuccess(() -> Component.literal("Set ")
+                .append(Component.literal(name).withStyle(ChatFormatting.AQUA))
+                .append(Component.literal(" to "))
+                .append(Component.literal(String.valueOf(value)).withStyle(ChatFormatting.GOLD)), true);
         return 1;
     }
 
-    private static int executeConfigQueryDouble(CommandContext<ServerCommandSource> ctx, String name) {
+    private static int executeConfigQueryDouble(CommandContext<CommandSourceStack> ctx, String name) {
         CreatureConfig config = DeeperDarkConfig.get().creature;
         double value = getDoubleConfig(config, name);
-        ctx.getSource().sendFeedback(() -> Text.literal(name + ": ")
-                .append(Text.literal(String.valueOf(value)).formatted(Formatting.AQUA)), false);
+        ctx.getSource().sendSuccess(() -> Component.literal(name + ": ")
+                .append(Component.literal(String.valueOf(value)).withStyle(ChatFormatting.AQUA)), false);
         return 1;
     }
 
-    private static int executeConfigSetDouble(CommandContext<ServerCommandSource> ctx, String name) {
+    private static int executeConfigSetDouble(CommandContext<CommandSourceStack> ctx, String name) {
         double value = DoubleArgumentType.getDouble(ctx, "value");
         CreatureConfig config = DeeperDarkConfig.get().creature;
         setDoubleConfig(config, name, value);
         DeeperDarkConfig.save();
-        ctx.getSource().sendFeedback(() -> Text.literal("Set ")
-                .append(Text.literal(name).formatted(Formatting.AQUA))
-                .append(Text.literal(" to "))
-                .append(Text.literal(String.valueOf(value)).formatted(Formatting.GOLD)), true);
+        ctx.getSource().sendSuccess(() -> Component.literal("Set ")
+                .append(Component.literal(name).withStyle(ChatFormatting.AQUA))
+                .append(Component.literal(" to "))
+                .append(Component.literal(String.valueOf(value)).withStyle(ChatFormatting.GOLD)), true);
         return 1;
     }
 
@@ -338,7 +338,7 @@ public class CreatureCommands {
 
     // ===== Suggestions =====
 
-    private static CompletableFuture<Suggestions> suggestPlayers(CommandContext<ServerCommandSource> ctx, SuggestionsBuilder builder) {
+    private static CompletableFuture<Suggestions> suggestPlayers(CommandContext<CommandSourceStack> ctx, SuggestionsBuilder builder) {
         return CommandSource.suggestMatching(
                 ctx.getSource().getServer().getPlayerManager().getPlayerList().stream()
                         .map(p -> p.getName().getString()),

@@ -9,14 +9,14 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.minecraft.command.CommandSource;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
 import net.noahsarch.deeperdark.DeeperDarkConfig;
 import net.noahsarch.deeperdark.event.GoldenCauldronEvents;
 import net.noahsarch.deeperdark.event.GunpowderBlockEvents;
@@ -25,6 +25,7 @@ import net.noahsarch.deeperdark.event.SiphonEvents;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import net.minecraft.world.level.Explosion;
 
 /**
  * Consolidated command system for DeeperDark mod.
@@ -44,58 +45,58 @@ public class DeeperDarkCommands {
     private static void registerItems() {
         // Gunpowder Block (Sugar base)
         ItemStack gunpowderBlock = new ItemStack(Items.SUGAR);
-        gunpowderBlock.set(DataComponentTypes.ITEM_MODEL, GunpowderBlockEvents.GUNPOWDER_BLOCK_MODEL_ID);
+        gunpowderBlock.set(DataComponents.ITEM_MODEL, GunpowderBlockEvents.GUNPOWDER_BLOCK_MODEL_ID);
         // User requested localized name fix via recipe, but here we give default logic or let the client handle translation key if set
         // Adding custom name for clarity
-        gunpowderBlock.set(DataComponentTypes.ITEM_NAME, Text.translatable("item.deeperdark.gunpowder_block"));
+        gunpowderBlock.set(DataComponents.ITEM_NAME, Component.translatable("item.deeperdark.gunpowder_block"));
         REGISTRY.put("gunpowder_block", gunpowderBlock);
 
         // Leather Block (Brown Wool base)
         ItemStack leatherBlock = new ItemStack(Items.SUGAR);
-        leatherBlock.set(DataComponentTypes.ITEM_MODEL, net.noahsarch.deeperdark.event.LeatherBlockEvents.LEATHER_BLOCK_MODEL_ID);
-        leatherBlock.set(DataComponentTypes.ITEM_NAME, Text.translatable("item.deeperdark.leather_block"));
+        leatherBlock.set(DataComponents.ITEM_MODEL, net.noahsarch.deeperdark.event.LeatherBlockEvents.LEATHER_BLOCK_MODEL_ID);
+        leatherBlock.set(DataComponents.ITEM_NAME, Component.translatable("item.deeperdark.leather_block"));
         REGISTRY.put("leather_block", leatherBlock);
 
         // Flint Block (Cobbled Deepslate base)
         ItemStack flintBlock = new ItemStack(Items.SUGAR);
-        flintBlock.set(DataComponentTypes.ITEM_MODEL, net.noahsarch.deeperdark.event.FlintBlockEvents.FLINT_BLOCK_MODEL_ID);
-        flintBlock.set(DataComponentTypes.ITEM_NAME, Text.translatable("item.deeperdark.flint_block"));
+        flintBlock.set(DataComponents.ITEM_MODEL, net.noahsarch.deeperdark.event.FlintBlockEvents.FLINT_BLOCK_MODEL_ID);
+        flintBlock.set(DataComponents.ITEM_NAME, Component.translatable("item.deeperdark.flint_block"));
         REGISTRY.put("flint_block", flintBlock);
 
         // Rotten Flesh Block (Nether Wart Block base)
         ItemStack rottenFleshBlock = new ItemStack(Items.SUGAR);
-        rottenFleshBlock.set(DataComponentTypes.ITEM_MODEL, net.noahsarch.deeperdark.event.RottenFleshBlockEvents.ROTTEN_FLESH_BLOCK_MODEL_ID);
-        rottenFleshBlock.set(DataComponentTypes.ITEM_NAME, Text.translatable("item.deeperdark.rotten_flesh_block"));
+        rottenFleshBlock.set(DataComponents.ITEM_MODEL, net.noahsarch.deeperdark.event.RottenFleshBlockEvents.ROTTEN_FLESH_BLOCK_MODEL_ID);
+        rottenFleshBlock.set(DataComponents.ITEM_NAME, Component.translatable("item.deeperdark.rotten_flesh_block"));
         REGISTRY.put("rotten_flesh_block", rottenFleshBlock);
 
         // Golden Cauldron (Cauldron base, item model)
         ItemStack goldenCauldron = new ItemStack(Items.SUGAR);
-        goldenCauldron.set(DataComponentTypes.ITEM_MODEL, GoldenCauldronEvents.GOLDEN_CAULDRON_ITEM_MODEL_ID);
-        goldenCauldron.set(DataComponentTypes.ITEM_NAME, Text.translatable("item.deeperdark.golden_cauldron"));
+        goldenCauldron.set(DataComponents.ITEM_MODEL, GoldenCauldronEvents.GOLDEN_CAULDRON_ITEM_MODEL_ID);
+        goldenCauldron.set(DataComponents.ITEM_NAME, Component.translatable("item.deeperdark.golden_cauldron"));
         REGISTRY.put("golden_cauldron", goldenCauldron);
 
         // Siphon (Hopper base)
         ItemStack siphon = new ItemStack(Items.SUGAR);
-        siphon.set(DataComponentTypes.ITEM_MODEL, SiphonEvents.SIPHON_MODEL_ID);
-        siphon.set(DataComponentTypes.ITEM_NAME, Text.translatable("item.deeperdark.siphon"));
+        siphon.set(DataComponents.ITEM_MODEL, SiphonEvents.SIPHON_MODEL_ID);
+        siphon.set(DataComponents.ITEM_NAME, Component.translatable("item.deeperdark.siphon"));
         REGISTRY.put("siphon", siphon);
 
         // Leather Scrap (Sugar base)
         ItemStack leatherScrap = new ItemStack(Items.SUGAR);
-        leatherScrap.set(DataComponentTypes.ITEM_MODEL, net.minecraft.util.Identifier.of("leather_scrap"));
-        leatherScrap.set(DataComponentTypes.ITEM_NAME, Text.translatable("item.deeperdark.leather_scrap"));
+        leatherScrap.set(DataComponents.ITEM_MODEL, net.minecraft.resources.Identifier.withDefaultNamespace("leather_scrap"));
+        leatherScrap.set(DataComponents.ITEM_NAME, Component.translatable("item.deeperdark.leather_scrap"));
         REGISTRY.put("leather_scrap", leatherScrap);
     }
 
-    private static void registerCommands(CommandDispatcher<ServerCommandSource> dispatcher) {
+    private static void registerCommands(CommandDispatcher<CommandSourceStack> dispatcher) {
         // Main "dd" command with all subcommands
-        dispatcher.register(CommandManager.literal("dd")
+        dispatcher.register(Commands.literal("dd")
             .requires(source -> {
                 // Check if source has operator permissions (level 2)
                 try {
-                    net.minecraft.server.network.ServerPlayerEntity player = source.getPlayer();
+                    net.minecraft.server.level.ServerPlayer player = source.getPlayer();
                     if (player != null) {
-                        return source.getServer().getPlayerManager().isOperator(player.getPlayerConfigEntry());
+                        return source.getEntity() instanceof net.minecraft.server.level.ServerPlayer _p && source.getServer().getPlayerList().getOps().get(_p.getGameProfile()) != null;
                     }
                     // Allow console/command blocks
                     return true;
@@ -105,158 +106,158 @@ public class DeeperDarkCommands {
             })
 
             // dd give <item> [amount]
-            .then(CommandManager.literal("give")
-                .then(CommandManager.argument("item", StringArgumentType.word())
+            .then(Commands.literal("give")
+                .then(Commands.argument("item", StringArgumentType.word())
                     .suggests(DeeperDarkCommands::suggestItems)
                     .executes(DeeperDarkCommands::executeGive) // Default 1 item
-                    .then(CommandManager.argument("amount", IntegerArgumentType.integer(1, 64))
+                    .then(Commands.argument("amount", IntegerArgumentType.integer(1, 64))
                         .executes(DeeperDarkCommands::executeGiveWithAmount))))
 
             // dd border origin <x> <z>
             // dd border radius <radius>
             // dd border force <multiplier>
             // dd border info
-            .then(CommandManager.literal("border")
-                .then(CommandManager.literal("origin")
-                    .then(CommandManager.argument("x", IntegerArgumentType.integer())
-                        .then(CommandManager.argument("z", IntegerArgumentType.integer())
+            .then(Commands.literal("border")
+                .then(Commands.literal("origin")
+                    .then(Commands.argument("x", IntegerArgumentType.integer())
+                        .then(Commands.argument("z", IntegerArgumentType.integer())
                             .executes(DeeperDarkCommands::executeSetOrigin))))
-                .then(CommandManager.literal("radius")
-                    .then(CommandManager.argument("radius", DoubleArgumentType.doubleArg(1.0))
+                .then(Commands.literal("radius")
+                    .then(Commands.argument("radius", DoubleArgumentType.doubleArg(1.0))
                         .executes(DeeperDarkCommands::executeSetRadius)))
-                .then(CommandManager.literal("force")
-                    .then(CommandManager.argument("multiplier", DoubleArgumentType.doubleArg(0.0))
+                .then(Commands.literal("force")
+                    .then(Commands.argument("multiplier", DoubleArgumentType.doubleArg(0.0))
                         .executes(DeeperDarkCommands::executeSetForce)))
-                .then(CommandManager.literal("info")
+                .then(Commands.literal("info")
                     .executes(DeeperDarkCommands::executeBorderInfo)))
 
             // dd config <setting> <value>
             // dd config <setting> (query current value)
             // dd config list
-            .then(CommandManager.literal("config")
-                .then(CommandManager.literal("list")
+            .then(Commands.literal("config")
+                .then(Commands.literal("list")
                     .executes(DeeperDarkCommands::executeConfigList))
 
                 // Border settings
-                .then(CommandManager.literal("allowEntitySpawningOutsideBorder")
+                .then(Commands.literal("allowEntitySpawningOutsideBorder")
                     .executes(ctx -> executeConfigQuery(ctx, "allowEntitySpawning"))
-                    .then(CommandManager.argument("value", BoolArgumentType.bool())
+                    .then(Commands.argument("value", BoolArgumentType.bool())
                         .executes(ctx -> executeConfigBoolean(ctx, "allowEntitySpawning"))))
-                .then(CommandManager.literal("pushSurvivalModeOnly")
+                .then(Commands.literal("pushSurvivalModeOnly")
                     .executes(ctx -> executeConfigQuery(ctx, "pushSurvivalModeOnly"))
-                    .then(CommandManager.argument("value", BoolArgumentType.bool())
+                    .then(Commands.argument("value", BoolArgumentType.bool())
                         .executes(ctx -> executeConfigBoolean(ctx, "pushSurvivalModeOnly"))))
 
                 // Nether settings
-                .then(CommandManager.literal("netherCoordinateMultiplier")
+                .then(Commands.literal("netherCoordinateMultiplier")
                     .executes(ctx -> executeConfigQuery(ctx, "netherCoordinateMultiplier"))
-                    .then(CommandManager.argument("value", DoubleArgumentType.doubleArg(0.0))
+                    .then(Commands.argument("value", DoubleArgumentType.doubleArg(0.0))
                         .executes(ctx -> executeConfigDouble(ctx, "netherCoordinateMultiplier"))))
 
                 // Creeper settings
-                .then(CommandManager.literal("creeperEffectMinSeconds")
+                .then(Commands.literal("creeperEffectMinSeconds")
                     .executes(ctx -> executeConfigQuery(ctx, "creeperEffectMinSeconds"))
-                    .then(CommandManager.argument("value", IntegerArgumentType.integer(1))
+                    .then(Commands.argument("value", IntegerArgumentType.integer(1))
                         .executes(ctx -> executeConfigInt(ctx, "creeperEffectMinSeconds"))))
-                .then(CommandManager.literal("creeperEffectMaxSeconds")
+                .then(Commands.literal("creeperEffectMaxSeconds")
                     .executes(ctx -> executeConfigQuery(ctx, "creeperEffectMaxSeconds"))
-                    .then(CommandManager.argument("value", IntegerArgumentType.integer(1))
+                    .then(Commands.argument("value", IntegerArgumentType.integer(1))
                         .executes(ctx -> executeConfigInt(ctx, "creeperEffectMaxSeconds"))))
 
                 // Fortune settings
-                .then(CommandManager.literal("customFortuneEnabled")
+                .then(Commands.literal("customFortuneEnabled")
                     .executes(ctx -> executeConfigQuery(ctx, "customFortuneEnabled"))
-                    .then(CommandManager.argument("value", BoolArgumentType.bool())
+                    .then(Commands.argument("value", BoolArgumentType.bool())
                         .executes(ctx -> executeConfigBoolean(ctx, "customFortuneEnabled"))))
-                .then(CommandManager.literal("fortune1DropChance")
+                .then(Commands.literal("fortune1DropChance")
                     .executes(ctx -> executeConfigQuery(ctx, "fortune1DropChance"))
-                    .then(CommandManager.argument("value", DoubleArgumentType.doubleArg(0.0, 1.0))
+                    .then(Commands.argument("value", DoubleArgumentType.doubleArg(0.0, 1.0))
                         .executes(ctx -> executeConfigDouble(ctx, "fortune1DropChance"))))
-                .then(CommandManager.literal("fortune2DropChance")
+                .then(Commands.literal("fortune2DropChance")
                     .executes(ctx -> executeConfigQuery(ctx, "fortune2DropChance"))
-                    .then(CommandManager.argument("value", DoubleArgumentType.doubleArg(0.0, 1.0))
+                    .then(Commands.argument("value", DoubleArgumentType.doubleArg(0.0, 1.0))
                         .executes(ctx -> executeConfigDouble(ctx, "fortune2DropChance"))))
-                .then(CommandManager.literal("fortune3DropChance")
+                .then(Commands.literal("fortune3DropChance")
                     .executes(ctx -> executeConfigQuery(ctx, "fortune3DropChance"))
-                    .then(CommandManager.argument("value", DoubleArgumentType.doubleArg(0.0, 1.0))
+                    .then(Commands.argument("value", DoubleArgumentType.doubleArg(0.0, 1.0))
                         .executes(ctx -> executeConfigDouble(ctx, "fortune3DropChance"))))
-                .then(CommandManager.literal("fortuneMaxDrops")
+                .then(Commands.literal("fortuneMaxDrops")
                     .executes(ctx -> executeConfigQuery(ctx, "fortuneMaxDrops"))
-                    .then(CommandManager.argument("value", IntegerArgumentType.integer(1))
+                    .then(Commands.argument("value", IntegerArgumentType.integer(1))
                         .executes(ctx -> executeConfigInt(ctx, "fortuneMaxDrops"))))
 
                 // Explosion settings
-                .then(CommandManager.literal("explosionItemKnockbackEnabled")
+                .then(Commands.literal("explosionItemKnockbackEnabled")
                     .executes(ctx -> executeConfigQuery(ctx, "explosionItemKnockbackEnabled"))
-                    .then(CommandManager.argument("value", BoolArgumentType.bool())
+                    .then(Commands.argument("value", BoolArgumentType.bool())
                         .executes(ctx -> executeConfigBoolean(ctx, "explosionItemKnockbackEnabled"))))
-                .then(CommandManager.literal("explosionItemKnockbackMultiplier")
+                .then(Commands.literal("explosionItemKnockbackMultiplier")
                     .executes(ctx -> executeConfigQuery(ctx, "explosionItemKnockbackMultiplier"))
-                    .then(CommandManager.argument("value", DoubleArgumentType.doubleArg(1.0))
+                    .then(Commands.argument("value", DoubleArgumentType.doubleArg(1.0))
                         .executes(ctx -> executeConfigDouble(ctx, "explosionItemKnockbackMultiplier"))))
 
                 // Piston settings
-                .then(CommandManager.literal("pistonPushLimit")
+                .then(Commands.literal("pistonPushLimit")
                     .executes(ctx -> executeConfigQuery(ctx, "pistonPushLimit"))
-                    .then(CommandManager.argument("value", IntegerArgumentType.integer(1, 1000))
+                    .then(Commands.argument("value", IntegerArgumentType.integer(1, 1000))
                         .executes(ctx -> executeConfigInt(ctx, "pistonPushLimit"))))
 
                 // Enderman settings
-                .then(CommandManager.literal("endermanPickUpAllBlocks")
+                .then(Commands.literal("endermanPickUpAllBlocks")
                     .executes(ctx -> executeConfigQuery(ctx, "endermanPickUpAllBlocks"))
-                    .then(CommandManager.argument("value", BoolArgumentType.bool())
+                    .then(Commands.argument("value", BoolArgumentType.bool())
                         .executes(ctx -> executeConfigBoolean(ctx, "endermanPickUpAllBlocks"))))
 
                 // Baby mob settings
-                .then(CommandManager.literal("babySkeletonsEnabled")
+                .then(Commands.literal("babySkeletonsEnabled")
                     .executes(ctx -> executeConfigQuery(ctx, "babySkeletonsEnabled"))
-                    .then(CommandManager.argument("value", BoolArgumentType.bool())
+                    .then(Commands.argument("value", BoolArgumentType.bool())
                         .executes(ctx -> executeConfigBoolean(ctx, "babySkeletonsEnabled"))))
-                .then(CommandManager.literal("babyCreepersEnabled")
+                .then(Commands.literal("babyCreepersEnabled")
                     .executes(ctx -> executeConfigQuery(ctx, "babyCreepersEnabled"))
-                    .then(CommandManager.argument("value", BoolArgumentType.bool())
+                    .then(Commands.argument("value", BoolArgumentType.bool())
                         .executes(ctx -> executeConfigBoolean(ctx, "babyCreepersEnabled"))))
 
                 // Fishing settings
-                .then(CommandManager.literal("fishingChargedCreeperChance")
+                .then(Commands.literal("fishingChargedCreeperChance")
                     .executes(ctx -> executeConfigQuery(ctx, "fishingChargedCreeperChance"))
-                    .then(CommandManager.argument("value", IntegerArgumentType.integer(1))
+                    .then(Commands.argument("value", IntegerArgumentType.integer(1))
                         .executes(ctx -> executeConfigInt(ctx, "fishingChargedCreeperChance"))))
 
                 // Moss growth settings
-                .then(CommandManager.literal("mossGrowthEnabled")
+                .then(Commands.literal("mossGrowthEnabled")
                     .executes(ctx -> executeConfigQuery(ctx, "mossGrowthEnabled"))
-                    .then(CommandManager.argument("value", BoolArgumentType.bool())
+                    .then(Commands.argument("value", BoolArgumentType.bool())
                         .executes(ctx -> executeConfigBoolean(ctx, "mossGrowthEnabled"))))
-                .then(CommandManager.literal("mossTickCheckFrequency")
+                .then(Commands.literal("mossTickCheckFrequency")
                     .executes(ctx -> executeConfigQuery(ctx, "mossTickCheckFrequency"))
-                    .then(CommandManager.argument("value", IntegerArgumentType.integer(1))
+                    .then(Commands.argument("value", IntegerArgumentType.integer(1))
                         .executes(ctx -> executeConfigInt(ctx, "mossTickCheckFrequency"))))
-                .then(CommandManager.literal("mossBaseChance")
+                .then(Commands.literal("mossBaseChance")
                     .executes(ctx -> executeConfigQuery(ctx, "mossBaseChance"))
-                    .then(CommandManager.argument("value", DoubleArgumentType.doubleArg(0.0, 1.0))
+                    .then(Commands.argument("value", DoubleArgumentType.doubleArg(0.0, 1.0))
                         .executes(ctx -> executeConfigDouble(ctx, "mossBaseChance"))))
-                .then(CommandManager.literal("mossNearbyBonus")
+                .then(Commands.literal("mossNearbyBonus")
                     .executes(ctx -> executeConfigQuery(ctx, "mossNearbyBonus"))
-                    .then(CommandManager.argument("value", DoubleArgumentType.doubleArg(0.0, 1.0))
+                    .then(Commands.argument("value", DoubleArgumentType.doubleArg(0.0, 1.0))
                         .executes(ctx -> executeConfigDouble(ctx, "mossNearbyBonus"))))
-                .then(CommandManager.literal("mossUnderwaterMultiplier")
+                .then(Commands.literal("mossUnderwaterMultiplier")
                     .executes(ctx -> executeConfigQuery(ctx, "mossUnderwaterMultiplier"))
-                    .then(CommandManager.argument("value", DoubleArgumentType.doubleArg(0.1))
+                    .then(Commands.argument("value", DoubleArgumentType.doubleArg(0.1))
                         .executes(ctx -> executeConfigDouble(ctx, "mossUnderwaterMultiplier"))))
-                .then(CommandManager.literal("stoneBrickMossMultiplier")
+                .then(Commands.literal("stoneBrickMossMultiplier")
                     .executes(ctx -> executeConfigQuery(ctx, "stoneBrickMossMultiplier"))
-                    .then(CommandManager.argument("value", DoubleArgumentType.doubleArg(0.0))
+                    .then(Commands.argument("value", DoubleArgumentType.doubleArg(0.0))
                         .executes(ctx -> executeConfigDouble(ctx, "stoneBrickMossMultiplier"))))
 
                 // Zombie settings
-                .then(CommandManager.literal("zombieFollowRange")
+                .then(Commands.literal("zombieFollowRange")
                     .executes(ctx -> executeConfigQuery(ctx, "zombieFollowRange"))
-                    .then(CommandManager.argument("value", DoubleArgumentType.doubleArg(1.0, 128.0))
+                    .then(Commands.argument("value", DoubleArgumentType.doubleArg(1.0, 128.0))
                         .executes(ctx -> executeConfigDouble(ctx, "zombieFollowRange")))))
 
             // dd reload - Reload configuration from disk
-            .then(CommandManager.literal("reload")
+            .then(Commands.literal("reload")
                 .executes(DeeperDarkCommands::executeReload))
 
             // dd creature - Creature system commands
@@ -265,58 +266,58 @@ public class DeeperDarkCommands {
 
     // ===== Suggestions =====
 
-    private static CompletableFuture<Suggestions> suggestItems(CommandContext<ServerCommandSource> context, SuggestionsBuilder builder) {
-        return CommandSource.suggestMatching(REGISTRY.keySet(), builder);
+    private static CompletableFuture<Suggestions> suggestItems(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
+        return SharedSuggestionProvider.suggest(REGISTRY.keySet(), builder);
     }
 
     // ===== Command Executors =====
 
     // ----- Give command -----
-    private static int executeGive(CommandContext<ServerCommandSource> context) {
+    private static int executeGive(CommandContext<CommandSourceStack> context) {
         return executeGiveInternal(context, 1);
     }
 
-    private static int executeGiveWithAmount(CommandContext<ServerCommandSource> context) {
+    private static int executeGiveWithAmount(CommandContext<CommandSourceStack> context) {
         int amount = IntegerArgumentType.getInteger(context, "amount");
         return executeGiveInternal(context, amount);
     }
 
-    private static int executeGiveInternal(CommandContext<ServerCommandSource> context, int amount) {
-        ServerCommandSource source = context.getSource();
+    private static int executeGiveInternal(CommandContext<CommandSourceStack> context, int amount) {
+        CommandSourceStack source = context.getSource();
         String itemName = StringArgumentType.getString(context, "item");
 
         ItemStack stack = REGISTRY.get(itemName);
         if (stack == null) {
-            source.sendError(Text.literal("Unknown item: " + itemName).formatted(Formatting.RED));
+            source.sendFailure(Component.literal("Unknown item: " + itemName).withStyle(ChatFormatting.RED));
             return 0;
         }
 
         try {
-            net.minecraft.server.network.ServerPlayerEntity player = source.getPlayerOrThrow();
+            net.minecraft.server.level.ServerPlayer player = source.getPlayerOrException();
             ItemStack giveStack = stack.copy();
             giveStack.setCount(amount);
 
-            boolean inserted = player.getInventory().insertStack(giveStack);
+            boolean inserted = player.getInventory().add(giveStack);
             if (!inserted) {
-                player.dropItem(giveStack, false);
+                player.drop(giveStack, false);
             }
 
-            source.sendFeedback(() -> Text.literal("Gave ")
-                .append(Text.literal(String.valueOf(amount)).formatted(Formatting.GOLD))
-                .append(Text.literal(" ["))
-                .append(Text.literal(itemName).formatted(Formatting.AQUA))
-                .append(Text.literal("] to "))
-                .append(Text.literal(player.getName().getString()).formatted(Formatting.YELLOW)), true);
+            source.sendSuccess(() -> Component.literal("Gave ")
+                .append(Component.literal(String.valueOf(amount)).withStyle(ChatFormatting.GOLD))
+                .append(Component.literal(" ["))
+                .append(Component.literal(itemName).withStyle(ChatFormatting.AQUA))
+                .append(Component.literal("] to "))
+                .append(Component.literal(player.getName().getString()).withStyle(ChatFormatting.YELLOW)), true);
             return 1;
         } catch (Exception e) {
-            source.sendError(Text.literal("Failed to give item: " + e.getMessage()).formatted(Formatting.RED));
+            source.sendFailure(Component.literal("Failed to give item: " + e.getMessage()).withStyle(ChatFormatting.RED));
             return 0;
         }
     }
 
     // ----- Border commands -----
-    private static int executeSetOrigin(CommandContext<ServerCommandSource> context) {
-        ServerCommandSource source = context.getSource();
+    private static int executeSetOrigin(CommandContext<CommandSourceStack> context) {
+        CommandSourceStack source = context.getSource();
         int x = IntegerArgumentType.getInteger(context, "x");
         int z = IntegerArgumentType.getInteger(context, "z");
 
@@ -325,107 +326,107 @@ public class DeeperDarkCommands {
         config.originZ = z;
         DeeperDarkConfig.save();
 
-        source.sendFeedback(() -> Text.literal("Border origin set to ")
-            .append(Text.literal("(" + x + ", " + z + ")").formatted(Formatting.AQUA)), true);
+        source.sendSuccess(() -> Component.literal("Border origin set to ")
+            .append(Component.literal("(" + x + ", " + z + ")").withStyle(ChatFormatting.AQUA)), true);
         return 1;
     }
 
-    private static int executeSetRadius(CommandContext<ServerCommandSource> context) {
-        ServerCommandSource source = context.getSource();
+    private static int executeSetRadius(CommandContext<CommandSourceStack> context) {
+        CommandSourceStack source = context.getSource();
         double radius = DoubleArgumentType.getDouble(context, "radius");
 
         DeeperDarkConfig.ConfigInstance config = DeeperDarkConfig.get();
         config.safeRadius = radius;
         DeeperDarkConfig.save();
 
-        source.sendFeedback(() -> Text.literal("Border radius set to ")
-            .append(Text.literal(String.valueOf(radius)).formatted(Formatting.AQUA))
-            .append(Text.literal(" blocks")), true);
+        source.sendSuccess(() -> Component.literal("Border radius set to ")
+            .append(Component.literal(String.valueOf(radius)).withStyle(ChatFormatting.AQUA))
+            .append(Component.literal(" blocks")), true);
         return 1;
     }
 
-    private static int executeSetForce(CommandContext<ServerCommandSource> context) {
-        ServerCommandSource source = context.getSource();
+    private static int executeSetForce(CommandContext<CommandSourceStack> context) {
+        CommandSourceStack source = context.getSource();
         double multiplier = DoubleArgumentType.getDouble(context, "multiplier");
 
         DeeperDarkConfig.ConfigInstance config = DeeperDarkConfig.get();
         config.forceMultiplier = multiplier;
         DeeperDarkConfig.save();
 
-        source.sendFeedback(() -> Text.literal("Border force multiplier set to ")
-            .append(Text.literal(String.valueOf(multiplier)).formatted(Formatting.AQUA)), true);
+        source.sendSuccess(() -> Component.literal("Border force multiplier set to ")
+            .append(Component.literal(String.valueOf(multiplier)).withStyle(ChatFormatting.AQUA)), true);
         return 1;
     }
 
-    private static int executeBorderInfo(CommandContext<ServerCommandSource> context) {
-        ServerCommandSource source = context.getSource();
+    private static int executeBorderInfo(CommandContext<CommandSourceStack> context) {
+        CommandSourceStack source = context.getSource();
         DeeperDarkConfig.ConfigInstance config = DeeperDarkConfig.get();
 
-        source.sendFeedback(() -> Text.literal("===== Border Configuration =====").formatted(Formatting.GOLD)
-            .append(Text.literal("\nOrigin: ").formatted(Formatting.WHITE))
-            .append(Text.literal("(" + config.originX + ", " + config.originZ + ")").formatted(Formatting.AQUA))
-            .append(Text.literal("\nRadius: ").formatted(Formatting.WHITE))
-            .append(Text.literal(String.valueOf(config.safeRadius)).formatted(Formatting.AQUA))
-            .append(Text.literal(" blocks").formatted(Formatting.WHITE))
-            .append(Text.literal("\nForce Multiplier: ").formatted(Formatting.WHITE))
-            .append(Text.literal(String.valueOf(config.forceMultiplier)).formatted(Formatting.AQUA))
-            .append(Text.literal("\nAllow Entity Spawning Outside: ").formatted(Formatting.WHITE))
-            .append(Text.literal(String.valueOf(config.allowEntitySpawning)).formatted(config.allowEntitySpawning ? Formatting.GREEN : Formatting.RED)), false);
+        source.sendSuccess(() -> Component.literal("===== Border Configuration =====").withStyle(ChatFormatting.GOLD)
+            .append(Component.literal("\nOrigin: ").withStyle(ChatFormatting.WHITE))
+            .append(Component.literal("(" + config.originX + ", " + config.originZ + ")").withStyle(ChatFormatting.AQUA))
+            .append(Component.literal("\nRadius: ").withStyle(ChatFormatting.WHITE))
+            .append(Component.literal(String.valueOf(config.safeRadius)).withStyle(ChatFormatting.AQUA))
+            .append(Component.literal(" blocks").withStyle(ChatFormatting.WHITE))
+            .append(Component.literal("\nForce Multiplier: ").withStyle(ChatFormatting.WHITE))
+            .append(Component.literal(String.valueOf(config.forceMultiplier)).withStyle(ChatFormatting.AQUA))
+            .append(Component.literal("\nAllow Entity Spawning Outside: ").withStyle(ChatFormatting.WHITE))
+            .append(Component.literal(String.valueOf(config.allowEntitySpawning)).withStyle(config.allowEntitySpawning ? ChatFormatting.GREEN : ChatFormatting.RED)), false);
         return 1;
     }
 
     // ----- Config commands -----
-    private static int executeConfigList(CommandContext<ServerCommandSource> context) {
-        ServerCommandSource source = context.getSource();
+    private static int executeConfigList(CommandContext<CommandSourceStack> context) {
+        CommandSourceStack source = context.getSource();
         DeeperDarkConfig.ConfigInstance config = DeeperDarkConfig.get();
 
-        source.sendFeedback(() -> Text.literal("===== DeeperDark Configuration =====").formatted(Formatting.GOLD)
-            .append(Text.literal("\n\n--- Border Settings ---").formatted(Formatting.YELLOW))
+        source.sendSuccess(() -> Component.literal("===== DeeperDark Configuration =====").withStyle(ChatFormatting.GOLD)
+            .append(Component.literal("\n\n--- Border Settings ---").withStyle(ChatFormatting.YELLOW))
             .append(formatConfigLine("allowEntitySpawningOutsideBorder", config.allowEntitySpawning))
             .append(formatConfigLine("pushSurvivalModeOnly", config.pushSurvivalModeOnly))
-            .append(Text.literal("\n\n--- Nether Settings ---").formatted(Formatting.YELLOW))
+            .append(Component.literal("\n\n--- Nether Settings ---").withStyle(ChatFormatting.YELLOW))
             .append(formatConfigLine("netherCoordinateMultiplier", config.netherCoordinateMultiplier))
-            .append(Text.literal("\n\n--- Creeper Settings ---").formatted(Formatting.YELLOW))
+            .append(Component.literal("\n\n--- Creeper Settings ---").withStyle(ChatFormatting.YELLOW))
             .append(formatConfigLine("creeperEffectMinSeconds", config.creeperEffectMinSeconds))
             .append(formatConfigLine("creeperEffectMaxSeconds", config.creeperEffectMaxSeconds))
-            .append(Text.literal("\n\n--- Fortune Settings ---").formatted(Formatting.YELLOW))
+            .append(Component.literal("\n\n--- Fortune Settings ---").withStyle(ChatFormatting.YELLOW))
             .append(formatConfigLine("customFortuneEnabled", config.customFortuneEnabled))
             .append(formatConfigLine("fortune1DropChance", config.fortune1DropChance))
             .append(formatConfigLine("fortune2DropChance", config.fortune2DropChance))
             .append(formatConfigLine("fortune3DropChance", config.fortune3DropChance))
             .append(formatConfigLine("fortuneMaxDrops", config.fortuneMaxDrops))
-            .append(Text.literal("\n\n--- Explosion Settings ---").formatted(Formatting.YELLOW))
+            .append(Component.literal("\n\n--- Explosion Settings ---").withStyle(ChatFormatting.YELLOW))
             .append(formatConfigLine("explosionItemKnockbackEnabled", config.explosionItemKnockbackEnabled))
             .append(formatConfigLine("explosionItemKnockbackMultiplier", config.explosionItemKnockbackMultiplier))
-            .append(Text.literal("\n\n--- Piston Settings ---").formatted(Formatting.YELLOW))
+            .append(Component.literal("\n\n--- Piston Settings ---").withStyle(ChatFormatting.YELLOW))
             .append(formatConfigLine("pistonPushLimit", config.pistonPushLimit))
-            .append(Text.literal("\n\n--- Enderman Settings ---").formatted(Formatting.YELLOW))
+            .append(Component.literal("\n\n--- Enderman Settings ---").withStyle(ChatFormatting.YELLOW))
             .append(formatConfigLine("endermanPickUpAllBlocks", config.endermanPickUpAllBlocks))
-            .append(Text.literal("\n\n--- Baby Mob Settings ---").formatted(Formatting.YELLOW))
+            .append(Component.literal("\n\n--- Baby Mob Settings ---").withStyle(ChatFormatting.YELLOW))
             .append(formatConfigLine("babySkeletonsEnabled", config.babySkeletonsEnabled))
             .append(formatConfigLine("babyCreepersEnabled", config.babyCreepersEnabled))
-            .append(Text.literal("\n\n--- Fishing Settings ---").formatted(Formatting.YELLOW))
+            .append(Component.literal("\n\n--- Fishing Settings ---").withStyle(ChatFormatting.YELLOW))
             .append(formatConfigLine("fishingChargedCreeperChance", config.fishingChargedCreeperChance))
-            .append(Text.literal("\n\n--- Moss Growth Settings ---").formatted(Formatting.YELLOW))
+            .append(Component.literal("\n\n--- Moss Growth Settings ---").withStyle(ChatFormatting.YELLOW))
             .append(formatConfigLine("mossGrowthEnabled", config.mossGrowthEnabled))
             .append(formatConfigLine("mossTickCheckFrequency", config.mossTickCheckFrequency))
             .append(formatConfigLine("mossBaseChance", config.mossBaseChance))
             .append(formatConfigLine("mossNearbyBonus", config.mossNearbyBonus))
             .append(formatConfigLine("mossUnderwaterMultiplier", config.mossUnderwaterMultiplier))
             .append(formatConfigLine("stoneBrickMossMultiplier", config.stoneBrickMossMultiplier))
-            .append(Text.literal("\n\n--- Zombie Settings ---").formatted(Formatting.YELLOW))
+            .append(Component.literal("\n\n--- Zombie Settings ---").withStyle(ChatFormatting.YELLOW))
             .append(formatConfigLine("zombieFollowRange", config.zombieFollowRange))
-            .append(Text.literal("\n\nUse /dd config <setting> [value] to change or query settings").formatted(Formatting.GRAY)), false);
+            .append(Component.literal("\n\nUse /dd config <setting> [value] to change or query settings").withStyle(ChatFormatting.GRAY)), false);
         return 1;
     }
 
-    private static Text formatConfigLine(String key, Object value) {
-        return Text.literal("\n  " + key + ": ").formatted(Formatting.WHITE)
-            .append(Text.literal(String.valueOf(value)).formatted(Formatting.AQUA));
+    private static Component formatConfigLine(String key, Object value) {
+        return Component.literal("\n  " + key + ": ").withStyle(ChatFormatting.WHITE)
+            .append(Component.literal(String.valueOf(value)).withStyle(ChatFormatting.AQUA));
     }
 
-    private static int executeConfigQuery(CommandContext<ServerCommandSource> context, String configKey) {
-        ServerCommandSource source = context.getSource();
+    private static int executeConfigQuery(CommandContext<CommandSourceStack> context, String configKey) {
+        CommandSourceStack source = context.getSource();
         DeeperDarkConfig.ConfigInstance config = DeeperDarkConfig.get();
         Object value = switch (configKey) {
             case "allowEntitySpawning" -> config.allowEntitySpawning;
@@ -453,20 +454,20 @@ public class DeeperDarkCommands {
             case "stoneBrickMossMultiplier" -> config.stoneBrickMossMultiplier;
             case "zombieFollowRange" -> config.zombieFollowRange;
             default -> {
-                source.sendError(Text.literal("Unknown config key: " + configKey).formatted(Formatting.RED));
+                source.sendFailure(Component.literal("Unknown config key: " + configKey).withStyle(ChatFormatting.RED));
                 yield null;
             }
         };
 
         if (value == null) return 0;
 
-        source.sendFeedback(() -> Text.literal(configKey + ": ").formatted(Formatting.WHITE)
-            .append(Text.literal(String.valueOf(value)).formatted(Formatting.AQUA)), false);
+        source.sendSuccess(() -> Component.literal(configKey + ": ").withStyle(ChatFormatting.WHITE)
+            .append(Component.literal(String.valueOf(value)).withStyle(ChatFormatting.AQUA)), false);
         return 1;
     }
 
-    private static int executeConfigBoolean(CommandContext<ServerCommandSource> context, String configKey) {
-        ServerCommandSource source = context.getSource();
+    private static int executeConfigBoolean(CommandContext<CommandSourceStack> context, String configKey) {
+        CommandSourceStack source = context.getSource();
         boolean value = BoolArgumentType.getBool(context, "value");
         DeeperDarkConfig.ConfigInstance config = DeeperDarkConfig.get();
 
@@ -480,21 +481,21 @@ public class DeeperDarkCommands {
             case "babyCreepersEnabled" -> config.babyCreepersEnabled = value;
             case "mossGrowthEnabled" -> config.mossGrowthEnabled = value;
             default -> {
-                source.sendError(Text.literal("Unknown config key: " + configKey).formatted(Formatting.RED));
+                source.sendFailure(Component.literal("Unknown config key: " + configKey).withStyle(ChatFormatting.RED));
                 return 0;
             }
         }
 
         DeeperDarkConfig.save();
-        source.sendFeedback(() -> Text.literal("Set ")
-            .append(Text.literal(configKey).formatted(Formatting.AQUA))
-            .append(Text.literal(" to "))
-            .append(Text.literal(String.valueOf(value)).formatted(value ? Formatting.GREEN : Formatting.RED)), true);
+        source.sendSuccess(() -> Component.literal("Set ")
+            .append(Component.literal(configKey).withStyle(ChatFormatting.AQUA))
+            .append(Component.literal(" to "))
+            .append(Component.literal(String.valueOf(value)).withStyle(value ? ChatFormatting.GREEN : ChatFormatting.RED)), true);
         return 1;
     }
 
-    private static int executeConfigInt(CommandContext<ServerCommandSource> context, String configKey) {
-        ServerCommandSource source = context.getSource();
+    private static int executeConfigInt(CommandContext<CommandSourceStack> context, String configKey) {
+        CommandSourceStack source = context.getSource();
         int value = IntegerArgumentType.getInteger(context, "value");
         DeeperDarkConfig.ConfigInstance config = DeeperDarkConfig.get();
 
@@ -506,21 +507,21 @@ public class DeeperDarkCommands {
             case "fishingChargedCreeperChance" -> config.fishingChargedCreeperChance = value;
             case "mossTickCheckFrequency" -> config.mossTickCheckFrequency = value;
             default -> {
-                source.sendError(Text.literal("Unknown config key: " + configKey).formatted(Formatting.RED));
+                source.sendFailure(Component.literal("Unknown config key: " + configKey).withStyle(ChatFormatting.RED));
                 return 0;
             }
         }
 
         DeeperDarkConfig.save();
-        source.sendFeedback(() -> Text.literal("Set ")
-            .append(Text.literal(configKey).formatted(Formatting.AQUA))
-            .append(Text.literal(" to "))
-            .append(Text.literal(String.valueOf(value)).formatted(Formatting.GOLD)), true);
+        source.sendSuccess(() -> Component.literal("Set ")
+            .append(Component.literal(configKey).withStyle(ChatFormatting.AQUA))
+            .append(Component.literal(" to "))
+            .append(Component.literal(String.valueOf(value)).withStyle(ChatFormatting.GOLD)), true);
         return 1;
     }
 
-    private static int executeConfigDouble(CommandContext<ServerCommandSource> context, String configKey) {
-        ServerCommandSource source = context.getSource();
+    private static int executeConfigDouble(CommandContext<CommandSourceStack> context, String configKey) {
+        CommandSourceStack source = context.getSource();
         double value = DoubleArgumentType.getDouble(context, "value");
         DeeperDarkConfig.ConfigInstance config = DeeperDarkConfig.get();
 
@@ -536,29 +537,29 @@ public class DeeperDarkCommands {
             case "stoneBrickMossMultiplier" -> config.stoneBrickMossMultiplier = value;
             case "zombieFollowRange" -> config.zombieFollowRange = value;
             default -> {
-                source.sendError(Text.literal("Unknown config key: " + configKey).formatted(Formatting.RED));
+                source.sendFailure(Component.literal("Unknown config key: " + configKey).withStyle(ChatFormatting.RED));
                 return 0;
             }
         }
 
         DeeperDarkConfig.save();
-        source.sendFeedback(() -> Text.literal("Set ")
-            .append(Text.literal(configKey).formatted(Formatting.AQUA))
-            .append(Text.literal(" to "))
-            .append(Text.literal(String.valueOf(value)).formatted(Formatting.GOLD)), true);
+        source.sendSuccess(() -> Component.literal("Set ")
+            .append(Component.literal(configKey).withStyle(ChatFormatting.AQUA))
+            .append(Component.literal(" to "))
+            .append(Component.literal(String.valueOf(value)).withStyle(ChatFormatting.GOLD)), true);
         return 1;
     }
 
     // ----- Reload command -----
-    private static int executeReload(CommandContext<ServerCommandSource> context) {
-        ServerCommandSource source = context.getSource();
+    private static int executeReload(CommandContext<CommandSourceStack> context) {
+        CommandSourceStack source = context.getSource();
 
         try {
             DeeperDarkConfig.load();
-            source.sendFeedback(() -> Text.literal("Successfully reloaded DeeperDark configuration from disk").formatted(Formatting.GREEN), true);
+            source.sendSuccess(() -> Component.literal("Successfully reloaded DeeperDark configuration from disk").withStyle(ChatFormatting.GREEN), true);
             return 1;
         } catch (Exception e) {
-            source.sendError(Text.literal("Failed to reload configuration: " + e.getMessage()).formatted(Formatting.RED));
+            source.sendFailure(Component.literal("Failed to reload configuration: " + e.getMessage()).withStyle(ChatFormatting.RED));
             return 0;
         }
     }

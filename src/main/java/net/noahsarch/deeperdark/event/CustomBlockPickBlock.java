@@ -1,15 +1,15 @@
 package net.noahsarch.deeperdark.event;
 
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.entity.decoration.DisplayEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.world.World;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.entity.Display;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.level.Level;
 
 /**
  * Handles middle-click pick block for custom blocks.
@@ -21,26 +21,26 @@ public class CustomBlockPickBlock {
         // This won't catch actual middle-click (that's client-only),
         // but we can provide a workaround using right-click while sneaking
         UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
-            if (world.isClient() || hand != Hand.MAIN_HAND) {
-                return ActionResult.PASS;
+            if (world.isClient() || hand != InteractionHand.MAIN_HAND) {
+                return InteractionResult.PASS;
             }
 
             // Only trigger if player is sneaking and holding nothing or the same custom block
             if (!player.isSneaking()) {
-                return ActionResult.PASS;
+                return InteractionResult.PASS;
             }
 
             BlockPos pos = hitResult.getBlockPos();
             ItemStack clickedBlock = getCustomBlockItem(world, pos);
 
             if (clickedBlock == null) {
-                return ActionResult.PASS;
+                return InteractionResult.PASS;
             }
 
             // Check if player has permission (creative or has item in inventory)
-            ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
+            ServerPlayer serverPlayer = (ServerPlayer) player;
             if (!serverPlayer.isCreative() && !hasItemInInventory(serverPlayer, clickedBlock)) {
-                return ActionResult.PASS;
+                return InteractionResult.PASS;
             }
 
             // Get the custom block item
@@ -54,24 +54,24 @@ public class CustomBlockPickBlock {
             // Only replace if slot is empty or contains the same item
             if (currentStack.isEmpty() || ItemStack.areItemsAndComponentsEqual(currentStack, pickStack)) {
                 serverPlayer.getInventory().setStack(selectedSlot, pickStack);
-                return ActionResult.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
 
-            return ActionResult.PASS;
+            return InteractionResult.PASS;
         });
     }
 
     /**
      * Get the custom block item at the given position
      */
-    private static ItemStack getCustomBlockItem(World world, BlockPos pos) {
-        Box box = new Box(pos);
+    private static ItemStack getCustomBlockItem(Level world, BlockPos pos) {
+        AABB box = new AABB(pos);
         var displays = world.getEntitiesByClass(
-            DisplayEntity.ItemDisplayEntity.class,
+            Display.ItemDisplay.class,
             box,
             entity -> {
                 ItemStack stack = entity.getItemStack();
-                return stack.contains(DataComponentTypes.ITEM_MODEL);
+                return stack.contains(DataComponents.ITEM_MODEL);
             }
         );
 
@@ -86,7 +86,7 @@ public class CustomBlockPickBlock {
     /**
      * Check if player has the item in their inventory
      */
-    private static boolean hasItemInInventory(ServerPlayerEntity player, ItemStack item) {
+    private static boolean hasItemInInventory(ServerPlayer player, ItemStack item) {
         for (int i = 0; i < player.getInventory().size(); i++) {
             ItemStack stack = player.getInventory().getStack(i);
             if (ItemStack.areItemsAndComponentsEqual(stack, item)) {

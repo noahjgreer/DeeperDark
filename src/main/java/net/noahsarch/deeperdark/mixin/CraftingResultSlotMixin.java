@@ -1,16 +1,16 @@
 package net.noahsarch.deeperdark.mixin;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.screen.slot.CraftingResultSlot;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.protocol.game.ClientboundSoundPacket;
+import net.minecraft.core.Holder;
+import net.minecraft.world.inventory.ResultSlot;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.Level;
 import net.noahsarch.deeperdark.Deeperdark;
 import net.noahsarch.deeperdark.duck.EntityAccessor;
 import org.spongepowered.asm.mixin.Final;
@@ -27,15 +27,15 @@ import java.util.WeakHashMap;
 
 /**
  * Mixin to play a sound when players craft items on the crafting table.
- * Uses the same Direct RegistryEntry approach as the organ noteblock sound.
+ * Uses the same Direct Holder approach as the organ noteblock sound.
  */
-@Mixin(CraftingResultSlot.class)
+@Mixin(ResultSlot.class)
 public class CraftingResultSlotMixin {
 
-    @Shadow @Final private PlayerEntity player;
+    @Shadow @Final private Player player;
 
     @Unique
-    private static final Identifier CRAFTING_SOUND_ID = Identifier.of(Deeperdark.MOD_ID, "block.crafting_table.craft");
+    private static final Identifier CRAFTING_SOUND_ID = Identifier.fromNamespaceAndPath(Deeperdark.MOD_ID, "block.crafting_table.craft");
 
     /**
      * Debounce map to track last craft time per player UUID.
@@ -56,9 +56,9 @@ public class CraftingResultSlotMixin {
      * Uses debouncing to prevent sound spam when shift-clicking to craft multiple items.
      */
     @Inject(method = "onTakeItem", at = @At("HEAD"))
-    private void deeperdark$playCraftingSound(PlayerEntity player, ItemStack stack, CallbackInfo ci) {
-        World world = ((EntityAccessor)player).deeperdark$getWorld();
-        if (player instanceof ServerPlayerEntity serverPlayer && world instanceof ServerWorld serverWorld) {
+    private void deeperdark$playCraftingSound(Player player, ItemStack stack, CallbackInfo ci) {
+        Level world = ((EntityAccessor)player).deeperdark$getWorld();
+        if (player instanceof ServerPlayer serverPlayer && world instanceof ServerLevel serverWorld) {
             // Check debounce - only play sound if enough time has passed since last craft
             UUID playerUUID = player.getUuid();
             long currentTime = System.currentTimeMillis();
@@ -72,14 +72,14 @@ public class CraftingResultSlotMixin {
     }
 
     /**
-     * Send the crafting sound packet to all nearby players using Direct RegistryEntry.
+     * Send the crafting sound packet to all nearby players using Direct Holder.
      * This mirrors how the vanilla /playsound command works, bypassing registry sync.
      */
     @Unique
-    private void deeperdark$sendCraftingSound(ServerWorld world, ServerPlayerEntity crafter) {
-        // Create a Direct RegistryEntry (not Reference) - same as /playsound command does
+    private void deeperdark$sendCraftingSound(ServerLevel world, ServerPlayer crafter) {
+        // Create a Direct Holder (not Reference) - same as /playsound command does
         // This bypasses Fabric's registry sync because Direct entries aren't synced
-        RegistryEntry<SoundEvent> soundEntry = RegistryEntry.of(SoundEvent.of(CRAFTING_SOUND_ID));
+        Holder<SoundEvent> soundEntry = Holder.of(SoundEvent.of(CRAFTING_SOUND_ID));
 
         double x = crafter.getX();
         double y = crafter.getY();
@@ -92,12 +92,12 @@ public class CraftingResultSlotMixin {
         double maxDistSq = Math.pow(soundEntry.value().getDistanceToTravel(volume), 2);
 
         // Send packet to all players within hearing range
-        for (ServerPlayerEntity player : world.getPlayers()) {
+        for (ServerPlayer player : world.getPlayers()) {
             double distSq = player.squaredDistanceTo(x, y, z);
             if (distSq < maxDistSq) {
-                player.networkHandler.sendPacket(new PlaySoundS2CPacket(
+                player.networkHandler.sendPacket(new ClientboundSoundPacket(
                     soundEntry,
-                    SoundCategory.BLOCKS,
+                    SoundSource.BLOCKS,
                     x, y, z,
                     volume,
                     pitch,

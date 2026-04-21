@@ -1,16 +1,16 @@
 package net.noahsarch.deeperdark.potion;
 
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.LoreComponent;
-import net.minecraft.component.type.PotionContentsComponent;
-import net.minecraft.component.type.TooltipDisplayComponent;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableTextContent;
-import net.minecraft.util.Formatting;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.component.ItemLore;
+import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.item.component.TooltipDisplay;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
+import net.minecraft.ChatFormatting;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,8 +22,8 @@ public class ScentlessPotion {
         ItemStack potionStack = new ItemStack(Items.POTION);
 
         // ...existing code...
-        StatusEffectInstance windChargedEffect = new StatusEffectInstance(
-            StatusEffects.WIND_CHARGED,
+        MobEffectInstance windChargedEffect = new MobEffectInstance(
+            MobEffects.WIND_CHARGED,
             isLong ? 19200 : 9600,  // 8 minutes or 3 minutes
             0,                     // Amplifier
             false,                 // Ambient
@@ -32,7 +32,7 @@ public class ScentlessPotion {
         );
 
         // ...existing code...
-        PotionContentsComponent customPotionContents = new PotionContentsComponent(
+        PotionContents customPotionContents = new PotionContents(
             Optional.empty(),                     // No base potion
             Optional.of(0x529EC9),               // Custom purple color
             List.of(windChargedEffect),          // Our custom effect list
@@ -40,38 +40,38 @@ public class ScentlessPotion {
         );
 
         // Set potion Lore with different colors for each line
-        LoreComponent lore = new LoreComponent(List.of(
-            Text.translatable("effect.deeperdark.scentless.duration", isLong ? "16:00" : "8:00")
-                    .formatted(Formatting.RESET).formatted(Formatting.BLUE).styled(style -> {
+        ItemLore lore = new ItemLore(List.of(
+            Component.translatable("effect.deeperdark.scentless.duration", isLong ? "16:00" : "8:00")
+                    .formatted(ChatFormatting.RESET).formatted(ChatFormatting.BLUE).styled(style -> {
                         return style.withItalic(false);
                     }),
-            Text.translatable("effect.deeperdark.scentless.desc.1")
-                    .formatted(Formatting.RESET).formatted(Formatting.GRAY).styled(style -> {
+            Component.translatable("effect.deeperdark.scentless.desc.1")
+                    .formatted(ChatFormatting.RESET).formatted(ChatFormatting.GRAY).styled(style -> {
                         return style.withItalic(false);
                     }),
-            Text.translatable("effect.deeperdark.scentless.desc.2")
-                    .formatted(Formatting.RESET).formatted(Formatting.GRAY).styled(style -> {
+            Component.translatable("effect.deeperdark.scentless.desc.2")
+                    .formatted(ChatFormatting.RESET).formatted(ChatFormatting.GRAY).styled(style -> {
                         return style.withItalic(false);
                     })
         ));
 
         // Create tooltip display component to hide potion contents
-        TooltipDisplayComponent tooltip = new TooltipDisplayComponent(false,
-            new java.util.LinkedHashSet<>(java.util.Set.of(DataComponentTypes.POTION_CONTENTS))
+        TooltipDisplay tooltip = new TooltipDisplay(false,
+            new java.util.LinkedHashSet<>(java.util.Set.of(DataComponents.POTION_CONTENTS))
         );
 
         // Set the custom potion contents
-        potionStack.set(DataComponentTypes.POTION_CONTENTS, customPotionContents);
+        potionStack.set(DataComponents.POTION_CONTENTS, customPotionContents);
 
         // Set lore
-        potionStack.set(DataComponentTypes.LORE, lore);
+        potionStack.set(DataComponents.LORE, lore);
 
         // Set tooltip display to hide potion contents
-        potionStack.set(DataComponentTypes.TOOLTIP_DISPLAY, tooltip);
+        potionStack.set(DataComponents.TOOLTIP_DISPLAY, tooltip);
 
         // Set custom name
-        potionStack.set(DataComponentTypes.CUSTOM_NAME,
-            Text.translatable(isLong ? "potion.deeperdark.long_scentless.name" : "potion.deeperdark.scentless.name").formatted(Formatting.RESET).formatted(Formatting.WHITE).styled(style -> {
+        potionStack.set(DataComponents.CUSTOM_NAME,
+            Component.translatable(isLong ? "potion.deeperdark.long_scentless.name" : "potion.deeperdark.scentless.name").formatted(ChatFormatting.RESET).formatted(ChatFormatting.WHITE).styled(style -> {
                 return style.withItalic(false);
             }));
 
@@ -80,13 +80,13 @@ public class ScentlessPotion {
 
     // Helper method to check if a potion is our custom scentless potion
     public static boolean isScentlessPotion(ItemStack stack) {
-        if (!(stack.getItem() instanceof net.minecraft.item.PotionItem)) {
+        if (!(stack.getItem() instanceof net.minecraft.world.item.PotionItem)) {
             return false;
         }
 
         // Check if it has our custom name
-        Text customName = stack.get(DataComponentTypes.CUSTOM_NAME);
-        if (customName != null && customName.getContent() instanceof TranslatableTextContent translatable) {
+        Component customName = stack.get(DataComponents.CUSTOM_NAME);
+        if (customName != null && customName.getContent() instanceof TranslatableContents translatable) {
             String key = translatable.getKey();
             return key.equals("potion.deeperdark.scentless.name") ||
                    key.equals("potion.deeperdark.long_scentless.name");

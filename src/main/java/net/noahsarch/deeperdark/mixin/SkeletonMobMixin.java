@@ -1,17 +1,17 @@
 package net.noahsarch.deeperdark.mixin;
 
-import net.minecraft.entity.EntityData;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.attribute.EntityAttributeModifier;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.mob.CreeperEntity;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.mob.SkeletonEntity;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.LocalDifficulty;
-import net.minecraft.world.ServerWorldAccess;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.SpawnGroupData;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.monster.skeleton.Skeleton;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.DifficultyInstance;
+import net.minecraft.world.level.ServerLevelAccessor;
 import net.noahsarch.deeperdark.DeeperDarkConfig;
 import net.noahsarch.deeperdark.util.BabyCreeperAccessor;
 import net.noahsarch.deeperdark.util.BabySkeletonAccessor;
@@ -22,21 +22,21 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(MobEntity.class)
+@Mixin(Mob.class)
 public class SkeletonMobMixin implements BabySkeletonAccessor, BabyCreeperAccessor {
 
     @Unique
-    private static final Identifier BABY_SPEED_MODIFIER_ID = Identifier.of("deeperdark", "baby_skeleton_speed");
+    private static final Identifier BABY_SPEED_MODIFIER_ID = Identifier.fromNamespaceAndPath("deeperdark", "baby_skeleton_speed");
     @Unique
-    private static final EntityAttributeModifier BABY_SPEED_MODIFIER = new EntityAttributeModifier(
-        BABY_SPEED_MODIFIER_ID, 0.75, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE
+    private static final AttributeModifier BABY_SPEED_MODIFIER = new AttributeModifier(
+        BABY_SPEED_MODIFIER_ID, 0.75, AttributeModifier.Operation.ADD_MULTIPLIED_BASE
     );
 
     @Unique
-    private static final Identifier BABY_CREEPER_SPEED_MODIFIER_ID = Identifier.of("deeperdark", "baby_creeper_speed");
+    private static final Identifier BABY_CREEPER_SPEED_MODIFIER_ID = Identifier.fromNamespaceAndPath("deeperdark", "baby_creeper_speed");
     @Unique
-    private static final EntityAttributeModifier BABY_CREEPER_SPEED_MODIFIER = new EntityAttributeModifier(
-        BABY_CREEPER_SPEED_MODIFIER_ID, 0.75, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE
+    private static final AttributeModifier BABY_CREEPER_SPEED_MODIFIER = new AttributeModifier(
+        BABY_CREEPER_SPEED_MODIFIER_ID, 0.75, AttributeModifier.Operation.ADD_MULTIPLIED_BASE
     );
 
     @Unique
@@ -66,11 +66,11 @@ public class SkeletonMobMixin implements BabySkeletonAccessor, BabyCreeperAccess
     }
 
     @Inject(method = "initialize", at = @At("TAIL"))
-    private void deeperdark$initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, EntityData entityData, CallbackInfoReturnable<EntityData> cir) {
-        MobEntity self = (MobEntity)(Object)this;
+    private void deeperdark$initialize(ServerLevelAccessor world, DifficultyInstance difficulty, EntitySpawnReason spawnReason, SpawnGroupData entityData, CallbackInfoReturnable<SpawnGroupData> cir) {
+        Mob self = (Mob)(Object)this;
 
         // Handle baby skeletons
-        if (self instanceof SkeletonEntity) {
+        if (self instanceof Skeleton) {
             // Check if baby skeletons are enabled in config
             if (!DeeperDarkConfig.get().babySkeletonsEnabled) return;
 
@@ -81,7 +81,7 @@ public class SkeletonMobMixin implements BabySkeletonAccessor, BabyCreeperAccess
         }
 
         // Handle baby creepers
-        if (self instanceof CreeperEntity) {
+        if (self instanceof Creeper) {
             // Check if baby creepers are enabled in config
             if (!DeeperDarkConfig.get().babyCreepersEnabled) return;
 
@@ -92,24 +92,24 @@ public class SkeletonMobMixin implements BabySkeletonAccessor, BabyCreeperAccess
         }
     }
 
-    @Inject(method = "writeCustomData", at = @At("TAIL"))
-    private void deeperdark$writeCustomData(WriteView view, CallbackInfo ci) {
-        MobEntity self = (MobEntity)(Object)this;
-        if (self instanceof SkeletonEntity) {
+    @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
+    private void deeperdark$writeCustomData(ValueOutput view, CallbackInfo ci) {
+        Mob self = (Mob)(Object)this;
+        if (self instanceof Skeleton) {
             view.putBoolean("DeeperDarkIsBaby", this.deeperdark$isBaby);
         }
-        if (self instanceof CreeperEntity) {
+        if (self instanceof Creeper) {
             view.putBoolean("DeeperDarkIsBabyCreeper", this.deeperdark$isBabyCreeper);
         }
     }
 
-    @Inject(method = "readCustomData", at = @At("TAIL"))
-    private void deeperdark$readCustomData(ReadView view, CallbackInfo ci) {
-        MobEntity self = (MobEntity)(Object)this;
-        if (self instanceof SkeletonEntity) {
+    @Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
+    private void deeperdark$readCustomData(ValueInput view, CallbackInfo ci) {
+        Mob self = (Mob)(Object)this;
+        if (self instanceof Skeleton) {
             this.deeperdark$setBabyInternal(view.getBoolean("DeeperDarkIsBaby", false));
         }
-        if (self instanceof CreeperEntity) {
+        if (self instanceof Creeper) {
             this.deeperdark$setBabyCreeperInternal(view.getBoolean("DeeperDarkIsBabyCreeper", false));
         }
     }
@@ -117,10 +117,10 @@ public class SkeletonMobMixin implements BabySkeletonAccessor, BabyCreeperAccess
     @Unique
     private void deeperdark$setBabyInternal(boolean isBaby) {
         this.deeperdark$isBaby = isBaby;
-        MobEntity self = (MobEntity) (Object) this;
+        Mob self = (Mob) (Object) this;
 
-        var scaleAttr = self.getAttributeInstance(EntityAttributes.SCALE);
-        var speedAttr = self.getAttributeInstance(EntityAttributes.MOVEMENT_SPEED);
+        var scaleAttr = self.getAttributeInstance(Attributes.SCALE);
+        var speedAttr = self.getAttributeInstance(Attributes.MOVEMENT_SPEED);
 
         if (isBaby) {
             // Set scale to half
@@ -148,10 +148,10 @@ public class SkeletonMobMixin implements BabySkeletonAccessor, BabyCreeperAccess
     @Unique
     private void deeperdark$setBabyCreeperInternal(boolean isBaby) {
         this.deeperdark$isBabyCreeper = isBaby;
-        MobEntity self = (MobEntity) (Object) this;
+        Mob self = (Mob) (Object) this;
 
-        var scaleAttr = self.getAttributeInstance(EntityAttributes.SCALE);
-        var speedAttr = self.getAttributeInstance(EntityAttributes.MOVEMENT_SPEED);
+        var scaleAttr = self.getAttributeInstance(Attributes.SCALE);
+        var speedAttr = self.getAttributeInstance(Attributes.MOVEMENT_SPEED);
 
         if (isBaby) {
             // Set scale to half

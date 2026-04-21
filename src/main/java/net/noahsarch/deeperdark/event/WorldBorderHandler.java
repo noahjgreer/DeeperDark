@@ -1,10 +1,10 @@
 package net.noahsarch.deeperdark.event;
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ServerLevel;
 import net.noahsarch.deeperdark.DeeperDarkConfig;
 
 import java.util.ArrayList;
@@ -17,14 +17,14 @@ public class WorldBorderHandler {
             DeeperDarkConfig.ConfigInstance config = DeeperDarkConfig.get();
 
             // Handle players
-            for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
+            for (ServerPlayer player : server.getPlayerManager().getPlayerList()) {
                 if (player.isSpectator()) continue;
 
                 // If pushSurvivalModeOnly is true, skip creative players
                 if (config.pushSurvivalModeOnly && player.isCreative()) continue;
 
                 if (player.hasVehicle()) {
-                    net.minecraft.entity.Entity vehicle = player.getVehicle();
+                    net.minecraft.world.entity.Entity vehicle = player.getVehicle();
                     if (vehicle != null && vehicle.getControllingPassenger() == player) {
                         applyBorderForce(vehicle);
                     }
@@ -34,21 +34,21 @@ public class WorldBorderHandler {
             }
 
             // Handle mobs in all worlds
-            for (ServerWorld world : server.getWorlds()) {
+            for (ServerLevel world : server.getWorlds()) {
                 // Collect all mobs first to avoid concurrent modification
-                List<MobEntity> mobs = new ArrayList<>();
+                List<Mob> mobs = new ArrayList<>();
                 world.iterateEntities().forEach(entity -> {
-                    if (entity instanceof MobEntity mob) {
+                    if (entity instanceof Mob mob) {
                         mobs.add(mob);
                     }
                 });
 
                 // Now process them safely
-                for (MobEntity mob : mobs) {
+                for (Mob mob : mobs) {
                     if (!mob.isRemoved()) { // Check if still exists
                         boolean handled = false;
                         if (mob.hasVehicle()) {
-                            net.minecraft.entity.Entity vehicle = mob.getVehicle();
+                            net.minecraft.world.entity.Entity vehicle = mob.getVehicle();
                             if (vehicle != null && vehicle.getControllingPassenger() == mob) {
                                 applyBorderForce(vehicle);
                                 handled = true;
@@ -79,7 +79,7 @@ public class WorldBorderHandler {
     /**
      * Handle mobs near or outside the border
      */
-    private static void handleMobBorder(MobEntity mob) {
+    private static void handleMobBorder(Mob mob) {
         DeeperDarkConfig.ConfigInstance config = DeeperDarkConfig.get();
 
         // If entity spawning is allowed, don't push or delete mobs
@@ -124,7 +124,7 @@ public class WorldBorderHandler {
         }
     }
 
-    public static void applyBorderForce(net.minecraft.entity.Entity entity) {
+    public static void applyBorderForce(net.minecraft.world.entity.Entity entity) {
         DeeperDarkConfig.ConfigInstance config = DeeperDarkConfig.get();
         double radius = config.safeRadius;
         int originX = config.originX;
@@ -151,10 +151,10 @@ public class WorldBorderHandler {
             entity.addVelocity(-Math.signum(dx) * strengthX, 0, -Math.signum(dz) * strengthZ);
             entity.velocityDirty = true;
 
-            if (entity instanceof ServerPlayerEntity player) {
-                player.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(player));
-            } else if (entity.getEntityWorld() instanceof ServerWorld serverWorld) {
-                serverWorld.getChunkManager().sendToNearbyPlayers(entity, new EntityVelocityUpdateS2CPacket(entity));
+            if (entity instanceof ServerPlayer player) {
+                player.networkHandler.sendPacket(new ClientboundSetEntityMotionPacket(player));
+            } else if (entity.getEntityWorld() instanceof ServerLevel serverWorld) {
+                serverWorld.getChunkManager().sendToNearbyPlayers(entity, new ClientboundSetEntityMotionPacket(entity));
             }
         }
     }

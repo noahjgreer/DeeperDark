@@ -1,16 +1,15 @@
 package net.noahsarch.deeperdark.mixin;
 
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.structure.SimpleStructurePiece;
-import net.minecraft.structure.StructurePiece;
-import net.minecraft.structure.StructurePiecesCollector;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.BiomeKeys;
-import net.minecraft.world.biome.source.BiomeCoords;
-import net.minecraft.world.gen.structure.Structure;
-import net.minecraft.world.gen.structure.WoodlandMansionStructure;
+import net.minecraft.core.Holder;
+import net.minecraft.world.level.levelgen.structure.TemplateStructurePiece;
+import net.minecraft.world.level.levelgen.structure.StructurePiece;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.core.QuartPos;
+import net.minecraft.world.level.levelgen.structure.Structure;
+import net.minecraft.world.level.levelgen.structure.structures.WoodlandMansionStructure;
 import net.noahsarch.deeperdark.worldgen.PaleMansionProcessor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -18,24 +17,26 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
+import net.minecraft.world.level.levelgen.structure.pieces.StructurePiecesBuilder;
+import net.minecraft.world.level.levelgen.structure.Structure.GenerationContext;
 
 @Mixin(WoodlandMansionStructure.class)
 public class WoodlandMansionStructureMixin {
 
     @Inject(method = "addPieces", at = @At("TAIL"))
-    private void deeperdark$replaceWithPaleOak(StructurePiecesCollector collector, Structure.Context context, BlockPos pos, BlockRotation rotation, CallbackInfo ci) {
+    private void deeperdark$replaceWithPaleOak(StructurePiecesBuilder collector, GenerationContext context, BlockPos pos, Rotation rotation, CallbackInfo ci) {
         List<StructurePiece> pieces = ((StructurePiecesCollectorAccessor) collector).getPieces();
         boolean isPaleMansion = false;
 
         for (StructurePiece piece : pieces) {
             BlockPos center = piece.getBoundingBox().getCenter();
-            RegistryEntry<Biome> biomeEntry = context.chunkGenerator().getBiomeSource().getBiome(
-                    BiomeCoords.fromBlock(center.getX()),
-                    BiomeCoords.fromBlock(center.getY()),
-                    BiomeCoords.fromBlock(center.getZ()),
-                    context.noiseConfig().getMultiNoiseSampler()
+            Holder<Biome> biomeEntry = context.chunkGenerator().getBiomeSource().getBiome(
+                    QuartPos.fromBlock(center.getX()),
+                    QuartPos.fromBlock(center.getY()),
+                    QuartPos.fromBlock(center.getZ()),
+                    context.randomState().getMultiNoiseSampler()
             );
-            if (biomeEntry.matchesKey(BiomeKeys.PALE_GARDEN)) {
+            if (biomeEntry.matchesKey(Biomes.PALE_GARDEN)) {
                 isPaleMansion = true;
                 break;
             }
@@ -43,7 +44,7 @@ public class WoodlandMansionStructureMixin {
 
         if (isPaleMansion) {
             for (StructurePiece piece : pieces) {
-                if (piece instanceof SimpleStructurePiece simplePiece) {
+                if (piece instanceof TemplateStructurePiece simplePiece) {
                     ((SimpleStructurePieceAccessor) simplePiece).deeperdark$getPlacementData().addProcessor(PaleMansionProcessor.INSTANCE);
 
                 }

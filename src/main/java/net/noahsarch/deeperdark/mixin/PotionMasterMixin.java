@@ -1,15 +1,14 @@
 package net.noahsarch.deeperdark.mixin;
 
-import net.minecraft.entity.passive.VillagerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.village.TradeOfferList;
-import net.minecraft.village.TradeOffers;
-import net.minecraft.village.VillagerData;
-import net.minecraft.village.VillagerProfession;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.RegistryKey;
+import net.minecraft.world.entity.npc.villager.Villager;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.item.trading.MerchantOffers;
+import net.minecraft.world.entity.npc.villager.VillagerData;
+import net.minecraft.world.entity.npc.villager.VillagerProfession;
+import net.minecraft.core.Holder;
+import net.minecraft.resources.ResourceKey;
 import net.noahsarch.deeperdark.duck.PotionMasterDuck;
 import net.noahsarch.deeperdark.villager.ModVillagers;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,8 +18,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import net.noahsarch.deeperdark.villager.ModVillagers;
 
-@Mixin(VillagerEntity.class)
+@Mixin(Villager.class)
 public abstract class PotionMasterMixin implements PotionMasterDuck {
 
     @Shadow public abstract VillagerData getVillagerData();
@@ -38,29 +38,33 @@ public abstract class PotionMasterMixin implements PotionMasterDuck {
         this.isPotionMaster = isPotionMaster;
     }
 
-    @Inject(method = "writeCustomData", at = @At("TAIL"))
-    public void writeCustomData(WriteView view, CallbackInfo ci) {
+    @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
+    public void writeCustomData(ValueOutput view, CallbackInfo ci) {
         if (this.isPotionMaster) {
             view.putBoolean("DeeperDarkPotionMaster", true);
         }
     }
 
-    @Inject(method = "readCustomData", at = @At("TAIL"))
-    public void readCustomData(ReadView view, CallbackInfo ci) {
+    @Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
+    public void readCustomData(ValueInput view, CallbackInfo ci) {
         this.isPotionMaster = view.getBoolean("DeeperDarkPotionMaster", false);
     }
 
     @Inject(method = "fillRecipes", at = @At("HEAD"), cancellable = true)
-    public void fillRecipes(ServerWorld world, CallbackInfo ci) {
+    public void fillRecipes(ServerLevel world, CallbackInfo ci) {
         if (this.isPotionMaster) {
-            VillagerEntity villager = (VillagerEntity) (Object) this;
+            Villager villager = (Villager) (Object) this;
             VillagerData villagerData = this.getVillagerData();
             // We use the villager's level to determine trades from our custom map
             if(ModVillagers.POTION_MASTER_TRADES.containsKey(villagerData.level())) {
-                TradeOffers.Factory[] factories = ModVillagers.POTION_MASTER_TRADES.get(villagerData.level());
+                ModVillagers.TradeFactory[] factories = ModVillagers.POTION_MASTER_TRADES.get(villagerData.level());
                 if (factories != null) {
-                    TradeOfferList tradeOfferList = villager.getOffers();
-                    ((VillagerEntityAccessor)villager).deeperdark$fillRecipesFromPool(world, tradeOfferList, factories, 2);
+                    MerchantOffers offers = villager.getOffers();
+                    int added = 0;
+                    for (int i = 0; i < factories.length && added < 2; i++) {
+                        net.minecraft.world.item.trading.MerchantOffer offer = factories[i].create(world, villager, villager.getRandom());
+                        if (offer != null) { offers.add(offer); added++; }
+                    }
                 }
             }
             ci.cancel(); // Prevent vanilla logic which might look for profession-based trades
@@ -69,8 +73,8 @@ public abstract class PotionMasterMixin implements PotionMasterDuck {
 
     // We redirect the matchesKey check in mobTick to prevent the villager from resetting its customer
     // when it has the NONE profession (which we forcing for visuals) but is a Potion Master.
-    @Redirect(method = "mobTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/registry/entry/RegistryEntry;matchesKey(Lnet/minecraft/registry/RegistryKey;)Z"))
-    public boolean deeperdark$preventCustomerReset(RegistryEntry<VillagerProfession> instance, RegistryKey<VillagerProfession> key) {
+    @Redirect(method = "mobTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/registry/entry/Holder;matchesKey(Lnet/minecraft/registry/ResourceKey;)Z"))
+    public boolean deeperdark$preventCustomerReset(Holder<VillagerProfession> instance, ResourceKey<VillagerProfession> key) {
         if (this.isPotionMaster && key.equals(VillagerProfession.NONE)) {
             // Logic: if we are a Potion Master and the code checks if we match NONE, return false!
             // This tricks the logic: if (profession.matchesKey(NONE)) -> false

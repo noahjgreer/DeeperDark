@@ -1,23 +1,23 @@
 package net.noahsarch.deeperdark.mixin;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.PillarBlock;
-import net.minecraft.block.SaplingBlock;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.gen.feature.ConfiguredFeature;
-import net.minecraft.world.gen.feature.TreeConfiguredFeatures;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.RotatedPillarBlock;
+import net.minecraft.world.level.block.SaplingBlock;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.core.Holder;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
 import net.noahsarch.deeperdark.Deeperdark;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -44,7 +44,7 @@ public abstract class SaplingBlockMixin {
      * This ensures growth rate matches vanilla (requires stage advancement first).
      */
     @Inject(method = "generate", at = @At("HEAD"), cancellable = true)
-    private void deeperdark$handleGiantOakAndTeleport(ServerWorld world, BlockPos pos, BlockState state, Random random, CallbackInfo ci) {
+    private void deeperdark$handleGiantOakAndTeleport(ServerLevel world, BlockPos pos, BlockState state, RandomSource random, CallbackInfo ci) {
         // Check if this is an oak sapling
         Block block = state.getBlock();
         if (!isOakSapling(block)) {
@@ -128,7 +128,7 @@ public abstract class SaplingBlockMixin {
      * Gets the largest pattern size that includes this position.
      */
     @Unique
-    private int deeperdark$getPatternSize(ServerWorld world, BlockPos pos, Block block) {
+    private int deeperdark$getPatternSize(ServerLevel world, BlockPos pos, Block block) {
         // Check 10, then 5, 4, 3, 2 (skipping 6-9)
         int[] sizesToCheck = {10, 5, 4, 3, 2};
         for (int size : sizesToCheck) {
@@ -148,7 +148,7 @@ public abstract class SaplingBlockMixin {
      * Advances all saplings in a pattern to stage 1 (like vanilla stage cycling).
      */
     @Unique
-    private void deeperdark$advanceAllSaplingsInPattern(ServerWorld world, BlockPos corner, int size, BlockState state) {
+    private void deeperdark$advanceAllSaplingsInPattern(ServerLevel world, BlockPos corner, int size, BlockState state) {
         BlockState advancedState = state.with(Properties.STAGE, 1);
         for (int x = 0; x < size; x++) {
             for (int z = 0; z < size; z++) {
@@ -170,7 +170,7 @@ public abstract class SaplingBlockMixin {
      * Generic method to find the southwest corner of an NxN sapling pattern.
      */
     @Unique
-    private BlockPos deeperdark$findPatternCorner(ServerWorld world, BlockPos pos, BlockState state, int size) {
+    private BlockPos deeperdark$findPatternCorner(ServerLevel world, BlockPos pos, BlockState state, int size) {
         Block block = state.getBlock();
 
         // Check all possible NxN patterns that include this position
@@ -186,7 +186,7 @@ public abstract class SaplingBlockMixin {
     }
 
     @Unique
-    private boolean deeperdark$isNxNPattern(ServerWorld world, BlockPos corner, Block block, int size) {
+    private boolean deeperdark$isNxNPattern(ServerLevel world, BlockPos corner, Block block, int size) {
         for (int x = 0; x < size; x++) {
             for (int z = 0; z < size; z++) {
                 if (!world.getBlockState(corner.add(x, 0, z)).isOf(block)) {
@@ -201,7 +201,7 @@ public abstract class SaplingBlockMixin {
      * Finds the southwest corner of a 2x2 sapling pattern if one exists.
      */
     @Unique
-    private BlockPos deeperdark$findGiant2x2Corner(ServerWorld world, BlockPos pos, BlockState state) {
+    private BlockPos deeperdark$findGiant2x2Corner(ServerLevel world, BlockPos pos, BlockState state) {
         return deeperdark$findPatternCorner(world, pos, state, 2);
     }
 
@@ -212,7 +212,7 @@ public abstract class SaplingBlockMixin {
      * Height: 25-35 blocks
      */
     @Unique
-    private boolean deeperdark$generateMassive3x3Oak(ServerWorld world, BlockPos corner, BlockState state, Random random) {
+    private boolean deeperdark$generateMassive3x3Oak(ServerLevel world, BlockPos corner, BlockState state, RandomSource random) {
         int baseHeight = 25 + random.nextInt(11); // 25-35 blocks tall
         return deeperdark$generateGiantOakTree(world, corner, state, random, 3, baseHeight);
     }
@@ -222,7 +222,7 @@ public abstract class SaplingBlockMixin {
      * Height: 35-50 blocks
      */
     @Unique
-    private boolean deeperdark$generateGrand4x4Oak(ServerWorld world, BlockPos corner, BlockState state, Random random) {
+    private boolean deeperdark$generateGrand4x4Oak(ServerLevel world, BlockPos corner, BlockState state, RandomSource random) {
         int baseHeight = 35 + random.nextInt(16); // 35-50 blocks tall
         return deeperdark$generateGiantOakTree(world, corner, state, random, 4, baseHeight);
     }
@@ -232,7 +232,7 @@ public abstract class SaplingBlockMixin {
      * Height: 50-70 blocks
      */
     @Unique
-    private boolean deeperdark$generateColossal5x5Oak(ServerWorld world, BlockPos corner, BlockState state, Random random) {
+    private boolean deeperdark$generateColossal5x5Oak(ServerLevel world, BlockPos corner, BlockState state, RandomSource random) {
         int baseHeight = 50 + random.nextInt(21); // 50-70 blocks tall
         return deeperdark$generateGiantOakTree(world, corner, state, random, 5, baseHeight);
     }
@@ -242,7 +242,7 @@ public abstract class SaplingBlockMixin {
      * Height: 80-120 blocks with massive branching canopy
      */
     @Unique
-    private boolean deeperdark$generateUltimate10x10Oak(ServerWorld world, BlockPos corner, BlockState state, Random random) {
+    private boolean deeperdark$generateUltimate10x10Oak(ServerLevel world, BlockPos corner, BlockState state, RandomSource random) {
         int baseHeight = 80 + random.nextInt(41); // 80-120 blocks tall
         return deeperdark$generateGiantOakTree(world, corner, state, random, 10, baseHeight);
     }
@@ -253,12 +253,12 @@ public abstract class SaplingBlockMixin {
      * @param world The world
      * @param corner Southwest corner of the sapling pattern
      * @param state The sapling block state
-     * @param random Random for generation
+     * @param random RandomSource for generation
      * @param trunkSize The size of the trunk base (3, 4, 5, or 10)
      * @param targetHeight Target height for the tree
      */
     @Unique
-    private boolean deeperdark$generateGiantOakTree(ServerWorld world, BlockPos corner, BlockState state, Random random, int trunkSize, int targetHeight) {
+    private boolean deeperdark$generateGiantOakTree(ServerLevel world, BlockPos corner, BlockState state, RandomSource random, int trunkSize, int targetHeight) {
         // Calculate trunk curve parameters FIRST so we know where the top will be
         Direction.Axis curveAxis = random.nextBoolean() ? Direction.Axis.X : Direction.Axis.Z;
         float curveStrength = (random.nextFloat() - 0.5f) * 2.0f * (trunkSize * 0.6f); // Curve scales with size
@@ -268,14 +268,14 @@ public abstract class SaplingBlockMixin {
         BlockPos topPos = deeperdark$getTrunkTopPosition(corner, trunkSize, targetHeight, curveAxis, curveStrength, doubleCurve);
 
         // Collect players standing in the sapling area and TELEPORT THEM FIRST
-        Box saplingArea = new Box(
+        AABB saplingArea = new AABB(
             corner.getX(), corner.getY(), corner.getZ(),
             corner.getX() + trunkSize, corner.getY() + 2, corner.getZ() + trunkSize
         );
-        List<PlayerEntity> playersInArea = world.getEntitiesByClass(PlayerEntity.class, saplingArea, p -> true);
+        List<Player> playersInArea = world.getEntitiesByClass(Player.class, saplingArea, p -> true);
 
         // Teleport players to the top BEFORE generating the tree (so they don't suffocate)
-        for (PlayerEntity player : playersInArea) {
+        for (Player player : playersInArea) {
             player.teleport(topPos.getX() + 0.5, topPos.getY() + 2, topPos.getZ() + 0.5, false);
             Deeperdark.LOGGER.info("[Deeper Dark] Teleported player {} to top of {}x{} giant oak tree",
                 player.getName().getString(), trunkSize, trunkSize);
@@ -300,7 +300,7 @@ public abstract class SaplingBlockMixin {
                 }
             }
             // Teleport players back down
-            for (PlayerEntity player : playersInArea) {
+            for (Player player : playersInArea) {
                 player.teleport(corner.getX() + trunkSize / 2.0, corner.getY(), corner.getZ() + trunkSize / 2.0, false);
             }
             return false;
@@ -328,8 +328,8 @@ public abstract class SaplingBlockMixin {
      * Returns the actual height achieved.
      */
     @Unique
-    private int deeperdark$generateCurvedTrunkWithButtress(ServerWorld world, BlockPos corner, int trunkSize, int targetHeight,
-                                               Direction.Axis curveAxis, float curveStrength, boolean doubleCurve, Random random) {
+    private int deeperdark$generateCurvedTrunkWithButtress(ServerLevel world, BlockPos corner, int trunkSize, int targetHeight,
+                                               Direction.Axis curveAxis, float curveStrength, boolean doubleCurve, RandomSource random) {
         BlockState oakLog = Blocks.OAK_LOG.getDefaultState();
 
         float centerX = corner.getX() + trunkSize / 2.0f;
@@ -387,7 +387,7 @@ public abstract class SaplingBlockMixin {
                     // Check if this position is within the trunk radius
                     float distX = blockX + 0.5f - currentCenterX;
                     float distZ = blockZ + 0.5f - currentCenterZ;
-                    float dist = MathHelper.sqrt(distX * distX + distZ * distZ);
+                    float dist = Mth.sqrt(distX * distX + distZ * distZ);
 
                     if (dist <= currentRadius) {
                         BlockPos logPos = new BlockPos(blockX, corner.getY() + y, blockZ);
@@ -395,7 +395,7 @@ public abstract class SaplingBlockMixin {
                         // Check if we can place here
                         BlockState existingState = world.getBlockState(logPos);
                         if (existingState.isAir() || existingState.isOf(Blocks.OAK_LEAVES) ||
-                            existingState.isIn(net.minecraft.registry.tag.BlockTags.REPLACEABLE_BY_TREES)) {
+                            existingState.isIn(net.minecraft.tags.BlockTags.REPLACEABLE_BY_TREES)) {
                             world.setBlockState(logPos, oakLog, Block.NOTIFY_ALL);
                             placedAny = true;
                         }
@@ -453,8 +453,8 @@ public abstract class SaplingBlockMixin {
      * Returns a list of branch end positions for leaf cluster placement.
      */
     @Unique
-    private List<BlockPos> deeperdark$generateBranchingCanopy(ServerWorld world, BlockPos corner, int trunkSize, int height,
-                                                    Direction.Axis curveAxis, float curveStrength, boolean doubleCurve, Random random) {
+    private List<BlockPos> deeperdark$generateBranchingCanopy(ServerLevel world, BlockPos corner, int trunkSize, int height,
+                                                    Direction.Axis curveAxis, float curveStrength, boolean doubleCurve, RandomSource random) {
         List<BlockPos> branchEnds = new ArrayList<>();
 
         // Determine number of branch levels based on tree size
@@ -524,20 +524,20 @@ public abstract class SaplingBlockMixin {
      * Returns the end position of the branch.
      */
     @Unique
-    private BlockPos deeperdark$generateMainBranch(ServerWorld world, int startX, int startY, int startZ,
-                                           float angle, int length, Random random) {
+    private BlockPos deeperdark$generateMainBranch(ServerLevel world, int startX, int startY, int startZ,
+                                           float angle, int length, RandomSource random) {
         BlockState oakLog = Blocks.OAK_LOG.getDefaultState();
 
         float x = startX + 0.5f;
         float y = startY + 0.5f;
         float z = startZ + 0.5f;
 
-        float dx = MathHelper.cos(angle);
-        float dz = MathHelper.sin(angle);
+        float dx = Mth.cos(angle);
+        float dz = Mth.sin(angle);
         float dy = 0.15f + random.nextFloat() * 0.25f; // Slight upward angle
 
         // Normalize direction
-        float mag = MathHelper.sqrt(dx * dx + dy * dy + dz * dz);
+        float mag = Mth.sqrt(dx * dx + dy * dy + dz * dz);
         dx /= mag;
         dy /= mag;
         dz /= mag;
@@ -559,7 +559,7 @@ public abstract class SaplingBlockMixin {
             BlockState existingState = world.getBlockState(branchPos);
 
             if (existingState.isAir() || existingState.isOf(Blocks.OAK_LEAVES) ||
-                existingState.isIn(net.minecraft.registry.tag.BlockTags.REPLACEABLE_BY_TREES)) {
+                existingState.isIn(net.minecraft.tags.BlockTags.REPLACEABLE_BY_TREES)) {
 
                 // Determine axis for the log based on direction
                 Direction.Axis axis = Direction.Axis.Y;
@@ -569,7 +569,7 @@ public abstract class SaplingBlockMixin {
                     axis = Direction.Axis.Z;
                 }
 
-                world.setBlockState(branchPos, oakLog.with(PillarBlock.AXIS, axis), Block.NOTIFY_ALL);
+                world.setBlockState(branchPos, oakLog.with(RotatedPillarBlock.AXIS, axis), Block.NOTIFY_ALL);
                 lastPos = branchPos;
             }
         }
@@ -582,8 +582,8 @@ public abstract class SaplingBlockMixin {
      * Creates a more natural, spreading canopy.
      */
     @Unique
-    private List<BlockPos> deeperdark$generateSubBranches(ServerWorld world, BlockPos branchEnd,
-                                                          float parentAngle, int parentLength, int trunkSize, Random random) {
+    private List<BlockPos> deeperdark$generateSubBranches(ServerLevel world, BlockPos branchEnd,
+                                                          float parentAngle, int parentLength, int trunkSize, RandomSource random) {
         List<BlockPos> subBranchEnds = new ArrayList<>();
         BlockState oakLog = Blocks.OAK_LOG.getDefaultState();
 
@@ -602,12 +602,12 @@ public abstract class SaplingBlockMixin {
             float y = branchEnd.getY() + 0.5f;
             float z = branchEnd.getZ() + 0.5f;
 
-            float dx = MathHelper.cos(subAngle);
-            float dz = MathHelper.sin(subAngle);
+            float dx = Mth.cos(subAngle);
+            float dz = Mth.sin(subAngle);
             float dy = 0.1f + random.nextFloat() * 0.3f; // Mostly horizontal to slightly upward
 
             // Normalize
-            float mag = MathHelper.sqrt(dx * dx + dy * dy + dz * dz);
+            float mag = Mth.sqrt(dx * dx + dy * dy + dz * dz);
             dx /= mag;
             dy /= mag;
             dz /= mag;
@@ -629,7 +629,7 @@ public abstract class SaplingBlockMixin {
                 BlockState existingState = world.getBlockState(subBranchPos);
 
                 if (existingState.isAir() || existingState.isOf(Blocks.OAK_LEAVES) ||
-                    existingState.isIn(net.minecraft.registry.tag.BlockTags.REPLACEABLE_BY_TREES)) {
+                    existingState.isIn(net.minecraft.tags.BlockTags.REPLACEABLE_BY_TREES)) {
 
                     Direction.Axis axis = Direction.Axis.Y;
                     if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > Math.abs(dz)) {
@@ -638,7 +638,7 @@ public abstract class SaplingBlockMixin {
                         axis = Direction.Axis.Z;
                     }
 
-                    world.setBlockState(subBranchPos, oakLog.with(PillarBlock.AXIS, axis), Block.NOTIFY_ALL);
+                    world.setBlockState(subBranchPos, oakLog.with(RotatedPillarBlock.AXIS, axis), Block.NOTIFY_ALL);
                     lastPos = subBranchPos;
                 }
             }
@@ -654,9 +654,9 @@ public abstract class SaplingBlockMixin {
      * This ensures leaves don't decay due to being too far from logs.
      */
     @Unique
-    private void deeperdark$generateLeafClustersWithSupport(ServerWorld world, BlockPos corner, int trunkSize, int height,
+    private void deeperdark$generateLeafClustersWithSupport(ServerLevel world, BlockPos corner, int trunkSize, int height,
                                                   Direction.Axis curveAxis, float curveStrength, boolean doubleCurve,
-                                                  List<BlockPos> branchEnds, Random random) {
+                                                  List<BlockPos> branchEnds, RandomSource random) {
         BlockState oakLeaves = Blocks.OAK_LEAVES.getDefaultState().with(Properties.DISTANCE_1_7, 1);
 
         // Leaf cluster size scales with tree size
@@ -688,7 +688,7 @@ public abstract class SaplingBlockMixin {
                             BlockState existingState = world.getBlockState(leafPos);
 
                             // Only place leaves where there isn't already a log
-                            if (existingState.isAir() || existingState.isIn(net.minecraft.registry.tag.BlockTags.REPLACEABLE_BY_TREES)) {
+                            if (existingState.isAir() || existingState.isIn(net.minecraft.tags.BlockTags.REPLACEABLE_BY_TREES)) {
                                 world.setBlockState(leafPos, oakLeaves, Block.NOTIFY_ALL);
                             }
                         }
@@ -723,7 +723,7 @@ public abstract class SaplingBlockMixin {
                         if (distSq <= radiusSq && (distSq < radiusSq * 0.6f || random.nextFloat() > 0.4f)) {
                             BlockPos leafPos = crownBranchEnd.add(dx, dy, dz);
                             BlockState existingState = world.getBlockState(leafPos);
-                            if (existingState.isAir() || existingState.isIn(net.minecraft.registry.tag.BlockTags.REPLACEABLE_BY_TREES)) {
+                            if (existingState.isAir() || existingState.isIn(net.minecraft.tags.BlockTags.REPLACEABLE_BY_TREES)) {
                                 world.setBlockState(leafPos, oakLeaves, Block.NOTIFY_ALL);
                             }
                         }
@@ -741,11 +741,11 @@ public abstract class SaplingBlockMixin {
                     float heightFactor = dy > 0 ? 1.0f - ((float)dy / crownHeightUp) * 0.6f : 1.0f;
                     float effectiveRadius = crownRadius * heightFactor;
 
-                    float dist = MathHelper.sqrt(dx * dx + dz * dz);
+                    float dist = Mth.sqrt(dx * dx + dz * dz);
                     if (dist <= effectiveRadius && (dist < effectiveRadius - 0.5f || random.nextFloat() < 0.5f)) {
                         BlockPos leafPos = topPos.add(dx, dy, dz);
                         BlockState existingState = world.getBlockState(leafPos);
-                        if (existingState.isAir() || existingState.isIn(net.minecraft.registry.tag.BlockTags.REPLACEABLE_BY_TREES)) {
+                        if (existingState.isAir() || existingState.isIn(net.minecraft.tags.BlockTags.REPLACEABLE_BY_TREES)) {
                             world.setBlockState(leafPos, oakLeaves, Block.NOTIFY_ALL);
                         }
                     }
@@ -760,7 +760,7 @@ public abstract class SaplingBlockMixin {
      * Leaves can be up to 7 blocks from a log before they decay.
      */
     @Unique
-    private void deeperdark$generateLeafSupportNetwork(ServerWorld world, BlockPos center, int radius, Random random) {
+    private void deeperdark$generateLeafSupportNetwork(ServerLevel world, BlockPos center, int radius, RandomSource random) {
         BlockState oakLog = Blocks.OAK_LOG.getDefaultState();
 
         // Calculate the interior zone where logs should be placed (stay 2 blocks inside the leaf edge)
@@ -771,7 +771,7 @@ public abstract class SaplingBlockMixin {
             BlockPos logPos = center.add(0, dy, 0);
             BlockState existingState = world.getBlockState(logPos);
             if (existingState.isAir() || existingState.isOf(Blocks.OAK_LEAVES) ||
-                existingState.isIn(net.minecraft.registry.tag.BlockTags.REPLACEABLE_BY_TREES)) {
+                existingState.isIn(net.minecraft.tags.BlockTags.REPLACEABLE_BY_TREES)) {
                 world.setBlockState(logPos, oakLog, Block.NOTIFY_ALL);
             }
         }
@@ -781,8 +781,8 @@ public abstract class SaplingBlockMixin {
         float[] angles = {0, (float)(Math.PI * 0.5), (float)Math.PI, (float)(Math.PI * 1.5)};
 
         for (float angle : angles) {
-            float dx = MathHelper.cos(angle);
-            float dz = MathHelper.sin(angle);
+            float dx = Mth.cos(angle);
+            float dz = Mth.sin(angle);
 
             // Place logs along this direction, but stay inside the interior
             for (int dist = 3; dist <= interiorRadius; dist += 3) {
@@ -794,7 +794,7 @@ public abstract class SaplingBlockMixin {
 
                 // Place log if position is air or replaceable (will be filled with leaves later)
                 if (existingState.isAir() || existingState.isOf(Blocks.OAK_LEAVES) ||
-                    existingState.isIn(net.minecraft.registry.tag.BlockTags.REPLACEABLE_BY_TREES)) {
+                    existingState.isIn(net.minecraft.tags.BlockTags.REPLACEABLE_BY_TREES)) {
 
                     // Determine axis based on direction
                     Direction.Axis axis = Direction.Axis.Y;
@@ -804,7 +804,7 @@ public abstract class SaplingBlockMixin {
                         axis = Direction.Axis.Z;
                     }
 
-                    world.setBlockState(logPos, oakLog.with(PillarBlock.AXIS, axis), Block.NOTIFY_ALL);
+                    world.setBlockState(logPos, oakLog.with(RotatedPillarBlock.AXIS, axis), Block.NOTIFY_ALL);
                 }
             }
         }
@@ -832,7 +832,7 @@ public abstract class SaplingBlockMixin {
      * Returns the end positions of these branches for leaf cluster placement.
      */
     @Unique
-    private List<BlockPos> deeperdark$generateDiagonalCrownBranches(ServerWorld world, BlockPos topPos, int trunkSize, Random random) {
+    private List<BlockPos> deeperdark$generateDiagonalCrownBranches(ServerLevel world, BlockPos topPos, int trunkSize, RandomSource random) {
         List<BlockPos> branchEnds = new ArrayList<>();
         BlockState oakLog = Blocks.OAK_LOG.getDefaultState();
 
@@ -858,13 +858,13 @@ public abstract class SaplingBlockMixin {
                 float y = tierHeight + 0.5f;
                 float z = topPos.getZ() + 0.5f;
 
-                float dx = MathHelper.cos(angle);
-                float dz = MathHelper.sin(angle);
+                float dx = Mth.cos(angle);
+                float dz = Mth.sin(angle);
                 // Key fix: branches go UPWARD and outward, with steeper angles for inner tiers
                 float dy = 0.4f + random.nextFloat() * 0.3f + (tier * 0.1f);
 
                 // Normalize
-                float mag = MathHelper.sqrt(dx * dx + dy * dy + dz * dz);
+                float mag = Mth.sqrt(dx * dx + dy * dy + dz * dz);
                 dx /= mag;
                 dy /= mag;
                 dz /= mag;
@@ -886,7 +886,7 @@ public abstract class SaplingBlockMixin {
                     BlockState existingState = world.getBlockState(branchPos);
 
                     if (existingState.isAir() || existingState.isOf(Blocks.OAK_LEAVES) ||
-                        existingState.isIn(net.minecraft.registry.tag.BlockTags.REPLACEABLE_BY_TREES)) {
+                        existingState.isIn(net.minecraft.tags.BlockTags.REPLACEABLE_BY_TREES)) {
 
                         Direction.Axis axis = Direction.Axis.Y;
                         if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > Math.abs(dz)) {
@@ -895,7 +895,7 @@ public abstract class SaplingBlockMixin {
                             axis = Direction.Axis.Z;
                         }
 
-                        world.setBlockState(branchPos, oakLog.with(PillarBlock.AXIS, axis), Block.NOTIFY_ALL);
+                        world.setBlockState(branchPos, oakLog.with(RotatedPillarBlock.AXIS, axis), Block.NOTIFY_ALL);
                         lastPos = branchPos;
                     }
                 }
@@ -914,8 +914,8 @@ public abstract class SaplingBlockMixin {
             float y = topPos.getY() + 0.5f;
             float z = topPos.getZ() + 0.5f;
 
-            float dx = MathHelper.cos(angle) * 0.3f;
-            float dz = MathHelper.sin(angle) * 0.3f;
+            float dx = Mth.cos(angle) * 0.3f;
+            float dz = Mth.sin(angle) * 0.3f;
             float dy = 0.9f; // Almost straight up
 
             int peakLength = 3 + random.nextInt(3);
@@ -930,7 +930,7 @@ public abstract class SaplingBlockMixin {
                 BlockState existingState = world.getBlockState(branchPos);
 
                 if (existingState.isAir() || existingState.isOf(Blocks.OAK_LEAVES) ||
-                    existingState.isIn(net.minecraft.registry.tag.BlockTags.REPLACEABLE_BY_TREES)) {
+                    existingState.isIn(net.minecraft.tags.BlockTags.REPLACEABLE_BY_TREES)) {
                     world.setBlockState(branchPos, oakLog, Block.NOTIFY_ALL);
                     lastPos = branchPos;
                 }
@@ -946,18 +946,18 @@ public abstract class SaplingBlockMixin {
      * Generates a giant fancy oak tree with a 2x2 trunk base.
      */
     @Unique
-    private boolean deeperdark$generateGiantFancyOak(ServerWorld world, BlockPos corner, BlockState state, Random random) {
+    private boolean deeperdark$generateGiantFancyOak(ServerLevel world, BlockPos corner, BlockState state, RandomSource random) {
         // Collect players standing in the sapling area before clearing
-        List<PlayerEntity> playersToTeleport = new ArrayList<>();
-        Box saplingArea = new Box(
+        List<Player> playersToTeleport = new ArrayList<>();
+        AABB saplingArea = new AABB(
             corner.getX(), corner.getY(), corner.getZ(),
             corner.getX() + 2, corner.getY() + 2, corner.getZ() + 2
         );
-        playersToTeleport.addAll(world.getEntitiesByClass(PlayerEntity.class, saplingArea, p -> true));
+        playersToTeleport.addAll(world.getEntitiesByClass(Player.class, saplingArea, p -> true));
 
         // Get the FANCY_OAK feature
-        RegistryEntry<ConfiguredFeature<?, ?>> fancyOakFeature = world.getRegistryManager()
-            .getOrThrow(RegistryKeys.CONFIGURED_FEATURE)
+        Holder<ConfiguredFeature<?, ?>> fancyOakFeature = world.getRegistryManager()
+            .getOrThrow(Registries.CONFIGURED_FEATURE)
             .getOptional(TreeConfiguredFeatures.FANCY_OAK)
             .orElse(null);
 
@@ -989,7 +989,7 @@ public abstract class SaplingBlockMixin {
             // Teleport players to the top of the tree
             if (!playersToTeleport.isEmpty() && treeHeight > 0) {
                 BlockPos topPos = corner.up(treeHeight + 1);
-                for (PlayerEntity player : playersToTeleport) {
+                for (Player player : playersToTeleport) {
                     player.teleport(topPos.getX() + 0.5, topPos.getY(), topPos.getZ() + 0.5, false);
                     Deeperdark.LOGGER.info("[Deeper Dark] Teleported player {} to top of growing tree", player.getName().getString());
                 }
@@ -1007,7 +1007,7 @@ public abstract class SaplingBlockMixin {
     }
 
     @Unique
-    private int deeperdark$findTreeHeight(ServerWorld world, BlockPos base) {
+    private int deeperdark$findTreeHeight(ServerLevel world, BlockPos base) {
         int height = 0;
         BlockPos.Mutable mutable = new BlockPos.Mutable();
         for (int y = 0; y < 40; y++) {
@@ -1020,7 +1020,7 @@ public abstract class SaplingBlockMixin {
     }
 
     @Unique
-    private void deeperdark$fill2x2TrunkBase(ServerWorld world, BlockPos corner, int height) {
+    private void deeperdark$fill2x2TrunkBase(ServerLevel world, BlockPos corner, int height) {
         // Fill in a 2x2 trunk for the lower portion of the tree
         int trunkHeight = Math.min(height / 2 + 2, height); // Make 2x2 trunk for about half the height
         BlockState oakLog = Blocks.OAK_LOG.getDefaultState();
@@ -1054,11 +1054,11 @@ public abstract class SaplingBlockMixin {
      * Handles teleporting players to the top of any tree that grows while they're standing in it.
      */
     @Unique
-    private void deeperdark$teleportPlayersAfterGrowth(ServerWorld world, BlockPos pos) {
+    private void deeperdark$teleportPlayersAfterGrowth(ServerLevel world, BlockPos pos) {
         // Get players standing in the sapling position
-        Box saplingArea = new Box(pos).expand(0.5, 1, 0.5);
-        List<PlayerEntity> playersToTeleport = new ArrayList<>(
-            world.getEntitiesByClass(PlayerEntity.class, saplingArea, p -> true)
+        AABB saplingArea = new AABB(pos).expand(0.5, 1, 0.5);
+        List<Player> playersToTeleport = new ArrayList<>(
+            world.getEntitiesByClass(Player.class, saplingArea, p -> true)
         );
 
         if (playersToTeleport.isEmpty()) {
@@ -1080,14 +1080,14 @@ public abstract class SaplingBlockMixin {
                     // Find tree height
                     int treeHeight = 0;
                     for (int y = 0; y < 40; y++) {
-                        if (world.getBlockState(pos.up(y)).isIn(net.minecraft.registry.tag.BlockTags.LOGS)) {
+                        if (world.getBlockState(pos.up(y)).isIn(net.minecraft.tags.BlockTags.LOGS)) {
                             treeHeight = y;
                         }
                     }
 
                     if (treeHeight > 0) {
                         BlockPos topPos = pos.up(treeHeight + 1);
-                        for (PlayerEntity player : playersToTeleport) {
+                        for (Player player : playersToTeleport) {
                             if (player.isAlive()) {
                                 player.teleport(topPos.getX() + 0.5, topPos.getY(), topPos.getZ() + 0.5, false);
                                 Deeperdark.LOGGER.info("[Deeper Dark] Teleported player {} to top of growing tree", player.getName().getString());

@@ -1,21 +1,21 @@
 package net.noahsarch.deeperdark.mixin;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.NoteBlock;
-import net.minecraft.block.enums.NoteBlockInstrument;
-import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.NoteBlock;
+import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
+import net.minecraft.network.protocol.game.ClientboundSoundPacket;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.Holder;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.resources.Identifier;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.noahsarch.deeperdark.Deeperdark;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -30,13 +30,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class NoteBlockMixin {
 
     @Unique
-    private static final Identifier ORGAN_SOUND_ID = Identifier.of(Deeperdark.MOD_ID, "block.note_block.organ");
+    private static final Identifier ORGAN_SOUND_ID = Identifier.fromNamespaceAndPath(Deeperdark.MOD_ID, "block.note_block.organ");
 
     /**
      * Inject into onSyncedBlockEvent to play organ sound when copper is below
      */
     @Inject(method = "onSyncedBlockEvent", at = @At("HEAD"), cancellable = true)
-    private void deeperdark$playOrganSound(BlockState state, World world, BlockPos pos, int type, int data, CallbackInfoReturnable<Boolean> cir) {
+    private void deeperdark$playOrganSound(BlockState state, Level world, BlockPos pos, int type, int data, CallbackInfoReturnable<Boolean> cir) {
         // Check if there's a copper block below
         BlockState belowState = world.getBlockState(pos.down());
         if (deeperdark$isCopperBlock(belowState)) {
@@ -52,8 +52,8 @@ public class NoteBlockMixin {
                     note / 24.0, 0.0, 0.0);
 
                 // Play organ sound by manually sending the packet (like /playsound does)
-                // This avoids Fabric registry sync issues since we use a Direct RegistryEntry
-                if (world instanceof ServerWorld serverWorld) {
+                // This avoids Fabric registry sync issues since we use a Direct Holder
+                if (world instanceof ServerLevel serverWorld) {
                     deeperdark$sendOrganSound(serverWorld, pos, pitch);
                 }
 
@@ -65,14 +65,14 @@ public class NoteBlockMixin {
     }
 
     /**
-     * Send the organ sound packet to all nearby players using Direct RegistryEntry.
+     * Send the organ sound packet to all nearby players using Direct Holder.
      * This mirrors how the vanilla /playsound command works, bypassing registry sync.
      */
     @Unique
-    private void deeperdark$sendOrganSound(ServerWorld world, BlockPos pos, float pitch) {
-        // Create a Direct RegistryEntry (not Reference) - same as /playsound command does
+    private void deeperdark$sendOrganSound(ServerLevel world, BlockPos pos, float pitch) {
+        // Create a Direct Holder (not Reference) - same as /playsound command does
         // This bypasses Fabric's registry sync because Direct entries aren't synced
-        RegistryEntry<SoundEvent> soundEntry = RegistryEntry.of(SoundEvent.of(ORGAN_SOUND_ID));
+        Holder<SoundEvent> soundEntry = Holder.of(SoundEvent.of(ORGAN_SOUND_ID));
 
         double x = pos.getX() + 0.5;
         double y = pos.getY() + 0.5;
@@ -84,12 +84,12 @@ public class NoteBlockMixin {
         double maxDistSq = Math.pow(soundEntry.value().getDistanceToTravel(volume), 2);
 
         // Send packet to all players within hearing range
-        for (ServerPlayerEntity player : world.getPlayers()) {
+        for (ServerPlayer player : world.getPlayers()) {
             double distSq = player.squaredDistanceTo(x, y, z);
             if (distSq < maxDistSq) {
-                player.networkHandler.sendPacket(new PlaySoundS2CPacket(
+                player.networkHandler.sendPacket(new ClientboundSoundPacket(
                     soundEntry,
-                    SoundCategory.RECORDS,
+                    SoundSource.RECORDS,
                     x, y, z,
                     volume,
                     pitch,

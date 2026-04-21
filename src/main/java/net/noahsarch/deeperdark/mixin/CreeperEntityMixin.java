@@ -1,11 +1,11 @@
 package net.noahsarch.deeperdark.mixin;
 
-import net.minecraft.entity.AreaEffectCloudEntity;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.mob.CreeperEntity;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.AreaEffectCloud;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
 import net.noahsarch.deeperdark.DeeperDarkConfig;
 import net.noahsarch.deeperdark.duck.EntityAccessor;
 import net.noahsarch.deeperdark.util.BabyCreeperAccessor;
@@ -18,17 +18,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Collection;
 
-@Mixin(CreeperEntity.class)
+@Mixin(Creeper.class)
 public abstract class CreeperEntityMixin {
 
     @Shadow private int explosionRadius;
 
     /**
-     * Helper to check if this creeper is a baby (accesses the state from MobEntity mixin)
+     * Helper to check if this creeper is a baby (accesses the state from Mob mixin)
      */
     @Unique
     private boolean deeperdark$isBaby() {
-        CreeperEntity self = (CreeperEntity) (Object) this;
+        Creeper self = (Creeper) (Object) this;
         if (self instanceof BabyCreeperAccessor accessor) {
             return accessor.deeperdark$isBabyCreeper();
         }
@@ -37,13 +37,13 @@ public abstract class CreeperEntityMixin {
 
     @Inject(method = "spawnEffectsCloud", at = @At("HEAD"), cancellable = true)
     private void deeperdark$spawnEffectsCloud(CallbackInfo ci) {
-        CreeperEntity self = (CreeperEntity) (Object) this;
-        World world = ((EntityAccessor)self).deeperdark$getWorld();
-        Collection<StatusEffectInstance> collection = self.getStatusEffects();
+        Creeper self = (Creeper) (Object) this;
+        Level world = ((EntityAccessor)self).deeperdark$getWorld();
+        Collection<MobEffectInstance> collection = self.getStatusEffects();
         boolean isBaby = deeperdark$isBaby();
 
         if (!collection.isEmpty()) {
-            AreaEffectCloudEntity areaEffectCloudEntity = new AreaEffectCloudEntity(world, self.getX(), self.getY(), self.getZ());
+            AreaEffectCloud areaEffectCloudEntity = new AreaEffectCloud(world, self.getX(), self.getY(), self.getZ());
             // Baby creepers have smaller effect cloud
             float radius = isBaby ? 0.5F : 2.5F;
             areaEffectCloudEntity.setRadius(radius);
@@ -57,13 +57,13 @@ public abstract class CreeperEntityMixin {
             int min = Math.max(1, cfg.creeperEffectMinSeconds) * 20;
             int max = Math.max(min, cfg.creeperEffectMaxSeconds * 20);
 
-            for (StatusEffectInstance statusEffectInstance : collection) {
-                StatusEffectInstance toAdd;
+            for (MobEffectInstance statusEffectInstance : collection) {
+                MobEffectInstance toAdd;
                 if (statusEffectInstance.isInfinite()) {
                     int roll = world.random.nextInt(max - min + 1) + min;
-                    toAdd = new StatusEffectInstance(statusEffectInstance.getEffectType(), roll, statusEffectInstance.getAmplifier(), statusEffectInstance.isAmbient(), statusEffectInstance.shouldShowParticles(), statusEffectInstance.shouldShowIcon());
+                    toAdd = new MobEffectInstance(statusEffectInstance.getEffectType(), roll, statusEffectInstance.getAmplifier(), statusEffectInstance.isAmbient(), statusEffectInstance.shouldShowParticles(), statusEffectInstance.shouldShowIcon());
                 } else {
-                    toAdd = new StatusEffectInstance(statusEffectInstance);
+                    toAdd = new MobEffectInstance(statusEffectInstance);
                 }
                 areaEffectCloudEntity.addEffect(toAdd);
             }
@@ -80,8 +80,8 @@ public abstract class CreeperEntityMixin {
      */
     @Inject(method = "explode()V", at = @At("HEAD"))
     private void deeperdark$modifyExplosionRadiusAndSpawnParticles(CallbackInfo ci) {
-        CreeperEntity self = (CreeperEntity) (Object) this;
-        World world = ((EntityAccessor)self).deeperdark$getWorld();
+        Creeper self = (Creeper) (Object) this;
+        Level world = ((EntityAccessor)self).deeperdark$getWorld();
 
         if (deeperdark$isBaby()) {
             // Reduce explosion radius to 1/5 for baby creepers
@@ -90,7 +90,7 @@ public abstract class CreeperEntityMixin {
             this.explosionRadius = 1; // Minimum explosion, will be ~0.6 blocks effective radius
 
             // Spawn poof particles instead of normal explosion particles
-            if (world instanceof ServerWorld serverWorld) {
+            if (world instanceof ServerLevel serverWorld) {
                 for (int i = 0; i < 20; i++) {
                     double offsetX = (self.getRandom().nextDouble() - 0.5) * 2.0;
                     double offsetY = self.getRandom().nextDouble() * 1.5;

@@ -1,6 +1,6 @@
 package net.noahsarch.deeperdark.mixin;
 
-import net.minecraft.block.piston.PistonHandler;
+import net.minecraft.world.level.block.piston.PistonStructureResolver;
 import net.noahsarch.deeperdark.DeeperDarkConfig;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.Constant;
@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
  * Vanilla default is 12 blocks.
  * The constant 12 appears 3 times in the tryMove method.
  */
-@Mixin(PistonHandler.class)
+@Mixin(PistonStructureResolver.class)
 public class PistonHandlerMixin {
 
     /**

@@ -1,21 +1,21 @@
 package net.noahsarch.deeperdark.mixin;
 
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.ItemEnchantmentsComponent;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.screen.AnvilScreenHandler;
-import net.minecraft.screen.ForgingScreenHandler;
-import net.minecraft.screen.Property;
-import net.minecraft.screen.ScreenHandlerContext;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.screen.slot.ForgingSlotsManager;
-import net.minecraft.text.Text;
-import net.minecraft.util.StringHelper;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.Holder;
+import net.minecraft.world.inventory.AnvilMenu;
+import net.minecraft.world.inventory.ItemCombinerMenu;
+import net.minecraft.world.inventory.DataSlot;
+import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.ItemCombinerMenuSlotDefinition;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.StringUtil;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -28,12 +28,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * - Repairs cost 0 XP
  * - Adding enchanted books or enchanted items costs 5 levels per enchantment
  */
-@Mixin(AnvilScreenHandler.class)
-public abstract class AnvilScreenHandlerMixin extends ForgingScreenHandler {
+@Mixin(AnvilMenu.class)
+public abstract class AnvilScreenHandlerMixin extends ItemCombinerMenu {
 
     @Shadow
     @Final
-    private Property levelCost;
+    private DataSlot levelCost;
 
     @Shadow
     private String newItemName;
@@ -41,7 +41,7 @@ public abstract class AnvilScreenHandlerMixin extends ForgingScreenHandler {
     @Shadow
     private int repairItemUsage;
 
-    public AnvilScreenHandlerMixin(ScreenHandlerType<?> type, int syncId, PlayerInventory playerInventory, ScreenHandlerContext context, ForgingSlotsManager forgingSlotsManager) {
+    public AnvilScreenHandlerMixin(MenuType<?> type, int syncId, Inventory playerInventory, ContainerLevelAccess context, ItemCombinerMenuSlotDefinition forgingSlotsManager) {
         super(type, syncId, playerInventory, context, forgingSlotsManager);
     }
 
@@ -64,7 +64,7 @@ public abstract class AnvilScreenHandlerMixin extends ForgingScreenHandler {
 
         ItemStack resultStack = inputStack.copy();
         ItemStack secondStack = this.input.getStack(1);
-        ItemEnchantmentsComponent.Builder enchantmentBuilder = new ItemEnchantmentsComponent.Builder(
+        ItemEnchantments.Builder enchantmentBuilder = new ItemEnchantments.Builder(
                 EnchantmentHelper.getEnchantments(resultStack));
 
         this.repairItemUsage = 0;
@@ -74,7 +74,7 @@ public abstract class AnvilScreenHandlerMixin extends ForgingScreenHandler {
 
         if (!secondStack.isEmpty()) {
             isRenameOnly = false;
-            boolean hasStoredEnchantments = secondStack.contains(DataComponentTypes.STORED_ENCHANTMENTS);
+            boolean hasStoredEnchantments = secondStack.contains(DataComponents.STORED_ENCHANTMENTS);
 
             // Check if this is a material repair (e.g., diamond to repair diamond tool)
             if (resultStack.isDamageable() && inputStack.canRepairWith(secondStack)) {
@@ -124,24 +124,24 @@ public abstract class AnvilScreenHandlerMixin extends ForgingScreenHandler {
                 }
 
                 // Transfer enchantments from second item (enchanted book or item)
-                ItemEnchantmentsComponent sourceEnchantments = EnchantmentHelper.getEnchantments(secondStack);
+                ItemEnchantments sourceEnchantments = EnchantmentHelper.getEnchantments(secondStack);
                 boolean anyEnchantmentAdded = false;
                 boolean anyEnchantmentFailed = false;
 
-                for (Object2IntMap.Entry<RegistryEntry<Enchantment>> entry : sourceEnchantments.getEnchantmentEntries()) {
-                    RegistryEntry<Enchantment> enchantmentEntry = entry.getKey();
+                for (Object2IntMap.Entry<Holder<Enchantment>> entry : sourceEnchantments.getEnchantmentEntries()) {
+                    Holder<Enchantment> enchantmentEntry = entry.getKey();
                     int currentLevel = enchantmentBuilder.getLevel(enchantmentEntry);
                     int sourceLevel = entry.getIntValue();
                     int newLevel = currentLevel == sourceLevel ? sourceLevel + 1 : Math.max(sourceLevel, currentLevel);
 
                     Enchantment enchantment = enchantmentEntry.value();
                     boolean canApply = enchantment.isAcceptableItem(inputStack);
-                    if (this.player.isInCreativeMode() || inputStack.isOf(net.minecraft.item.Items.ENCHANTED_BOOK)) {
+                    if (this.player.isInCreativeMode() || inputStack.isOf(net.minecraft.world.item.Items.ENCHANTED_BOOK)) {
                         canApply = true;
                     }
 
                     // Check for enchantment conflicts
-                    for (RegistryEntry<Enchantment> existingEnchantment : enchantmentBuilder.getEnchantments()) {
+                    for (Holder<Enchantment> existingEnchantment : enchantmentBuilder.getEnchantments()) {
                         if (!existingEnchantment.equals(enchantmentEntry) && !Enchantment.canBeCombined(enchantmentEntry, existingEnchantment)) {
                             canApply = false;
                         }
@@ -178,17 +178,17 @@ public abstract class AnvilScreenHandlerMixin extends ForgingScreenHandler {
 
         // Handle renaming
         boolean renamed = false;
-        if (this.newItemName != null && !StringHelper.isBlank(this.newItemName)) {
+        if (this.newItemName != null && !StringUtil.isBlank(this.newItemName)) {
             if (!this.newItemName.equals(inputStack.getName().getString())) {
                 renamed = true;
-                resultStack.set(DataComponentTypes.CUSTOM_NAME, Text.literal(this.newItemName));
+                resultStack.set(DataComponents.CUSTOM_NAME, Component.literal(this.newItemName));
                 if (isRenameOnly) {
                     totalCost = 1; // Rename-only costs 1 level
                 }
             }
-        } else if (inputStack.contains(DataComponentTypes.CUSTOM_NAME)) {
+        } else if (inputStack.contains(DataComponents.CUSTOM_NAME)) {
             renamed = true;
-            resultStack.remove(DataComponentTypes.CUSTOM_NAME);
+            resultStack.remove(DataComponents.CUSTOM_NAME);
             if (isRenameOnly) {
                 totalCost = 1; // Removing name costs 1 level
             }
@@ -207,7 +207,7 @@ public abstract class AnvilScreenHandlerMixin extends ForgingScreenHandler {
 
         // Update repair cost on the result to prevent "Too Expensive"
         // We set repair cost to 0 to allow unlimited operations
-        resultStack.set(DataComponentTypes.REPAIR_COST, 0);
+        resultStack.set(DataComponents.REPAIR_COST, 0);
 
         // Apply enchantments
         EnchantmentHelper.set(resultStack, enchantmentBuilder.build());

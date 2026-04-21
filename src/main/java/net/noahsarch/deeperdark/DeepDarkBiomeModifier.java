@@ -1,12 +1,12 @@
 package net.noahsarch.deeperdark;
 
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.BiomeKeys;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biomes;
 
 public class DeepDarkBiomeModifier {
     // We're keeping this constant for use in our mixin
-    public static final RegistryKey<Biome> DEEP_DARK = BiomeKeys.DEEP_DARK;
+    public static final ResourceKey<Biome> DEEP_DARK = Biomes.DEEP_DARK;
 
     // Initialize the biome modification system
     public static void init() {

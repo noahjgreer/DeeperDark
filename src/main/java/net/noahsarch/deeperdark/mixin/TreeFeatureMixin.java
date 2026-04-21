@@ -1,9 +1,9 @@
 package net.noahsarch.deeperdark.mixin;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.TestableWorld;
-import net.minecraft.world.gen.feature.TreeFeature;
-import net.minecraft.world.gen.feature.TreeFeatureConfig;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.LevelSimulatedReader;
+import net.minecraft.world.level.levelgen.feature.TreeFeature;
+import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -24,7 +24,7 @@ public class TreeFeatureMixin {
      * the center column (the trunk position).
      */
     @Inject(method = "getTopPosition", at = @At("HEAD"), cancellable = true)
-    private void deeperdark$skipHorizontalChecks(TestableWorld world, int height, BlockPos pos, TreeFeatureConfig config, CallbackInfoReturnable<Integer> cir) {
+    private void deeperdark$skipHorizontalChecks(LevelSimulatedReader world, int height, BlockPos pos, TreeConfiguration config, CallbackInfoReturnable<Integer> cir) {
         BlockPos.Mutable mutable = new BlockPos.Mutable();
 
         // Only check the center column (vertical checks only)
@@ -53,7 +53,7 @@ public class TreeFeatureMixin {
      * Helper method to check for vines (mirrors TreeFeature.isVine)
      */
     @Unique
-    private static boolean isVine(TestableWorld world, BlockPos pos) {
-        return world.testBlockState(pos, state -> state.isOf(net.minecraft.block.Blocks.VINE));
+    private static boolean isVine(LevelSimulatedReader world, BlockPos pos) {
+        return world.testBlockState(pos, state -> state.isOf(net.minecraft.world.level.block.Blocks.VINE));
     }
 }

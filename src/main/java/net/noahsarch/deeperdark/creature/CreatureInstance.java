@@ -1,12 +1,13 @@
 package net.noahsarch.deeperdark.creature;
 
-import net.minecraft.entity.decoration.DisplayEntity;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.entity.Display;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.UUID;
+import net.minecraft.world.entity.projectile.Projectile;
 
 /**
  * Represents a single creature instance in the world, tracking all of its internal state.
@@ -42,8 +43,8 @@ public class CreatureInstance {
     private UUID displayEntityUuid = null;
 
     // ===== Position =====
-    private Vec3d position;
-    private final ServerWorld world;
+    private Vec3 position;
+    private final ServerLevel world;
     private float yaw = 0f;
 
     // ===== Visual State =====
@@ -77,19 +78,19 @@ public class CreatureInstance {
     // ===== Chase State =====
     private UUID targetPlayerUuid = null;
     private String targetPlayerName = null;
-    private Vec3d chaseTargetPos = null;
+    private Vec3 chaseTargetPos = null;
     private int chaseTicks = 0;
     private float pitchInfluenceAccumulated = 0;
 
     // ===== Echo Zone State =====
-    private Vec3d echoPosition = null;
+    private Vec3 echoPosition = null;
     private int echoTicksRemaining = 0;
     private boolean echoTriggered = false;
 
     // ===== Despawn =====
     private int despawnTimer;
 
-    public CreatureInstance(UUID creatureId, Vec3d position, ServerWorld world, int textureVariant, int despawnDelay) {
+    public CreatureInstance(UUID creatureId, Vec3 position, ServerLevel world, int textureVariant, int despawnDelay) {
         this.creatureId = creatureId;
         this.position = position;
         this.world = world;
@@ -102,8 +103,8 @@ public class CreatureInstance {
     public UUID getCreatureId() { return creatureId; }
     public int getDisplayEntityId() { return displayEntityId; }
     public UUID getDisplayEntityUuid() { return displayEntityUuid; }
-    public Vec3d getPosition() { return position; }
-    public ServerWorld getWorld() { return world; }
+    public Vec3 getPosition() { return position; }
+    public ServerLevel getWorld() { return world; }
     public float getYaw() { return yaw; }
     public int getTextureVariant() { return textureVariant; }
     public Sequence getCurrentSequence() { return currentSequence; }
@@ -120,10 +121,10 @@ public class CreatureInstance {
     public boolean willRejectProjectiles() { return willRejectProjectiles; }
     public UUID getTargetPlayerUuid() { return targetPlayerUuid; }
     public String getTargetPlayerName() { return targetPlayerName; }
-    public Vec3d getChaseTargetPos() { return chaseTargetPos; }
+    public Vec3 getChaseTargetPos() { return chaseTargetPos; }
     public int getChaseTicks() { return chaseTicks; }
     public float getPitchInfluenceAccumulated() { return pitchInfluenceAccumulated; }
-    public Vec3d getEchoPosition() { return echoPosition; }
+    public Vec3 getEchoPosition() { return echoPosition; }
     public int getEchoTicksRemaining() { return echoTicksRemaining; }
     public boolean isEchoTriggered() { return echoTriggered; }
     public int getDespawnTimer() { return despawnTimer; }
@@ -135,7 +136,7 @@ public class CreatureInstance {
 
     public void setDisplayEntityId(int id) { this.displayEntityId = id; }
     public void setDisplayEntityUuid(UUID uuid) { this.displayEntityUuid = uuid; }
-    public void setPosition(Vec3d position) { this.position = position; }
+    public void setPosition(Vec3 position) { this.position = position; }
     public void setYaw(float yaw) { this.yaw = yaw; }
     public void setTextureVariant(int variant) { this.textureVariant = variant; }
     public void setCurrentSequence(Sequence sequence) {
@@ -152,9 +153,9 @@ public class CreatureInstance {
     public void setWillRemoveTorches(boolean willRemove) { this.willRemoveTorches = willRemove; }
     public void setWillEcho(boolean willEcho) { this.willEcho = willEcho; }
     public void setWillRejectProjectiles(boolean willReject) { this.willRejectProjectiles = willReject; }
-    public void setTargetPlayer(ServerPlayerEntity player) {
+    public void setTargetPlayer(ServerPlayer player) {
         if (player != null) {
-            this.targetPlayerUuid = player.getUuid();
+            this.targetPlayerUuid = player.getUUID();
             this.targetPlayerName = player.getName().getString();
         } else {
             this.targetPlayerUuid = null;
@@ -163,10 +164,10 @@ public class CreatureInstance {
     }
     public void setTargetPlayerUuid(UUID uuid) { this.targetPlayerUuid = uuid; }
     public void setTargetPlayerName(String name) { this.targetPlayerName = name; }
-    public void setChaseTargetPos(Vec3d pos) { this.chaseTargetPos = pos; }
+    public void setChaseTargetPos(Vec3 pos) { this.chaseTargetPos = pos; }
     public void setChaseTicks(int ticks) { this.chaseTicks = ticks; }
     public void setPitchInfluenceAccumulated(float pitch) { this.pitchInfluenceAccumulated = pitch; }
-    public void setEchoPosition(Vec3d pos) { this.echoPosition = pos; }
+    public void setEchoPosition(Vec3 pos) { this.echoPosition = pos; }
     public void setEchoTicksRemaining(int ticks) { this.echoTicksRemaining = ticks; }
     public void setEchoTriggered(boolean triggered) { this.echoTriggered = triggered; }
     public void setDespawnTimer(int timer) { this.despawnTimer = timer; }

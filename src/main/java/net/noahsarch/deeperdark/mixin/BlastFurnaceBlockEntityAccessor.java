@@ -1,6 +1,6 @@
 package net.noahsarch.deeperdark.mixin;
 
-import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
+import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(AbstractFurnaceBlockEntity.class)

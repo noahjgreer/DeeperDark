@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c ' *)",
+      "Bash(python3)",
+      "Bash(python3 -c \" import subprocess result = subprocess.run\\(['javap', 'ref-decompiled/net/minecraft/server/permissions/Permission.class'], capture_output=True, text=True\\) print\\(result.stdout[:1500]\\) \" find \"f:/DeeperDark/ref-decompiled/net/minecraft/server/permissions\" -name \"*.class\")",
+      "Bash(python3 -c \" import subprocess result = subprocess.run\\(['javap', 'ref-decompiled/net/minecraft/world/entity/Display.class'], capture_output=True, text=True\\) for line in result.stdout.split\\('\\\\n'\\): if 'public' in line and any\\(k in line for k in ['set', 'get', 'Billboard', 'billboard']\\): print\\(line.strip\\(\\)\\) \")",
+      "Bash(xargs -I{} python3 -c \" import subprocess, sys result = subprocess.run\\(['javap', sys.argv[1]], capture_output=True, text=True\\) if any\\(k in result.stdout for k in ['Billboard', 'Interpolation', 'interpolation', 'billboard']\\): print\\('FILE:', sys.argv[1]\\) for line in result.stdout.split\\('\\\\n'\\): if any\\(k in line for k in ['Billboard', 'billboard', 'Interpolation', 'interpolation']\\): print\\(' ', line.strip\\(\\)\\) \" {})"
+    ]
+  }
+}

@@ -2,33 +2,33 @@ package net.noahsarch.deeperdark.event;
 
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.sound.BlockSoundGroup;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.resources.Identifier;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
 import net.noahsarch.deeperdark.util.CustomBlockManager;
 
 public class RottenFleshBlockEvents {
-    public static final Identifier ROTTEN_FLESH_BLOCK_MODEL_ID = Identifier.of("minecraft", "rotten_flesh_block");
+    public static final Identifier ROTTEN_FLESH_BLOCK_MODEL_ID = Identifier.fromNamespaceAndPath("minecraft", "rotten_flesh_block");
 
     public static void register() {
         // Placement Logic
         UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
             ItemStack stack = player.getStackInHand(hand);
-            if (stack.isEmpty()) return ActionResult.PASS;
+            if (stack.isEmpty()) return InteractionResult.PASS;
 
             // Check for item_model component
-            Identifier modelId = stack.get(DataComponentTypes.ITEM_MODEL);
+            Identifier modelId = stack.get(DataComponents.ITEM_MODEL);
             if (modelId == null || !modelId.equals(ROTTEN_FLESH_BLOCK_MODEL_ID)) {
-                return ActionResult.PASS;
+                return InteractionResult.PASS;
             }
 
             BlockPos pos = hitResult.getBlockPos();
@@ -36,19 +36,19 @@ public class RottenFleshBlockEvents {
             Direction side = hitResult.getSide();
             BlockPos placePos = pos.offset(side);
 
-            if (!world.getBlockState(placePos).canReplace(new ItemPlacementContext(player, hand, stack, hitResult))) {
-                 return ActionResult.PASS;
+            if (!world.getBlockState(placePos).canReplace(new UseOnContext(player, hand, stack, hitResult))) {
+                 return InteractionResult.PASS;
             }
 
             if (!player.isSneaking() && isInteractable(state, world, pos)) {
-                 return ActionResult.PASS;
+                 return InteractionResult.PASS;
             }
 
             if (!world.isClient()) {
                 // Place Nether Wart Block with Rotten Flesh Block Display
                 if (CustomBlockManager.place(world, placePos, stack, Blocks.NETHER_WART_BLOCK, null)) {
                     // Use NETHER_WART sound
-                    world.playSound(null, placePos, BlockSoundGroup.NETHER_WART.getPlaceSound(), SoundCategory.BLOCKS, 1f, 1f);
+                    world.playSound(null, placePos, SoundType.NETHER_WART.getPlaceSound(), SoundSource.BLOCKS, 1f, 1f);
 
                     if (!player.isCreative()) {
                         stack.decrement(1);
@@ -56,13 +56,13 @@ public class RottenFleshBlockEvents {
                 }
             }
 
-            return ActionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         });
 
         // Break Logic
         PlayerBlockBreakEvents.BEFORE.register((world, player, pos, state, blockEntity) -> {
             if (state.getBlock() == Blocks.NETHER_WART_BLOCK) {
-                if (CustomBlockManager.onBreak(world, pos, state, player, ROTTEN_FLESH_BLOCK_MODEL_ID, BlockSoundGroup.NETHER_WART, null, null)) {
+                if (CustomBlockManager.onBreak(world, pos, state, player, ROTTEN_FLESH_BLOCK_MODEL_ID, SoundType.NETHER_WART, null, null)) {
                     return false;
                 }
             }
@@ -70,13 +70,13 @@ public class RottenFleshBlockEvents {
         });
     }
 
-    private static boolean isInteractable(BlockState state, World world, BlockPos pos) {
+    private static boolean isInteractable(BlockState state, Level world, BlockPos pos) {
         return state.createScreenHandlerFactory(world, pos) != null ||
-               state.getBlock() instanceof net.minecraft.block.DoorBlock ||
-               state.getBlock() instanceof net.minecraft.block.TrapdoorBlock ||
-               state.getBlock() instanceof net.minecraft.block.FenceGateBlock ||
-               state.getBlock() instanceof net.minecraft.block.ButtonBlock ||
-               state.getBlock() instanceof net.minecraft.block.LeverBlock;
+               state.getBlock() instanceof net.minecraft.world.level.block.DoorBlock ||
+               state.getBlock() instanceof net.minecraft.world.level.block.TrapdoorBlock ||
+               state.getBlock() instanceof net.minecraft.world.level.block.FenceGateBlock ||
+               state.getBlock() instanceof net.minecraft.world.level.block.ButtonBlock ||
+               state.getBlock() instanceof net.minecraft.world.level.block.LeverBlock;
     }
 }
 

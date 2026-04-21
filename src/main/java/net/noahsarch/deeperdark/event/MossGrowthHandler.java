@@ -1,15 +1,15 @@
 package net.noahsarch.deeperdark.event;
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.registry.tag.FluidTags;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.random.Random;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.RandomSource;
 import net.noahsarch.deeperdark.DeeperDarkConfig;
 
 /**
@@ -25,7 +25,7 @@ public class MossGrowthHandler {
         ServerTickEvents.END_WORLD_TICK.register(MossGrowthHandler::onWorldTick);
     }
 
-    private static void onWorldTick(ServerWorld world) {
+    private static void onWorldTick(ServerLevel world) {
         DeeperDarkConfig.ConfigInstance config = DeeperDarkConfig.get();
 
         // Check if moss growth is enabled
@@ -42,7 +42,7 @@ public class MossGrowthHandler {
             return;
         }
 
-        Random random = world.getRandom();
+        RandomSource random = world.getRandom();
 
         // Process random blocks similar to how random ticks work
         // We'll check a small number of random positions around each player
@@ -72,7 +72,7 @@ public class MossGrowthHandler {
         }
     }
 
-    private static void tryMossBlock(ServerWorld world, BlockPos pos, BlockState state, Random random, DeeperDarkConfig.ConfigInstance config) {
+    private static void tryMossBlock(ServerLevel world, BlockPos pos, BlockState state, RandomSource random, DeeperDarkConfig.ConfigInstance config) {
         Block block = state.getBlock();
         Block mossyVariant = null;
         double speedMultiplier = 1.0;
@@ -127,7 +127,7 @@ public class MossGrowthHandler {
         }
     }
 
-    private static int countNearbyMossyBlocks(ServerWorld world, BlockPos pos) {
+    private static int countNearbyMossyBlocks(ServerLevel world, BlockPos pos) {
         int count = 0;
         for (Direction direction : Direction.values()) {
             BlockState adjacent = world.getBlockState(pos.offset(direction));
@@ -156,13 +156,13 @@ public class MossGrowthHandler {
     private static BlockState copyBlockStateProperties(BlockState from, BlockState to) {
         for (var property : from.getProperties()) {
             if (to.contains(property)) {
-                to = copyProperty(from, to, (net.minecraft.state.property.Property) property);
+                to = copyProperty(from, to, (net.minecraft.world.level.block.state.properties.Property) property);
             }
         }
         return to;
     }
 
-    private static <T extends Comparable<T>> BlockState copyProperty(BlockState from, BlockState to, net.minecraft.state.property.Property<T> property) {
+    private static <T extends Comparable<T>> BlockState copyProperty(BlockState from, BlockState to, net.minecraft.world.level.block.state.properties.Property<T> property) {
         return to.with(property, from.get(property));
     }
 }

@@ -1,11 +1,11 @@
 package net.noahsarch.deeperdark.mixin;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.vehicle.AbstractBoatEntity;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.vehicle.boat.AbstractBoat;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -14,15 +14,15 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(AbstractBoatEntity.class)
+@Mixin(AbstractBoat.class)
 public abstract class AbstractBoatEntityMixin extends Entity {
 
-    @Shadow private AbstractBoatEntity.Location location;
+    @Shadow private AbstractBoat.Status location;
 
     @Unique
     private float deeperdark$speed = 1.0f;
 
-    public AbstractBoatEntityMixin(EntityType<?> type, World world) {
+    public AbstractBoatEntityMixin(EntityType<?> type, Level world) {
         super(type, world);
     }
 
@@ -38,7 +38,7 @@ public abstract class AbstractBoatEntityMixin extends Entity {
 
     @Inject(method = "getNearbySlipperiness", at = @At("HEAD"), cancellable = true)
     private void deeperdark$getNearbySlipperiness(CallbackInfoReturnable<Float> cir) {
-        if (this.location == AbstractBoatEntity.Location.IN_AIR) {
+        if (this.location == AbstractBoat.Status.IN_AIR) {
             // Return high slipperiness to maintain horizontal velocity
             cir.setReturnValue(0.98F);
         }
@@ -51,14 +51,14 @@ public abstract class AbstractBoatEntityMixin extends Entity {
         }
     }
 
-    @Inject(method = "writeCustomData", at = @At("TAIL"))
-    private void deeperdark$writeCustomData(WriteView view, CallbackInfo ci) {
+    @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
+    private void deeperdark$writeCustomData(ValueOutput view, CallbackInfo ci) {
         view.putFloat("DeeperDarkSpeed", this.deeperdark$speed);
     }
 
-    @Inject(method = "readCustomData", at = @At("TAIL"))
-    private void deeperdark$readCustomData(ReadView view, CallbackInfo ci) {
-        this.deeperdark$speed = view.getFloat("DeeperDarkSpeed", 1.0f);
+    @Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
+    private void deeperdark$readCustomData(ValueInput view, CallbackInfo ci) {
+        this.deeperdark$speed = view.getFloatOr("DeeperDarkSpeed", 1.0f);
     }
 }
 

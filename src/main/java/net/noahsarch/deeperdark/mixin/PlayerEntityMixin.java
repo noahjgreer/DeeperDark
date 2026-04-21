@@ -1,17 +1,17 @@
 package net.noahsarch.deeperdark.mixin;
 
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.Leashable;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Leashable;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.level.Level;
 import net.noahsarch.deeperdark.duck.EntityAccessor;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -20,13 +20,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(PlayerEntity.class)
+@Mixin(Player.class)
 public abstract class PlayerEntityMixin extends LivingEntity implements Leashable {
 
     @Unique
     private Leashable.LeashData leashData;
 
-    protected PlayerEntityMixin(EntityType<? extends LivingEntity> entityType, World world) {
+    protected PlayerEntityMixin(EntityType<? extends LivingEntity> entityType, Level world) {
         super(entityType, world);
     }
 
@@ -41,31 +41,31 @@ public abstract class PlayerEntityMixin extends LivingEntity implements Leashabl
         this.leashData = leashData;
     }
 
-    @Inject(method = "writeCustomData", at = @At("TAIL"))
-    private void writeLeashData(WriteView nbt, CallbackInfo ci) {
+    @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
+    private void writeLeashData(ValueOutput nbt, CallbackInfo ci) {
         this.writeLeashData(nbt, this.leashData);
     }
 
-    @Inject(method = "readCustomData", at = @At("TAIL"))
-    private void readLeashData(ReadView nbt, CallbackInfo ci) {
+    @Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
+    private void readLeashData(ValueInput nbt, CallbackInfo ci) {
         this.readLeashData(nbt);
     }
 
     @Inject(method = "tick", at = @At("TAIL"))
     private void tickLeash(CallbackInfo ci) {
         if (!((EntityAccessor)this).deeperdark$getWorld().isClient()) {
-            Leashable.tickLeash((ServerWorld) ((EntityAccessor)this).deeperdark$getWorld(), (LivingEntity & Leashable) this);
+            Leashable.tickLeash((ServerLevel) ((EntityAccessor)this).deeperdark$getWorld(), (LivingEntity & Leashable) this);
         }
     }
 
     @Override
-    public ActionResult interact(PlayerEntity player, Hand hand) {
+    public InteractionResult interact(Player player, InteractionHand hand) {
         ItemStack itemStack = player.getStackInHand(hand);
         if (itemStack.isOf(Items.LEAD) && this.canBeLeashedTo(player)) {
             if (!this.isLeashed()) {
                 this.attachLeash(player, true);
                 itemStack.decrement(1);
-                return ActionResult.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
         }
         return super.interact(player, hand);

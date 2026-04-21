@@ -1,7 +1,7 @@
 package net.noahsarch.deeperdark.mixin;
 
-import net.minecraft.block.NetherPortalBlock;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.level.block.NetherPortalBlock;
+import net.minecraft.world.level.dimension.DimensionType;
 import net.noahsarch.deeperdark.DeeperDarkConfig;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

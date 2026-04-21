@@ -1,18 +1,18 @@
 package net.noahsarch.deeperdark.mixin;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.FarmlandBlock;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.ItemEnchantmentsComponent;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.FarmlandBlock;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.Holder;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -25,19 +25,19 @@ public class FarmlandBlockMixin {
      * Prevent farmland from being trampled if the player has Feather Falling enchantment on their boots
      */
     @Inject(method = "onLandedUpon", at = @At("HEAD"), cancellable = true)
-    private void deeperdark$preventTrampleWithFeatherFalling(World world, BlockState state, BlockPos pos, Entity entity, double fallDistance, CallbackInfo ci) {
+    private void deeperdark$preventTrampleWithFeatherFalling(Level world, BlockState state, BlockPos pos, Entity entity, double fallDistance, CallbackInfo ci) {
         // Check if the entity is a player
-        if (entity instanceof PlayerEntity player) {
+        if (entity instanceof Player player) {
             // Get the boots item stack
             ItemStack boots = player.getEquippedStack(EquipmentSlot.FEET);
 
             // Check if the boots have Feather Falling enchantment (any level)
             if (!boots.isEmpty()) {
-                ItemEnchantmentsComponent enchantments = boots.getOrDefault(DataComponentTypes.ENCHANTMENTS, ItemEnchantmentsComponent.DEFAULT);
+                ItemEnchantments enchantments = boots.getOrDefault(DataComponents.ENCHANTMENTS, ItemEnchantments.DEFAULT);
 
                 // Check if Feather Falling is present
                 boolean hasFeatherFalling = false;
-                for (RegistryEntry<Enchantment> enchantment : enchantments.getEnchantments()) {
+                for (Holder<Enchantment> enchantment : enchantments.getEnchantments()) {
                     if (enchantment.matchesKey(Enchantments.FEATHER_FALLING)) {
                         hasFeatherFalling = true;
                         break;

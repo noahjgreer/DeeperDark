@@ -1,9 +1,9 @@
 package net.noahsarch.deeperdark;
 
-import net.minecraft.block.ComposterBlock;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.util.Identifier;
+import net.minecraft.world.level.block.ComposterBlock;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.Identifier;
 import net.noahsarch.deeperdark.event.*;
 import net.noahsarch.deeperdark.portal.SlipPortalHandler;
 import net.noahsarch.deeperdark.potion.CustomBrewingRecipeHandler;
@@ -11,11 +11,12 @@ import net.noahsarch.deeperdark.sound.ModSounds;
 import net.noahsarch.deeperdark.villager.ModVillagers;
 import net.noahsarch.deeperdark.worldgen.SlipChunkGenerator;
 import net.fabricmc.api.ModInitializer;
-import net.minecraft.item.Items;
+import net.minecraft.world.item.Items;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import net.minecraft.structure.processor.StructureProcessorType;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType;
 import net.noahsarch.deeperdark.worldgen.PaleMansionProcessor;
+import net.minecraft.core.registries.Registries;
 
 public class Deeperdark implements ModInitializer {
 	public static final String MOD_ID = "deeperdark";
@@ -26,8 +27,8 @@ public class Deeperdark implements ModInitializer {
 	// That way, it's clear which mod wrote info, warnings, and errors.
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-//    public static final StatusEffect SCENTLESS = new DeeperDarkStatusEffects.ScentlessStatusEffect();
-//    public static RegistryEntry<StatusEffect> SCENTLESS_ENTRY;
+//    public static final MobEffect SCENTLESS = new DeeperDarkStatusEffects.ScentlessStatusEffect();
+//    public static Holder<MobEffect> SCENTLESS_ENTRY;
 
 	@Override
 	public void onInitialize() {
@@ -41,10 +42,10 @@ public class Deeperdark implements ModInitializer {
 
 		// Register the Slip chunk generator
 		Registry.register(Registries.CHUNK_GENERATOR,
-				Identifier.of(MOD_ID, "slip_room_generator"),
+				Identifier.fromNamespaceAndPath(MOD_ID, "slip_room_generator"),
 				SlipChunkGenerator.CODEC);
 
-		PALE_MANSION_PROCESSOR = Registry.register(Registries.STRUCTURE_PROCESSOR, Identifier.of(MOD_ID, "pale_mansion_processor"), () -> PaleMansionProcessor.CODEC);
+		PALE_MANSION_PROCESSOR = Registry.register(Registries.STRUCTURE_PROCESSOR, Identifier.fromNamespaceAndPath(MOD_ID, "pale_mansion_processor"), () -> PaleMansionProcessor.CODEC);
 
 		SiphonEvents.register();
 		GoldenCauldronEvents.register();
@@ -59,7 +60,7 @@ public class Deeperdark implements ModInitializer {
 
 		// Register tick handler for custom block tracker
 		net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_WORLD_TICK.register(world -> {
-			if (world instanceof net.minecraft.server.world.ServerWorld serverWorld) {
+			if (world instanceof net.minecraft.server.level.ServerLevel serverWorld) {
 				// Run every 20 ticks (1 second) to be gentle
 				if (serverWorld.getTime() % 20 == 0) {
 					net.noahsarch.deeperdark.util.CustomBlockTracker.get(serverWorld).tick(serverWorld);
@@ -74,7 +75,7 @@ public class Deeperdark implements ModInitializer {
 
 		// Save custom block data when server stops
 		net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
-			for (net.minecraft.server.world.ServerWorld world : server.getWorlds()) {
+			for (net.minecraft.server.level.ServerLevel world : server.getWorlds()) {
 				net.noahsarch.deeperdark.util.CustomBlockTracker.get(world).save();
 			}
 		});
@@ -100,8 +101,8 @@ public class Deeperdark implements ModInitializer {
         ComposterBlock.ITEM_TO_LEVEL_INCREASE_CHANCE.put(Items.DIAMOND.asItem(), 1.0f);
 
         // Register the effects
-//        Registry.register(Registries.STATUS_EFFECT, Identifier.of("deeperdark:scentless"), SCENTLESS);
-//        SCENTLESS_ENTRY = Registries.STATUS_EFFECT.getEntry(Identifier.of("deeperdark:scentless")).orElseThrow();
+//        Registry.register(Registries.STATUS_EFFECT, Identifier.withDefaultNamespace("deeperdark:scentless"), SCENTLESS);
+//        SCENTLESS_ENTRY = Registries.STATUS_EFFECT.getEntry(Identifier.withDefaultNamespace("deeperdark:scentless")).orElseThrow();
 
         // Register the potion itself somewhere else, as you already do
 //        ScentlessPotion.registerPotions();

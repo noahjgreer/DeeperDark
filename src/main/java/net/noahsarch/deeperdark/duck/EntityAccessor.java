@@ -1,8 +1,8 @@
 package net.noahsarch.deeperdark.duck;
 
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
 
 public interface EntityAccessor {
-    World deeperdark$getWorld();
+    Level deeperdark$getWorld();
 }
 

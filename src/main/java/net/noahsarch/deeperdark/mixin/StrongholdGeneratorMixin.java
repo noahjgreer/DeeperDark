@@ -1,11 +1,11 @@
 package net.noahsarch.deeperdark.mixin;
 
-import net.minecraft.structure.StrongholdGenerator;
+import net.minecraft.world.level.levelgen.structure.structures.StrongholdStructure;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 
-@Mixin(StrongholdGenerator.class)
+@Mixin(StrongholdStructure.class)
 public class StrongholdGeneratorMixin {
     @ModifyConstant(method = "pieceGenerator", constant = @Constant(intValue = 50))
     private static int modifyDepthLimit(int constant) {

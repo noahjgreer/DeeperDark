@@ -4,17 +4,17 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredient;
 import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredientSerializer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.util.Identifier;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.Identifier;
 import java.util.List;
 import java.util.stream.Stream;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.item.Item;
+import net.minecraft.core.Holder;
+import net.minecraft.world.item.Item;
 
 public class ComponentIngredient implements CustomIngredient {
-    public static final Identifier ID = Identifier.of("deeperdark", "component_ingredient");
+    public static final Identifier ID = Identifier.fromNamespaceAndPath("deeperdark", "component_ingredient");
 
     private final ItemStack prototype;
 
@@ -28,9 +28,9 @@ public class ComponentIngredient implements CustomIngredient {
         if (stack.getItem() != prototype.getItem()) return false;
 
         // Match explicit component changes required by the recipe
-        net.minecraft.component.ComponentChanges changes = prototype.getComponentChanges();
-        for (java.util.Map.Entry<net.minecraft.component.ComponentType<?>, java.util.Optional<?>> entry : changes.entrySet()) {
-            net.minecraft.component.ComponentType<?> type = entry.getKey();
+        net.minecraft.core.component.ComponentChanges changes = prototype.getComponentChanges();
+        for (java.util.Map.Entry<net.minecraft.core.component.ComponentType<?>, java.util.Optional<?>> entry : changes.entrySet()) {
+            net.minecraft.core.component.ComponentType<?> type = entry.getKey();
             java.util.Optional<?> requiredValue = entry.getValue();
 
             if (requiredValue.isPresent()) {
@@ -49,7 +49,7 @@ public class ComponentIngredient implements CustomIngredient {
     }
 
     @Override
-    public Stream<RegistryEntry<Item>> getMatchingItems() {
+    public Stream<Holder<Item>> getMatchingItems() {
         return Stream.of(prototype.getItem().getRegistryEntry());
     }
 
@@ -79,7 +79,7 @@ public class ComponentIngredient implements CustomIngredient {
         );
 
         // Packet Codec for Sync
-        private static final PacketCodec<RegistryByteBuf, ComponentIngredient> PACKET_CODEC = ItemStack.PACKET_CODEC
+        private static final StreamCodec<RegistryFriendlyByteBuf, ComponentIngredient> PACKET_CODEC = ItemStack.PACKET_CODEC
             .xmap(ComponentIngredient::new, i -> i.prototype);
 
         @Override
@@ -93,7 +93,7 @@ public class ComponentIngredient implements CustomIngredient {
         }
 
         @Override
-        public PacketCodec<RegistryByteBuf, ComponentIngredient> getPacketCodec() {
+        public StreamCodec<RegistryFriendlyByteBuf, ComponentIngredient> getPacketCodec() {
             return PACKET_CODEC;
         }
     }

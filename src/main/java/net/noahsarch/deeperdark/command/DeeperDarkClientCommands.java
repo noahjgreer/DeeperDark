@@ -3,11 +3,11 @@ package net.noahsarch.deeperdark.command;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
 import net.noahsarch.deeperdark.DeeperDarkConfig;
 
 import java.util.ArrayList;
@@ -21,38 +21,38 @@ public class DeeperDarkClientCommands {
 
     public static void register() {
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) ->
-                dispatcher.register(CommandManager.literal("ddclient")
-                        .requires(source -> source.getEntity() instanceof ServerPlayerEntity)
-                        .then(CommandManager.literal("chat_sounds")
+                dispatcher.register(Commands.literal("ddclient")
+                        .requires(source -> source.getEntity() instanceof ServerPlayer)
+                        .then(Commands.literal("chat_sounds")
                                 .executes(DeeperDarkClientCommands::executeChatSoundsQuery)
-                                .then(CommandManager.argument("enabled", BoolArgumentType.bool())
+                                .then(Commands.argument("enabled", BoolArgumentType.bool())
                                         .executes(DeeperDarkClientCommands::executeChatSoundsSet))))
         );
     }
 
-    private static int executeChatSoundsQuery(CommandContext<ServerCommandSource> context) {
-        ServerPlayerEntity player;
+    private static int executeChatSoundsQuery(CommandContext<CommandSourceStack> context) {
+        ServerPlayer player;
         try {
-            player = context.getSource().getPlayerOrThrow();
+            player = context.getSource().getPlayerOrException();
         } catch (Exception e) {
-            context.getSource().sendError(Text.literal("This command can only be used by players.").formatted(Formatting.RED));
+            context.getSource().sendFailure(Component.literal("This command can only be used by players.").withStyle(ChatFormatting.RED));
             return 0;
         }
 
         boolean enabled = isChatSoundsEnabledFor(player);
-        context.getSource().sendFeedback(() -> Text.literal("Chat sounds are currently ")
-                .formatted(Formatting.WHITE)
-                .append(Text.literal(enabled ? "enabled" : "disabled")
-                        .formatted(enabled ? Formatting.GREEN : Formatting.RED)), false);
+        context.getSource().sendSuccess(() -> Component.literal("Chat sounds are currently ")
+                .withStyle(ChatFormatting.WHITE)
+                .append(Component.literal(enabled ? "enabled" : "disabled")
+                        .withStyle(enabled ? ChatFormatting.GREEN : ChatFormatting.RED)), false);
         return 1;
     }
 
-    private static int executeChatSoundsSet(CommandContext<ServerCommandSource> context) {
-        ServerPlayerEntity player;
+    private static int executeChatSoundsSet(CommandContext<CommandSourceStack> context) {
+        ServerPlayer player;
         try {
-            player = context.getSource().getPlayerOrThrow();
+            player = context.getSource().getPlayerOrException();
         } catch (Exception e) {
-            context.getSource().sendError(Text.literal("This command can only be used by players.").formatted(Formatting.RED));
+            context.getSource().sendFailure(Component.literal("This command can only be used by players.").withStyle(ChatFormatting.RED));
             return 0;
         }
 
@@ -72,15 +72,15 @@ public class DeeperDarkClientCommands {
 
         DeeperDarkConfig.save();
 
-        context.getSource().sendFeedback(() -> Text.literal("Chat sounds ")
-                .formatted(Formatting.WHITE)
-                .append(Text.literal(enabled ? "enabled" : "disabled")
-                        .formatted(enabled ? Formatting.GREEN : Formatting.RED))
-                .append(Text.literal(" for you.").formatted(Formatting.WHITE)), false);
+        context.getSource().sendSuccess(() -> Component.literal("Chat sounds ")
+                .withStyle(ChatFormatting.WHITE)
+                .append(Component.literal(enabled ? "enabled" : "disabled")
+                        .withStyle(enabled ? ChatFormatting.GREEN : ChatFormatting.RED))
+                .append(Component.literal(" for you.").withStyle(ChatFormatting.WHITE)), false);
         return 1;
     }
 
-    private static boolean isChatSoundsEnabledFor(ServerPlayerEntity player) {
+    private static boolean isChatSoundsEnabledFor(ServerPlayer player) {
         DeeperDarkConfig.ConfigInstance config = DeeperDarkConfig.get();
         if (config.chatSoundExclusions == null) return true;
         String playerNameLower = player.getName().getString().toLowerCase(Locale.ROOT);

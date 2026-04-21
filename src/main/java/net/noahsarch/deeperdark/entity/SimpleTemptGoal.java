@@ -1,24 +1,25 @@
 package net.noahsarch.deeperdark.entity;
 
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.passive.MerchantEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.npc.ClientSideMerchant;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 import java.util.EnumSet;
+import net.minecraft.world.entity.npc.villager.AbstractVillager;
 
 /**
  * A simplified version of TemptGoal that doesn't require entity attributes.
  * Used to make villagers follow players holding emeralds.
  */
 public class SimpleTemptGoal extends Goal {
-    private final MerchantEntity entity;
+    private final AbstractVillager entity;
     private final double speed;
-    private PlayerEntity closestPlayer;
+    private Player closestPlayer;
     private int cooldown;
 
-    public SimpleTemptGoal(MerchantEntity entity, double speed) {
+    public SimpleTemptGoal(AbstractVillager entity, double speed) {
         this.entity = entity;
         this.speed = speed;
         this.setControls(EnumSet.of(Goal.Control.MOVE, Goal.Control.LOOK));

@@ -1,13 +1,14 @@
 package net.noahsarch.deeperdark.creature;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.phys.Vec3;
 import net.noahsarch.deeperdark.Deeperdark;
 
 import java.util.*;
+import net.minecraft.util.RandomSource;
 
 /**
  * Handles pathfinding algorithms for creature spawning and movement.
@@ -21,11 +22,11 @@ public class CreaturePathfinder {
     /**
      * Result from a pathfinding operation.
      */
-    public record PathResult(Vec3d position, List<BlockPos> path, boolean success, String failureReason) {
+    public record PathResult(Vec3 position, List<BlockPos> path, boolean success, String failureReason) {
         public static PathResult failure(String reason) {
             return new PathResult(null, List.of(), false, reason);
         }
-        public static PathResult success(Vec3d position, List<BlockPos> path) {
+        public static PathResult success(Vec3 position, List<BlockPos> path) {
             return new PathResult(position, path, true, null);
         }
     }
@@ -36,7 +37,7 @@ public class CreaturePathfinder {
      * - Not in the open (adjacent to at least one wall)
      * - Below the configured max Y
      */
-    public static boolean isValidPlacement(ServerWorld world, BlockPos pos, int maxY, boolean debug) {
+    public static boolean isValidPlacement(ServerLevel world, BlockPos pos, int maxY, boolean debug) {
         if (pos.getY() > maxY) {
             if (debug) LOGGER.info("[Creature] Position {} above max Y {}", pos, maxY);
             return false;
@@ -84,7 +85,7 @@ public class CreaturePathfinder {
      * Scores a placement position for the creature based on preferences.
      * Higher score = better position.
      */
-    public static int scorePlacement(ServerWorld world, BlockPos pos) {
+    public static int scorePlacement(ServerLevel world, BlockPos pos) {
         int score = 0;
 
         // Prefer positions with ceiling at exactly 3 blocks
@@ -125,9 +126,9 @@ public class CreaturePathfinder {
      * then places the creature between min and max crawl distance, favoring
      * positions that meet the creature's preferences.
      */
-    public static PathResult pathtraceFromPlayer(ServerWorld world, BlockPos playerPos,
+    public static PathResult pathtraceFromPlayer(ServerLevel world, BlockPos playerPos,
                                                   int minDist, int maxDist, int maxY,
-                                                  List<Vec3d> existingCreaturePositions, int entitySpacing,
+                                                  List<Vec3> existingCreaturePositions, int entitySpacing,
                                                   boolean debug) {
         if (debug) LOGGER.info("[Creature] Starting pathtrace from player at {}", playerPos);
 
@@ -194,26 +195,26 @@ public class CreaturePathfinder {
         // Build the actual path from player to creature for copper trail
         List<BlockPos> trailPath = buildPathBFS(world, startPos, bestPos, maxY);
 
-        return PathResult.success(Vec3d.ofBottomCenter(bestPos), trailPath);
+        return PathResult.success(Vec3.ofBottomCenter(bestPos), trailPath);
     }
 
     /**
      * Fallback radial placement algorithm.
      * Casts a sphere from the player's position searching for nearby cave systems.
      */
-    public static PathResult radialPlacement(ServerWorld world, BlockPos playerPos,
+    public static PathResult radialPlacement(ServerLevel world, BlockPos playerPos,
                                               int minDist, int maxDist, int maxY,
-                                              List<Vec3d> existingCreaturePositions, int entitySpacing,
+                                              List<Vec3> existingCreaturePositions, int entitySpacing,
                                               boolean debug) {
         if (debug) LOGGER.info("[Creature] Starting radial placement from {}", playerPos);
 
-        Random rand = new Random();
+        RandomSource rand = new RandomSource();
         List<BlockPos> candidates = new ArrayList<>();
 
         // Sample random points within the sphere
         int sampleAttempts = 500;
         for (int i = 0; i < sampleAttempts; i++) {
-            // Random point in spherical shell between minDist and maxDist
+            // RandomSource point in spherical shell between minDist and maxDist
             double distance = minDist + rand.nextDouble() * (maxDist - minDist);
             double theta = rand.nextDouble() * 2 * Math.PI;
             double phi = Math.acos(2 * rand.nextDouble() - 1);
@@ -250,22 +251,22 @@ public class CreaturePathfinder {
         List<BlockPos> trailPath = buildPathBFS(world, findNearestAirAboveSolid(world, playerPos), bestPos, maxY);
 
         if (debug) LOGGER.info("[Creature] Radial placement selected: {}", bestPos);
-        return PathResult.success(Vec3d.ofBottomCenter(bestPos), trailPath);
+        return PathResult.success(Vec3.ofBottomCenter(bestPos), trailPath);
     }
 
     /**
      * Finds a path between two positions for the creature's chase pathfinding.
      * Returns a list of positions the creature should walk through.
      */
-    public static List<BlockPos> findChasePath(ServerWorld world, BlockPos from, BlockPos to, int maxY) {
+    public static List<BlockPos> findChasePath(ServerLevel world, BlockPos from, BlockPos to, int maxY) {
         return buildPathBFS(world, from, to, maxY);
     }
 
     /**
      * Finds a chase placement position within the specified distance range.
      */
-    public static BlockPos findChasePosition(ServerWorld world, BlockPos playerPos, int minDist, int maxDist, int maxY, boolean debug) {
-        Random rand = new Random();
+    public static BlockPos findChasePosition(ServerLevel world, BlockPos playerPos, int minDist, int maxDist, int maxY, boolean debug) {
+        RandomSource rand = new RandomSource();
         List<BlockPos> candidates = new ArrayList<>();
 
         int sampleAttempts = 300;
@@ -298,7 +299,7 @@ public class CreaturePathfinder {
 
     // ===== Private Helpers =====
 
-    private static void exploreNeighbor(ServerWorld world, BlockPos current, Direction dir,
+    private static void exploreNeighbor(ServerLevel world, BlockPos current, Direction dir,
                                          Queue<BlockPos> queue, Set<BlockPos> visited,
                                          Map<BlockPos, Integer> distanceMap, int newDist,
                                          int maxDist, int maxY) {
@@ -352,7 +353,7 @@ public class CreaturePathfinder {
         queue.add(next);
     }
 
-    private static void exploreVertical(ServerWorld world, BlockPos current,
+    private static void exploreVertical(ServerLevel world, BlockPos current,
                                          Queue<BlockPos> queue, Set<BlockPos> visited,
                                          Map<BlockPos, Integer> distanceMap, int newDist,
                                          int maxDist, int maxY) {
@@ -383,7 +384,7 @@ public class CreaturePathfinder {
         }
     }
 
-    private static BlockPos findNearestAirAboveSolid(ServerWorld world, BlockPos pos) {
+    private static BlockPos findNearestAirAboveSolid(ServerLevel world, BlockPos pos) {
         // Search for the nearest valid standing position
         for (int dy = -3; dy <= 3; dy++) {
             BlockPos check = pos.add(0, dy, 0);
@@ -395,9 +396,9 @@ public class CreaturePathfinder {
         return pos;
     }
 
-    private static boolean isSpacingValid(BlockPos pos, List<Vec3d> existingPositions, int minSpacing) {
-        Vec3d posVec = Vec3d.ofBottomCenter(pos);
-        for (Vec3d existing : existingPositions) {
+    private static boolean isSpacingValid(BlockPos pos, List<Vec3> existingPositions, int minSpacing) {
+        Vec3 posVec = Vec3.ofBottomCenter(pos);
+        for (Vec3 existing : existingPositions) {
             if (posVec.distanceTo(existing) < minSpacing) {
                 return false;
             }
@@ -408,7 +409,7 @@ public class CreaturePathfinder {
     /**
      * Selects a candidate with weighted randomness based on placement score.
      */
-    private static BlockPos selectWeightedCandidate(ServerWorld world, List<BlockPos> candidates) {
+    private static BlockPos selectWeightedCandidate(ServerLevel world, List<BlockPos> candidates) {
         if (candidates.size() == 1) return candidates.getFirst();
 
         // Score all candidates
@@ -436,7 +437,7 @@ public class CreaturePathfinder {
      * BFS pathfinding between two positions, returning a walkable path.
      * Used for copper nugget trail placement and chase movement.
      */
-    private static List<BlockPos> buildPathBFS(ServerWorld world, BlockPos from, BlockPos to, int maxY) {
+    private static List<BlockPos> buildPathBFS(ServerLevel world, BlockPos from, BlockPos to, int maxY) {
         if (from == null || to == null) return List.of();
 
         Set<BlockPos> visited = new HashSet<>();

@@ -2,24 +2,24 @@ package net.noahsarch.deeperdark.portal;
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.TeleportTarget;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.resources.Identifier;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.portal.TeleportTransition;
+import net.minecraft.world.level.Level;
 import net.noahsarch.deeperdark.duck.ServerPlayerAccessor;
 import net.noahsarch.deeperdark.duck.EntityAccessor;
 
@@ -34,9 +34,9 @@ import java.util.*;
  * - Slip portals lead to the Overworld (64:1 scale) with waypoint markers
  */
 public class SlipPortalHandler {
-    private static final RegistryKey<World> THE_END = World.END;
-    private static final RegistryKey<World> THE_SLIP = RegistryKey.of(RegistryKeys.WORLD, Identifier.of("minecraft", "the_slip"));
-    private static final RegistryKey<World> OVERWORLD = World.OVERWORLD;
+    private static final ResourceKey<Level> THE_END = Level.END;
+    private static final ResourceKey<Level> THE_SLIP = ResourceKey.create(Registries.WORLD, Identifier.fromNamespaceAndPath("minecraft", "the_slip"));
+    private static final ResourceKey<Level> OVERWORLD = Level.OVERWORLD;
 
     // Cooldown to prevent rapid teleportation (100 ticks = 5 seconds)
     private static final int TELEPORT_COOLDOWN = 100;
@@ -143,17 +143,17 @@ public class SlipPortalHandler {
         // Handle water bucket placement to activate portals
         UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
             if (world.isClient()) {
-                return ActionResult.PASS;
+                return InteractionResult.PASS;
             }
 
             // Only work in the End dimension
             if (!world.getRegistryKey().equals(THE_END)) {
-                return ActionResult.PASS;
+                return InteractionResult.PASS;
             }
 
             ItemStack heldItem = player.getStackInHand(hand);
             if (!heldItem.isOf(Items.WATER_BUCKET)) {
-                return ActionResult.PASS;
+                return InteractionResult.PASS;
             }
 
             BlockPos clickedPos = hitResult.getBlockPos();
@@ -163,7 +163,7 @@ public class SlipPortalHandler {
             BlockPos portalCenter = findPortalCenter(world, placePos);
             if (portalCenter != null && isValidHorizontalPortalFrame(world, portalCenter)) {
                 // Activate the portal!
-                activateHorizontalPortal((ServerWorld) world, portalCenter);
+                activateHorizontalPortal((ServerLevel) world, portalCenter);
 
                 // Replace water bucket with empty bucket
                 if (!player.isCreative()) {
@@ -175,26 +175,26 @@ public class SlipPortalHandler {
                     }
                 }
 
-                return ActionResult.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
 
-            return ActionResult.PASS;
+            return InteractionResult.PASS;
         });
 
         // Handle flint and steel activation for vertical portals in the Slip
         UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
             if (world.isClient()) {
-                return ActionResult.PASS;
+                return InteractionResult.PASS;
             }
 
             // Only work in the Slip dimension
             if (!world.getRegistryKey().equals(THE_SLIP)) {
-                return ActionResult.PASS;
+                return InteractionResult.PASS;
             }
 
             ItemStack heldItem = player.getStackInHand(hand);
             if (!heldItem.isOf(Items.FLINT_AND_STEEL)) {
-                return ActionResult.PASS;
+                return InteractionResult.PASS;
             }
 
             BlockPos clickedPos = hitResult.getBlockPos();
@@ -202,42 +202,42 @@ public class SlipPortalHandler {
 
             // Check if player clicked on packed ice
             if (!clickedState.isOf(Blocks.PACKED_ICE)) {
-                return ActionResult.PASS;
+                return InteractionResult.PASS;
             }
 
             // Try to find a valid vertical portal frame with packed ice center
             BlockPos portalCenter = findVerticalPortalCenter(world, clickedPos);
             if (portalCenter != null && isValidVerticalPortalFrameWithPackedIce(world, portalCenter)) {
                 // Activate the portal!
-                activateVerticalPortalFromPackedIce((ServerWorld) world, portalCenter);
+                activateVerticalPortalFromPackedIce((ServerLevel) world, portalCenter);
 
                 // Damage the flint and steel
                 if (!player.isCreative()) {
                     heldItem.damage(1, player, player.getPreferredEquipmentSlot(heldItem));
                 }
 
-                return ActionResult.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
 
-            return ActionResult.PASS;
+            return InteractionResult.PASS;
         });
 
         // Handle player teleportation and portal maintenance
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             // Handle horizontal portals in the End
-            ServerWorld endWorld = server.getWorld(THE_END);
+            ServerLevel endWorld = server.getWorld(THE_END);
             if (endWorld != null) {
                 handleHorizontalPortals(server, endWorld);
             }
 
             // Handle vertical portals in the Slip
-            ServerWorld slipWorld = server.getWorld(THE_SLIP);
+            ServerLevel slipWorld = server.getWorld(THE_SLIP);
             if (slipWorld != null) {
                 handleVerticalPortals(server, slipWorld);
             }
 
             // Handle waypoint particle effects in the Overworld
-            ServerWorld overworldWorld = server.getWorld(OVERWORLD);
+            ServerLevel overworldWorld = server.getWorld(OVERWORLD);
             if (overworldWorld != null) {
                 handleOverworldWaypoints(overworldWorld);
             }
@@ -247,7 +247,7 @@ public class SlipPortalHandler {
     /**
      * Finds the center of a portal frame if the given position is within the 3x3 interior
      */
-    private static BlockPos findPortalCenter(World world, BlockPos pos) {
+    private static BlockPos findPortalCenter(Level world, BlockPos pos) {
         // Try all possible center positions that would include this position in the 3x3 area
         for (int xOffset = -1; xOffset <= 1; xOffset++) {
             for (int zOffset = -1; zOffset <= 1; zOffset++) {
@@ -263,7 +263,7 @@ public class SlipPortalHandler {
     /**
      * Finds the center of a vertical portal frame if the given position is within the 3x3 interior
      */
-    private static BlockPos findVerticalPortalCenter(World world, BlockPos pos) {
+    private static BlockPos findVerticalPortalCenter(Level world, BlockPos pos) {
         // Try all possible center positions that would include this position in the 3x3 area
         // Check for North-South orientation (X axis)
         for (int xOffset = -1; xOffset <= 1; xOffset++) {
@@ -291,10 +291,10 @@ public class SlipPortalHandler {
     /**
      * Handles horizontal portals in the End dimension
      */
-    private static void handleHorizontalPortals(net.minecraft.server.MinecraftServer server, ServerWorld endWorld) {
+    private static void handleHorizontalPortals(net.minecraft.server.MinecraftServer server, ServerLevel endWorld) {
         // Check players for teleportation
-        for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
-            net.minecraft.world.World world = ((net.noahsarch.deeperdark.duck.EntityAccessor)player).deeperdark$getWorld();
+        for (ServerPlayer player : server.getPlayerManager().getPlayerList()) {
+            net.minecraft.world.level.Level world = ((net.noahsarch.deeperdark.duck.EntityAccessor)player).deeperdark$getWorld();
             if (!world.getRegistryKey().equals(THE_END)) {
                 continue;
             }
@@ -353,10 +353,10 @@ public class SlipPortalHandler {
     /**
      * Handles vertical portals in the Slip dimension
      */
-    private static void handleVerticalPortals(net.minecraft.server.MinecraftServer server, ServerWorld slipWorld) {
+    private static void handleVerticalPortals(net.minecraft.server.MinecraftServer server, ServerLevel slipWorld) {
         // Check players for teleportation to the Overworld
-        for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
-            net.minecraft.world.World world = ((net.noahsarch.deeperdark.duck.EntityAccessor)player).deeperdark$getWorld();
+        for (ServerPlayer player : server.getPlayerManager().getPlayerList()) {
+            net.minecraft.world.level.Level world = ((net.noahsarch.deeperdark.duck.EntityAccessor)player).deeperdark$getWorld();
             if (!world.getRegistryKey().equals(THE_SLIP)) {
                 continue;
             }
@@ -418,7 +418,7 @@ public class SlipPortalHandler {
     /**
      * Checks if there's a valid blue ice frame around the given center position (horizontal)
      */
-    private static boolean isValidHorizontalPortalFrame(World world, BlockPos center) {
+    private static boolean isValidHorizontalPortalFrame(Level world, BlockPos center) {
         // North side (z = -2)
         for (int x = -1; x <= 1; x++) {
             if (!world.getBlockState(center.add(x, 0, -2)).isOf(Blocks.BLUE_ICE)) {
@@ -453,7 +453,7 @@ public class SlipPortalHandler {
     /**
      * Checks if there's a valid blue ice frame around the given center position with packed ice in the center (vertical portal)
      */
-    private static boolean isValidVerticalPortalFrameWithPackedIce(World world, BlockPos center) {
+    private static boolean isValidVerticalPortalFrameWithPackedIce(Level world, BlockPos center) {
         // Try North-South orientation first (frame parallel to X axis)
         boolean isNorthSouthValid = true;
 
@@ -556,7 +556,7 @@ public class SlipPortalHandler {
     /**
      * Checks if a horizontal portal's frame is still intact
      */
-    private static boolean isHorizontalPortalFrameIntact(ServerWorld world, HorizontalPortalData portal) {
+    private static boolean isHorizontalPortalFrameIntact(ServerLevel world, HorizontalPortalData portal) {
         for (BlockPos framePos : portal.frameBlocks) {
             if (!world.getBlockState(framePos).isOf(Blocks.BLUE_ICE)) {
                 return false;
@@ -568,7 +568,7 @@ public class SlipPortalHandler {
     /**
      * Checks if a vertical portal's frame is still intact
      */
-    private static boolean isVerticalPortalFrameIntact(ServerWorld world, VerticalPortalData portal) {
+    private static boolean isVerticalPortalFrameIntact(ServerLevel world, VerticalPortalData portal) {
         for (BlockPos framePos : portal.frameBlocks) {
             if (!world.getBlockState(framePos).isOf(Blocks.BLUE_ICE)) {
                 return false;
@@ -580,7 +580,7 @@ public class SlipPortalHandler {
     /**
      * Activates a horizontal portal by filling the center with water and placing a light block above
      */
-    private static void activateHorizontalPortal(ServerWorld world, BlockPos center) {
+    private static void activateHorizontalPortal(ServerLevel world, BlockPos center) {
         Set<BlockPos> frameBlocks = new HashSet<>();
         Set<BlockPos> waterBlocks = new HashSet<>();
 
@@ -615,7 +615,7 @@ public class SlipPortalHandler {
             null,
             center,
             SoundEvents.BLOCK_PORTAL_TRIGGER,
-            SoundCategory.BLOCKS,
+            SoundSource.BLOCKS,
             1.0F,
             1.0F
         );
@@ -641,7 +641,7 @@ public class SlipPortalHandler {
     /**
      * Maintains the water blocks in a horizontal portal and prevents water from flowing below
      */
-    private static void maintainHorizontalPortalWater(ServerWorld world, HorizontalPortalData portal) {
+    private static void maintainHorizontalPortalWater(ServerLevel world, HorizontalPortalData portal) {
         // Replace any water blocks that appear below the portal (similar to vertical portal containment)
         for (int x = -1; x <= 1; x++) {
             for (int z = -1; z <= 1; z++) {
@@ -656,7 +656,7 @@ public class SlipPortalHandler {
     /**
      * Deactivates a horizontal portal by removing the water and light block
      */
-    private static void deactivateHorizontalPortal(ServerWorld world, HorizontalPortalData portal) {
+    private static void deactivateHorizontalPortal(ServerLevel world, HorizontalPortalData portal) {
         // Remove water blocks
         for (BlockPos waterPos : portal.waterBlocks) {
             BlockState state = world.getBlockState(waterPos);
@@ -675,7 +675,7 @@ public class SlipPortalHandler {
             null,
             portal.centerPos,
             SoundEvents.BLOCK_FIRE_EXTINGUISH,
-            SoundCategory.BLOCKS,
+            SoundSource.BLOCKS,
             1.0F,
             0.8F
         );
@@ -684,7 +684,7 @@ public class SlipPortalHandler {
     /**
      * Spawns particles around an active horizontal portal
      */
-    private static void spawnHorizontalPortalParticles(ServerWorld world, HorizontalPortalData portal) {
+    private static void spawnHorizontalPortalParticles(ServerLevel world, HorizontalPortalData portal) {
         // Spawn particles in the water area
         for (BlockPos waterPos : portal.waterBlocks) {
             if (world.random.nextInt(3) == 0) {
@@ -726,7 +726,7 @@ public class SlipPortalHandler {
     /**
      * Creates a vertical portal in the Slip dimension
      */
-    private static void activateVerticalPortal(ServerWorld world, BlockPos center, Direction facing) {
+    private static void activateVerticalPortal(ServerLevel world, BlockPos center, Direction facing) {
         Set<BlockPos> frameBlocks = new HashSet<>();
         Set<BlockPos> waterBlocks = new HashSet<>();
 
@@ -794,7 +794,7 @@ public class SlipPortalHandler {
             null,
             center,
             SoundEvents.BLOCK_PORTAL_TRIGGER,
-            SoundCategory.BLOCKS,
+            SoundSource.BLOCKS,
             1.0F,
             1.0F
         );
@@ -820,7 +820,7 @@ public class SlipPortalHandler {
     /**
      * Activates a vertical portal by converting packed ice to water
      */
-    private static void activateVerticalPortalFromPackedIce(ServerWorld world, BlockPos center) {
+    private static void activateVerticalPortalFromPackedIce(ServerLevel world, BlockPos center) {
         Set<BlockPos> frameBlocks = new HashSet<>();
         Set<BlockPos> waterBlocks = new HashSet<>();
 
@@ -888,7 +888,7 @@ public class SlipPortalHandler {
             null,
             center,
             SoundEvents.BLOCK_PORTAL_TRIGGER,
-            SoundCategory.BLOCKS,
+            SoundSource.BLOCKS,
             1.0F,
             1.0F
         );
@@ -914,7 +914,7 @@ public class SlipPortalHandler {
     /**
      * Maintains the water blocks in a vertical portal (prevents them from flowing out)
      */
-    private static void maintainVerticalPortalWater(ServerWorld world, VerticalPortalData portal) {
+    private static void maintainVerticalPortalWater(ServerLevel world, VerticalPortalData portal) {
         // Re-place any missing water blocks to keep the portal contained
         for (BlockPos waterPos : portal.waterBlocks) {
             if (!world.getBlockState(waterPos).isOf(Blocks.WATER)) {
@@ -926,7 +926,7 @@ public class SlipPortalHandler {
     /**
      * Deactivates a vertical portal by removing the water and light block
      */
-    private static void deactivateVerticalPortal(ServerWorld world, VerticalPortalData portal) {
+    private static void deactivateVerticalPortal(ServerLevel world, VerticalPortalData portal) {
         // Remove water blocks
         for (BlockPos waterPos : portal.waterBlocks) {
             BlockState state = world.getBlockState(waterPos);
@@ -945,7 +945,7 @@ public class SlipPortalHandler {
             null,
             portal.centerPos,
             SoundEvents.BLOCK_FIRE_EXTINGUISH,
-            SoundCategory.BLOCKS,
+            SoundSource.BLOCKS,
             1.0F,
             0.8F
         );
@@ -954,7 +954,7 @@ public class SlipPortalHandler {
     /**
      * Spawns particles around an active vertical portal
      */
-    private static void spawnVerticalPortalParticles(ServerWorld world, VerticalPortalData portal) {
+    private static void spawnVerticalPortalParticles(ServerLevel world, VerticalPortalData portal) {
         // Spawn particles in the water area
         for (BlockPos waterPos : portal.waterBlocks) {
             if (world.random.nextInt(3) == 0) {
@@ -997,7 +997,7 @@ public class SlipPortalHandler {
      * Checks if there's a valid blue ice frame around the given center position with packed ice in the center (vertical portal)
      * North-South orientation check
      */
-    private static boolean isValidVerticalPortalFrameWithPackedIce_NorthSouth(World world, BlockPos center) {
+    private static boolean isValidVerticalPortalFrameWithPackedIce_NorthSouth(Level world, BlockPos center) {
         // Check horizontal bars (top and bottom)
         for (int x = -1; x <= 1; x++) {
             if (!world.getBlockState(center.add(x, -2, 0)).isOf(Blocks.BLUE_ICE)) {
@@ -1036,12 +1036,12 @@ public class SlipPortalHandler {
     /**
      * Teleports the player to The Slip dimension
      */
-    private static boolean teleportToSlip(ServerPlayerEntity player) {
+    private static boolean teleportToSlip(ServerPlayer player) {
         if (((ServerPlayerAccessor)player).deeperdark$getServer() == null) {
             return false;
         }
 
-        ServerWorld slipWorld = ((ServerPlayerAccessor)player).deeperdark$getServer().getWorld(THE_SLIP);
+        ServerLevel slipWorld = ((ServerPlayerAccessor)player).deeperdark$getServer().getWorld(THE_SLIP);
         if (slipWorld == null) {
             return false;
         }
@@ -1072,20 +1072,20 @@ public class SlipPortalHandler {
             player.getY(),
             player.getZ(),
             SoundEvents.BLOCK_PORTAL_TRAVEL,
-            SoundCategory.PLAYERS,
+            SoundSource.PLAYERS,
             1.0F,
             1.0F
         );
 
         // Create teleport target - spawn player IN the portal water
-        Vec3d targetVec = new Vec3d(targetPos.getX() + 0.5, targetPos.getY(), targetPos.getZ() + 0.5);
-        TeleportTarget target = new TeleportTarget(
+        Vec3 targetVec = new Vec3(targetPos.getX() + 0.5, targetPos.getY(), targetPos.getZ() + 0.5);
+        TeleportTransition target = new TeleportTransition(
             slipWorld,
             targetVec,
-            Vec3d.ZERO,
+            Vec3.ZERO,
             player.getYaw(),
             player.getPitch(),
-            TeleportTarget.NO_OP
+            TeleportTransition.NO_OP
         );
 
         // Teleport the player
@@ -1096,7 +1096,7 @@ public class SlipPortalHandler {
             null,
             targetPos,
             SoundEvents.BLOCK_PORTAL_TRAVEL,
-            SoundCategory.PLAYERS,
+            SoundSource.PLAYERS,
             1.0F,
             1.0F
         );
@@ -1107,12 +1107,12 @@ public class SlipPortalHandler {
     /**
      * Teleports the player to the Overworld dimension with a waypoint marker
      */
-    private static boolean teleportToOverworld(ServerPlayerEntity player, BlockPos slipPortalCenter) {
+    private static boolean teleportToOverworld(ServerPlayer player, BlockPos slipPortalCenter) {
         if (((ServerPlayerAccessor)player).deeperdark$getServer() == null) {
             return false;
         }
 
-        ServerWorld overworldWorld = ((ServerPlayerAccessor)player).deeperdark$getServer().getWorld(OVERWORLD);
+        ServerLevel overworldWorld = ((ServerPlayerAccessor)player).deeperdark$getServer().getWorld(OVERWORLD);
         if (overworldWorld == null) {
             return false;
         }
@@ -1164,7 +1164,7 @@ public class SlipPortalHandler {
     /**
      * Finds a suitable surface location in the Overworld
      */
-    private static BlockPos findSurfaceLocation(ServerWorld world, BlockPos startPos) {
+    private static BlockPos findSurfaceLocation(ServerLevel world, BlockPos startPos) {
         // Search in a spiral pattern for a suitable surface
         for (int radius = 0; radius <= SEARCH_RADIUS; radius++) {
             for (int xOffset = -radius; xOffset <= radius; xOffset++) {
@@ -1181,7 +1181,7 @@ public class SlipPortalHandler {
                     );
 
                     // Find the highest solid block (surface)
-                    BlockPos surfacePos = world.getTopPosition(net.minecraft.world.Heightmap.Type.WORLD_SURFACE, checkPos);
+                    BlockPos surfacePos = world.getTopPosition(net.minecraft.world.level.levelgen.Heightmap.Type.WORLD_SURFACE, checkPos);
 
                     // Make sure there's solid ground and air above
                     if (world.getBlockState(surfacePos).isSolidBlock(world, surfacePos) &&
@@ -1194,13 +1194,13 @@ public class SlipPortalHandler {
         }
 
         // Fallback: use the top position at the scaled location
-        return world.getTopPosition(net.minecraft.world.Heightmap.Type.WORLD_SURFACE, startPos);
+        return world.getTopPosition(net.minecraft.world.level.levelgen.Heightmap.Type.WORLD_SURFACE, startPos);
     }
 
     /**
      * Creates a waypoint marker (blue ice + pink petals)
      */
-    private static void createWaypointMarker(ServerWorld world, BlockPos pos) {
+    private static void createWaypointMarker(ServerLevel world, BlockPos pos) {
         // Place blue ice block (in the ground)
         world.setBlockState(pos, Blocks.BLUE_ICE.getDefaultState(), 3);
 
@@ -1213,7 +1213,7 @@ public class SlipPortalHandler {
             null,
             pos,
             SoundEvents.BLOCK_PORTAL_TRIGGER,
-            SoundCategory.BLOCKS,
+            SoundSource.BLOCKS,
             0.5F,
             1.5F
         );
@@ -1239,7 +1239,7 @@ public class SlipPortalHandler {
     /**
      * Teleports a player to a waypoint location
      */
-    private static void teleportPlayerToWaypoint(ServerPlayerEntity player, ServerWorld overworldWorld, BlockPos waypointPos) {
+    private static void teleportPlayerToWaypoint(ServerPlayer player, ServerLevel overworldWorld, BlockPos waypointPos) {
         // Play portal sound in source dimension
         ((net.noahsarch.deeperdark.duck.EntityAccessor)player).deeperdark$getWorld().playSound(
             null,
@@ -1247,21 +1247,21 @@ public class SlipPortalHandler {
             player.getY(),
             player.getZ(),
             SoundEvents.BLOCK_PORTAL_TRAVEL,
-            SoundCategory.PLAYERS,
+            SoundSource.PLAYERS,
             1.0F,
             1.0F
         );
 
         // Teleport player to stand on the waypoint
         BlockPos spawnPos = waypointPos.up();
-        Vec3d targetVec = new Vec3d(spawnPos.getX() + 0.5, spawnPos.getY(), spawnPos.getZ() + 0.5);
-        TeleportTarget target = new TeleportTarget(
+        Vec3 targetVec = new Vec3(spawnPos.getX() + 0.5, spawnPos.getY(), spawnPos.getZ() + 0.5);
+        TeleportTransition target = new TeleportTransition(
             overworldWorld,
             targetVec,
-            Vec3d.ZERO,
+            Vec3.ZERO,
             player.getYaw(),
             player.getPitch(),
-            TeleportTarget.NO_OP
+            TeleportTransition.NO_OP
         );
 
         // Teleport the player
@@ -1272,7 +1272,7 @@ public class SlipPortalHandler {
             null,
             spawnPos,
             SoundEvents.BLOCK_PORTAL_TRAVEL,
-            SoundCategory.PLAYERS,
+            SoundSource.PLAYERS,
             1.0F,
             1.0F
         );
@@ -1281,7 +1281,7 @@ public class SlipPortalHandler {
     /**
      * Handles waypoint particle effects in the Overworld
      */
-    private static void handleOverworldWaypoints(ServerWorld overworldWorld) {
+    private static void handleOverworldWaypoints(ServerLevel overworldWorld) {
         // Spawn particles around waypoint flowers
         for (BlockPos waypointPos : slipToOverworldWaypoints.values()) {
             BlockPos flowerPos = waypointPos.up();
@@ -1315,7 +1315,7 @@ public class SlipPortalHandler {
     /**
      * Finds an existing vertical portal or creates a new one in the Slip dimension
      */
-    private static BlockPos findOrCreateVerticalPortalLocation(ServerWorld world, BlockPos sourcePos) {
+    private static BlockPos findOrCreateVerticalPortalLocation(ServerLevel world, BlockPos sourcePos) {
         // Use the scaled position for search
         BlockPos searchCenter = new BlockPos(sourcePos.getX(), 64, sourcePos.getZ());
 
@@ -1384,7 +1384,7 @@ public class SlipPortalHandler {
     /**
      * Checks if a location is suitable for vertical portal placement
      */
-    private static boolean isSuitableVerticalPortalLocation(ServerWorld world, BlockPos pos) {
+    private static boolean isSuitableVerticalPortalLocation(ServerLevel world, BlockPos pos) {
         // Need a 5x5 vertical area clear (checking North-South orientation)
         for (int x = -2; x <= 2; x++) {
             for (int y = -2; y <= 2; y++) {
@@ -1434,7 +1434,7 @@ public class SlipPortalHandler {
     /**
      * Creates a vertical portal structure at the given position
      */
-    private static void createVerticalPortalStructure(ServerWorld world, BlockPos center, Direction facing) {
+    private static void createVerticalPortalStructure(ServerLevel world, BlockPos center, Direction facing) {
         boolean isNorthSouth = facing == Direction.NORTH || facing == Direction.SOUTH;
 
         if (isNorthSouth) {
@@ -1467,7 +1467,7 @@ public class SlipPortalHandler {
             null,
             center,
             SoundEvents.BLOCK_GLASS_PLACE,
-            SoundCategory.BLOCKS,
+            SoundSource.BLOCKS,
             1.0F,
             0.8F
         );
@@ -1476,7 +1476,7 @@ public class SlipPortalHandler {
     /**
      * Creates a vertical portal structure with a packed ice platform (for void/air placement)
      */
-    private static void createVerticalPortalWithPlatform(ServerWorld world, BlockPos center, Direction facing) {
+    private static void createVerticalPortalWithPlatform(ServerLevel world, BlockPos center, Direction facing) {
         boolean isNorthSouth = facing == Direction.NORTH || facing == Direction.SOUTH;
 
         // Create 5x5 packed ice platform below the portal
@@ -1517,7 +1517,7 @@ public class SlipPortalHandler {
             null,
             center,
             SoundEvents.BLOCK_GLASS_PLACE,
-            SoundCategory.BLOCKS,
+            SoundSource.BLOCKS,
             1.0F,
             0.8F
         );
