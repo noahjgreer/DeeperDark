@@ -7,6 +7,6 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(PortalShape.class)
 public interface NetherPortalAccessor {
-    @Accessor("lowerCorner")
-    BlockPos getLowerCorner();
+    @Accessor("bottomLeft")
+    BlockPos getBottomLeft();
 }

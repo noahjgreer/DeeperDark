@@ -9,8 +9,6 @@
     "AxeItemAccessor",
     "AxeItemMixin",
     "BiomeAccessMixin",
-    "BlastFurnaceBlockEntityMixin",
-    "BlastFurnaceBlockEntityAccessor",
     "BrewingStandMixin",
     "ConsumableComponentsMixin",
     "EnchantingTableBlockMixin",

@@ -9,16 +9,19 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 /**
  * Mixin to make the piston push limit configurable.
  * Vanilla default is 12 blocks.
- * The constant 12 appears 3 times in the tryMove method.
+ * The constant 12 appears in addBlockLine in current mappings.
  */
 @Mixin(PistonStructureResolver.class)
 public class PistonHandlerMixin {
 
     /**
-     * Modify all occurrences of constant 12 in tryMove method.
+     * Modify all occurrences of constant 12 in addBlockLine.
      * This affects the piston push limit checks.
      */
-    @ModifyConstant(method = "tryMove", constant = @Constant(intValue = 12))
+    @ModifyConstant(
+        method = "addBlockLine(Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction;)Z",
+        constant = @Constant(intValue = 12)
+    )
     private int deeperdark$modifyPushLimit(int original) {
         return DeeperDarkConfig.get().pistonPushLimit;
     }

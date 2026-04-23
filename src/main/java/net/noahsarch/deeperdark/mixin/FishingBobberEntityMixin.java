@@ -49,7 +49,7 @@ public abstract class FishingBobberEntityMixin {
             if (chance > 0 && serverWorld.getRandom().nextInt(chance) == 0) {
                 // Spawn a charged creeper at the bobber position
                 Creeper creeper = EntityType.CREEPER.create(serverWorld, EntitySpawnReason.TRIGGERED);
-                if (creeper != null) {
+if (creeper != null) {
                     creeper.snapTo(self.getX(), self.getY(), self.getZ(),
                         serverWorld.getRandom().nextFloat() * 360.0F, 0.0F);
 
