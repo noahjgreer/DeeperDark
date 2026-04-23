@@ -26,35 +26,34 @@ import net.minecraft.world.item.context.UseOnContext;
 public class ShearsItemMixin {
     @Inject(method = "useOnBlock", at = @At("HEAD"), cancellable = true)
     private void onUseOnBlock(UseOnContext context, CallbackInfoReturnable<InteractionResult> cir) {
-        Level world = context.getWorld();
-        BlockPos blockPos = context.getBlockPos();
+        Level world = context.getLevel();
+        BlockPos blockPos = context.getClickedPos();
         BlockState blockState = world.getBlockState(blockPos);
         Map<Block, Block> strippedBlocks = AxeItemAccessor.getStrippedBlocks();
 
         Block strippedBlock = strippedBlocks.get(blockState.getBlock());
         if (strippedBlock != null) {
             Player playerEntity = context.getPlayer();
-            ItemStack itemStack = context.getStack();
+            ItemStack itemStack = context.getItemInHand();
             if (playerEntity instanceof ServerPlayer) {
                 CriteriaTriggers.ITEM_USED_ON_BLOCK.trigger((ServerPlayer)playerEntity, blockPos, itemStack);
             }
 
-            world.playSound(playerEntity, blockPos, SoundEvents.ITEM_AXE_STRIP, SoundSource.BLOCKS, 1.0F, 1.0F);
+            world.playSound(playerEntity, blockPos, SoundEvents.AXE_STRIP, SoundSource.BLOCKS, 1.0F, 1.0F);
 
-            BlockState newState = strippedBlock.getDefaultState();
-            if (blockState.contains(RotatedPillarBlock.AXIS)) {
-                newState = newState.with(RotatedPillarBlock.AXIS, blockState.get(RotatedPillarBlock.AXIS));
+            BlockState newState = strippedBlock.defaultBlockState();
+            if (blockState.hasProperty(RotatedPillarBlock.AXIS)) {
+                newState = newState.setValue(RotatedPillarBlock.AXIS, blockState.getValue(RotatedPillarBlock.AXIS));
             }
 
-            world.setBlockState(blockPos, newState, 11);
-            world.emitGameEvent(GameEvent.BLOCK_CHANGE, blockPos, GameEvent.Emitter.of(playerEntity, newState));
+            world.setBlock(blockPos, newState, 11);
+            world.gameEvent(GameEvent.BLOCK_CHANGE, blockPos, GameEvent.Context.of(playerEntity, newState));
 
             if (playerEntity != null) {
-                itemStack.damage(1, playerEntity, context.getHand());
+                itemStack.hurtAndBreak(1, playerEntity, context.getHand());
             }
 
             cir.setReturnValue(InteractionResult.SUCCESS);
         }
     }
 }
-

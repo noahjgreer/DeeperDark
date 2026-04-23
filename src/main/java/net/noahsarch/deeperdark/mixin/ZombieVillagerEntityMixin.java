@@ -39,29 +39,25 @@ public abstract class ZombieVillagerEntityMixin {
 
     @Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
     private void deeperdark$readCustomData(ValueInput view, CallbackInfo ci) {
-        deeperdark$isExplosiveCure = view.getBoolean("DeeperDarkExplosiveCure", false);
+        deeperdark$isExplosiveCure = view.getBooleanOr("DeeperDarkExplosiveCure", false);
     }
 
-    @Inject(method = "interactMob", at = @At("HEAD"), cancellable = true)
-    private void deeperdark$interactMob(Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
-        ItemStack itemStack = player.getStackInHand(hand);
-        if (itemStack.isOf(Items.ENCHANTED_GOLDEN_APPLE)) {
+    @Inject(method = "mobInteract", at = @At("HEAD"), cancellable = true)
+    private void deeperdark$mobInteract(Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
+        ItemStack itemStack = player.getItemInHand(hand);
+        if (itemStack.getItem() == Items.ENCHANTED_GOLDEN_APPLE) {
             ZombieVillager self = (ZombieVillager) (Object) this;
-            if (self.hasStatusEffect(MobEffects.WEAKNESS)) {
-                if (!player.getAbilities().creativeMode) {
-                    itemStack.decrement(1);
+            if (self.hasEffect(MobEffects.WEAKNESS)) {
+                if (!player.isCreative()) {
+                    itemStack.shrink(1);
                 }
                 Level world = ((EntityAccessor)self).deeperdark$getWorld();
-                if (!world.isClient()) {
-                    // Start conversion with random delay (same as vanilla)
-                    // Vanilla uses: this.random.nextInt(2401) + 3600
-                    this.setConverting(player.getUuid(), self.getRandom().nextInt(2401) + 3600);
+                if (!world.isClientSide()) {
+                    this.setConverting(player.getUUID(), self.getRandom().nextInt(2401) + 3600);
 
-                    // Mark as explosive
                     this.deeperdark$isExplosiveCure = true;
 
-                    // Play cure sound
-                    self.playSound(SoundEvents.ENTITY_ZOMBIE_VILLAGER_CURE, 1.0F, 1.0F);
+                    self.playSound(SoundEvents.ZOMBIE_VILLAGER_CURE, 1.0F, 1.0F);
                 }
                 cir.setReturnValue(InteractionResult.SUCCESS);
             }
@@ -73,14 +69,10 @@ public abstract class ZombieVillagerEntityMixin {
         if (deeperdark$isExplosiveCure) {
             ZombieVillager self = (ZombieVillager) (Object) this;
 
-            // Create explosion
-            // Power 6.0F is larger than TNT (4.0F)
-            world.createExplosion(self, self.getX(), self.getY(), self.getZ(), 128.0F, Level.ExplosionSourceType.TNT);
+            world.explode(self, self.getX(), self.getY(), self.getZ(), 128.0F, Level.ExplosionInteraction.TNT);
 
-            // Discard the entity
             self.discard();
 
-            // Cancel the conversion to villager
             ci.cancel();
         }
     }

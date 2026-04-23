@@ -40,7 +40,7 @@ public abstract class FishingBobberEntityMixin {
         }
 
         Level world = ((EntityAccessor)self).deeperdark$getWorld();
-        if (world.isClient()) {
+        if (world.isClientSide()) {
             return;
         }
 
@@ -50,25 +50,25 @@ public abstract class FishingBobberEntityMixin {
                 // Spawn a charged creeper at the bobber position
                 Creeper creeper = EntityType.CREEPER.create(serverWorld, EntitySpawnReason.TRIGGERED);
                 if (creeper != null) {
-                    creeper.refreshPositionAndAngles(self.getX(), self.getY(), self.getZ(),
+                    creeper.snapTo(self.getX(), self.getY(), self.getZ(),
                         serverWorld.getRandom().nextFloat() * 360.0F, 0.0F);
 
                     // Spawn the creeper first
-                    serverWorld.spawnEntity(creeper);
+                    serverWorld.addFreshEntity(creeper);
 
                     // Strike it with silent lightning to make it charged
                     LightningBolt lightning = EntityType.LIGHTNING_BOLT.create(serverWorld, EntitySpawnReason.TRIGGERED);
                     if (lightning != null) {
-                        lightning.refreshPositionAfterTeleport(Vec3.ofBottomCenter(creeper.getBlockPos()));
-                        lightning.setCosmetic(true); // No fire, no damage to other entities
-                        serverWorld.spawnEntity(lightning);
+                        lightning.snapTo(creeper.getX(), creeper.getY(), creeper.getZ());
+                        lightning.setVisualOnly(true);
+                        serverWorld.addFreshEntity(lightning);
                     }
 
                     // Give some velocity towards the player (like caught fish)
                     double dx = player.getX() - self.getX();
                     double dy = player.getY() - self.getY();
                     double dz = player.getZ() - self.getZ();
-                    creeper.setVelocity(dx * 0.1, dy * 0.1 + Math.sqrt(Math.sqrt(dx * dx + dy * dy + dz * dz)) * 0.08, dz * 0.1);
+                    creeper.setDeltaMovement(dx * 0.1, dy * 0.1 + Math.sqrt(Math.sqrt(dx * dx + dy * dy + dz * dz)) * 0.08, dz * 0.1);
 
                     // Discard the bobber
                     self.discard();

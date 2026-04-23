@@ -17,13 +17,12 @@ public class WorldBorderHandler {
             DeeperDarkConfig.ConfigInstance config = DeeperDarkConfig.get();
 
             // Handle players
-            for (ServerPlayer player : server.getPlayerManager().getPlayerList()) {
+            for (ServerPlayer player : server.getPlayerList().getPlayers()) {
                 if (player.isSpectator()) continue;
 
-                // If pushSurvivalModeOnly is true, skip creative players
                 if (config.pushSurvivalModeOnly && player.isCreative()) continue;
 
-                if (player.hasVehicle()) {
+                if (player.getVehicle() != null) {
                     net.minecraft.world.entity.Entity vehicle = player.getVehicle();
                     if (vehicle != null && vehicle.getControllingPassenger() == player) {
                         applyBorderForce(vehicle);
@@ -34,20 +33,18 @@ public class WorldBorderHandler {
             }
 
             // Handle mobs in all worlds
-            for (ServerLevel world : server.getWorlds()) {
-                // Collect all mobs first to avoid concurrent modification
+            for (ServerLevel world : server.getAllLevels()) {
                 List<Mob> mobs = new ArrayList<>();
-                world.iterateEntities().forEach(entity -> {
+                world.getAllEntities().forEach(entity -> {
                     if (entity instanceof Mob mob) {
                         mobs.add(mob);
                     }
                 });
 
-                // Now process them safely
                 for (Mob mob : mobs) {
-                    if (!mob.isRemoved()) { // Check if still exists
+                    if (!mob.isRemoved()) {
                         boolean handled = false;
-                        if (mob.hasVehicle()) {
+                        if (mob.getVehicle() != null) {
                             net.minecraft.world.entity.Entity vehicle = mob.getVehicle();
                             if (vehicle != null && vehicle.getControllingPassenger() == mob) {
                                 applyBorderForce(vehicle);
@@ -76,13 +73,9 @@ public class WorldBorderHandler {
         return distX <= radius && distZ <= radius;
     }
 
-    /**
-     * Handle mobs near or outside the border
-     */
     private static void handleMobBorder(Mob mob) {
         DeeperDarkConfig.ConfigInstance config = DeeperDarkConfig.get();
 
-        // If entity spawning is allowed, don't push or delete mobs
         if (config.allowEntitySpawning) {
             return;
         }
@@ -98,29 +91,25 @@ public class WorldBorderHandler {
         double distX = Math.abs(dx);
         double distZ = Math.abs(dz);
 
-        // Delete mobs more than 16 blocks outside the border
         if (distX > radius + 16 || distZ > radius + 16) {
-            mob.discard(); // Discard, not kill - no drops, no death message
-            return;
-        }
-
-        // If just spawned (low age) and outside, remove immediately
-        if (mob.age < 200 && (distX > radius + 2 || distZ > radius + 2)) {
             mob.discard();
             return;
         }
 
-        // Push mobs back if they're outside or close to the border
+        if (mob.tickCount < 200 && (distX > radius + 2 || distZ > radius + 2)) {
+            mob.discard();
+            return;
+        }
+
         if (distX > radius || distZ > radius) {
             double overlapX = Math.max(0, distX - radius);
             double overlapZ = Math.max(0, distZ - radius);
 
-            // Gentler push for mobs - use a linear or mild exponential force
             double strengthX = overlapX > 0 ? Math.min(overlapX * 0.05 * forceMult, 0.5) : 0;
             double strengthZ = overlapZ > 0 ? Math.min(overlapZ * 0.05 * forceMult, 0.5) : 0;
 
-            mob.addVelocity(-Math.signum(dx) * strengthX, 0, -Math.signum(dz) * strengthZ);
-            mob.velocityDirty = true;
+            mob.push(-Math.signum(dx) * strengthX, 0, -Math.signum(dz) * strengthZ);
+            mob.hurtMarked = true;
         }
     }
 
@@ -148,13 +137,13 @@ public class WorldBorderHandler {
             if (strengthX > 4.0) strengthX = 4.0;
             if (strengthZ > 4.0) strengthZ = 4.0;
 
-            entity.addVelocity(-Math.signum(dx) * strengthX, 0, -Math.signum(dz) * strengthZ);
-            entity.velocityDirty = true;
+            entity.push(-Math.signum(dx) * strengthX, 0, -Math.signum(dz) * strengthZ);
+            entity.hurtMarked = true;
 
             if (entity instanceof ServerPlayer player) {
-                player.networkHandler.sendPacket(new ClientboundSetEntityMotionPacket(player));
-            } else if (entity.getEntityWorld() instanceof ServerLevel serverWorld) {
-                serverWorld.getChunkManager().sendToNearbyPlayers(entity, new ClientboundSetEntityMotionPacket(entity));
+                player.connection.send(new ClientboundSetEntityMotionPacket(player));
+            } else if (entity.level() instanceof ServerLevel serverWorld) {
+                serverWorld.getChunkSource().sendToTrackingPlayers(entity, new ClientboundSetEntityMotionPacket(entity));
             }
         }
     }

@@ -18,10 +18,10 @@ public class NetherPortalBlockMixin {
      * Redirect the getCoordinateScaleFactor call to use our custom multiplier from config
      */
     @Redirect(
-        method = "createTeleportTarget",
+        method = "getPortalDestination",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/world/dimension/DimensionType;getCoordinateScaleFactor(Lnet/minecraft/world/dimension/DimensionType;Lnet/minecraft/world/dimension/DimensionType;)D"
+            target = "Lnet/minecraft/world/level/dimension/DimensionType;getTeleportationScale(Lnet/minecraft/world/level/dimension/DimensionType;Lnet/minecraft/world/level/dimension/DimensionType;)D"
         )
     )
     private double deeperdark$useCustomNetherMultiplier(DimensionType fromDimension, DimensionType toDimension) {

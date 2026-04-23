@@ -41,11 +41,11 @@ public class Deeperdark implements ModInitializer {
 		ModSounds.registerSounds();
 
 		// Register the Slip chunk generator
-		Registry.register(Registries.CHUNK_GENERATOR,
+		Registry.register(net.minecraft.core.registries.BuiltInRegistries.CHUNK_GENERATOR,
 				Identifier.fromNamespaceAndPath(MOD_ID, "slip_room_generator"),
 				SlipChunkGenerator.CODEC);
 
-		PALE_MANSION_PROCESSOR = Registry.register(Registries.STRUCTURE_PROCESSOR, Identifier.fromNamespaceAndPath(MOD_ID, "pale_mansion_processor"), () -> PaleMansionProcessor.CODEC);
+		PALE_MANSION_PROCESSOR = Registry.register(net.minecraft.core.registries.BuiltInRegistries.STRUCTURE_PROCESSOR, Identifier.fromNamespaceAndPath(MOD_ID, "pale_mansion_processor"), () -> PaleMansionProcessor.CODEC);
 
 		SiphonEvents.register();
 		GoldenCauldronEvents.register();
@@ -59,23 +59,23 @@ public class Deeperdark implements ModInitializer {
 		net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredientSerializer.register(net.noahsarch.deeperdark.recipe.ComponentIngredient.Serializer.INSTANCE);
 
 		// Register tick handler for custom block tracker
-		net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_WORLD_TICK.register(world -> {
-			if (world instanceof net.minecraft.server.level.ServerLevel serverWorld) {
-				// Run every 20 ticks (1 second) to be gentle
-				if (serverWorld.getTime() % 20 == 0) {
-					net.noahsarch.deeperdark.util.CustomBlockTracker.get(serverWorld).tick(serverWorld);
-				}
+		net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_LEVEL_TICK.register(serverWorld -> {
+			// Run every 20 ticks (1 second) to be gentle
+			if (serverWorld.getLevelData().getGameTime() % 20 == 0) {
+				net.noahsarch.deeperdark.util.CustomBlockTracker.get(serverWorld).tick(serverWorld);
 			}
 		});
 
-		// Save custom block data when world loads (to trigger initial load)
-		net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents.LOAD.register((server, world) ->
-			net.noahsarch.deeperdark.util.CustomBlockTracker.get(world)
-		);
+		// Pre-load custom block trackers when server starts
+		net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STARTED.register(server -> {
+			for (net.minecraft.server.level.ServerLevel world : server.getAllLevels()) {
+				net.noahsarch.deeperdark.util.CustomBlockTracker.get(world);
+			}
+		});
 
 		// Save custom block data when server stops
 		net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
-			for (net.minecraft.server.level.ServerLevel world : server.getWorlds()) {
+			for (net.minecraft.server.level.ServerLevel world : server.getAllLevels()) {
 				net.noahsarch.deeperdark.util.CustomBlockTracker.get(world).save();
 			}
 		});
@@ -98,7 +98,7 @@ public class Deeperdark implements ModInitializer {
 
         // Register diamond as compostable (silly easter egg!)
         // Since registerCompostableItem is private, we access the public map directly
-        ComposterBlock.ITEM_TO_LEVEL_INCREASE_CHANCE.put(Items.DIAMOND.asItem(), 1.0f);
+        ComposterBlock.COMPOSTABLES.put(Items.DIAMOND.asItem(), 1.0f);
 
         // Register the effects
 //        Registry.register(Registries.STATUS_EFFECT, Identifier.withDefaultNamespace("deeperdark:scentless"), SCENTLESS);

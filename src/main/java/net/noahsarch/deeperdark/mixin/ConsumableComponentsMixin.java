@@ -25,8 +25,8 @@ public class ConsumableComponentsMixin {
     @Inject(method = "<clinit>", at = @At("TAIL"))
     private static void modifyRottenFlesh(CallbackInfo ci) {
         // Replace rotten flesh to give both hunger and nausea effects
-        ROTTEN_FLESH = Consumables.food()
-                .consumeEffect(new ApplyStatusEffectsConsumeEffect(
+        ROTTEN_FLESH = Consumables.defaultFood()
+                .onConsume(new ApplyStatusEffectsConsumeEffect(
                         List.of(
                                 new MobEffectInstance(MobEffects.HUNGER, 600, 0),
                                 new MobEffectInstance(MobEffects.NAUSEA, 300, 0)

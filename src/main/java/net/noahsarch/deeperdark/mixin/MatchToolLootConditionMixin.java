@@ -26,26 +26,22 @@ public abstract class MatchToolLootConditionMixin {
 
     @Shadow public abstract Optional<ItemPredicate> predicate();
 
-    @Inject(method = "test(Lnet/minecraft/loot/context/LootContext;)Z", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "test", at = @At("HEAD"), cancellable = true)
     private void deeperdark$implicitSilkTouch(LootContext lootContext, CallbackInfoReturnable<Boolean> cir) {
-        ItemStack stack = lootContext.get(LootContextParams.TOOL);
+        ItemStack stack = (ItemStack) lootContext.getParameter(LootContextParams.TOOL);
 
         if (stack != null && deeperdark$isGoldenTool(stack)) {
-             // Create a copy to avoid modifying the actual world item
              ItemStack modifiedStack = stack.copy();
 
-             // Get existing enchantments
-             ItemEnchantments enchantments = modifiedStack.getOrDefault(DataComponents.ENCHANTMENTS, ItemEnchantments.DEFAULT);
-             ItemEnchantments.Builder builder = new ItemEnchantments.Builder(enchantments);
+             ItemEnchantments enchantments = modifiedStack.getOrDefault(DataComponents.ENCHANTMENTS, ItemEnchantments.EMPTY);
+             ItemEnchantments.Mutable builder = new ItemEnchantments.Mutable(enchantments);
 
-             // Check if Silk Touch is already present, if not, add it
-             Holder<Enchantment> silkTouch = lootContext.getWorld().getRegistryManager().getOrThrow(Registries.ENCHANTMENT).getOptional(Enchantments.SILK_TOUCH).orElse(null);
+             Holder<Enchantment> silkTouch = lootContext.getLevel().registryAccess().lookupOrThrow(Registries.ENCHANTMENT).get(Enchantments.SILK_TOUCH).orElse(null);
 
              if (silkTouch != null && enchantments.getLevel(silkTouch) == 0) {
                  builder.set(silkTouch, 1);
-                 modifiedStack.set(DataComponents.ENCHANTMENTS, builder.build());
+                 modifiedStack.set(DataComponents.ENCHANTMENTS, builder.toImmutable());
 
-                 // Run the predicate check on the modified stack
                  boolean result = this.predicate().isEmpty() || this.predicate().get().test(modifiedStack);
                  cir.setReturnValue(result);
              }
@@ -54,11 +50,10 @@ public abstract class MatchToolLootConditionMixin {
 
     @Unique
     private boolean deeperdark$isGoldenTool(ItemStack stack) {
-        return stack.isOf(Items.GOLDEN_PICKAXE) ||
-               stack.isOf(Items.GOLDEN_AXE) ||
-               stack.isOf(Items.GOLDEN_SHOVEL) ||
-               stack.isOf(Items.GOLDEN_HOE) ||
-               stack.isOf(Items.GOLDEN_SWORD);
+        return stack.getItem() == Items.GOLDEN_PICKAXE ||
+               stack.getItem() == Items.GOLDEN_AXE ||
+               stack.getItem() == Items.GOLDEN_SHOVEL ||
+               stack.getItem() == Items.GOLDEN_HOE ||
+               stack.getItem() == Items.GOLDEN_SWORD;
     }
 }
-

@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(FlowingFluid.class)
 public class FlowableFluidMixin {
-    @Inject(method = "receivesFlow", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "canPassThroughWall", at = @At("HEAD"), cancellable = true)
     private static void deeperdark$blockStructureVoidFlow(Direction face, BlockGetter world, BlockPos pos, BlockState state, BlockPos fromPos, BlockState fromState, CallbackInfoReturnable<Boolean> cir) {
         // Check if we are in range of an active sponge
         if (world instanceof net.noahsarch.deeperdark.util.ActiveSpongeTracker tracker) {
@@ -22,7 +22,7 @@ public class FlowableFluidMixin {
                  int range = 3;
                  // Optimization: quick check if any sponge is close
                  for (BlockPos spongePos : sponges) {
-                     if (spongePos.getSquaredDistance(pos) <= (range * range) + 2) { // +2 for margin/geometry
+                     if (spongePos.distSqr(pos) <= (range * range) + 2) { // +2 for margin/geometry
                           // More precise check if matches intent
                           // Iterate radius 3 box
                           if (Math.abs(spongePos.getX() - pos.getX()) <= range &&

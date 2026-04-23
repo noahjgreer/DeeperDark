@@ -26,17 +26,17 @@ public abstract class PotionEntityMixin extends ThrowableItemProjectile {
         super(entityType, world);
     }
 
-    @Inject(method = "onCollision", at = @At("HEAD"))
-    private void onCollision(HitResult hitResult, CallbackInfo ci) {
+    @Inject(method = "onHit", at = @At("HEAD"))
+    private void onHit(HitResult hitResult, CallbackInfo ci) {
         Level world = ((EntityAccessor)(Object)this).deeperdark$getWorld();
-        if (!world.isClient()) {
-            ItemStack itemStack = this.getStack();
-            PotionContents potionContentsComponent = itemStack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.DEFAULT);
-            if (potionContentsComponent.matches(Potions.WATER)) {
-                 AABB box = this.getBoundingBox().expand(4.0, 2.0, 4.0);
-                 List<LivingEntity> list = world.getEntitiesByClass(LivingEntity.class, box, LivingEntity::isOnFire);
+        if (!world.isClientSide()) {
+            ItemStack itemStack = this.getItem();
+            PotionContents potionContentsComponent = itemStack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
+            if (potionContentsComponent.is(Potions.WATER)) {
+                 AABB box = this.getBoundingBox().inflate(4.0, 2.0, 4.0);
+                 List<LivingEntity> list = world.getEntitiesOfClass(LivingEntity.class, box, entity -> entity.isOnFire());
                  for (LivingEntity entity : list) {
-                     entity.extinguishWithSound();
+                     entity.clearFire();
                  }
             }
         }

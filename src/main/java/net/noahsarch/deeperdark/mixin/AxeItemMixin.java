@@ -17,7 +17,7 @@ public class AxeItemMixin {
     @Inject(method = "useOnBlock", at = @At("HEAD"), cancellable = true)
     private void onUseOnBlock(UseOnContext context, CallbackInfoReturnable<InteractionResult> cir) {
         Map<Block, Block> strippedBlocks = AxeItemAccessor.getStrippedBlocks();
-        BlockState state = context.getWorld().getBlockState(context.getBlockPos());
+        BlockState state = context.getLevel().getBlockState(context.getClickedPos());
         if (strippedBlocks.containsKey(state.getBlock())) {
             cir.setReturnValue(InteractionResult.PASS);
         }

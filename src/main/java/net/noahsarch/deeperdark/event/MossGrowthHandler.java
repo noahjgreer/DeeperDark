@@ -14,42 +14,34 @@ import net.noahsarch.deeperdark.DeeperDarkConfig;
 
 /**
  * Handles natural mossing of cobblestone and stone bricks over time.
- * Since these blocks don't have randomTicks enabled, we use the server tick event
- * and manually select random blocks to check for mossing.
  */
 public class MossGrowthHandler {
 
     private static long tickCounter = 0;
 
     public static void register() {
-        ServerTickEvents.END_WORLD_TICK.register(MossGrowthHandler::onWorldTick);
+        ServerTickEvents.END_LEVEL_TICK.register(MossGrowthHandler::onWorldTick);
     }
 
     private static void onWorldTick(ServerLevel world) {
         DeeperDarkConfig.ConfigInstance config = DeeperDarkConfig.get();
 
-        // Check if moss growth is enabled
         if (!config.mossGrowthEnabled) {
             return;
         }
 
         tickCounter++;
 
-        // Only run every N ticks to reduce performance impact
-        // mossTickCheckFrequency controls how often we check (higher = less frequent)
-        int checkInterval = Math.max(1, config.mossTickCheckFrequency * 20); // Convert to ticks
+        int checkInterval = Math.max(1, config.mossTickCheckFrequency * 20);
         if (tickCounter % checkInterval != 0) {
             return;
         }
 
         RandomSource random = world.getRandom();
 
-        // Process random blocks similar to how random ticks work
-        // We'll check a small number of random positions around each player
-        for (var player : world.getPlayers()) {
-            // Check random positions in a radius around the player (similar to random tick range)
-            int checkRadius = 128; // Vanilla random tick range
-            int checksPerPlayer = 3; // Number of random checks per player per interval
+        for (var player : world.players()) {
+            int checkRadius = 128;
+            int checksPerPlayer = 3;
 
             for (int i = 0; i < checksPerPlayer; i++) {
                 int x = player.getBlockX() + random.nextInt(checkRadius * 2) - checkRadius;
@@ -57,12 +49,11 @@ public class MossGrowthHandler {
                 int z = player.getBlockZ() + random.nextInt(checkRadius * 2) - checkRadius;
 
                 // Clamp Y to valid range
-                y = Math.max(world.getBottomY(), Math.min(world.getTopYInclusive(), y));
+                y = Math.max(world.getMinY(), Math.min(world.getMaxY(), y));
 
                 BlockPos pos = new BlockPos(x, y, z);
 
-                // Check if chunk is loaded
-                if (!world.isChunkLoaded(pos)) {
+                if (!world.isLoaded(pos)) {
                     continue;
                 }
 
@@ -77,7 +68,6 @@ public class MossGrowthHandler {
         Block mossyVariant = null;
         double speedMultiplier = 1.0;
 
-        // Check if this is a mossable block
         if (block == Blocks.COBBLESTONE) {
             mossyVariant = Blocks.MOSSY_COBBLESTONE;
             speedMultiplier = 1.0;
@@ -103,34 +93,29 @@ public class MossGrowthHandler {
             mossyVariant = Blocks.MOSSY_STONE_BRICK_STAIRS;
             speedMultiplier = config.stoneBrickMossMultiplier;
         } else {
-            return; // Not a mossable block
+            return;
         }
 
-        // Calculate moss chance
         double chance = config.mossBaseChance * speedMultiplier;
 
-        // Check if underwater (faster mossing)
         FluidState fluidState = world.getFluidState(pos);
-        if (fluidState.isIn(FluidTags.WATER)) {
+        if (fluidState.getType().is(FluidTags.WATER)) {
             chance *= config.mossUnderwaterMultiplier;
         }
 
-        // Bonus for nearby mossy blocks (moss spreads)
         int nearbyMossy = countNearbyMossyBlocks(world, pos);
         chance += nearbyMossy * config.mossNearbyBonus;
 
-        // Roll for mossing
         if (random.nextDouble() < chance) {
-            // Convert to mossy variant, preserving block state properties where possible
-            BlockState mossyState = copyBlockStateProperties(state, mossyVariant.getDefaultState());
-            world.setBlockState(pos, mossyState, Block.NOTIFY_ALL);
+            BlockState mossyState = copyBlockStateProperties(state, mossyVariant.defaultBlockState());
+            world.setBlock(pos, mossyState, Block.UPDATE_ALL);
         }
     }
 
     private static int countNearbyMossyBlocks(ServerLevel world, BlockPos pos) {
         int count = 0;
         for (Direction direction : Direction.values()) {
-            BlockState adjacent = world.getBlockState(pos.offset(direction));
+            BlockState adjacent = world.getBlockState(pos.relative(direction));
             if (isMossyBlock(adjacent)) {
                 count++;
             }
@@ -155,7 +140,7 @@ public class MossGrowthHandler {
     @SuppressWarnings("unchecked")
     private static BlockState copyBlockStateProperties(BlockState from, BlockState to) {
         for (var property : from.getProperties()) {
-            if (to.contains(property)) {
+            if (to.hasProperty(property)) {
                 to = copyProperty(from, to, (net.minecraft.world.level.block.state.properties.Property) property);
             }
         }
@@ -163,6 +148,6 @@ public class MossGrowthHandler {
     }
 
     private static <T extends Comparable<T>> BlockState copyProperty(BlockState from, BlockState to, net.minecraft.world.level.block.state.properties.Property<T> property) {
-        return to.with(property, from.get(property));
+        return to.setValue(property, from.getValue(property));
     }
 }

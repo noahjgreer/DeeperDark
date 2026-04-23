@@ -63,33 +63,33 @@ public class ChatSoundManager {
     private static void playGlobalSound(ServerPlayer sourcePlayer, String rawSoundId, double basePitch, double pitchDeviance) {
         if (rawSoundId == null || rawSoundId.isBlank()) return;
 
-        MinecraftServer server = sourcePlayer.getEntityWorld().getServer();
+        MinecraftServer server = sourcePlayer.level().getServer();
         if (server == null) return;
 
         Identifier soundId = parseSoundId(rawSoundId.trim());
         if (soundId == null) return;
 
-        Holder<SoundEvent> soundEntry = Holder.of(SoundEvent.of(soundId));
+        Holder<SoundEvent> soundEntry = Holder.direct(SoundEvent.createVariableRangeEvent(soundId));
         double deviance = Math.max(0.0, pitchDeviance);
-        double randomOffset = (sourcePlayer.getEntityWorld().getRandom().nextDouble() * 2.0 - 1.0) * deviance;
+        double randomOffset = (sourcePlayer.level().getRandom().nextDouble() * 2.0 - 1.0) * deviance;
         float finalPitch = (float) Math.max(0.01, basePitch + randomOffset);
 
         List<String> exclusions = DeeperDarkConfig.get().chatSoundExclusions;
 
-        for (ServerPlayer target : server.getPlayerManager().getPlayerList()) {
+        for (ServerPlayer target : server.getPlayerList().getPlayers()) {
             String targetName = target.getName().getString().toLowerCase(Locale.ROOT);
             if (exclusions != null && exclusions.contains(targetName)) {
                 continue;
             }
 
             // Play at the receiver's location so chat sounds are globally audible regardless of distance.
-            target.networkHandler.sendPacket(new ClientboundSoundPacket(
+            target.connection.send(new ClientboundSoundPacket(
                     soundEntry,
                     SoundSource.PLAYERS,
                     target.getX(), target.getY(), target.getZ(),
                     1.0f,
                     finalPitch,
-                    sourcePlayer.getEntityWorld().getRandom().nextLong()
+                    sourcePlayer.level().getRandom().nextLong()
             ));
         }
     }

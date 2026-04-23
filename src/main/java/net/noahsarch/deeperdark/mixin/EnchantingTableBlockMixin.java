@@ -9,7 +9,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
@@ -22,7 +21,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(EnchantingTableBlock.class)
 public class EnchantingTableBlockMixin {
 
-    @Inject(method = "onUse", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "useWithoutItem", at = @At("HEAD"), cancellable = true)
     private void onUse(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit, CallbackInfoReturnable<InteractionResult> cir) {
         // Logic moved to SiphonEvents for Siphon block
     }
@@ -32,7 +31,7 @@ public class EnchantingTableBlockMixin {
         int level = player.experienceLevel;
         float progress = player.experienceProgress;
 
-        int currentLevelXp = (int) (progress * player.getNextLevelExperience());
+        int currentLevelXp = (int) (progress * player.getXpNeededForNextLevel());
 
         int totalXp = currentLevelXp;
         for (int i = 0; i < level; i++) {

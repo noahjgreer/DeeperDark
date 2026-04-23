@@ -60,7 +60,7 @@ public class CraftingResultSlotMixin {
         Level world = ((EntityAccessor)player).deeperdark$getWorld();
         if (player instanceof ServerPlayer serverPlayer && world instanceof ServerLevel serverWorld) {
             // Check debounce - only play sound if enough time has passed since last craft
-            UUID playerUUID = player.getUuid();
+            UUID playerUUID = player.getUUID();
             long currentTime = System.currentTimeMillis();
             Long lastCraftTime = LAST_CRAFT_TIME.get(playerUUID);
 
@@ -79,7 +79,7 @@ public class CraftingResultSlotMixin {
     private void deeperdark$sendCraftingSound(ServerLevel world, ServerPlayer crafter) {
         // Create a Direct Holder (not Reference) - same as /playsound command does
         // This bypasses Fabric's registry sync because Direct entries aren't synced
-        Holder<SoundEvent> soundEntry = Holder.of(SoundEvent.of(CRAFTING_SOUND_ID));
+        Holder<SoundEvent> soundEntry = Holder.direct(SoundEvent.createVariableRangeEvent(CRAFTING_SOUND_ID));
 
         double x = crafter.getX();
         double y = crafter.getY();
@@ -89,13 +89,13 @@ public class CraftingResultSlotMixin {
         long seed = world.getRandom().nextLong();
 
         // Calculate max hearing distance (volume affects range)
-        double maxDistSq = Math.pow(soundEntry.value().getDistanceToTravel(volume), 2);
+        double maxDistSq = Math.pow(soundEntry.value().getRange(volume), 2);
 
         // Send packet to all players within hearing range
-        for (ServerPlayer player : world.getPlayers()) {
-            double distSq = player.squaredDistanceTo(x, y, z);
+        for (ServerPlayer player : world.players()) {
+            double distSq = player.distanceToSqr(x, y, z);
             if (distSq < maxDistSq) {
-                player.networkHandler.sendPacket(new ClientboundSoundPacket(
+                player.connection.send(new ClientboundSoundPacket(
                     soundEntry,
                     SoundSource.BLOCKS,
                     x, y, z,

@@ -59,6 +59,32 @@ processResources {
 	exclude "**/Thumbs.db", "**/.DS_Store", "**/desktop.ini"
 }
 
+// For MC 26.1.2 which ships unobfuscated: official names == named names.
+// Fabric Loader's computeRuntimeNamespace() uses hasAnyMappings() to detect dev mode;
+// our empty tiny (no class entries) makes hasAnyMappings() return false, so it defaults
+// to "official" as the runtime namespace. Patch launch.cfg to set both properties:
+//   - fabric.runtimeMappingNamespace=named  (overrides computeRuntimeNamespace before any logic)
+//   - fabric.defaultModDistributionNamespace=named  (fixes mod distribution namespace check)
+tasks.named("generateDLIConfig").configure {
+	doLast {
+		def launchCfg = project.file(".gradle/loom-cache/launch.cfg")
+		if (launchCfg.exists()) {
+			def content = launchCfg.text
+			content = content.replace(
+				"fabric.defaultModDistributionNamespace=official",
+				"fabric.defaultModDistributionNamespace=named"
+			)
+			if (!content.contains("fabric.runtimeMappingNamespace=")) {
+				content = content.replace(
+					"fabric.defaultModDistributionNamespace=named",
+					"fabric.runtimeMappingNamespace=named\n\tfabric.defaultModDistributionNamespace=named"
+				)
+			}
+			launchCfg.text = content
+		}
+	}
+}
+
 tasks.withType(JavaCompile).configureEach {
 	it.options.release = 25
 }

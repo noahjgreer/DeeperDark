@@ -30,13 +30,13 @@ public class WoodlandMansionStructureMixin {
 
         for (StructurePiece piece : pieces) {
             BlockPos center = piece.getBoundingBox().getCenter();
-            Holder<Biome> biomeEntry = context.chunkGenerator().getBiomeSource().getBiome(
+            Holder<Biome> biomeEntry = context.chunkGenerator().getBiomeSource().getNoiseBiome(
                     QuartPos.fromBlock(center.getX()),
                     QuartPos.fromBlock(center.getY()),
                     QuartPos.fromBlock(center.getZ()),
-                    context.randomState().getMultiNoiseSampler()
+                    context.randomState().sampler()
             );
-            if (biomeEntry.matchesKey(Biomes.PALE_GARDEN)) {
+            if (biomeEntry.is(Biomes.PALE_GARDEN)) {
                 isPaleMansion = true;
                 break;
             }

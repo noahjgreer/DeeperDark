@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 
 @Mixin(LoomMenu.class)
 public class LoomScreenHandlerMixin {
-    @ModifyConstant(method = "onContentChanged", constant = @Constant(intValue = 6))
+    @ModifyConstant(method = "slotsChanged", constant = @Constant(intValue = 6))
     private int increasePatternLimit(int original) {
         return Integer.MAX_VALUE;
     }

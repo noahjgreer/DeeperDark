@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MobEntityMixin {
     @Inject(method = "tick", at = @At("HEAD"))
     private void tick(CallbackInfo ci) {
-        if (!((EntityAccessor)(Object)this).deeperdark$getWorld().isClient()) {
+        if (!((EntityAccessor)(Object)this).deeperdark$getWorld().isClientSide()) {
              WorldBorderHandler.applyBorderForce((Mob)(Object)this);
         }
     }

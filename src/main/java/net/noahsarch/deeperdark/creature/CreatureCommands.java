@@ -175,7 +175,7 @@ public class CreatureCommands {
 
         ServerLevel world;
         try {
-            world = ctx.getSource().getWorld();
+            world = ctx.getSource().getLevel();
         } catch (Exception e) {
             ctx.getSource().sendFailure(Component.literal("Could not determine world").withStyle(ChatFormatting.RED));
             return 0;
@@ -200,7 +200,7 @@ public class CreatureCommands {
 
     private static int executeSpawnInternal(CommandContext<CommandSourceStack> ctx, int maxDist) {
         String playerName = StringArgumentType.getString(ctx, "player");
-        ServerPlayer target = ctx.getSource().getServer().getPlayerManager().getPlayer(playerName);
+        ServerPlayer target = ctx.getSource().getServer().getPlayerList().getPlayer(playerName);
 
         if (target == null) {
             ctx.getSource().sendFailure(Component.literal("Player not found: " + playerName).withStyle(ChatFormatting.RED));
@@ -339,8 +339,8 @@ public class CreatureCommands {
     // ===== Suggestions =====
 
     private static CompletableFuture<Suggestions> suggestPlayers(CommandContext<CommandSourceStack> ctx, SuggestionsBuilder builder) {
-        return CommandSource.suggestMatching(
-                ctx.getSource().getServer().getPlayerManager().getPlayerList().stream()
+        return SharedSuggestionProvider.suggest(
+                ctx.getSource().getServer().getPlayerList().getPlayers().stream()
                         .map(p -> p.getName().getString()),
                 builder
         );

@@ -17,26 +17,26 @@ import net.minecraft.world.level.Level;
 public class BoneHeadEvents {
     public static void register() {
         UseItemCallback.EVENT.register((player, world, hand) -> {
-            ItemStack stack = player.getStackInHand(hand);
-            if (!world.isClient() && stack.isOf(Items.BONE)) {
+            ItemStack stack = player.getItemInHand(hand);
+            if (!world.isClientSide() && stack.getItem() == Items.BONE) {
                 // Raycast to see if looking at a wolf/dog
                 double reach = 4.5D;
                 Entity target = null;
-                HitResult hit = player.raycast(reach, 1.0F, false);
+                HitResult hit = player.pick(reach, 1.0F, false);
                 if (hit instanceof EntityHitResult entityHit) {
                     target = entityHit.getEntity();
                 }
                 if (!(target instanceof Wolf)) {
                     // Not looking at a wolf/dog, equip bone to head
-                    ItemStack headStack = player.getEquippedStack(EquipmentSlot.HEAD);
+                    ItemStack headStack = player.getItemBySlot(EquipmentSlot.HEAD);
                     world.playSound(player, player.getX(), player.getY(), player.getZ(),
-                            SoundEvents.ITEM_ARMOR_EQUIP_LEATHER,
+                            SoundEvents.ARMOR_EQUIP_LEATHER,
                             net.minecraft.sounds.SoundSource.PLAYERS, 1.0F, 1.25F);
-                    player.equipStack(EquipmentSlot.HEAD, stack.copyWithCount(1));
+                    player.setItemSlot(EquipmentSlot.HEAD, stack.copyWithCount(1));
                     if (!player.isCreative()) {
-                        stack.decrement(1);
+                        stack.shrink(1);
                         if (!headStack.isEmpty()) {
-                            player.giveItemStack(headStack);
+                            player.addItem(headStack);
                         }
                     }
                     return InteractionResult.SUCCESS;

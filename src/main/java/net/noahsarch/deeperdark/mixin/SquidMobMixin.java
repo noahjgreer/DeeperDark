@@ -17,18 +17,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(Mob.class)
 public class SquidMobMixin {
 
-    @Inject(method = "interactMob", at = @At("HEAD"), cancellable = true)
-    private void deeperdark$interactMob(Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
+    @Inject(method = "mobInteract", at = @At("HEAD"), cancellable = true)
+    private void deeperdark$mobInteract(Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
         Mob self = (Mob)(Object)this;
         if (!(self instanceof Squid)) return;
 
-        ItemStack stack = player.getStackInHand(hand);
-        if (stack.isOf(Items.BUCKET)) {
-            player.playSound(SoundEvents.ENTITY_COW_MILK, 1.0F, 1.0F);
-            ItemStack milk = ItemUsage.exchangeStack(stack, player, new ItemStack(Items.MILK_BUCKET));
-            player.setStackInHand(hand, milk);
+        ItemStack stack = player.getItemInHand(hand);
+        if (stack.getItem() == Items.BUCKET) {
+            player.playSound(SoundEvents.COW_MILK, 1.0F, 1.0F);
+            ItemStack milk = ItemUtils.createFilledResult(stack, player, new ItemStack(Items.MILK_BUCKET));
+            player.setItemInHand(hand, milk);
             cir.setReturnValue(InteractionResult.SUCCESS);
         }
     }
 }
-

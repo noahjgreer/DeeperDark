@@ -35,11 +35,11 @@ public abstract class CreeperEntityMixin {
         return false;
     }
 
-    @Inject(method = "spawnEffectsCloud", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "spawnLingeringCloud", at = @At("HEAD"), cancellable = true)
     private void deeperdark$spawnEffectsCloud(CallbackInfo ci) {
         Creeper self = (Creeper) (Object) this;
         Level world = ((EntityAccessor)self).deeperdark$getWorld();
-        Collection<MobEffectInstance> collection = self.getStatusEffects();
+        Collection<MobEffectInstance> collection = self.getActiveEffects();
         boolean isBaby = deeperdark$isBaby();
 
         if (!collection.isEmpty()) {
@@ -51,7 +51,7 @@ public abstract class CreeperEntityMixin {
             areaEffectCloudEntity.setWaitTime(10);
             areaEffectCloudEntity.setDuration(isBaby ? 60 : 300);
             areaEffectCloudEntity.setPotionDurationScale(0.25F);
-            areaEffectCloudEntity.setRadiusGrowth(-areaEffectCloudEntity.getRadius() / (float)areaEffectCloudEntity.getDuration());
+            areaEffectCloudEntity.setRadiusPerTick(-areaEffectCloudEntity.getRadius() / (float)areaEffectCloudEntity.getDuration());
 
             DeeperDarkConfig.ConfigInstance cfg = DeeperDarkConfig.get();
             int min = Math.max(1, cfg.creeperEffectMinSeconds) * 20;
@@ -59,16 +59,16 @@ public abstract class CreeperEntityMixin {
 
             for (MobEffectInstance statusEffectInstance : collection) {
                 MobEffectInstance toAdd;
-                if (statusEffectInstance.isInfinite()) {
-                    int roll = world.random.nextInt(max - min + 1) + min;
-                    toAdd = new MobEffectInstance(statusEffectInstance.getEffectType(), roll, statusEffectInstance.getAmplifier(), statusEffectInstance.isAmbient(), statusEffectInstance.shouldShowParticles(), statusEffectInstance.shouldShowIcon());
+                if (statusEffectInstance.isInfiniteDuration()) {
+                    int roll = world.getRandom().nextInt(max - min + 1) + min;
+                    toAdd = new MobEffectInstance(statusEffectInstance.getEffect(), roll, statusEffectInstance.getAmplifier(), statusEffectInstance.isAmbient(), statusEffectInstance.isVisible(), statusEffectInstance.showIcon());
                 } else {
                     toAdd = new MobEffectInstance(statusEffectInstance);
                 }
                 areaEffectCloudEntity.addEffect(toAdd);
             }
 
-            world.spawnEntity(areaEffectCloudEntity);
+            world.addFreshEntity(areaEffectCloudEntity);
         }
 
         ci.cancel();
@@ -95,7 +95,7 @@ public abstract class CreeperEntityMixin {
                     double offsetX = (self.getRandom().nextDouble() - 0.5) * 2.0;
                     double offsetY = self.getRandom().nextDouble() * 1.5;
                     double offsetZ = (self.getRandom().nextDouble() - 0.5) * 2.0;
-                    serverWorld.spawnParticles(ParticleTypes.POOF,
+                    serverWorld.sendParticles(ParticleTypes.POOF,
                         self.getX() + offsetX, self.getY() + offsetY, self.getZ() + offsetZ,
                         1, 0, 0, 0, 0.05);
                 }
@@ -103,7 +103,7 @@ public abstract class CreeperEntityMixin {
                     double offsetX = (self.getRandom().nextDouble() - 0.5) * 1.5;
                     double offsetY = self.getRandom().nextDouble() * 1.0;
                     double offsetZ = (self.getRandom().nextDouble() - 0.5) * 1.5;
-                    serverWorld.spawnParticles(ParticleTypes.SMOKE,
+                    serverWorld.sendParticles(ParticleTypes.SMOKE,
                         self.getX() + offsetX, self.getY() + offsetY, self.getZ() + offsetZ,
                         1, 0, 0.05, 0, 0.02);
                 }

@@ -20,29 +20,24 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(Block.class)
 public class IceBlockMixin {
 
-    @Inject(method = "onPlaced", at = @At("HEAD"))
+    @Inject(method = "setPlacedBy", at = @At("HEAD"))
     private void onPlaced(Level world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack, CallbackInfo ci) {
-        // Only run on the server
-        if (world.isClient()) return;
+        if (world.isClientSide()) return;
 
-        // Check if we're in the Nether
-        if (world.getRegistryKey() == Level.NETHER) {
-            // Detect ice blocks: explicit vanilla ice blocks and any block whose translation key contains "ice"
+        if (world.dimension() == Level.NETHER) {
             Block block = state.getBlock();
             boolean isIce = block == Blocks.ICE
                     || block == Blocks.PACKED_ICE
                     || block == Blocks.BLUE_ICE
                     || block == Blocks.FROSTED_ICE
-                    || block.getTranslationKey().toLowerCase().contains("ice");
+                    || block.getDescriptionId().toLowerCase().contains("ice");
 
             if (isIce) {
-                // Remove the block (evaporate)
                 world.removeBlock(pos, false);
 
-                // Spawn particles and sound on the server for clients to see/hear
                 if (world instanceof ServerLevel server) {
-                    server.spawnParticles(ParticleTypes.LARGE_SMOKE, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 10, 0.25, 0.25, 0.25, 0.02);
-                    server.playSound(null, pos, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundSource.BLOCKS, 1.0f, 1.0f);
+                    server.sendParticles(ParticleTypes.LARGE_SMOKE, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 10, 0.25, 0.25, 0.25, 0.02);
+                    server.playSound(null, pos, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 1.0f, 1.0f);
                 }
             }
         }

@@ -15,7 +15,7 @@ import net.minecraft.world.item.alchemy.PotionContents;
 public class PotionItemMixin {
     @Inject(method = "finishUsing", at = @At("RETURN"))
     private void onPotionConsumed(ItemStack stack, Level world, LivingEntity user, CallbackInfoReturnable<ItemStack> cir) {
-        if (!world.isClient() && stack.getItem() instanceof net.minecraft.world.item.PotionItem) {
+        if (!world.isClientSide() && stack.getItem() instanceof net.minecraft.world.item.PotionItem) {
             // Check if this is our custom scentless potion
             if (ScentlessPotion.isScentlessPotion(stack)) {
                 // The potion already contains the WIND_CHARGED effect built-in

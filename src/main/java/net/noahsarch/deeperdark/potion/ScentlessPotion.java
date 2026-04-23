@@ -42,17 +42,11 @@ public class ScentlessPotion {
         // Set potion Lore with different colors for each line
         ItemLore lore = new ItemLore(List.of(
             Component.translatable("effect.deeperdark.scentless.duration", isLong ? "16:00" : "8:00")
-                    .formatted(ChatFormatting.RESET).formatted(ChatFormatting.BLUE).styled(style -> {
-                        return style.withItalic(false);
-                    }),
+                    .withStyle(ChatFormatting.RESET).withStyle(ChatFormatting.BLUE).withStyle(style -> style.withItalic(false)),
             Component.translatable("effect.deeperdark.scentless.desc.1")
-                    .formatted(ChatFormatting.RESET).formatted(ChatFormatting.GRAY).styled(style -> {
-                        return style.withItalic(false);
-                    }),
+                    .withStyle(ChatFormatting.RESET).withStyle(ChatFormatting.GRAY).withStyle(style -> style.withItalic(false)),
             Component.translatable("effect.deeperdark.scentless.desc.2")
-                    .formatted(ChatFormatting.RESET).formatted(ChatFormatting.GRAY).styled(style -> {
-                        return style.withItalic(false);
-                    })
+                    .withStyle(ChatFormatting.RESET).withStyle(ChatFormatting.GRAY).withStyle(style -> style.withItalic(false))
         ));
 
         // Create tooltip display component to hide potion contents
@@ -71,9 +65,7 @@ public class ScentlessPotion {
 
         // Set custom name
         potionStack.set(DataComponents.CUSTOM_NAME,
-            Component.translatable(isLong ? "potion.deeperdark.long_scentless.name" : "potion.deeperdark.scentless.name").formatted(ChatFormatting.RESET).formatted(ChatFormatting.WHITE).styled(style -> {
-                return style.withItalic(false);
-            }));
+            Component.translatable(isLong ? "potion.deeperdark.long_scentless.name" : "potion.deeperdark.scentless.name").withStyle(ChatFormatting.RESET).withStyle(ChatFormatting.WHITE).withStyle(style -> style.withItalic(false)));
 
         return potionStack;
     }
@@ -86,7 +78,7 @@ public class ScentlessPotion {
 
         // Check if it has our custom name
         Component customName = stack.get(DataComponents.CUSTOM_NAME);
-        if (customName != null && customName.getContent() instanceof TranslatableContents translatable) {
+        if (customName != null && customName.getContents() instanceof TranslatableContents translatable) {
             String key = translatable.getKey();
             return key.equals("potion.deeperdark.scentless.name") ||
                    key.equals("potion.deeperdark.long_scentless.name");

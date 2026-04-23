@@ -24,7 +24,7 @@ public class BiomeAccessMixin {
             Holder<Biome> currentBiome = cir.getReturnValue();
 
             // If it's already Deep Dark, don't need to do anything
-            if (currentBiome != null && currentBiome.matchesKey(DeepDarkBiomeModifier.DEEP_DARK)) {
+            if (currentBiome != null && currentBiome.is(DeepDarkBiomeModifier.DEEP_DARK)) {
                 return;
             }
 

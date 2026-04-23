@@ -23,36 +23,25 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-/**
- * Mixin to add organ instrument sound when a copper block is placed beneath a noteblock.
- */
 @Mixin(NoteBlock.class)
 public class NoteBlockMixin {
 
     @Unique
     private static final Identifier ORGAN_SOUND_ID = Identifier.fromNamespaceAndPath(Deeperdark.MOD_ID, "block.note_block.organ");
 
-    /**
-     * Inject into onSyncedBlockEvent to play organ sound when copper is below
-     */
-    @Inject(method = "onSyncedBlockEvent", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "triggerEvent", at = @At("HEAD"), cancellable = true)
     private void deeperdark$playOrganSound(BlockState state, Level world, BlockPos pos, int type, int data, CallbackInfoReturnable<Boolean> cir) {
-        // Check if there's a copper block below
-        BlockState belowState = world.getBlockState(pos.down());
+        BlockState belowState = world.getBlockState(pos.below());
         if (deeperdark$isCopperBlock(belowState)) {
-            // Check if block above is air (note blocks need air above to play)
-            NoteBlockInstrument instrument = state.get(Properties.INSTRUMENT);
-            if (instrument.isNotBaseBlock() || world.getBlockState(pos.up()).isAir()) {
-                int note = state.get(Properties.NOTE);
-                float pitch = NoteBlock.getNotePitch(note);
+            NoteBlockInstrument instrument = state.getValue(BlockStateProperties.NOTEBLOCK_INSTRUMENT);
+            if (!instrument.isTunable() || world.getBlockState(pos.above()).isAir()) {
+                int note = state.getValue(BlockStateProperties.NOTE);
+                float pitch = NoteBlock.getPitchFromNote(note);
 
-                // Show note particle
-                world.addParticleClient(ParticleTypes.NOTE,
+                world.addParticle(ParticleTypes.NOTE,
                     pos.getX() + 0.5, pos.getY() + 1.2, pos.getZ() + 0.5,
                     note / 24.0, 0.0, 0.0);
 
-                // Play organ sound by manually sending the packet (like /playsound does)
-                // This avoids Fabric registry sync issues since we use a Direct Holder
                 if (world instanceof ServerLevel serverWorld) {
                     deeperdark$sendOrganSound(serverWorld, pos, pitch);
                 }
@@ -64,15 +53,9 @@ public class NoteBlockMixin {
         }
     }
 
-    /**
-     * Send the organ sound packet to all nearby players using Direct Holder.
-     * This mirrors how the vanilla /playsound command works, bypassing registry sync.
-     */
     @Unique
     private void deeperdark$sendOrganSound(ServerLevel world, BlockPos pos, float pitch) {
-        // Create a Direct Holder (not Reference) - same as /playsound command does
-        // This bypasses Fabric's registry sync because Direct entries aren't synced
-        Holder<SoundEvent> soundEntry = Holder.of(SoundEvent.of(ORGAN_SOUND_ID));
+        Holder<SoundEvent> soundEntry = Holder.direct(SoundEvent.createVariableRangeEvent(ORGAN_SOUND_ID));
 
         double x = pos.getX() + 0.5;
         double y = pos.getY() + 0.5;
@@ -80,14 +63,12 @@ public class NoteBlockMixin {
         float volume = 3.0F;
         long seed = world.getRandom().nextLong();
 
-        // Calculate max hearing distance (volume affects range)
-        double maxDistSq = Math.pow(soundEntry.value().getDistanceToTravel(volume), 2);
+        double maxDistSq = Math.pow(soundEntry.value().getRange(volume), 2);
 
-        // Send packet to all players within hearing range
-        for (ServerPlayer player : world.getPlayers()) {
-            double distSq = player.squaredDistanceTo(x, y, z);
+        for (ServerPlayer player : world.players()) {
+            double distSq = player.distanceToSqr(x, y, z);
             if (distSq < maxDistSq) {
-                player.networkHandler.sendPacket(new ClientboundSoundPacket(
+                player.connection.send(new ClientboundSoundPacket(
                     soundEntry,
                     SoundSource.RECORDS,
                     x, y, z,
@@ -99,9 +80,6 @@ public class NoteBlockMixin {
         }
     }
 
-    /**
-     * Checks if the given block state is any type of copper block
-     */
     @Unique
     private boolean deeperdark$isCopperBlock(BlockState state) {
         Block block = state.getBlock();

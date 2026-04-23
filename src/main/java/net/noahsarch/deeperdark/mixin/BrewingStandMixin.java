@@ -21,7 +21,7 @@ import net.minecraft.world.item.alchemy.PotionContents;
 @Mixin(BrewingStandBlockEntity.class)
 public class BrewingStandMixin {
 
-    @Inject(method = "craft", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "doBrew", at = @At("HEAD"), cancellable = true)
     private static void onCraft(Level world, BlockPos pos, NonNullList<ItemStack> slots, CallbackInfo ci) {
         System.out.println("DEBUG - craft method called!");
 
@@ -54,17 +54,17 @@ public class BrewingStandMixin {
                 // Get the potion contents to check what type of potion it is
                 net.minecraft.world.item.alchemy.PotionContents potionContents =
                     potionStack.getOrDefault(net.minecraft.core.component.DataComponents.POTION_CONTENTS,
-                    net.minecraft.world.item.alchemy.PotionContents.DEFAULT);
+                    net.minecraft.world.item.alchemy.PotionContents.EMPTY);
 
                 System.out.println("DEBUG CUSTOM - Slot " + i + " - Is Echo Shard? " + (ingredient.getItem() == Items.ECHO_SHARD));
 
                 // Recipe 1: (Water OR Mundane OR Awkward) + Echo Shard = Scentless Potion
                 if (ingredient.getItem() == Items.ECHO_SHARD && potionContents.potion().isPresent()) {
                     Holder<net.minecraft.world.item.alchemy.Potion> potionEntry = potionContents.potion().get();
-                    ResourceKey<net.minecraft.world.item.alchemy.Potion> potionKey = potionEntry.getKey().orElse(null);
-                    ResourceKey<net.minecraft.world.item.alchemy.Potion> waterKey = Potions.WATER.getKey().orElse(null);
-                    ResourceKey<net.minecraft.world.item.alchemy.Potion> mundaneKey = Potions.MUNDANE.getKey().orElse(null);
-                    ResourceKey<net.minecraft.world.item.alchemy.Potion> awkwardKey = Potions.AWKWARD.getKey().orElse(null);
+                    ResourceKey<net.minecraft.world.item.alchemy.Potion> potionKey = potionEntry.unwrapKey().orElse(null);
+                    ResourceKey<net.minecraft.world.item.alchemy.Potion> waterKey = Potions.WATER.unwrapKey().orElse(null);
+                    ResourceKey<net.minecraft.world.item.alchemy.Potion> mundaneKey = Potions.MUNDANE.unwrapKey().orElse(null);
+                    ResourceKey<net.minecraft.world.item.alchemy.Potion> awkwardKey = Potions.AWKWARD.unwrapKey().orElse(null);
 
                     System.out.println("DEBUG CUSTOM - Potion Key: " + potionKey);
                     System.out.println("DEBUG CUSTOM - Mundane Key: " + mundaneKey);
@@ -91,7 +91,7 @@ public class BrewingStandMixin {
 
         // Only consume ingredient if we actually handled a custom recipe
         if (customRecipeHandled) {
-            ingredient.decrement(1);
+            ingredient.shrink(1);
             System.out.println("DEBUG CUSTOM - Ingredient consumed, returning true");
         }
 

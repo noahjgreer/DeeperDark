@@ -45,13 +45,13 @@ public class ApplyBonusLootFunctionOreDropsMixin {
         }
 
         // Get the tool that was used
-        ItemStack tool = context.get(LootContextParams.TOOL);
+        net.minecraft.world.item.ItemInstance tool = context.getParameter(LootContextParams.TOOL);
         if (tool == null) {
             return;
         }
 
         // Get the fortune level
-        int fortuneLevel = EnchantmentHelper.getLevel(this.enchantment, tool);
+        int fortuneLevel = EnchantmentHelper.getItemEnchantmentLevel(this.enchantment, tool);
 
         // If no fortune, don't modify
         if (fortuneLevel <= 0) {

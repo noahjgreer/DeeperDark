@@ -15,21 +15,21 @@ public class CustomBrewingRecipeHandler {
             // Water + Echo Shard = Scentless
             builder.registerPotionRecipe(
                     Potions.WATER,                          // Water bottle base
-                    Ingredient.ofItems(Items.ECHO_SHARD),   // Echo shard ingredient
+                    Ingredient.of(Items.ECHO_SHARD),   // Echo shard ingredient
                     Potions.WATER                           // Output will be replaced by mixin
             );
 
             // Mundane + Echo Shard = Scentless
             builder.registerPotionRecipe(
                     Potions.MUNDANE,                        // Mundane potion base
-                    Ingredient.ofItems(Items.ECHO_SHARD),   // Echo shard ingredient
+                    Ingredient.of(Items.ECHO_SHARD),   // Echo shard ingredient
                     Potions.MUNDANE                         // Output will be replaced by mixin
             );
 
             // Awkward + Echo Shard = Scentless
             builder.registerPotionRecipe(
                     Potions.AWKWARD,                        // Awkward potion base
-                    Ingredient.ofItems(Items.ECHO_SHARD),   // Echo shard ingredient
+                    Ingredient.of(Items.ECHO_SHARD),   // Echo shard ingredient
                     Potions.AWKWARD                         // Output will be replaced by mixin
             );
 

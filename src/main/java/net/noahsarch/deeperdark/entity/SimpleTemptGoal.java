@@ -22,56 +22,56 @@ public class SimpleTemptGoal extends Goal {
     public SimpleTemptGoal(AbstractVillager entity, double speed) {
         this.entity = entity;
         this.speed = speed;
-        this.setControls(EnumSet.of(Goal.Control.MOVE, Goal.Control.LOOK));
+        this.setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK));
     }
 
     @Override
-    public boolean canStart() {
+    public boolean canUse() {
         if (this.cooldown > 0) {
             --this.cooldown;
             return false;
         }
 
-        this.closestPlayer = ((net.noahsarch.deeperdark.duck.EntityAccessor)this.entity).deeperdark$getWorld().getClosestPlayer(this.entity, 10.0);
+        this.closestPlayer = ((net.noahsarch.deeperdark.duck.EntityAccessor)this.entity).deeperdark$getWorld().getNearestPlayer(this.entity, 10.0);
         if (this.closestPlayer == null) {
             return false;
         }
 
-        return this.isTemptedBy(this.closestPlayer.getMainHandStack()) || this.isTemptedBy(this.closestPlayer.getOffHandStack());
+        return isTemptedBy(this.closestPlayer.getMainHandItem()) || isTemptedBy(this.closestPlayer.getOffhandItem());
     }
 
     private boolean isTemptedBy(ItemStack stack) {
-        return stack.isOf(Items.EMERALD);
+        return stack.getItem() == Items.EMERALD;
     }
 
     @Override
-    public boolean shouldContinue() {
-        if (this.canStart()) {
+    public boolean canContinueToUse() {
+        if (this.canUse()) {
             return true;
         }
 
-        if (this.entity.getNavigation().isIdle()) {
+        if (!this.entity.getNavigation().isInProgress()) {
             return false;
         }
 
-        return this.closestPlayer != null && this.entity.squaredDistanceTo(this.closestPlayer) < 36.0;
+        return this.closestPlayer != null && this.entity.distanceToSqr(this.closestPlayer) < 36.0;
     }
 
     @Override
     public void stop() {
         this.closestPlayer = null;
         this.entity.getNavigation().stop();
-        this.cooldown = toGoalTicks(100);
+        this.cooldown = adjustedTickDelay(100);
     }
 
     @Override
     public void tick() {
-        this.entity.getLookControl().lookAt(this.closestPlayer, this.entity.getMaxHeadRotation() + 20, this.entity.getMaxLookPitchChange());
+        this.entity.getLookControl().setLookAt(this.closestPlayer, this.entity.getMaxHeadYRot() + 20, this.entity.getMaxHeadXRot());
 
-        if (this.entity.squaredDistanceTo(this.closestPlayer) < 6.25) {
+        if (this.entity.distanceToSqr(this.closestPlayer) < 6.25) {
             this.entity.getNavigation().stop();
         } else {
-            this.entity.getNavigation().startMovingTo(this.closestPlayer, this.speed);
+            this.entity.getNavigation().moveTo(this.closestPlayer, this.speed);
         }
     }
 }

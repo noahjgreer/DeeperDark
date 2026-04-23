@@ -40,10 +40,10 @@ public abstract class SoundFilterMixin {
         if (!((Object) this instanceof ServerGamePacketListenerImpl sph)) return;
 
         // Check if this player's sounds should be suppressed
-        if (!CreatureManager.isPlayerSoundSuppressed(sph.player.getUuid())) return;
+        if (!CreatureManager.isPlayerSoundSuppressed(sph.player.getUUID())) return;
 
         // Suppress the specified categories per the creature spec
-        SoundSource category = soundPacket.getCategory();
+        SoundSource category = soundPacket.getSource();
         if (category == SoundSource.AMBIENT
                 || category == SoundSource.MUSIC
                 || category == SoundSource.WEATHER

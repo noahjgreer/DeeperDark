@@ -26,6 +26,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import net.minecraft.world.level.Explosion;
+import net.minecraft.server.permissions.Permission;
+import net.minecraft.server.permissions.PermissionLevel;
 
 /**
  * Consolidated command system for DeeperDark mod.
@@ -91,19 +93,7 @@ public class DeeperDarkCommands {
     private static void registerCommands(CommandDispatcher<CommandSourceStack> dispatcher) {
         // Main "dd" command with all subcommands
         dispatcher.register(Commands.literal("dd")
-            .requires(source -> {
-                // Check if source has operator permissions (level 2)
-                try {
-                    net.minecraft.server.level.ServerPlayer player = source.getPlayer();
-                    if (player != null) {
-                        return source.getEntity() instanceof net.minecraft.server.level.ServerPlayer _p && source.getServer().getPlayerList().getOps().get(_p.getGameProfile()) != null;
-                    }
-                    // Allow console/command blocks
-                    return true;
-                } catch (Exception e) {
-                    return false;
-                }
-            })
+            .requires(source -> source.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.GAMEMASTERS)))
 
             // dd give <item> [amount]
             .then(Commands.literal("give")

@@ -25,14 +25,14 @@ public class TreeFeatureMixin {
      */
     @Inject(method = "getTopPosition", at = @At("HEAD"), cancellable = true)
     private void deeperdark$skipHorizontalChecks(LevelSimulatedReader world, int height, BlockPos pos, TreeConfiguration config, CallbackInfoReturnable<Integer> cir) {
-        BlockPos.Mutable mutable = new BlockPos.Mutable();
+        BlockPos.MutableBlockPos mutable = new BlockPos.MutableBlockPos();
 
         // Only check the center column (vertical checks only)
         for (int y = 0; y <= height + 1; y++) {
             mutable.set(pos.getX(), pos.getY() + y, pos.getZ());
 
             // Check if the trunk position can be replaced
-            if (!config.trunkPlacer.canReplaceOrIsLog(world, mutable)) {
+            if (!config.trunkPlacer.isFree((net.minecraft.world.level.WorldGenLevel) world, mutable)) {
                 // If we can't place at this vertical position, return adjusted height
                 cir.setReturnValue(y - 2);
                 return;
@@ -54,6 +54,6 @@ public class TreeFeatureMixin {
      */
     @Unique
     private static boolean isVine(LevelSimulatedReader world, BlockPos pos) {
-        return world.testBlockState(pos, state -> state.isOf(net.minecraft.world.level.block.Blocks.VINE));
+        return world.isStateAtPosition(pos, state -> state.is(net.minecraft.world.level.block.Blocks.VINE));
     }
 }

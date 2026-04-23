@@ -14,12 +14,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(FireBlock.class)
 public class FireBlockMixin {
 
-    @Inject(method = "scheduledTick", at = @At("HEAD"))
+    @Inject(method = "tick", at = @At("HEAD"))
     private void onScheduledTick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random, CallbackInfo ci) {
-        if (world.getBlockState(pos.down()).isOf(Blocks.GRASS_BLOCK)) {
+        if (world.getBlockState(pos.below()).getBlock() == Blocks.GRASS_BLOCK) {
             // 10% chance to turn into coarse dirt
             if (random.nextInt(10) == 0) {
-                world.setBlockState(pos.down(), Blocks.COARSE_DIRT.getDefaultState());
+                world.setBlock(pos.below(), Blocks.COARSE_DIRT.defaultBlockState(), 3);
             }
         }
     }

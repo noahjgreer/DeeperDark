@@ -17,12 +17,12 @@ public class EnchantmentHelperMixin {
     @Inject(method = "getLevel", at = @At("RETURN"), cancellable = true)
     private static void deeperdark$implicitSilkTouch(Holder<Enchantment> enchantment, ItemStack stack, CallbackInfoReturnable<Integer> cir) {
         if (cir.getReturnValue() == 0) {
-            if (enchantment.matchesKey(Enchantments.SILK_TOUCH)) {
-                if (stack.isOf(Items.GOLDEN_PICKAXE) ||
-                    stack.isOf(Items.GOLDEN_AXE) ||
-                    stack.isOf(Items.GOLDEN_SHOVEL) ||
-                    stack.isOf(Items.GOLDEN_HOE) ||
-                    stack.isOf(Items.GOLDEN_SWORD)) {
+            if (enchantment.is(Enchantments.SILK_TOUCH)) {
+                if (stack.getItem() == Items.GOLDEN_PICKAXE ||
+                    stack.getItem() == Items.GOLDEN_AXE ||
+                    stack.getItem() == Items.GOLDEN_SHOVEL ||
+                    stack.getItem() == Items.GOLDEN_HOE ||
+                    stack.getItem() == Items.GOLDEN_SWORD) {
                     cir.setReturnValue(1);
                 }
             }

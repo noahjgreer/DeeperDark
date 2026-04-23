@@ -47,19 +47,19 @@ public class PaleMansionProcessor extends StructureProcessor {
 
     @Nullable
     @Override
-    public StructureTemplate.StructureBlockInfo process(LevelReader world, BlockPos pos, BlockPos pivot, StructureTemplate.StructureBlockInfo originalBlockInfo, StructureTemplate.StructureBlockInfo currentBlockInfo, StructurePlaceSettings data) {
+    public StructureTemplate.StructureBlockInfo processBlock(LevelReader world, BlockPos pos, BlockPos pivot, StructureTemplate.StructureBlockInfo originalBlockInfo, StructureTemplate.StructureBlockInfo currentBlockInfo, StructurePlaceSettings data) {
         BlockState currentState = currentBlockInfo.state();
 
-        if (currentState.isOf(Blocks.BIRCH_PLANKS)) {
-             return new StructureTemplate.StructureBlockInfo(currentBlockInfo.pos(), Blocks.STRIPPED_PALE_OAK_LOG.getDefaultState().with(RotatedPillarBlock.AXIS, Direction.Axis.X), currentBlockInfo.nbt());
+        if (currentState.getBlock() == Blocks.BIRCH_PLANKS) {
+             return new StructureTemplate.StructureBlockInfo(currentBlockInfo.pos(), Blocks.STRIPPED_PALE_OAK_LOG.defaultBlockState().setValue(RotatedPillarBlock.AXIS, Direction.Axis.X), currentBlockInfo.nbt());
         }
 
         Block newBlock = REPLACEMENTS.get(currentState.getBlock());
         if (newBlock != null) {
-            BlockState newState = newBlock.getDefaultState();
+            BlockState newState = newBlock.defaultBlockState();
             // Copy properties if they exist
             for (Property property : currentState.getProperties()) {
-                if (newState.contains(property)) {
+                if (newState.hasProperty(property)) {
                     newState = copyProperty(currentState, newState, property);
                 }
             }
@@ -69,7 +69,7 @@ public class PaleMansionProcessor extends StructureProcessor {
     }
 
     private <T extends Comparable<T>> BlockState copyProperty(BlockState source, BlockState target, Property<T> property) {
-        return target.with(property, source.get(property));
+        return target.setValue(property, source.getValue(property));
     }
 
     @Override

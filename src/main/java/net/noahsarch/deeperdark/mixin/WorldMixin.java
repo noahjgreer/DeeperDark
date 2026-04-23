@@ -22,7 +22,7 @@ public class WorldMixin implements ActiveSpongeTracker {
     @Override
     public void addActiveSponge(BlockPos pos) {
         // Store immutable pos because BlockPos passed might be mutable
-        deeperdark$activeSponges.add(pos.toImmutable());
+        deeperdark$activeSponges.add(pos.immutable());
     }
 
     @Override

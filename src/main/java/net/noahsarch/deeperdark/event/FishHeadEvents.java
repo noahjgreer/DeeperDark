@@ -14,29 +14,29 @@ import net.minecraft.world.phys.HitResult;
 public class FishHeadEvents {
     public static void register() {
         UseItemCallback.EVENT.register((player, world, hand) -> {
-            ItemStack stack = player.getStackInHand(hand);
-            if (!world.isClient() && (stack.isOf(Items.COD) || stack.isOf(Items.SALMON) || stack.isOf(Items.TROPICAL_FISH) && !(player.isSneaking()))) {
+            ItemStack stack = player.getItemInHand(hand);
+            if (!world.isClientSide() && (stack.getItem() == Items.COD || stack.getItem() == Items.SALMON || stack.getItem() == Items.TROPICAL_FISH && !(player.isShiftKeyDown()))) {
                 // Raycast to see if looking at a cat/ocelot
                 double reach = 4.5D;
                 Entity target = null;
-                HitResult hit = player.raycast(reach, 1.0F, false);
+                HitResult hit = player.pick(reach, 1.0F, false);
                 if (hit instanceof EntityHitResult entityHit) {
                     target = entityHit.getEntity();
                 }
                 if (!(target instanceof Cat) && !(target instanceof Ocelot)) {
                     // Not looking at a wolf/dog, equip bone to head
-                    ItemStack headStack = player.getEquippedStack(EquipmentSlot.HEAD);
+                    ItemStack headStack = player.getItemBySlot(EquipmentSlot.HEAD);
                     // Play sound effect
                     world.playSound(player, player.getX(), player.getY(), player.getZ(),
-                            stack.isOf(Items.COD) ? net.minecraft.sounds.SoundEvents.ENTITY_COD_FLOP :
-                                    stack.isOf(Items.SALMON) ? net.minecraft.sounds.SoundEvents.ENTITY_SALMON_FLOP :
-                                            net.minecraft.sounds.SoundEvents.ENTITY_TROPICAL_FISH_FLOP,
+                            stack.getItem() == Items.COD ? net.minecraft.sounds.SoundEvents.COD_FLOP :
+                                    stack.getItem() == Items.SALMON ? net.minecraft.sounds.SoundEvents.SALMON_FLOP :
+                                            net.minecraft.sounds.SoundEvents.TROPICAL_FISH_FLOP,
                             net.minecraft.sounds.SoundSource.PLAYERS, 1.0F, 1.75F);
-                    player.equipStack(EquipmentSlot.HEAD, stack.copyWithCount(1));
+                    player.setItemSlot(EquipmentSlot.HEAD, stack.copyWithCount(1));
                     if (!player.isCreative()) {
-                        stack.decrement(1);
+                        stack.shrink(1);
                         if (!headStack.isEmpty()) {
-                            player.giveItemStack(headStack);
+                            player.addItem(headStack);
                         }
                     }
                     return InteractionResult.SUCCESS;

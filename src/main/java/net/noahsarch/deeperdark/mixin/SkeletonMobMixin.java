@@ -65,7 +65,7 @@ public class SkeletonMobMixin implements BabySkeletonAccessor, BabyCreeperAccess
         this.deeperdark$setBabyCreeperInternal(isBaby);
     }
 
-    @Inject(method = "initialize", at = @At("TAIL"))
+    @Inject(method = "finalizeSpawn", at = @At("TAIL"))
     private void deeperdark$initialize(ServerLevelAccessor world, DifficultyInstance difficulty, EntitySpawnReason spawnReason, SpawnGroupData entityData, CallbackInfoReturnable<SpawnGroupData> cir) {
         Mob self = (Mob)(Object)this;
 
@@ -107,10 +107,10 @@ public class SkeletonMobMixin implements BabySkeletonAccessor, BabyCreeperAccess
     private void deeperdark$readCustomData(ValueInput view, CallbackInfo ci) {
         Mob self = (Mob)(Object)this;
         if (self instanceof Skeleton) {
-            this.deeperdark$setBabyInternal(view.getBoolean("DeeperDarkIsBaby", false));
+            this.deeperdark$setBabyInternal(view.getBooleanOr("DeeperDarkIsBaby", false));
         }
         if (self instanceof Creeper) {
-            this.deeperdark$setBabyCreeperInternal(view.getBoolean("DeeperDarkIsBabyCreeper", false));
+            this.deeperdark$setBabyCreeperInternal(view.getBooleanOr("DeeperDarkIsBabyCreeper", false));
         }
     }
 
@@ -119,8 +119,8 @@ public class SkeletonMobMixin implements BabySkeletonAccessor, BabyCreeperAccess
         this.deeperdark$isBaby = isBaby;
         Mob self = (Mob) (Object) this;
 
-        var scaleAttr = self.getAttributeInstance(Attributes.SCALE);
-        var speedAttr = self.getAttributeInstance(Attributes.MOVEMENT_SPEED);
+        var scaleAttr = self.getAttribute(Attributes.SCALE);
+        var speedAttr = self.getAttribute(Attributes.MOVEMENT_SPEED);
 
         if (isBaby) {
             // Set scale to half
@@ -130,7 +130,7 @@ public class SkeletonMobMixin implements BabySkeletonAccessor, BabyCreeperAccess
 
             // Add speed modifier if not present
             if (speedAttr != null && !speedAttr.hasModifier(BABY_SPEED_MODIFIER_ID)) {
-                speedAttr.addPersistentModifier(BABY_SPEED_MODIFIER);
+                speedAttr.addPermanentModifier(BABY_SPEED_MODIFIER);
             }
         } else {
             // Reset scale
@@ -150,8 +150,8 @@ public class SkeletonMobMixin implements BabySkeletonAccessor, BabyCreeperAccess
         this.deeperdark$isBabyCreeper = isBaby;
         Mob self = (Mob) (Object) this;
 
-        var scaleAttr = self.getAttributeInstance(Attributes.SCALE);
-        var speedAttr = self.getAttributeInstance(Attributes.MOVEMENT_SPEED);
+        var scaleAttr = self.getAttribute(Attributes.SCALE);
+        var speedAttr = self.getAttribute(Attributes.MOVEMENT_SPEED);
 
         if (isBaby) {
             // Set scale to half
@@ -161,7 +161,7 @@ public class SkeletonMobMixin implements BabySkeletonAccessor, BabyCreeperAccess
 
             // Add speed modifier if not present
             if (speedAttr != null && !speedAttr.hasModifier(BABY_CREEPER_SPEED_MODIFIER_ID)) {
-                speedAttr.addPersistentModifier(BABY_CREEPER_SPEED_MODIFIER);
+                speedAttr.addPermanentModifier(BABY_CREEPER_SPEED_MODIFIER);
             }
         } else {
             // Reset scale

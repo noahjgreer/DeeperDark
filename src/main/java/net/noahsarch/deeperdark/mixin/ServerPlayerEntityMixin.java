@@ -22,13 +22,12 @@ public abstract class ServerPlayerEntityMixin implements ServerPlayerAccessor {
         return this.server;
     }
 
-    @Inject(method = "copyFrom", at = @At("RETURN"))
+    @Inject(method = "restoreFrom", at = @At("RETURN"))
     private void deeperdark$copyFrom(ServerPlayer oldPlayer, boolean alive, CallbackInfo ci) {
         ServerPlayer self = (ServerPlayer) (Object) this;
 
-        // If player died (not alive) and keepInventory is on
         ServerLevel world = (ServerLevel) ((net.noahsarch.deeperdark.duck.EntityAccessor)self).deeperdark$getWorld();
-        if (!alive && world != null && world.getGameRules().getValue(GameRules.KEEP_INVENTORY)) {
+        if (!alive && world != null && world.getGameRules().get(GameRules.KEEP_INVENTORY)) {
             // Halve the XP level
             self.experienceLevel = oldPlayer.experienceLevel / 2;
             // Keep progress

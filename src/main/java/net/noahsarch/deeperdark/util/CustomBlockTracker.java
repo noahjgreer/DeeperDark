@@ -48,7 +48,7 @@ public class CustomBlockTracker {
 
     private File getSaveFile() {
         try {
-            File worldDir = world.getServer().getSavePath(net.minecraft.util.WorldSavePath.ROOT).toFile();
+            File worldDir = world.getServer().getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT).toFile();
             File dataDir = new File(worldDir, "data");
             if (!dataDir.exists()) {
                 if (!dataDir.mkdirs()) {
@@ -83,7 +83,7 @@ public class CustomBlockTracker {
                 long posLong = blockNbt.getLong("Pos").orElse(0L);
                 if (posLong == 0L) continue;
 
-                BlockPos pos = BlockPos.fromLong(posLong);
+                BlockPos pos = BlockPos.of(posLong);
                 CustomBlockData data = CustomBlockData.fromNbt(blockNbt);
                 if (data != null) {
                     blocks.put(pos, data);
@@ -121,7 +121,7 @@ public class CustomBlockTracker {
     }
 
     public void addBlock(BlockPos pos, Block baseBlock, ItemStack displayStack, Transformation transform) {
-        blocks.put(pos.toImmutable(), new CustomBlockData(baseBlock, displayStack, transform));
+        blocks.put(pos.immutable(), new CustomBlockData(baseBlock, displayStack, transform));
         needsSave = true;
     }
 
@@ -140,7 +140,7 @@ public class CustomBlockTracker {
 
     public void tick(ServerLevel world) {
         // Save every 5 minutes (6000 ticks)
-        if (needsSave && world.getTime() % 6000 == 0) {
+        if (needsSave && world.getGameTime() % 6000 == 0) {
             save();
         }
 
@@ -150,21 +150,21 @@ public class CustomBlockTracker {
             BlockPos pos = entry.getKey();
             CustomBlockData data = entry.getValue();
 
-            if (!world.isChunkLoaded(pos.getX() >> 4, pos.getZ() >> 4)) continue;
+            if (!world.isLoaded(pos)) continue;
 
             BlockState state = world.getBlockState(pos);
 
             // Special handling for cauldrons - they can change between CAULDRON, WATER_CAULDRON, LAVA_CAULDRON, etc.
-            boolean isCauldronVariant = state.isOf(net.minecraft.world.level.block.Blocks.CAULDRON) ||
-                                       state.isOf(net.minecraft.world.level.block.Blocks.WATER_CAULDRON) ||
-                                       state.isOf(net.minecraft.world.level.block.Blocks.LAVA_CAULDRON) ||
-                                       state.isOf(net.minecraft.world.level.block.Blocks.POWDER_SNOW_CAULDRON);
+            boolean isCauldronVariant = state.is(net.minecraft.world.level.block.Blocks.CAULDRON) ||
+                                       state.is(net.minecraft.world.level.block.Blocks.WATER_CAULDRON) ||
+                                       state.is(net.minecraft.world.level.block.Blocks.LAVA_CAULDRON) ||
+                                       state.is(net.minecraft.world.level.block.Blocks.POWDER_SNOW_CAULDRON);
 
             boolean baseCauldron = data.baseBlock == net.minecraft.world.level.block.Blocks.CAULDRON;
 
             // If base is cauldron and current state is any cauldron variant, keep tracking
             // Otherwise use normal base block check
-            if (baseCauldron ? !isCauldronVariant : !state.isOf(data.baseBlock)) {
+            if (baseCauldron ? !isCauldronVariant : !state.is(data.baseBlock)) {
                  removeEntity(world, pos);
                  it.remove();
                  needsSave = true;
@@ -177,22 +177,22 @@ public class CustomBlockTracker {
 
     private void removeEntity(ServerLevel world, BlockPos pos) {
         AABB box = new AABB(pos); // Strict box
-        List<ItemDisplayEntity> entities = world.getEntitiesByClass(ItemDisplayEntity.class, box, entity -> true);
-        for (ItemDisplayEntity entity : entities) {
+        List<ItemDisplay> entities = world.getEntitiesOfClass(ItemDisplay.class, box, entity -> true);
+        for (ItemDisplay entity : entities) {
             entity.discard();
         }
     }
 
     private void ensureEntity(ServerLevel world, BlockPos pos, CustomBlockData data) {
         AABB box = new AABB(pos); // Strict box
-        List<ItemDisplayEntity> entities = world.getEntitiesByClass(ItemDisplayEntity.class, box, entity -> !entity.isRemoved());
+        List<ItemDisplay> entities = world.getEntitiesOfClass(ItemDisplay.class, box, entity -> !entity.isRemoved());
 
         if (entities.isEmpty()) {
             spawnEntity(world, pos, data);
         } else {
             // Update brightness
             net.minecraft.util.Brightness brightness = getBrightness(world, pos);
-            entities.getFirst().setBrightness(brightness);
+            entities.getFirst().setBrightnessOverride(brightness);
 
             // Removing duplicates
             if (entities.size() > 1) {
@@ -208,9 +208,9 @@ public class CustomBlockTracker {
         int maxSky = 0;
 
         for (Direction dir : Direction.values()) {
-            BlockPos neighbor = pos.offset(dir);
-            int block = world.getLightLevel(net.minecraft.world.LightType.BLOCK, neighbor);
-            int sky = world.getLightLevel(net.minecraft.world.LightType.SKY, neighbor);
+            BlockPos neighbor = pos.relative(dir);
+            int block = world.getBrightness(net.minecraft.world.level.LightLayer.BLOCK, neighbor);
+            int sky = world.getBrightness(net.minecraft.world.level.LightLayer.SKY, neighbor);
             if (block > maxBlock) maxBlock = block;
             if (sky > maxSky) maxSky = sky;
         }
@@ -218,14 +218,14 @@ public class CustomBlockTracker {
     }
 
     private void spawnEntity(ServerLevel world, BlockPos pos, CustomBlockData data) {
-        ItemDisplayEntity display = EntityType.ITEM_DISPLAY.create(world, EntitySpawnReason.MOB_SUMMONED);
+        ItemDisplay display = EntityType.ITEM_DISPLAY.create(world, EntitySpawnReason.MOB_SUMMONED);
         if (display != null) {
-            display.refreshPositionAndAngles(pos.getX() + 0.5, pos.getY() + 0.5005, pos.getZ() + 0.5, 0, 0);
+            display.setPos(pos.getX() + 0.5, pos.getY() + 0.5005, pos.getZ() + 0.5);
 
             ItemStack displayStack = data.displayStack.copy();
             displayStack.setCount(1);
             display.setItemStack(displayStack);
-            display.setItemDisplayContext(ItemDisplayContext.HEAD);
+            display.setItemTransform(ItemDisplayContext.HEAD);
 
             Transformation transform = Objects.requireNonNullElseGet(data.transform, () ->
                 new Transformation(
@@ -237,9 +237,9 @@ public class CustomBlockTracker {
             );
             display.setTransformation(transform);
 
-            display.setBrightness(getBrightness(world, pos));
+            display.setBrightnessOverride(getBrightness(world, pos));
 
-            world.spawnEntity(display);
+            world.addFreshEntity(display);
         }
     }
 
@@ -256,19 +256,19 @@ public class CustomBlockTracker {
 
         public void writeNbt(CompoundTag nbt) {
             // Store block identifier
-            Identifier blockId = Registries.BLOCK.getId(baseBlock);
+            Identifier blockId = BuiltInRegistries.BLOCK.getKey(baseBlock);
             nbt.putString("Block", blockId.toString());
 
             // Store display stack - serialize manually
             CompoundTag stackNbt = new CompoundTag();
-            Identifier itemId = Registries.ITEM.getId(displayStack.getItem());
+            Identifier itemId = BuiltInRegistries.ITEM.getKey(displayStack.getItem());
             stackNbt.putString("id", itemId.toString());
             stackNbt.putInt("count", displayStack.getCount());
 
             // Store components if they exist
             if (!displayStack.getComponents().isEmpty()) {
                 // Store the model ID if present
-                if (displayStack.contains(net.minecraft.core.component.DataComponents.ITEM_MODEL)) {
+                if (displayStack.has(net.minecraft.core.component.DataComponents.ITEM_MODEL)) {
                     Identifier modelId = displayStack.get(net.minecraft.core.component.DataComponents.ITEM_MODEL);
                     if (modelId != null) {
                         stackNbt.putString("model", modelId.toString());
@@ -276,11 +276,11 @@ public class CustomBlockTracker {
                 }
 
                 // Store the item name if present (important for custom names!)
-                if (displayStack.contains(net.minecraft.core.component.DataComponents.ITEM_NAME)) {
+                if (displayStack.has(net.minecraft.core.component.DataComponents.ITEM_NAME)) {
                     net.minecraft.network.chat.Component itemName = displayStack.get(net.minecraft.core.component.DataComponents.ITEM_NAME);
                     if (itemName != null) {
                         // Get the content to check if it's translatable
-                        var content = itemName.getContent();
+                        var content = itemName.getContents();
                         if (content instanceof net.minecraft.network.chat.contents.TranslatableContents translatableContent) {
                             // Store as translation key
                             stackNbt.putString("itemNameKey", translatableContent.getKey());
@@ -301,26 +301,26 @@ public class CustomBlockTracker {
 
                 // Get components by creating new vectors to hold the data
                 Vector3f translation = new Vector3f();
-                transform.getTranslation().get(translation);
+                transform.translation().get(translation);
                 transformNbt.putFloat("tx", translation.x);
                 transformNbt.putFloat("ty", translation.y);
                 transformNbt.putFloat("tz", translation.z);
 
                 Quaternionf leftRotation = new Quaternionf();
-                transform.getLeftRotation().get(leftRotation);
+                transform.leftRotation().get(leftRotation);
                 transformNbt.putFloat("lrx", leftRotation.x);
                 transformNbt.putFloat("lry", leftRotation.y);
                 transformNbt.putFloat("lrz", leftRotation.z);
                 transformNbt.putFloat("lrw", leftRotation.w);
 
                 Vector3f scale = new Vector3f();
-                transform.getScale().get(scale);
+                transform.scale().get(scale);
                 transformNbt.putFloat("sx", scale.x);
                 transformNbt.putFloat("sy", scale.y);
                 transformNbt.putFloat("sz", scale.z);
 
                 Quaternionf rightRotation = new Quaternionf();
-                transform.getRightRotation().get(rightRotation);
+                transform.rightRotation().get(rightRotation);
                 transformNbt.putFloat("rrx", rightRotation.x);
                 transformNbt.putFloat("rry", rightRotation.y);
                 transformNbt.putFloat("rrz", rightRotation.z);
@@ -339,7 +339,7 @@ public class CustomBlockTracker {
                 Identifier blockId = Identifier.tryParse(blockIdStr);
                 if (blockId == null) return null;
 
-                Block block = Registries.BLOCK.get(blockId);
+                Block block = BuiltInRegistries.BLOCK.getValue(blockId);
 
                 // Read display stack
                 CompoundTag stackNbt = nbt.getCompound("DisplayStack").orElse(null);
@@ -351,7 +351,7 @@ public class CustomBlockTracker {
                 Identifier itemId = Identifier.tryParse(itemIdStr);
                 if (itemId == null) return null;
 
-                net.minecraft.world.item.Item item = Registries.ITEM.get(itemId);
+                net.minecraft.world.item.Item item = BuiltInRegistries.ITEM.getValue(itemId);
                 int count = stackNbt.getInt("count").orElse(1);
 
                 ItemStack displayStack = new ItemStack(item, count);

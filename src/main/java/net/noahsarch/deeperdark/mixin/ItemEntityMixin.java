@@ -31,66 +31,47 @@ public abstract class ItemEntityMixin extends Entity {
 
     @Inject(method = "tick", at = @At("HEAD"))
     private void deeperdark$applyBorderForce(CallbackInfo ci) {
-        if (!((EntityAccessor)(Object)this).deeperdark$getWorld().isClient()) {
+        if (!((EntityAccessor)(Object)this).deeperdark$getWorld().isClientSide()) {
             net.noahsarch.deeperdark.event.WorldBorderHandler.applyBorderForce(this);
         }
     }
 
-    /**
-     * Store velocity at the start of tick to detect explosion changes
-     */
     @Inject(method = "tick", at = @At("HEAD"))
     private void deeperdark$storeVelocityBeforeTick(CallbackInfo ci) {
-        this.deeperdark$lastVelocity = this.getVelocity();
+        this.deeperdark$lastVelocity = this.getDeltaMovement();
     }
 
-    /**
-     * After tick completes, check if velocity changed significantly (likely from explosion)
-     * and multiply it to make items fly farther (if enabled in config)
-     */
     @Inject(method = "tick", at = @At("RETURN"))
     private void deeperdark$amplifyExplosionVelocity(CallbackInfo ci) {
         DeeperDarkConfig.ConfigInstance config = DeeperDarkConfig.get();
 
-        // Only apply velocity multiplier if enabled in config
         if (!config.explosionItemKnockbackEnabled) {
             return;
         }
 
-        if (!this.getEntityWorld().isClient()) {
-            Vec3 currentVelocity = this.getVelocity();
+        if (!this.level().isClientSide()) {
+            Vec3 currentVelocity = this.getDeltaMovement();
             Vec3 velocityChange = currentVelocity.subtract(this.deeperdark$lastVelocity);
 
-            // If velocity changed significantly in one tick, it's likely from an explosion
-            // (or other external force). Amplify it!
-            double changeSquared = velocityChange.lengthSquared();
-            if (changeSquared > 0.01) { // Threshold to detect explosion knockback
-                // Multiply the velocity change by the configured multiplier
+            double changeSquared = velocityChange.lengthSqr();
+            if (changeSquared > 0.01) {
                 double multiplier = config.explosionItemKnockbackMultiplier;
-                Vec3 amplifiedChange = velocityChange.multiply(multiplier);
-                this.setVelocity(this.deeperdark$lastVelocity.add(amplifiedChange));
-                this.velocityDirty = true;
+                Vec3 amplifiedChange = velocityChange.scale(multiplier);
+                this.setDeltaMovement(this.deeperdark$lastVelocity.add(amplifiedChange));
+                this.hurtMarked = true;
             }
         }
     }
 
-    @Inject(method = "damage", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "hurtServer", at = @At("HEAD"), cancellable = true)
     private void deeperdark$preventExplosionDamage(ServerLevel world, DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-        if (source.isIn(DamageTypeTags.IS_EXPLOSION)) {
+        if (source.is(DamageTypeTags.IS_EXPLOSION)) {
             cir.setReturnValue(false);
         }
     }
 
-    /**
-     * Allow items to be affected by explosion knockback (velocity) while preventing damage.
-     * By default, ItemEntity.isImmuneToExplosion returns true, which causes explosions to skip
-     * items entirely (no damage AND no velocity). We override this to return false so the explosion
-     * applies velocity, but our damage injection above prevents the actual damage.
-     */
-    @Inject(method = "isImmuneToExplosion", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "ignoreExplosion", at = @At("HEAD"), cancellable = true)
     private void deeperdark$allowExplosionKnockback(Explosion explosion, CallbackInfoReturnable<Boolean> cir) {
-        // Return false to allow explosion physics to apply (velocity/knockback)
-        // The damage is still prevented by the deeperdark$preventExplosionDamage injection
         cir.setReturnValue(false);
     }
 }

@@ -17,9 +17,12 @@ public abstract class ServerPlayNetworkHandlerChatSoundMixin {
     @Shadow
     public ServerPlayer player;
 
-    @Inject(method = "onChatMessage", at = @At("TAIL"))
+    @Shadow
+    protected MinecraftServer server;
+
+    @Inject(method = "handleChat", at = @At("TAIL"))
     private void deeperdark$playChatSound(ServerboundChatPacket packet, CallbackInfo ci) {
-        MinecraftServer server = this.player.getEntityWorld().getServer();
+        MinecraftServer server = this.server;
         if (server == null) {
             return;
         }

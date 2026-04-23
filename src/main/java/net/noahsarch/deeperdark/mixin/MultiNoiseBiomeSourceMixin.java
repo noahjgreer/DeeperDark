@@ -7,34 +7,32 @@ import net.minecraft.world.level.biome.MultiNoiseBiomeSource;
 import net.minecraft.world.level.biome.Climate;
 import net.noahsarch.deeperdark.DeepDarkBiomeModifier;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import java.util.stream.Stream;
 
 @Mixin(MultiNoiseBiomeSource.class)
-public class MultiNoiseBiomeSourceMixin {
-    @Inject(method = "getBiome", at = @At("RETURN"), cancellable = true)
+public abstract class MultiNoiseBiomeSourceMixin {
+
+    @Shadow protected abstract Stream<Holder<Biome>> collectPossibleBiomes();
+    @Inject(method = "getNoiseBiome", at = @At("RETURN"), cancellable = true)
     private void injectDeepDarkBiome(int biomeX, int biomeY, int biomeZ, Climate.Sampler noiseSampler, CallbackInfoReturnable<Holder<Biome>> cir) {
-        // Convert from biome coordinates to block coordinates
         int blockY = QuartPos.toBlock(biomeY);
 
-        // If below Y-54, replace with Deep Dark biome
         if (blockY < -54) {
             Holder<Biome> currentBiome = cir.getReturnValue();
 
-            // If already Deep Dark, no change needed
-            if (currentBiome != null && currentBiome.matchesKey(DeepDarkBiomeModifier.DEEP_DARK)) {
+            if (currentBiome != null && currentBiome.is(DeepDarkBiomeModifier.DEEP_DARK)) {
                 return;
             }
 
-            // Find Deep Dark biome in available biomes
-            MultiNoiseBiomeSource source = (MultiNoiseBiomeSource)(Object)this;
-            for (Holder<Biome> entry : source.getBiomes()) {
-                if (entry.matchesKey(DeepDarkBiomeModifier.DEEP_DARK)) {
+            this.collectPossibleBiomes().forEach(entry -> {
+                if (entry.is(DeepDarkBiomeModifier.DEEP_DARK)) {
                     cir.setReturnValue(entry);
-                    return;
                 }
-            }
+            });
         }
     }
 }

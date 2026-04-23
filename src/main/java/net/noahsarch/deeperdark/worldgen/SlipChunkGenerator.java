@@ -58,7 +58,7 @@ public class SlipChunkGenerator extends ChunkGenerator {
     private void ensureTemplateLoaded(MinecraftServer server) {
         if (!templatesLoaded && server != null) {
             try {
-                StructureTemplateManager manager = server.getStructureTemplateManager();
+                StructureTemplateManager manager = server.getStructureManager();
                 Deeperdark.LOGGER.info("Attempting to load templates from StructureTemplateManager: {}", manager != null);
 
                 if (manager == null) {
@@ -77,7 +77,7 @@ public class SlipChunkGenerator extends ChunkGenerator {
                 for (String path : possiblePaths) {
                     Identifier templateId = Identifier.fromNamespaceAndPath("minecraft", path);
                     Deeperdark.LOGGER.info("Trying to load template: {}", templateId);
-                    Optional<StructureTemplate> template = manager.getTemplate(templateId);
+                    Optional<StructureTemplate> template = manager.get(templateId);
 
                     if (template.isPresent()) {
                         roomTemplate = template.get();
@@ -97,7 +97,7 @@ public class SlipChunkGenerator extends ChunkGenerator {
                 for (String path : new String[]{"the_slip/room1", "structure/the_slip/room1"}) {
                     Identifier room1TemplateId = Identifier.fromNamespaceAndPath("minecraft", path);
                     Deeperdark.LOGGER.info("Trying to load template: {}", room1TemplateId);
-                    Optional<StructureTemplate> room1Template = manager.getTemplate(room1TemplateId);
+                    Optional<StructureTemplate> room1Template = manager.get(room1TemplateId);
 
                     if (room1Template.isPresent()) {
                         this.room1Template = room1Template.get();
@@ -116,7 +116,7 @@ public class SlipChunkGenerator extends ChunkGenerator {
                 for (String path : new String[]{"the_slip/room_hole", "structure/the_slip/room_hole"}) {
                     Identifier holeTemplateId = Identifier.fromNamespaceAndPath("minecraft", path);
                     Deeperdark.LOGGER.info("Trying to load template: {}", holeTemplateId);
-                    Optional<StructureTemplate> holeTemplate = manager.getTemplate(holeTemplateId);
+                    Optional<StructureTemplate> holeTemplate = manager.get(holeTemplateId);
 
                     if (holeTemplate.isPresent()) {
                         roomHoleTemplate = holeTemplate.get();
@@ -233,7 +233,7 @@ public class SlipChunkGenerator extends ChunkGenerator {
         // This prevents empty air chunks when templates aren't loaded yet
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
-                for (int y = chunk.getBottomY(); y < chunk.getBottomY() + chunk.getHeight(); y++) {
+                for (int y = chunk.getMinY(); y < chunk.getMinY() + chunk.getHeight(); y++) {
                     // Create a simple pattern
                     if (y < 0) {
                         chunk.setBlockState(new BlockPos(x, y, z), Blocks.DEEPSLATE.defaultBlockState(), 0);
@@ -249,8 +249,8 @@ public class SlipChunkGenerator extends ChunkGenerator {
 
     private void generateRoomBasedTerrain(ChunkAccess chunk) {
         ChunkPos chunkPos = chunk.getPos();
-        int chunkStartX = chunkPos.getStartX();
-        int chunkStartZ = chunkPos.getStartZ();
+        int chunkStartX = chunkPos.getMinBlockX();
+        int chunkStartZ = chunkPos.getMinBlockZ();
 
         int roomSizeX = roomSize.getX();
         int roomSizeY = roomSize.getY();
@@ -375,27 +375,23 @@ public class SlipChunkGenerator extends ChunkGenerator {
         int roomWorldZ = roomZ * roomSizeZ;
 
         ChunkPos chunkPos = chunk.getPos();
-        int chunkStartX = chunkPos.getStartX();
-        int chunkStartZ = chunkPos.getStartZ();
+        int chunkStartX = chunkPos.getMinBlockX();
+        int chunkStartZ = chunkPos.getMinBlockZ();
 
-        int chunkTopY = chunk.getBottomY() + chunk.getHeight();
+        int chunkTopY = chunk.getMinY() + chunk.getHeight();
 
-        // Use reflection to access the private blockInfoLists field
+        // Use reflection to access the private palettes field
         try {
-            java.lang.reflect.Field field = StructureTemplate.class.getDeclaredField("blockInfoLists");
+            java.lang.reflect.Field field = StructureTemplate.class.getDeclaredField("palettes");
             field.setAccessible(true);
             @SuppressWarnings("unchecked")
-            List<StructureTemplate.PalettedBlockInfoList> palettes =
-                (List<StructureTemplate.PalettedBlockInfoList>) field.get(template);
+            List<StructureTemplate.Palette> palettes =
+                (List<StructureTemplate.Palette>) field.get(template);
 
             if (palettes.isEmpty()) return;
 
             // Get all blocks from the first palette
-            java.lang.reflect.Method getAllMethod = StructureTemplate.PalettedBlockInfoList.class.getDeclaredMethod("getAll");
-            getAllMethod.setAccessible(true);
-            @SuppressWarnings("unchecked")
-            List<StructureTemplate.StructureBlockInfo> blockInfos =
-                (List<StructureTemplate.StructureBlockInfo>) getAllMethod.invoke(palettes.getFirst());
+            List<StructureTemplate.StructureBlockInfo> blockInfos = palettes.getFirst().blocks();
 
             // Place each block from the template
             for (StructureTemplate.StructureBlockInfo blockInfo : blockInfos) {
@@ -411,7 +407,7 @@ public class SlipChunkGenerator extends ChunkGenerator {
                 // Check if this block is within the current chunk
                 if (worldX >= chunkStartX && worldX < chunkStartX + 16 &&
                     worldZ >= chunkStartZ && worldZ < chunkStartZ + 16 &&
-                    worldY >= chunk.getBottomY() && worldY < chunkTopY) {
+                    worldY >= chunk.getMinY() && worldY < chunkTopY) {
 
                     BlockState blockState = blockInfo.state();
 

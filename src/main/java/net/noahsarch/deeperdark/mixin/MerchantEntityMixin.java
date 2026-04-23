@@ -13,7 +13,7 @@ public class MerchantEntityMixin {
     @Inject(method = "<init>", at = @org.spongepowered.asm.mixin.injection.At("TAIL"))
     private void addEmeraldTemptGoal(CallbackInfo callbackInfo) {
         AbstractVillager self = (AbstractVillager)(Object)this;
-        ((MobEntityAccessor)self).getGoalSelector().add(4, new SimpleTemptGoal(self, 0.5));
+        ((MobEntityAccessor)self).getGoalSelector().addGoal(4, new SimpleTemptGoal(self, 0.5));
     }
 
     @Overwrite

@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(AbstractSkeleton.class)
 public class AbstractSkeletonEntityMixin {
 
-    @Inject(method = "createArrowProjectile", at = @At("RETURN"))
+    @Inject(method = "getArrow", at = @At("RETURN"))
     private void onCreateArrowProjectile(ItemStack arrow, float damageModifier, ItemStack shotFrom, CallbackInfoReturnable<AbstractArrow> cir) {
         // Check if this entity actually implements MobEntityExtension before casting
         if (!(this instanceof MobEntityExtension)) {

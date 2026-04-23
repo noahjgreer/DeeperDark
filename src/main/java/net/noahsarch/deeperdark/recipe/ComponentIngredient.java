@@ -28,9 +28,9 @@ public class ComponentIngredient implements CustomIngredient {
         if (stack.getItem() != prototype.getItem()) return false;
 
         // Match explicit component changes required by the recipe
-        net.minecraft.core.component.ComponentChanges changes = prototype.getComponentChanges();
-        for (java.util.Map.Entry<net.minecraft.core.component.ComponentType<?>, java.util.Optional<?>> entry : changes.entrySet()) {
-            net.minecraft.core.component.ComponentType<?> type = entry.getKey();
+        net.minecraft.core.component.DataComponentPatch changes = prototype.getComponentsPatch();
+        for (java.util.Map.Entry<net.minecraft.core.component.DataComponentType<?>, java.util.Optional<?>> entry : changes.entrySet()) {
+            net.minecraft.core.component.DataComponentType<?> type = entry.getKey();
             java.util.Optional<?> requiredValue = entry.getValue();
 
             if (requiredValue.isPresent()) {
@@ -40,7 +40,7 @@ public class ComponentIngredient implements CustomIngredient {
                 }
             } else {
                 // Requirement: Stack must NOT have this component
-                if (stack.contains(type)) {
+                if (stack.has(type)) {
                     return false;
                 }
             }
@@ -49,8 +49,8 @@ public class ComponentIngredient implements CustomIngredient {
     }
 
     @Override
-    public Stream<Holder<Item>> getMatchingItems() {
-        return Stream.of(prototype.getItem().getRegistryEntry());
+    public Stream<Holder<Item>> items() {
+        return Stream.of(prototype.getItem().builtInRegistryHolder());
     }
 
     // @Override // Not part of interface in this version, but useful as helper or for other mods
@@ -79,8 +79,8 @@ public class ComponentIngredient implements CustomIngredient {
         );
 
         // Packet Codec for Sync
-        private static final StreamCodec<RegistryFriendlyByteBuf, ComponentIngredient> PACKET_CODEC = ItemStack.PACKET_CODEC
-            .xmap(ComponentIngredient::new, i -> i.prototype);
+        private static final StreamCodec<RegistryFriendlyByteBuf, ComponentIngredient> STREAM_CODEC = ItemStack.STREAM_CODEC
+            .map(ComponentIngredient::new, i -> i.prototype);
 
         @Override
         public Identifier getIdentifier() {
@@ -93,8 +93,8 @@ public class ComponentIngredient implements CustomIngredient {
         }
 
         @Override
-        public StreamCodec<RegistryFriendlyByteBuf, ComponentIngredient> getPacketCodec() {
-            return PACKET_CODEC;
+        public StreamCodec<RegistryFriendlyByteBuf, ComponentIngredient> getStreamCodec() {
+            return STREAM_CODEC;
         }
     }
 }

@@ -15,8 +15,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(StructureBlockEntity.class)
 public abstract class StructureBlockBlockEntityMixin {
 
-    @Shadow private BlockPos offset;
-    @Shadow private Vec3i size;
+    @Shadow private BlockPos structurePos;
+    @Shadow private Vec3i structureSize;
 
     @Unique
     private static final BlockPos DEFAULT_OFFSET = new BlockPos(0, 1, 0);
@@ -32,15 +32,15 @@ public abstract class StructureBlockBlockEntityMixin {
     @Inject(method = "loadAdditional", at = @At("TAIL"))
     private void onReadData(ValueInput view, CallbackInfo ci) {
         // Override the offset with larger limits
-        int i = Mth.clamp(view.getInt("posX", DEFAULT_OFFSET.getX()), -MAX_OFFSET, MAX_OFFSET);
-        int j = Mth.clamp(view.getInt("posY", DEFAULT_OFFSET.getY()), -MAX_OFFSET, MAX_OFFSET);
-        int k = Mth.clamp(view.getInt("posZ", DEFAULT_OFFSET.getZ()), -MAX_OFFSET, MAX_OFFSET);
-        this.offset = new BlockPos(i, j, k);
+        int i = Mth.clamp(view.getIntOr("posX", DEFAULT_OFFSET.getX()), -MAX_OFFSET, MAX_OFFSET);
+        int j = Mth.clamp(view.getIntOr("posY", DEFAULT_OFFSET.getY()), -MAX_OFFSET, MAX_OFFSET);
+        int k = Mth.clamp(view.getIntOr("posZ", DEFAULT_OFFSET.getZ()), -MAX_OFFSET, MAX_OFFSET);
+        this.structurePos = new BlockPos(i, j, k);
 
         // Override the size with larger limits
-        int l = Mth.clamp(view.getInt("sizeX", DEFAULT_SIZE.getX()), 0, MAX_STRUCTURE_SIZE);
-        int m = Mth.clamp(view.getInt("sizeY", DEFAULT_SIZE.getY()), 0, MAX_STRUCTURE_SIZE);
-        int n = Mth.clamp(view.getInt("sizeZ", DEFAULT_SIZE.getZ()), 0, MAX_STRUCTURE_SIZE);
-        this.size = new Vec3i(l, m, n);
+        int l = Mth.clamp(view.getIntOr("sizeX", DEFAULT_SIZE.getX()), 0, MAX_STRUCTURE_SIZE);
+        int m = Mth.clamp(view.getIntOr("sizeY", DEFAULT_SIZE.getY()), 0, MAX_STRUCTURE_SIZE);
+        int n = Mth.clamp(view.getIntOr("sizeZ", DEFAULT_SIZE.getZ()), 0, MAX_STRUCTURE_SIZE);
+        this.structureSize = new Vec3i(l, m, n);
     }
 }

@@ -45,7 +45,7 @@ public class CreaturePathfinder {
 
         // Needs 3 blocks of air vertically (no solid blocks, no fluids)
         for (int dy = 0; dy < 3; dy++) {
-            BlockPos check = pos.up(dy);
+            BlockPos check = pos.above(dy);
             BlockState state = world.getBlockState(check);
             if (!state.isAir()) {
                 if (debug) LOGGER.info("[Creature] Position {} blocked at y+{} by {}", pos, dy, state.getBlock());
@@ -54,21 +54,21 @@ public class CreaturePathfinder {
         }
 
         // Must have solid ground below
-        BlockPos below = pos.down();
-        if (!world.getBlockState(below).isSolidBlock(world, below)) {
+        BlockPos below = pos.below();
+        if (!world.getBlockState(below).isSolid()) {
             if (debug) LOGGER.info("[Creature] Position {} has no solid floor", pos);
             return false;
         }
 
         // Must have a ceiling at exactly 3 blocks (preferred height)
-        BlockPos ceiling = pos.up(3);
-        boolean hasCeiling = world.getBlockState(ceiling).isSolidBlock(world, ceiling);
+        BlockPos ceiling = pos.above(3);
+        boolean hasCeiling = world.getBlockState(ceiling).isSolid();
 
         // Must be adjacent to at least one solid block (wall/corner) - not standing in the open
         int adjacentWalls = 0;
         for (Direction dir : HORIZONTAL_DIRS) {
-            BlockPos adjacent = pos.offset(dir);
-            if (world.getBlockState(adjacent).isSolidBlock(world, adjacent)) {
+            BlockPos adjacent = pos.relative(dir);
+            if (world.getBlockState(adjacent).isSolid()) {
                 adjacentWalls++;
             }
         }
@@ -89,16 +89,16 @@ public class CreaturePathfinder {
         int score = 0;
 
         // Prefer positions with ceiling at exactly 3 blocks
-        BlockPos ceiling = pos.up(3);
-        if (world.getBlockState(ceiling).isSolidBlock(world, ceiling)) {
+        BlockPos ceiling = pos.above(3);
+        if (world.getBlockState(ceiling).isSolid()) {
             score += 10;
         }
 
         // Count adjacent walls - more walls = more hidden
         int adjacentWalls = 0;
         for (Direction dir : HORIZONTAL_DIRS) {
-            BlockPos adjacent = pos.offset(dir);
-            if (world.getBlockState(adjacent).isSolidBlock(world, adjacent)) {
+            BlockPos adjacent = pos.relative(dir);
+            if (world.getBlockState(adjacent).isSolid()) {
                 adjacentWalls++;
             }
         }
@@ -110,7 +110,7 @@ public class CreaturePathfinder {
         }
 
         // Bonus for darker areas (no sky access)
-        if (!world.isSkyVisible(pos)) {
+        if (!world.canSeeSky(pos)) {
             score += 5;
         }
 
@@ -195,7 +195,7 @@ public class CreaturePathfinder {
         // Build the actual path from player to creature for copper trail
         List<BlockPos> trailPath = buildPathBFS(world, startPos, bestPos, maxY);
 
-        return PathResult.success(Vec3.ofBottomCenter(bestPos), trailPath);
+        return PathResult.success(Vec3.atBottomCenterOf(bestPos), trailPath);
     }
 
     /**
@@ -208,7 +208,7 @@ public class CreaturePathfinder {
                                               boolean debug) {
         if (debug) LOGGER.info("[Creature] Starting radial placement from {}", playerPos);
 
-        RandomSource rand = new RandomSource();
+        RandomSource rand = RandomSource.create();
         List<BlockPos> candidates = new ArrayList<>();
 
         // Sample random points within the sphere
@@ -223,11 +223,11 @@ public class CreaturePathfinder {
             int dy = (int) (distance * Math.cos(phi));
             int dz = (int) (distance * Math.sin(phi) * Math.sin(theta));
 
-            BlockPos candidate = playerPos.add(dx, dy, dz);
+            BlockPos candidate = playerPos.offset(dx, dy, dz);
 
             // Skip if above max Y
             if (candidate.getY() > maxY) continue;
-            if (candidate.getY() < world.getBottomY()) continue;
+            if (candidate.getY() < world.getMinY()) continue;
 
             // Check if this is a valid placement
             if (isValidPlacement(world, candidate, maxY, false)) {
@@ -251,7 +251,7 @@ public class CreaturePathfinder {
         List<BlockPos> trailPath = buildPathBFS(world, findNearestAirAboveSolid(world, playerPos), bestPos, maxY);
 
         if (debug) LOGGER.info("[Creature] Radial placement selected: {}", bestPos);
-        return PathResult.success(Vec3.ofBottomCenter(bestPos), trailPath);
+        return PathResult.success(Vec3.atBottomCenterOf(bestPos), trailPath);
     }
 
     /**
@@ -266,7 +266,7 @@ public class CreaturePathfinder {
      * Finds a chase placement position within the specified distance range.
      */
     public static BlockPos findChasePosition(ServerLevel world, BlockPos playerPos, int minDist, int maxDist, int maxY, boolean debug) {
-        RandomSource rand = new RandomSource();
+        RandomSource rand = RandomSource.create();
         List<BlockPos> candidates = new ArrayList<>();
 
         int sampleAttempts = 300;
@@ -279,8 +279,8 @@ public class CreaturePathfinder {
 
             // Search for valid Y level
             for (int dy = -10; dy <= 10; dy++) {
-                BlockPos candidate = playerPos.add(dx, dy, dz);
-                if (candidate.getY() > maxY || candidate.getY() < world.getBottomY()) continue;
+                BlockPos candidate = playerPos.offset(dx, dy, dz);
+                if (candidate.getY() > maxY || candidate.getY() < world.getMinY()) continue;
 
                 if (isValidPlacement(world, candidate, maxY, false)) {
                     candidates.add(candidate);
@@ -303,7 +303,7 @@ public class CreaturePathfinder {
                                          Queue<BlockPos> queue, Set<BlockPos> visited,
                                          Map<BlockPos, Integer> distanceMap, int newDist,
                                          int maxDist, int maxY) {
-        BlockPos next = current.offset(dir);
+        BlockPos next = current.relative(dir);
         if (visited.contains(next) || next.getY() > maxY) return;
         if (newDist > maxDist) return;
 
@@ -311,18 +311,18 @@ public class CreaturePathfinder {
         BlockState state = world.getBlockState(next);
         if (!state.isAir()) {
             // Try stepping up or down
-            BlockPos stepUp = next.up();
-            BlockPos stepDown = next.down();
+            BlockPos stepUp = next.above();
+            BlockPos stepDown = next.below();
 
             if (!visited.contains(stepUp) && world.getBlockState(stepUp).isAir()
-                    && world.getBlockState(stepUp.up()).isAir() && stepUp.getY() <= maxY) {
+                    && world.getBlockState(stepUp.above()).isAir() && stepUp.getY() <= maxY) {
                 visited.add(stepUp);
                 distanceMap.put(stepUp, newDist);
                 queue.add(stepUp);
             }
             if (!visited.contains(stepDown) && world.getBlockState(stepDown).isAir()
-                    && world.getBlockState(stepDown.up()).isAir()
-                    && world.getBlockState(stepDown.down()).isSolidBlock(world, stepDown.down())) {
+                    && world.getBlockState(stepDown.above()).isAir()
+                    && world.getBlockState(stepDown.below()).isSolid()) {
                 visited.add(stepDown);
                 distanceMap.put(stepDown, newDist);
                 queue.add(stepDown);
@@ -331,12 +331,12 @@ public class CreaturePathfinder {
         }
 
         // Check that we can stand here (solid block below, or at least air going down to solid)
-        BlockPos below = next.down();
-        if (!world.getBlockState(below).isSolidBlock(world, below)) {
+        BlockPos below = next.below();
+        if (!world.getBlockState(below).isSolid()) {
             // Check if we can stand after dropping 1-2 blocks
-            BlockPos dropOne = next.down(2);
-            if (world.getBlockState(next.down()).isAir() && world.getBlockState(dropOne).isSolidBlock(world, dropOne)) {
-                BlockPos landPos = next.down();
+            BlockPos dropOne = next.below(2);
+            if (world.getBlockState(next.below()).isAir() && world.getBlockState(dropOne).isSolid()) {
+                BlockPos landPos = next.below();
                 if (!visited.contains(landPos)) {
                     visited.add(landPos);
                     distanceMap.put(landPos, newDist);
@@ -358,14 +358,14 @@ public class CreaturePathfinder {
                                          Map<BlockPos, Integer> distanceMap, int newDist,
                                          int maxDist, int maxY) {
         // Check going up (jumping/climbing)
-        BlockPos up = current.up(2);
+        BlockPos up = current.above(2);
         if (!visited.contains(up) && world.getBlockState(up).isAir()
-                && world.getBlockState(up.up()).isAir() && up.getY() <= maxY
+                && world.getBlockState(up.above()).isAir() && up.getY() <= maxY
                 && newDist <= maxDist) {
             // Can jump up if there's a solid block to stand on
-            BlockPos upBelow = up.down();
-            if (world.getBlockState(upBelow).isSolidBlock(world, upBelow) ||
-                    world.getBlockState(current.up()).isSolidBlock(world, current.up())) {
+            BlockPos upBelow = up.below();
+            if (world.getBlockState(upBelow).isSolid() ||
+                    world.getBlockState(current.above()).isSolid()) {
                 visited.add(up);
                 distanceMap.put(up, newDist);
                 queue.add(up);
@@ -373,10 +373,10 @@ public class CreaturePathfinder {
         }
 
         // Check going down (falling)
-        BlockPos down = current.down(2);
-        if (!visited.contains(down) && down.getY() >= world.getBottomY()
+        BlockPos down = current.below(2);
+        if (!visited.contains(down) && down.getY() >= world.getMinY()
                 && world.getBlockState(down).isAir()
-                && world.getBlockState(down.down()).isSolidBlock(world, down.down())
+                && world.getBlockState(down.below()).isSolid()
                 && newDist <= maxDist) {
             visited.add(down);
             distanceMap.put(down, newDist);
@@ -387,9 +387,9 @@ public class CreaturePathfinder {
     private static BlockPos findNearestAirAboveSolid(ServerLevel world, BlockPos pos) {
         // Search for the nearest valid standing position
         for (int dy = -3; dy <= 3; dy++) {
-            BlockPos check = pos.add(0, dy, 0);
+            BlockPos check = pos.offset(0, dy, 0);
             if (world.getBlockState(check).isAir()
-                    && world.getBlockState(check.down()).isSolidBlock(world, check.down())) {
+                    && world.getBlockState(check.below()).isSolid()) {
                 return check;
             }
         }
@@ -397,7 +397,7 @@ public class CreaturePathfinder {
     }
 
     private static boolean isSpacingValid(BlockPos pos, List<Vec3> existingPositions, int minSpacing) {
-        Vec3 posVec = Vec3.ofBottomCenter(pos);
+        Vec3 posVec = Vec3.atBottomCenterOf(pos);
         for (Vec3 existing : existingPositions) {
             if (posVec.distanceTo(existing) < minSpacing) {
                 return false;
@@ -447,14 +447,14 @@ public class CreaturePathfinder {
         queue.add(from);
         visited.add(from);
 
-        int maxSearchDist = (int)(from.getManhattanDistance(to) * 2.5) + 50;
+        int maxSearchDist = (int)(from.distManhattan(to) * 2.5) + 50;
         int searched = 0;
 
         while (!queue.isEmpty() && searched < maxSearchDist * 10) {
             BlockPos current = queue.poll();
             searched++;
 
-            if (current.equals(to) || current.isWithinDistance(to, 2)) {
+            if (current.equals(to) || current.closerThan(to, 2)) {
                 // Reconstruct path
                 List<BlockPos> path = new ArrayList<>();
                 BlockPos node = current;
@@ -469,11 +469,11 @@ public class CreaturePathfinder {
 
             // Explore neighbors
             for (Direction dir : HORIZONTAL_DIRS) {
-                BlockPos next = current.offset(dir);
+                BlockPos next = current.relative(dir);
                 if (visited.contains(next) || next.getY() > maxY) continue;
 
                 BlockState state = world.getBlockState(next);
-                if (state.isAir() && world.getBlockState(next.down()).isSolidBlock(world, next.down())) {
+                if (state.isAir() && world.getBlockState(next.below()).isSolid()) {
                     visited.add(next);
                     parentMap.put(next, current);
                     queue.add(next);
@@ -481,18 +481,18 @@ public class CreaturePathfinder {
                 }
 
                 // Step up
-                BlockPos up = next.up();
+                BlockPos up = next.above();
                 if (!visited.contains(up) && world.getBlockState(up).isAir()
-                        && world.getBlockState(up.up()).isAir() && up.getY() <= maxY) {
+                        && world.getBlockState(up.above()).isAir() && up.getY() <= maxY) {
                     visited.add(up);
                     parentMap.put(up, current);
                     queue.add(up);
                 }
 
                 // Step down
-                BlockPos down = next.down();
+                BlockPos down = next.below();
                 if (!visited.contains(down) && world.getBlockState(down).isAir()
-                        && world.getBlockState(down.down()).isSolidBlock(world, down.down())) {
+                        && world.getBlockState(down.below()).isSolid()) {
                     visited.add(down);
                     parentMap.put(down, current);
                     queue.add(down);

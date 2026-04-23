@@ -12,6 +12,7 @@ import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import net.noahsarch.deeperdark.duck.EntityAccessor;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -53,21 +54,21 @@ public abstract class PlayerEntityMixin extends LivingEntity implements Leashabl
 
     @Inject(method = "tick", at = @At("TAIL"))
     private void tickLeash(CallbackInfo ci) {
-        if (!((EntityAccessor)this).deeperdark$getWorld().isClient()) {
+        if (!((EntityAccessor)this).deeperdark$getWorld().isClientSide()) {
             Leashable.tickLeash((ServerLevel) ((EntityAccessor)this).deeperdark$getWorld(), (LivingEntity & Leashable) this);
         }
     }
 
     @Override
-    public InteractionResult interact(Player player, InteractionHand hand) {
-        ItemStack itemStack = player.getStackInHand(hand);
-        if (itemStack.isOf(Items.LEAD) && this.canBeLeashedTo(player)) {
+    public InteractionResult interact(Player player, InteractionHand hand, Vec3 pos) {
+        ItemStack itemStack = player.getItemInHand(hand);
+        if (itemStack.getItem() == Items.LEAD && this.canBeLeashed()) {
             if (!this.isLeashed()) {
-                this.attachLeash(player, true);
-                itemStack.decrement(1);
+                this.setLeashedTo(player, true);
+                itemStack.shrink(1);
                 return InteractionResult.SUCCESS;
             }
         }
-        return super.interact(player, hand);
+        return super.interact(player, hand, pos);
     }
 }

@@ -11,6 +11,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.npc.villager.VillagerType;
+import net.minecraft.world.entity.npc.villager.VillagerProfession;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -22,8 +23,8 @@ import java.util.UUID;
 import net.minecraft.world.entity.ConversionParams;
 import net.noahsarch.deeperdark.duck.WitchConversionAccessor;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 
-import net.minecraft.world.entity.npc.villager.VillagerProfession;
 import net.noahsarch.deeperdark.duck.PotionMasterDuck;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -32,12 +33,10 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.noahsarch.deeperdark.duck.EntityAccessor;
-import net.minecraft.core.registries.Registries;
 
 @Mixin(Witch.class)
 public abstract class WitchEntityMixin extends Raider implements WitchConversionAccessor {
 
-    // ...existing code...
     protected WitchEntityMixin(EntityType<? extends Raider> entityType, Level world) {
         super(entityType, world);
     }
@@ -50,8 +49,8 @@ public abstract class WitchEntityMixin extends Raider implements WitchConversion
     private UUID converter;
 
     @Override
-    public void writeCustomData(ValueOutput view) {
-        super.writeCustomData(view);
+    public void addAdditionalSaveData(ValueOutput view) {
+        super.addAdditionalSaveData(view);
         if (this.converting) {
             view.putInt("ConversionTime", this.conversionTimer);
             if (this.converter != null) {
@@ -61,13 +60,13 @@ public abstract class WitchEntityMixin extends Raider implements WitchConversion
     }
 
     @Override
-    public void readCustomData(ValueInput view) {
-        super.readCustomData(view);
-        int time = view.getInt("ConversionTime", -1);
+    public void readAdditionalSaveData(ValueInput view) {
+        super.readAdditionalSaveData(view);
+        int time = view.getIntOr("ConversionTime", -1);
         if (time > -1) {
             this.converting = true;
             this.conversionTimer = time;
-            String uuidString = view.getString("ConversionPlayer", "");
+            String uuidString = view.getStringOr("ConversionPlayer", "");
             if (!uuidString.isEmpty()) {
                 try {
                     this.converter = UUID.fromString(uuidString);
@@ -78,10 +77,10 @@ public abstract class WitchEntityMixin extends Raider implements WitchConversion
         }
     }
 
-    @Inject(method = "tickMovement", at = @At("TAIL"))
-    public void tickMovement(CallbackInfo ci) {
+    @Inject(method = "aiStep", at = @At("TAIL"))
+    public void aiStep(CallbackInfo ci) {
         Level world = ((EntityAccessor)this).deeperdark$getWorld();
-        if (!world.isClient() && this.isAlive() && this.deeperdark$isConverting()) {
+        if (!world.isClientSide() && this.isAlive() && this.deeperdark$isConverting()) {
             this.conversionTimer--;
             if (this.conversionTimer <= 0) {
                 this.deeperdark$finishConversion((ServerLevel) world);
@@ -100,9 +99,9 @@ public abstract class WitchEntityMixin extends Raider implements WitchConversion
         this.converter = uuid;
         this.conversionTimer = delay;
         this.converting = true;
-        this.removeStatusEffect(MobEffects.WEAKNESS);
-        this.addStatusEffect(new MobEffectInstance(MobEffects.STRENGTH, delay, Math.min(world.getDifficulty().getId() - 1, 0)));
-        world.playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.ENTITY_ZOMBIE_VILLAGER_CURE, this.getSoundCategory(), 1.0F + this.random.nextFloat(), this.random.nextFloat() * 0.7F + 0.3F);
+        this.removeEffect(MobEffects.WEAKNESS);
+        this.addEffect(new MobEffectInstance(MobEffects.STRENGTH, delay, Math.min(world.getDifficulty().getId() - 1, 0)));
+        world.playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.ZOMBIE_VILLAGER_CURE, this.getSoundSource(), 1.0F + this.random.nextFloat(), this.random.nextFloat() * 0.7F + 0.3F);
     }
 
     @Unique
@@ -127,36 +126,36 @@ public abstract class WitchEntityMixin extends Raider implements WitchConversion
     }
 
     @Override
-    public InteractionResult interactMob(Player player, InteractionHand hand) {
-        ItemStack itemStack = player.getStackInHand(hand);
-        if (itemStack.isOf(Items.GOLDEN_APPLE)) {
-            if (this.hasStatusEffect(MobEffects.WEAKNESS)) {
-                if (!player.getAbilities().creativeMode) {
-                    itemStack.decrement(1);
+    protected InteractionResult mobInteract(Player player, InteractionHand hand) {
+        ItemStack itemStack = player.getItemInHand(hand);
+        if (itemStack.getItem() == Items.GOLDEN_APPLE) {
+            if (this.hasEffect(MobEffects.WEAKNESS)) {
+                if (!player.isCreative()) {
+                    itemStack.shrink(1);
                 }
-                if (!((EntityAccessor)this).deeperdark$getWorld().isClient()) {
-                    this.deeperdark$setConverting(player.getUuid(), this.random.nextInt(2401) + 3600);
+                if (!((EntityAccessor)this).deeperdark$getWorld().isClientSide()) {
+                    this.deeperdark$setConverting(player.getUUID(), this.random.nextInt(2401) + 3600);
                 }
                 return InteractionResult.SUCCESS;
             }
         }
-        return super.interactMob(player, hand);
+        return super.mobInteract(player, hand);
     }
 
     @Unique
     private void deeperdark$finishConversion(ServerLevel world) {
-        this.convertTo(EntityType.VILLAGER, ConversionParams.create(this, false, false), (villager) -> {
-            villager.initialize(world, world.getLocalDifficulty(villager.getBlockPos()), EntitySpawnReason.CONVERSION, null);
-            // Use NONE profession but mark as Potion Master
-            villager.setVillagerData(villager.getVillagerData().withProfession(Registries.VILLAGER_PROFESSION.getOrThrow(VillagerProfession.NONE)).withType(Registries.VILLAGER_TYPE.getOrThrow(VillagerType.SWAMP)));
+        this.convertTo(EntityType.VILLAGER, ConversionParams.single((net.minecraft.world.entity.Mob)(Object)this, false, false), (villager) -> {
+            villager.finalizeSpawn(world, world.getCurrentDifficultyAt(villager.blockPosition()), EntitySpawnReason.CONVERSION, null);
+            villager.setVillagerData(villager.getVillagerData()
+                .withProfession(world.registryAccess().lookupOrThrow(Registries.VILLAGER_PROFESSION).getOrThrow(VillagerProfession.NONE))
+                .withType(world.registryAccess().lookupOrThrow(Registries.VILLAGER_TYPE).getOrThrow(VillagerType.SWAMP)));
 
             if (villager instanceof PotionMasterDuck potionMaster) {
                 potionMaster.deeperdark$setPotionMaster(true);
             }
 
-            villager.setExperience(1);
-             if (this.converter != null) {
-                // Player playerEntity = world.getPlayerByUuid(this.converter);
+            villager.setVillagerXp(1);
+            if (this.converter != null) {
                 // Custom criteria could be triggered here
             }
         });

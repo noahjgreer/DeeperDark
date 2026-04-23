@@ -5,6 +5,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.server.permissions.Permission;
 import net.minecraft.server.permissions.PermissionLevel;
+import net.minecraft.resources.Identifier;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
@@ -32,7 +33,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.network.chat.Component;
 import net.minecraft.ChatFormatting;
-import net.minecraft.resources.Identifier;
+import net.noahsarch.deeperdark.mixin.DisplayAccessor;
+import net.noahsarch.deeperdark.mixin.ItemDisplayAccessor;
 import com.mojang.math.Transformation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.AABB;
@@ -117,10 +119,10 @@ public class CreatureManager {
     private static void debugOps(MinecraftServer server, String message) {
         if (!DeeperDarkConfig.get().creature.enableDebugLogging) return;
         Component text = Component.literal("[Creature] " + message).withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC);
-        Permission gamemasterPerm = new Permission.Level(PermissionLevel.GAMEMASTERS);
-        for (ServerPlayer player : server.getPlayerManager().getPlayerList()) {
-            if (player.getPermissions().hasPermission(gamemasterPerm)) {
-                player.sendMessage(text, false);
+        Permission gamemasterPerm = new Permission.HasCommandLevel(PermissionLevel.GAMEMASTERS);
+        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+            if (player.permissions().hasPermission(gamemasterPerm)) {
+                player.sendSystemMessage(text);
             }
         }
     }
@@ -303,8 +305,8 @@ public class CreatureManager {
             if (creature.getDisplayEntityUuid() == null) continue;
             ServerLevel world = creature.getWorld();
             Entity entity = world.getEntity(creature.getDisplayEntityUuid());
-            if (entity != null && entity.isGlowing() != glowEnabled) {
-                entity.setGlowing(glowEnabled);
+            if (entity != null && entity.hasGlowingTag() != glowEnabled) {
+                entity.setGlowingTag(glowEnabled);
             }
         }
     }
@@ -323,8 +325,8 @@ public class CreatureManager {
         if (debug) LOGGER.info("[Creature] Spawn roll passed! Searching for eligible player...");
 
         // Shuffle player list for randomness
-        List<ServerPlayer> players = new ArrayList<>(server.getPlayerManager().getPlayerList());
-        Collections.shuffle(players, rand);
+        List<ServerPlayer> players = new ArrayList<>(server.getPlayerList().getPlayers());
+        Collections.shuffle(players, new java.util.Random(rand.nextLong()));
 
         for (ServerPlayer player : players) {
             if (player.isSpectator()) continue;
@@ -384,7 +386,7 @@ public class CreatureManager {
         double closestScreenDist = Double.MAX_VALUE;
 
         // Check all players for proximity triggers
-        for (ServerPlayer player : server.getPlayerManager().getPlayerList()) {
+        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
             if (((net.minecraft.server.level.ServerLevel) player.level()) != world) continue;
             if (player.isSpectator()) continue;
 
@@ -450,7 +452,7 @@ public class CreatureManager {
         ServerPlayer closestScreenPlayer = null;
         double closestScreenDist = Double.MAX_VALUE;
 
-        for (ServerPlayer player : server.getPlayerManager().getPlayerList()) {
+        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
             if (((net.minecraft.server.level.ServerLevel) player.level()) != world) continue;
             if (player.isSpectator()) continue;
 
@@ -584,12 +586,12 @@ public class CreatureManager {
 
         // Lock player gaze at creature origin
         Vec3 creaturePos = creature.getPosition().add(0, 1.5, 0); // Look at center of creature
-        Vec3 playerEye = player.getEyePos();
+        Vec3 playerEye = player.getEyePosition();
         Vec3 lookVec = creaturePos.subtract(playerEye).normalize();
         float yaw = (float) (Math.atan2(-lookVec.x, lookVec.z) * (180.0 / Math.PI));
         float pitch = (float) (-Math.asin(lookVec.y) * (180.0 / Math.PI));
 
-        player.networkHandler.requestTeleport(
+        player.connection.teleport(
                 new PositionMoveRotation(player.position(), Vec3.ZERO, yaw, pitch),
                 Set.of()
         );
@@ -620,12 +622,12 @@ public class CreatureManager {
 
         // Keep player frozen and looking at creature
         Vec3 creaturePos = creature.getPosition().add(0, 1.5, 0);
-        Vec3 playerEye = player.getEyePos();
+        Vec3 playerEye = player.getEyePosition();
         Vec3 lookVec = creaturePos.subtract(playerEye).normalize();
         float yaw = (float) (Math.atan2(-lookVec.x, lookVec.z) * (180.0 / Math.PI));
         float pitch = (float) (-Math.asin(lookVec.y) * (180.0 / Math.PI));
 
-        player.networkHandler.requestTeleport(
+        player.connection.teleport(
                 new PositionMoveRotation(player.position(), Vec3.ZERO, yaw, pitch),
                 Set.of()
         );
@@ -677,7 +679,7 @@ public class CreatureManager {
             if (debug) LOGGER.info("[Creature] Could not find chase position, using fallback");
             double angle = world.getRandom().nextDouble() * 2 * Math.PI;
             int dist = config.chasePathMinDist;
-            chasePos = player.blockPosition().add((int) (dist * Math.cos(angle)), 0, (int) (dist * Math.sin(angle)));
+            chasePos = player.blockPosition().offset((int) (dist * Math.cos(angle)), 0, (int) (dist * Math.sin(angle)));
         }
 
         Vec3 newPos = Vec3.atBottomCenterOf(chasePos);
@@ -726,7 +728,7 @@ public class CreatureManager {
 
         // Movement speed is blocks per second, so blocks per tick = speed / 20
         double movePerTick = config.movementSpeed / 20.0;
-        Vec3 newPos = creaturePos.add(direction.multiply(movePerTick));
+        Vec3 newPos = creaturePos.add(direction.scale(movePerTick));
 
         // Keep creature grounded - find solid ground
         BlockPos newBlockPos = BlockPos.containing(newPos);
@@ -770,14 +772,13 @@ public class CreatureManager {
                 LOGGER.info("[Creature] Player {} will be killed", player.getName().getString());
                 debugOps(server, String.format("Catch outcome: %s will be KILLED", player.getName().getString()));
             }
-            DamageSource creatureDamage = ((net.minecraft.server.level.ServerLevel) player.level()).getDamageSources().create(CREATURE_DAMAGE_TYPE);
+            ServerLevel playerWorld = (ServerLevel) player.level();
+            net.minecraft.core.Holder<net.minecraft.world.damagesource.DamageType> damageTypeHolder =
+                playerWorld.registryAccess().lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(CREATURE_DAMAGE_TYPE);
+            DamageSource creatureDamage = new DamageSource(damageTypeHolder);
             // Stop ambience sounds BEFORE dealing damage so the packet reaches the client
             CreatureSoundHelper.stopAllCreatureSounds(player);
-            player.hurtServer(world, 
-                    (ServerLevel) ((net.minecraft.server.level.ServerLevel) player.level()),
-                    creatureDamage,
-                    Float.MAX_VALUE
-            );
+            player.hurtServer(playerWorld, creatureDamage, Float.MAX_VALUE);
         } else {
             // Teleport to spawn — manually extract coordinates to avoid corrupt TeleportTransition
             if (debug) {
@@ -796,19 +797,19 @@ public class CreatureManager {
      */
     private static void teleportPlayerToSpawn(ServerPlayer player, MinecraftServer server, boolean debug) {
         // Try player's personal respawn point first (bed/respawn anchor)
-        ServerPlayer.Respawn respawn = player.getRespawnConfig();
+        ServerPlayer.RespawnConfig respawn = player.getRespawnConfig();
         if (respawn != null) {
-            net.minecraft.resources.ResourceKey<Level> dimension = respawn.respawnData().getDimension();
-            BlockPos spawnPos = respawn.respawnData().getPos();
+            net.minecraft.resources.ResourceKey<Level> dimension = respawn.respawnData().dimension();
+            BlockPos spawnPos = respawn.respawnData().pos();
             ServerLevel spawnWorld = server.getLevel(dimension);
 
             if (spawnWorld != null) {
                 Vec3 pos = new Vec3(spawnPos.getX() + 0.5, spawnPos.getY(), spawnPos.getZ() + 0.5);
                 if (debug) LOGGER.info("[Creature] Teleporting {} to personal spawn at {} in {}",
-                        player.getName().getString(), pos, dimension.getValue());
-                player.teleportTo(new net.minecraft.world.level.portal.TeleportTransition(
+                        player.getName().getString(), pos, dimension.identifier());
+                player.teleport(new net.minecraft.world.level.portal.TeleportTransition(
                         spawnWorld, pos, Vec3.ZERO, respawn.respawnData().yaw(), respawn.respawnData().pitch(),
-                        net.minecraft.world.level.portal.TeleportTransition.NO_OP
+                        net.minecraft.world.level.portal.TeleportTransition.DO_NOTHING
                 ));
                 return;
             }
@@ -828,7 +829,7 @@ public class CreatureManager {
             ServerLevel world = creature.getWorld();
             Vec3 dropPos = creature.getPosition();
             ItemEntity diamondEntity = new ItemEntity(world, dropPos.x, dropPos.y, dropPos.z, new ItemStack(Items.DIAMOND));
-            world.spawnEntity(diamondEntity);
+            world.addFreshEntity(diamondEntity);
             if (debug) LOGGER.info("[Creature] Diamond dropped at {}", dropPos);
         }
 
@@ -838,7 +839,7 @@ public class CreatureManager {
             // Restore ambient sounds that were stopped during chase
             // (just stop the silence — MC will naturally resume ambient sounds)
             // Clear all status effects
-            player.clearStatusEffects();
+            player.removeAllEffects();
         }
 
         // Remove chase tracking and sound suppression
@@ -897,13 +898,13 @@ public class CreatureManager {
         for (int x = -radius; x <= radius; x++) {
             for (int y = -radius; y <= radius; y++) {
                 for (int z = -radius; z <= radius; z++) {
-                    BlockPos pos = centerPos.add(x, y, z);
+                    BlockPos pos = centerPos.offset(x, y, z);
                     BlockState state = world.getBlockState(pos);
 
-                    if (state.isOf(Blocks.TORCH) || state.isOf(Blocks.WALL_TORCH)
-                            || state.isOf(Blocks.SOUL_TORCH) || state.isOf(Blocks.SOUL_WALL_TORCH)) {
+                    if (state.is(Blocks.TORCH) || state.is(Blocks.WALL_TORCH)
+                            || state.is(Blocks.SOUL_TORCH) || state.is(Blocks.SOUL_WALL_TORCH)) {
                         // Break the torch (drops the item)
-                        world.breakBlock(pos, true);
+                        world.destroyBlock(pos, true, null, 512);
                         removed++;
                     }
                 }
@@ -930,7 +931,7 @@ public class CreatureManager {
 
             // Check if any player is within trigger radius
             boolean triggered = false;
-            for (ServerPlayer player : server.getPlayerManager().getPlayerList()) {
+            for (ServerPlayer player : server.getPlayerList().getPlayers()) {
                 if (((net.minecraft.server.level.ServerLevel) player.level()) != zone.world()) continue;
                 if (player.isSpectator()) continue;
                 if (player.position().distanceTo(zone.position()) <= config.echoTriggerRadius) {
@@ -959,15 +960,14 @@ public class CreatureManager {
         Iterator<UUID> it = frozenPlayers.iterator();
         while (it.hasNext()) {
             UUID playerId = it.next();
-            ServerPlayer player = server.getPlayerManager().getPlayer(playerId);
+            ServerPlayer player = server.getPlayerList().getPlayer(playerId);
             if (player == null) {
                 it.remove();
                 continue;
             }
 
             // Keep player velocity at zero
-            player.setVelocity(Vec3.ZERO);
-            player.velocityDirty = true;
+            player.setDeltaMovement(Vec3.ZERO);
         }
     }
 
@@ -977,7 +977,7 @@ public class CreatureManager {
 
     private static void tickChasePitchInfluence(MinecraftServer server, CreatureConfig config) {
         for (Map.Entry<UUID, UUID> entry : playerChaseMap.entrySet()) {
-            ServerPlayer player = server.getPlayerManager().getPlayer(entry.getKey());
+            ServerPlayer player = server.getPlayerList().getPlayer(entry.getKey());
             if (player == null) continue;
 
             CreatureInstance creature = creatures.get(entry.getValue());
@@ -990,7 +990,7 @@ public class CreatureManager {
 
             // All values are RELATIVE — small random offsets added on top of current look direction.
             // X/Y/Z position and velocity are also relative at +0 so the player moves freely.
-            player.networkHandler.requestTeleport(
+            player.connection.teleport(
                     new PositionMoveRotation(Vec3.ZERO, Vec3.ZERO, jitterYaw, jitterPitch),
                     Set.of(Relative.X, Relative.Y, Relative.Z,
                             Relative.Y_ROT, Relative.X_ROT,
@@ -1013,7 +1013,7 @@ public class CreatureManager {
 
             // Check for projectiles near the creature (within 2 blocks)
             AABB detectionBox = new AABB(creaturePos.subtract(2, 2, 2), creaturePos.add(2, 5, 2));
-            List<Projectile> projectiles = world.getEntitiesByClass(Projectile.class, detectionBox, p -> !p.isRemoved());
+            List<Projectile> projectiles = world.getEntitiesOfClass(Projectile.class, detectionBox, p -> !p.isRemoved());
 
             for (Projectile projectile : projectiles) {
                 Entity owner = projectile.getOwner();
@@ -1023,7 +1023,7 @@ public class CreatureManager {
 
                     // Store projectile type info before destroying
                     EntityType<?> projectileType = projectile.getType();
-                    Vec3 projectileVelocity = projectile.getVelocity();
+                    Vec3 projectileVelocity = projectile.getDeltaMovement();
 
                     // Destroy the projectile
                     projectile.discard();
@@ -1052,15 +1052,15 @@ public class CreatureManager {
 
             try {
                 Vec3 creaturePos = creature.getPosition().add(0, 1.5, 0);
-                Vec3 targetPos = target.getEyePos();
+                Vec3 targetPos = target.getEyePosition();
                 Vec3 direction = targetPos.subtract(creaturePos).normalize();
 
                 // Create a new projectile of the same type
                 Entity newProjectile = projectileType.create(world, EntitySpawnReason.MOB_SUMMONED);
                 if (newProjectile instanceof Projectile proj) {
-                    proj.setPosition(creaturePos);
-                    proj.setVelocity(direction.x * 2.0, direction.y * 2.0, direction.z * 2.0);
-                    world.spawnEntity(proj);
+                    proj.setPos(creaturePos);
+                    proj.setDeltaMovement(direction.x * 2.0, direction.y * 2.0, direction.z * 2.0);
+                    world.addFreshEntity(proj);
                     if (debug) LOGGER.info("[Creature] Return fire projectile spawned at {} towards {}", creaturePos, target.getName().getString());
                 }
             } catch (Exception e) {
@@ -1077,7 +1077,7 @@ public class CreatureManager {
         double maxJitter = config.jitterMax;
         double bestJitter = 0;
 
-        for (ServerPlayer player : server.getPlayerManager().getPlayerList()) {
+        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
             if (((net.minecraft.server.level.ServerLevel) player.level()) != world) continue;
             if (player.isSpectator()) continue;
 
@@ -1085,9 +1085,9 @@ public class CreatureManager {
             if (distance > 64) continue; // Don't bother with very distant players
 
             // Check if creature is on player's screen (simplified check: within 90 degree FOV)
-            Vec3 playerLook = player.getRotationVec(1.0f);
-            Vec3 toCreature = creaturePos.add(0, 1.5, 0).subtract(player.getEyePos()).normalize();
-            double dotProduct = playerLook.dotProduct(toCreature);
+            Vec3 playerLook = player.getViewVector(1.0f);
+            Vec3 toCreature = creaturePos.add(0, 1.5, 0).subtract(player.getEyePosition()).normalize();
+            double dotProduct = playerLook.dot(toCreature);
 
             if (dotProduct <= 0) continue; // Behind the player
 
@@ -1150,7 +1150,7 @@ public class CreatureManager {
         // Calculate total path length
         double totalLength = 0;
         for (int i = 1; i < path.size(); i++) {
-            totalLength += path.get(i).toCenterPos().distanceTo(path.get(i - 1).toCenterPos());
+            totalLength += path.get(i).getCenter().distanceTo(path.get(i - 1).getCenter());
         }
 
         // Place nuggets along the path up to trail_reach percentage
@@ -1160,17 +1160,17 @@ public class CreatureManager {
         int nuggetsPlaced = 0;
 
         for (int i = 1; i < path.size(); i++) {
-            double segmentLength = path.get(i).toCenterPos().distanceTo(path.get(i - 1).toCenterPos());
+            double segmentLength = path.get(i).getCenter().distanceTo(path.get(i - 1).getCenter());
             traveled += segmentLength;
 
             if (traveled > reachDistance) break;
 
             if (traveled - lastNuggetDist >= config.trailSeparation) {
-                Vec3 nuggetPos = path.get(i).toCenterPos();
+                Vec3 nuggetPos = path.get(i).getCenter();
                 ItemEntity nugget = new ItemEntity(world, nuggetPos.x, nuggetPos.y, nuggetPos.z, new ItemStack(Items.COPPER_NUGGET));
-                nugget.setPickupDelay(0);
-                nugget.setVelocity(Vec3.ZERO);
-                world.spawnEntity(nugget);
+                nugget.setNoPickUpDelay();
+                nugget.setDeltaMovement(Vec3.ZERO);
+                world.addFreshEntity(nugget);
                 nuggetsPlaced++;
                 lastNuggetDist = traveled;
             }
@@ -1198,16 +1198,16 @@ public class CreatureManager {
 
         Vec3 pos = creature.getPosition();
         // Offset Y by +1 so the billboard feet align with the ground level
-        display.setPosition(pos.x + creature.getCurrentJitterX(), pos.y + 0.85, pos.z + creature.getCurrentJitterZ());
+        display.setPos(pos.x + creature.getCurrentJitterX(), pos.y + 0.85, pos.z + creature.getCurrentJitterZ());
 
         // Set up the creature's item model
         ItemStack displayStack = new ItemStack(Items.STICK);
         displayStack.set(DataComponents.ITEM_MODEL, CREATURE_MODELS[creature.getTextureVariant()]);
-        display.setItemStack(displayStack);
-        display.setItemDisplayContext(ItemDisplayContext.HEAD);
+        ((ItemDisplayAccessor) display).deeperdark$setItemStack(displayStack);
+        ((ItemDisplayAccessor) display).deeperdark$setItemTransform(ItemDisplayContext.HEAD);
 
-        // Billboard mode: vertical only (no pitch, only yaw) 
-        display.setBillboardMode(Display.BillboardMode.VERTICAL);
+        // Billboard mode: vertical only (no pitch, only yaw)
+        ((DisplayAccessor) display).deeperdark$setBillboardConstraints(Display.BillboardConstraints.VERTICAL);
 
         // Scale: creature is 3 blocks tall. Default item model in HEAD context is 1 block.
         // A flat model at 16x32 pixels (1x2 blocks) scaled to 3 blocks height = scale of 1.5
@@ -1222,8 +1222,8 @@ public class CreatureManager {
         ));
 
         // Smooth position interpolation for movement/jitter
-        display.setInterpolationDuration(3);
-        display.setStartInterpolation(0);
+        ((DisplayAccessor) display).deeperdark$setTransformationInterpolationDuration(3);
+        ((DisplayAccessor) display).deeperdark$setTransformationInterpolationDelay(0);
 
         // Good view range for cave visibility
         display.setViewRange(1.0f);
@@ -1235,12 +1235,12 @@ public class CreatureManager {
         display.setNoGravity(true);
 
         // Debug glow: make creature visible through walls
-        display.setGlowing(DeeperDarkConfig.get().creature.enableDebugGlow);
+        display.setGlowingTag(DeeperDarkConfig.get().creature.enableDebugGlow);
 
-        world.spawnEntity(display);
+        world.addFreshEntity(display);
 
         creature.setDisplayEntityId(display.getId());
-        creature.setDisplayEntityUuid(display.getUuid());
+        creature.setDisplayEntityUuid(display.getUUID());
     }
 
     private static void despawnDisplayEntity(CreatureInstance creature) {
@@ -1272,13 +1272,13 @@ public class CreatureManager {
         Entity entity = world.getEntity(creature.getDisplayEntityUuid());
         if (entity instanceof Display.ItemDisplay display) {
             Vec3 pos = creature.getPosition();
-            display.setPosition(
+            display.setPos(
                     pos.x + creature.getCurrentJitterX(),
                     pos.y + 0.85,
                     pos.z + creature.getCurrentJitterZ()
             );
             // Re-trigger interpolation for smooth movement
-            display.setStartInterpolation(0);
+            ((DisplayAccessor) display).deeperdark$setTransformationInterpolationDelay(0);
         }
     }
 
@@ -1291,7 +1291,7 @@ public class CreatureManager {
         // Find nearest player to face
         ServerPlayer nearest = null;
         double nearestDist = Double.MAX_VALUE;
-        for (ServerPlayer player : server.getPlayerManager().getPlayerList()) {
+        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
             if (((net.minecraft.server.level.ServerLevel) player.level()) != world) continue;
             if (player.isSpectator()) continue;
             double dist = player.position().distanceTo(creaturePos);
@@ -1302,14 +1302,14 @@ public class CreatureManager {
         }
 
         if (nearest != null) {
-            Vec3 playerPos = nearest.getEntityPos();
+            Vec3 playerPos = nearest.position();
             Vec3 direction = playerPos.subtract(creaturePos);
             float yaw = (float) (Math.atan2(-direction.x, direction.z) * (180.0 / Math.PI));
             creature.setYaw(yaw);
 
             Entity entity = world.getEntity(creature.getDisplayEntityUuid());
             if (entity != null) {
-                entity.setYaw(yaw);
+                entity.setYRot(yaw);
             }
         }
     }
@@ -1321,11 +1321,11 @@ public class CreatureManager {
      * Uses raycasting to check for line-of-sight and crosshair proximity.
      */
     private static boolean isPlayerLookingAtCreature(ServerPlayer player, Vec3 creaturePos, ServerLevel world) {
-        Vec3 eyePos = player.getEyePos();
-        Vec3 lookVec = player.getRotationVec(1.0f);
+        Vec3 eyePos = player.getEyePosition();
+        Vec3 lookVec = player.getViewVector(1.0f);
 
         // Raycast from player eye towards where they're looking (max 128 blocks)
-        Vec3 rayEnd = eyePos.add(lookVec.multiply(128));
+        Vec3 rayEnd = eyePos.add(lookVec.scale(128));
 
         // First check if the ray roughly points at the creature
         Vec3 toCreature = creaturePos.add(0, 1.5, 0).subtract(eyePos);
@@ -1333,7 +1333,7 @@ public class CreatureManager {
         if (distance > 128) return false;
 
         Vec3 toCreatureNorm = toCreature.normalize();
-        double dot = lookVec.dotProduct(toCreatureNorm);
+        double dot = lookVec.dot(toCreatureNorm);
 
         // Crosshair must be within ~3 degrees of the creature center
         if (dot < 0.998) return false;
@@ -1342,13 +1342,13 @@ public class CreatureManager {
         net.minecraft.world.phys.BlockHitResult blockHit = world.clip(new ClipContext(
                 eyePos,
                 creaturePos.add(0, 1.5, 0),
-                ClipContext.ShapeType.COLLIDER,
-                ClipContext.FluidHandling.NONE,
+                ClipContext.Block.COLLIDER,
+                ClipContext.Fluid.NONE,
                 player
         ));
 
         if (blockHit.getType() == net.minecraft.world.phys.HitResult.Type.BLOCK) {
-            double blockDist = eyePos.distanceTo(blockHit.getPos());
+            double blockDist = eyePos.distanceTo(blockHit.getLocation());
             if (blockDist < distance - 0.5) {
                 return false; // View obstructed by a block
             }
@@ -1362,14 +1362,14 @@ public class CreatureManager {
      * but NOT necessarily directly looked at. Used for on-screen tolerance timing on non-chase creatures.
      */
     private static boolean isCreatureOnPlayerScreen(ServerPlayer player, Vec3 creaturePos, ServerLevel world) {
-        Vec3 eyePos = player.getEyePos();
+        Vec3 eyePos = player.getEyePosition();
         Vec3 toCreature = creaturePos.add(0, 1.5, 0).subtract(eyePos);
         double distance = toCreature.length();
         if (distance > 128 || distance < 1) return false;
 
-        Vec3 lookVec = player.getRotationVec(1.0f);
+        Vec3 lookVec = player.getViewVector(1.0f);
         Vec3 toCreatureNorm = toCreature.normalize();
-        double dot = lookVec.dotProduct(toCreatureNorm);
+        double dot = lookVec.dot(toCreatureNorm);
 
         // On screen ≈ within ~55° of look direction (dot > 0.55)
         if (dot <= 0.55) return false;
@@ -1378,13 +1378,13 @@ public class CreatureManager {
         net.minecraft.world.phys.BlockHitResult blockHit = world.clip(new ClipContext(
                 eyePos,
                 creaturePos.add(0, 1.5, 0),
-                ClipContext.ShapeType.COLLIDER,
-                ClipContext.FluidHandling.NONE,
+                ClipContext.Block.COLLIDER,
+                ClipContext.Fluid.NONE,
                 player
         ));
 
         if (blockHit.getType() == net.minecraft.world.phys.HitResult.Type.BLOCK) {
-            double blockDist = eyePos.distanceTo(blockHit.getPos());
+            double blockDist = eyePos.distanceTo(blockHit.getLocation());
             if (blockDist < distance - 0.5) {
                 return false; // View obstructed
             }
@@ -1399,16 +1399,16 @@ public class CreatureManager {
      * not along the 3D line to the underground creature.
      */
     private static boolean isAnyPlayerLookingAtPath(MinecraftServer server, ServerLevel world, Vec3 from, Vec3 to) {
-        for (ServerPlayer player : server.getPlayerManager().getPlayerList()) {
+        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
             if (((net.minecraft.server.level.ServerLevel) player.level()) != world) continue;
             if (player.isSpectator()) continue;
 
-            Vec3 eyePos = player.getEyePos();
-            Vec3 lookVec = player.getRotationVec(1.0f);
+            Vec3 eyePos = player.getEyePosition();
+            Vec3 lookVec = player.getViewVector(1.0f);
 
             // Project look direction onto horizontal plane
             Vec3 lookHorizontal = new Vec3(lookVec.x, 0, lookVec.z);
-            if (lookHorizontal.lengthSquared() < 0.001) continue; // Player looking straight up/down
+            if (lookHorizontal.lengthSqr() < 0.001) continue; // Player looking straight up/down
             lookHorizontal = lookHorizontal.normalize();
 
             // Sample 5 points along the path, projected horizontally
@@ -1422,7 +1422,7 @@ public class CreatureManager {
                 if (horizDist > 80) continue;  // Too far to notice nuggets appearing
 
                 toSampleHorizontal = toSampleHorizontal.normalize();
-                double dot = lookHorizontal.dotProduct(toSampleHorizontal);
+                double dot = lookHorizontal.dot(toSampleHorizontal);
 
                 // dot > 0.55 ≈ within ~56 degree horizontal cone of view
                 if (dot > 0.55) {
@@ -1435,25 +1435,20 @@ public class CreatureManager {
 
     private static ServerPlayer getTargetPlayer(CreatureInstance creature, MinecraftServer server) {
         if (creature.getTargetPlayerUuid() == null) return null;
-        return server.getPlayerManager().getPlayer(creature.getTargetPlayerUuid());
+        return server.getPlayerList().getPlayer(creature.getTargetPlayerUuid());
     }
 
     /**
      * Teleports a player to the world spawn as a fallback.
      */
     private static void teleportToWorldSpawn(ServerPlayer player, MinecraftServer server) {
-        ServerLevel overworld = server.getOverworld();
-        var spawnPoint = overworld.getSpawnPoint();
-        Vec3 spawnPos;
-        if (spawnPoint != null) {
-            BlockPos worldSpawn = spawnPoint.getPos();
-            spawnPos = new Vec3(worldSpawn.getX() + 0.5, worldSpawn.getY(), worldSpawn.getZ() + 0.5);
-        } else {
-            spawnPos = new Vec3(0.5, 64, 0.5);
-        }
-        player.teleportTo(new net.minecraft.world.level.portal.TeleportTransition(
-                overworld, spawnPos, Vec3.ZERO, player.getYaw(), player.getPitch(),
-                net.minecraft.world.level.portal.TeleportTransition.NO_OP
+        ServerLevel overworld = server.overworld();
+        net.minecraft.world.level.storage.LevelData.RespawnData respawnData = overworld.getRespawnData();
+        BlockPos worldSpawn = (respawnData != null) ? respawnData.pos() : new BlockPos(0, 64, 0);
+        Vec3 spawnPos = new Vec3(worldSpawn.getX() + 0.5, worldSpawn.getY(), worldSpawn.getZ() + 0.5);
+        player.teleport(new net.minecraft.world.level.portal.TeleportTransition(
+                overworld, spawnPos, Vec3.ZERO, player.getYRot(), player.getXRot(),
+                net.minecraft.world.level.portal.TeleportTransition.DO_NOTHING
         ));
     }
 
@@ -1463,17 +1458,17 @@ public class CreatureManager {
     private static Vec3 snapToGround(ServerLevel world, BlockPos blockPos, Vec3 originalPos) {
         // Search downward for solid ground
         for (int dy = 0; dy >= -5; dy--) {
-            BlockPos checkPos = blockPos.add(0, dy, 0);
-            BlockPos belowPos = checkPos.down();
-            if (world.getBlockState(checkPos).isAir() && world.getBlockState(belowPos).isSolidBlock(world, belowPos)) {
+            BlockPos checkPos = blockPos.offset(0, dy, 0);
+            BlockPos belowPos = checkPos.below();
+            if (world.getBlockState(checkPos).isAir() && world.getBlockState(belowPos).isSolid()) {
                 return new Vec3(originalPos.x, checkPos.getY(), originalPos.z);
             }
         }
         // Search upward
         for (int dy = 1; dy <= 5; dy++) {
-            BlockPos checkPos = blockPos.add(0, dy, 0);
-            BlockPos belowPos = checkPos.down();
-            if (world.getBlockState(checkPos).isAir() && world.getBlockState(belowPos).isSolidBlock(world, belowPos)) {
+            BlockPos checkPos = blockPos.offset(0, dy, 0);
+            BlockPos belowPos = checkPos.below();
+            if (world.getBlockState(checkPos).isAir() && world.getBlockState(belowPos).isSolid()) {
                 return new Vec3(originalPos.x, checkPos.getY(), originalPos.z);
             }
         }
@@ -1502,7 +1497,7 @@ public class CreatureManager {
             final List<BlockPos> pathCopy = List.copyOf(path);
             deferredActions.add(new DeferredAction(delayTicks, () -> {
                 // Re-check that the player is still online
-                ServerPlayer player = world.getServer().getPlayerManager().getPlayer(triggeringPlayer.getUuid());
+                ServerPlayer player = world.getServer().getPlayerList().getPlayer(triggeringPlayer.getUUID());
                 if (player != null) {
                     sendDebugPathParticlesBurst(world, pathCopy, player);
                 }
@@ -1520,9 +1515,9 @@ public class CreatureManager {
         // Collect target players (triggering player + nearby players)
         List<ServerPlayer> targets = new ArrayList<>();
         targets.add(triggeringPlayer);
-        for (ServerPlayer other : world.getPlayers()) {
+        for (ServerPlayer other : world.players()) {
             if (other == triggeringPlayer) continue;
-            if (other.squaredDistanceTo(triggeringPlayer) < 128 * 128) {
+            if (other.distanceToSqr(triggeringPlayer) < 128 * 128) {
                 targets.add(other);
             }
         }
@@ -1539,7 +1534,7 @@ public class CreatureManager {
             );
 
             for (ServerPlayer target : targets) {
-                target.networkHandler.sendPacket(packet);
+                target.connection.send(packet);
             }
         }
 
@@ -1553,7 +1548,7 @@ public class CreatureManager {
                     0.02f, 20
             );
             for (ServerPlayer target : targets) {
-                target.networkHandler.sendPacket(markerPacket);
+                target.connection.send(markerPacket);
             }
         }
     }

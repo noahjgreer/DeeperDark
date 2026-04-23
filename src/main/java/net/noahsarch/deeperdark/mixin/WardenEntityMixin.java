@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Warden.class)
 public abstract class WardenEntityMixin {
-    @Inject(method = "addAttributes", at = @At("RETURN"), cancellable = true)
+    @Inject(method = "createAttributes", at = @At("RETURN"), cancellable = true)
     private static void removeKnockbackResistance(CallbackInfoReturnable<AttributeSupplier.Builder> cir) {
         AttributeSupplier.Builder builder = cir.getReturnValue();
         builder.add(Attributes.KNOCKBACK_RESISTANCE, 0.0);

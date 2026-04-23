@@ -21,17 +21,17 @@ public abstract class ExperienceBottleEntityMixin extends ThrowableItemProjectil
         super(entityType, world);
     }
 
-    @Inject(method = "onCollision", at = @At("HEAD"), cancellable = true)
-    private void onCollision(HitResult hitResult, CallbackInfo ci) {
-        super.onCollision(hitResult);
+    @Inject(method = "onHit", at = @At("HEAD"), cancellable = true)
+    private void onHit(HitResult hitResult, CallbackInfo ci) {
+        super.onHit(hitResult);
         Level world = ((EntityAccessor)(Object)this).deeperdark$getWorld();
-        if (!world.isClient()) {
+        if (!world.isClientSide()) {
             // Play splash effect (2002 is Potion Splash)
             // Color for water is 3694022
-            world.syncWorldEvent(2002, this.getBlockPos(), 3694022);
+            world.levelEvent(2002, this.blockPosition(), 3694022);
 
             int amount = 10;
-            ExperienceOrb.spawn((ServerLevel)world, new net.minecraft.world.phys.Vec3(this.getX(), this.getY(), this.getZ()), amount);
+            ExperienceOrb.award((ServerLevel)world, new net.minecraft.world.phys.Vec3(this.getX(), this.getY(), this.getZ()), amount);
 
             this.discard();
             ci.cancel();

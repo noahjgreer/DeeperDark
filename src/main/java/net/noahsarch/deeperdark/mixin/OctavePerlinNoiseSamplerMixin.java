@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(PerlinNoise.class)
 public class OctavePerlinNoiseSamplerMixin {
-    @Inject(method = "maintainPrecision", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "wrap", at = @At("HEAD"), cancellable = true)
     private static void onMaintainPrecision(double value, CallbackInfoReturnable<Double> cir) {
         cir.setReturnValue(value);
     }

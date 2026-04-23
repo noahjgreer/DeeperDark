@@ -35,34 +35,34 @@ public class ModVillagers {
 
     public static void registerTrades() {
         // Level 1
-        List<VillagerTrades.Factory> level1 = new ArrayList<>();
+        List<TradeFactory> level1 = new ArrayList<>();
         level1.add(new RandomBuyFactory(Items.GLASS_BOTTLE, 3, 6, 12, 5));
         level1.add(new RandomSellFactory(Items.REDSTONE, 1, 1, 2, 4, 12, 1)); // 1 Emerald for 2-4 Redstone
         level1.add(new RandomBuyFactory(Items.NETHER_WART, 16, 24, 12, 2));
         level1.add(new RandomBuyFactory(Items.STICK, 32, 64, 12, 2));
-        POTION_MASTER_TRADES.put(1, level1.toArray(new VillagerTrades.Factory[0]));
+        POTION_MASTER_TRADES.put(1, level1.toArray(new TradeFactory[0]));
 
         // Level 2
-        List<VillagerTrades.Factory> level2 = new ArrayList<>();
+        List<TradeFactory> level2 = new ArrayList<>();
         level2.add(new RandomBuyFactory(Items.GLOWSTONE_DUST, 1, 3, 12, 10));
         level2.add(new RandomSellFactory(Items.SUGAR, 1, 1, 2, 4, 12, 5));
         level2.add(new RandomSellFactory(Items.SPIDER_EYE, 1, 1, 1, 2, 12, 5));
         level2.add(new RandomBuyFactory(Items.QUARTZ, 8, 16, 12, 10));
         level2.add(new RandomSellFactory(Items.LAPIS_LAZULI, 1, 1, 1, 3, 12, 5));
         level2.add(new RandomBuyFactory(Items.GOLD_NUGGET, 16, 32, 12, 5));
-        POTION_MASTER_TRADES.put(2, level2.toArray(new VillagerTrades.Factory[0]));
+        POTION_MASTER_TRADES.put(2, level2.toArray(new TradeFactory[0]));
 
         // Level 3
-        List<VillagerTrades.Factory> level3 = new ArrayList<>();
+        List<TradeFactory> level3 = new ArrayList<>();
         level3.add(new RandomBuyFactory(Items.GUNPOWDER, 1, 3, 12, 20));
         level3.add(new RandomSellFactory(Items.GLISTERING_MELON_SLICE, 2, 4, 2, 4, 12, 10)); // Higher price?
         level3.add(new RandomSellFactory(Items.FERMENTED_SPIDER_EYE, 1, 1, 1, 2, 12, 10));
         level3.add(new RandomBuyFactory(Items.RABBIT_FOOT, 1, 2, 12, 20));
         level3.add(new RandomSellFactory(Items.HONEY_BOTTLE, 2, 3, 1, 1, 12, 10));
-        POTION_MASTER_TRADES.put(3, level3.toArray(new VillagerTrades.Factory[0]));
+        POTION_MASTER_TRADES.put(3, level3.toArray(new TradeFactory[0]));
 
         // Level 4
-        List<VillagerTrades.Factory> level4 = new ArrayList<>();
+        List<TradeFactory> level4 = new ArrayList<>();
         level4.add(new RandomBuyFactory(Items.GHAST_TEAR, 1, 1, 12, 30));
         level4.add(new RandomSellFactory(Items.PHANTOM_MEMBRANE, 4, 6, 1, 1, 12, 15));
         level4.add(new RandomSellFactory(Items.DRAGON_BREATH, 4, 6, 1, 1, 12, 15));
@@ -70,14 +70,14 @@ public class ModVillagers {
         level4.add(new RandomSellFactory(Items.TURTLE_SCUTE, 5, 8, 1, 1, 12, 15));
         level4.add(new MultiEffectPotionFactory(12, Items.SPLASH_POTION));
         level4.add(new MultiEffectPotionFactory(16, Items.SPLASH_POTION));
-        POTION_MASTER_TRADES.put(4, level4.toArray(new VillagerTrades.Factory[0]));
+        POTION_MASTER_TRADES.put(4, level4.toArray(new TradeFactory[0]));
 
         // Level 5
-        List<VillagerTrades.Factory> level5 = new ArrayList<>();
+        List<TradeFactory> level5 = new ArrayList<>();
         level5.add(new RandomSellFactory(Items.EXPERIENCE_BOTTLE, 3, 6, 1, 3, 12, 30));
         level5.add(new MultiEffectPotionFactory(6));
         level5.add(new MultiEffectPotionFactory(8));
-        POTION_MASTER_TRADES.put(5, level5.toArray(new VillagerTrades.Factory[0]));
+        POTION_MASTER_TRADES.put(5, level5.toArray(new TradeFactory[0]));
     }
 
     public static void registerVillagers() {
@@ -101,7 +101,7 @@ public class ModVillagers {
         @Override
         public MerchantOffer create(ServerLevel world, Entity entity, RandomSource random) {
             List<Holder<MobEffect>> possibleEffects = new ArrayList<>();
-            Registries.STATUS_EFFECT.streamEntries().forEach(possibleEffects::add);
+            BuiltInRegistries.MOB_EFFECT.listElements().forEach(possibleEffects::add);
 
             ItemStack potionStack = new ItemStack(this.item);
             List<MobEffectInstance> effects = new ArrayList<>();
@@ -114,7 +114,7 @@ public class ModVillagers {
                 Holder<MobEffect> effectEntry = possibleEffects.get(random.nextInt(possibleEffects.size()));
                 MobEffect effect = effectEntry.value();
 
-                int duration = effect.isInstant() ? 1 : (600 + random.nextInt(1200)); // 30s to 90s
+                int duration = effect.isInstantenous() ? 1 : (600 + random.nextInt(1200)); // 30s to 90s
                 effects.add(new MobEffectInstance(effectEntry, duration, 0));
             }
 
@@ -138,7 +138,7 @@ public class ModVillagers {
             String suffix = suffixes[random.nextInt(suffixes.length)];
             String translationKey = baseKey + suffix;
 
-            potionStack.set(DataComponents.CUSTOM_NAME, Component.translatable(translationKey).styled(style -> style.withItalic(false)));
+            potionStack.set(DataComponents.CUSTOM_NAME, Component.translatable(translationKey).withStyle(style -> style.withItalic(false)));
 
             return new MerchantOffer(
                     new ItemCost(Items.EMERALD, this.price),

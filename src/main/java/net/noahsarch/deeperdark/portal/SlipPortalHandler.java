@@ -35,7 +35,7 @@ import java.util.*;
  */
 public class SlipPortalHandler {
     private static final ResourceKey<Level> THE_END = Level.END;
-    private static final ResourceKey<Level> THE_SLIP = ResourceKey.create(Registries.WORLD, Identifier.fromNamespaceAndPath("minecraft", "the_slip"));
+    private static final ResourceKey<Level> THE_SLIP = ResourceKey.create(Registries.DIMENSION, Identifier.fromNamespaceAndPath("minecraft", "the_slip"));
     private static final ResourceKey<Level> OVERWORLD = Level.OVERWORLD;
 
     // Cooldown to prevent rapid teleportation (100 ticks = 5 seconds)
@@ -125,14 +125,14 @@ public class SlipPortalHandler {
     public static boolean isNearPortal(BlockPos pos, int radius) {
         // Check horizontal portals (in the End)
         for (HorizontalPortalData portal : activeHorizontalPortals.values()) {
-            if (portal.centerPos.isWithinDistance(pos, radius)) {
+            if (portal.centerPos.closerThan(pos, radius)) {
                 return true;
             }
         }
 
         // Check vertical portals (only these are in the Slip where ice conversion happens)
         for (VerticalPortalData portal : activeVerticalPortals.values()) {
-            if (portal.centerPos.isWithinDistance(pos, radius)) {
+            if (portal.centerPos.closerThan(pos, radius)) {
                 return true;
             }
         }
@@ -142,22 +142,22 @@ public class SlipPortalHandler {
     public static void register() {
         // Handle water bucket placement to activate portals
         UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
-            if (world.isClient()) {
+            if (world.isClientSide()) {
                 return InteractionResult.PASS;
             }
 
             // Only work in the End dimension
-            if (!world.getRegistryKey().equals(THE_END)) {
+            if (!world.dimension().equals(THE_END)) {
                 return InteractionResult.PASS;
             }
 
-            ItemStack heldItem = player.getStackInHand(hand);
-            if (!heldItem.isOf(Items.WATER_BUCKET)) {
+            ItemStack heldItem = player.getItemInHand(hand);
+            if (heldItem.getItem() != Items.WATER_BUCKET) {
                 return InteractionResult.PASS;
             }
 
             BlockPos clickedPos = hitResult.getBlockPos();
-            BlockPos placePos = clickedPos.up(); // Water will be placed above the clicked block
+            BlockPos placePos = clickedPos.above(); // Water will be placed above the clicked block
 
             // Check if this could be anywhere in a valid portal frame (not just center)
             BlockPos portalCenter = findPortalCenter(world, placePos);
@@ -167,11 +167,11 @@ public class SlipPortalHandler {
 
                 // Replace water bucket with empty bucket
                 if (!player.isCreative()) {
-                    heldItem.decrement(1);
+                    heldItem.shrink(1);
                     if (heldItem.isEmpty()) {
-                        player.setStackInHand(hand, new ItemStack(Items.BUCKET));
+                        player.setItemInHand(hand, new ItemStack(Items.BUCKET));
                     } else {
-                        player.giveItemStack(new ItemStack(Items.BUCKET));
+                        player.addItem(new ItemStack(Items.BUCKET));
                     }
                 }
 
@@ -183,17 +183,17 @@ public class SlipPortalHandler {
 
         // Handle flint and steel activation for vertical portals in the Slip
         UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
-            if (world.isClient()) {
+            if (world.isClientSide()) {
                 return InteractionResult.PASS;
             }
 
             // Only work in the Slip dimension
-            if (!world.getRegistryKey().equals(THE_SLIP)) {
+            if (!world.dimension().equals(THE_SLIP)) {
                 return InteractionResult.PASS;
             }
 
-            ItemStack heldItem = player.getStackInHand(hand);
-            if (!heldItem.isOf(Items.FLINT_AND_STEEL)) {
+            ItemStack heldItem = player.getItemInHand(hand);
+            if (heldItem.getItem() != Items.FLINT_AND_STEEL) {
                 return InteractionResult.PASS;
             }
 
@@ -201,7 +201,7 @@ public class SlipPortalHandler {
             BlockState clickedState = world.getBlockState(clickedPos);
 
             // Check if player clicked on packed ice
-            if (!clickedState.isOf(Blocks.PACKED_ICE)) {
+            if (!clickedState.is(Blocks.PACKED_ICE)) {
                 return InteractionResult.PASS;
             }
 
@@ -213,7 +213,7 @@ public class SlipPortalHandler {
 
                 // Damage the flint and steel
                 if (!player.isCreative()) {
-                    heldItem.damage(1, player, player.getPreferredEquipmentSlot(heldItem));
+                    heldItem.hurtAndBreak(1, player, hand);
                 }
 
                 return InteractionResult.SUCCESS;
@@ -225,19 +225,19 @@ public class SlipPortalHandler {
         // Handle player teleportation and portal maintenance
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             // Handle horizontal portals in the End
-            ServerLevel endWorld = server.getWorld(THE_END);
+            ServerLevel endWorld = server.getLevel(THE_END);
             if (endWorld != null) {
                 handleHorizontalPortals(server, endWorld);
             }
 
             // Handle vertical portals in the Slip
-            ServerLevel slipWorld = server.getWorld(THE_SLIP);
+            ServerLevel slipWorld = server.getLevel(THE_SLIP);
             if (slipWorld != null) {
                 handleVerticalPortals(server, slipWorld);
             }
 
             // Handle waypoint particle effects in the Overworld
-            ServerLevel overworldWorld = server.getWorld(OVERWORLD);
+            ServerLevel overworldWorld = server.getLevel(OVERWORLD);
             if (overworldWorld != null) {
                 handleOverworldWaypoints(overworldWorld);
             }
@@ -251,7 +251,7 @@ public class SlipPortalHandler {
         // Try all possible center positions that would include this position in the 3x3 area
         for (int xOffset = -1; xOffset <= 1; xOffset++) {
             for (int zOffset = -1; zOffset <= 1; zOffset++) {
-                BlockPos potentialCenter = pos.add(-xOffset, 0, -zOffset);
+                BlockPos potentialCenter = pos.offset(-xOffset, 0, -zOffset);
                 if (isValidHorizontalPortalFrame(world, potentialCenter)) {
                     return potentialCenter;
                 }
@@ -268,7 +268,7 @@ public class SlipPortalHandler {
         // Check for North-South orientation (X axis)
         for (int xOffset = -1; xOffset <= 1; xOffset++) {
             for (int yOffset = -1; yOffset <= 1; yOffset++) {
-                BlockPos potentialCenter = pos.add(-xOffset, -yOffset, 0);
+                BlockPos potentialCenter = pos.offset(-xOffset, -yOffset, 0);
                 if (isValidVerticalPortalFrameWithPackedIce(world, potentialCenter)) {
                     return potentialCenter;
                 }
@@ -278,7 +278,7 @@ public class SlipPortalHandler {
         // Check for East-West orientation (Z axis)
         for (int zOffset = -1; zOffset <= 1; zOffset++) {
             for (int yOffset = -1; yOffset <= 1; yOffset++) {
-                BlockPos potentialCenter = pos.add(0, -yOffset, -zOffset);
+                BlockPos potentialCenter = pos.offset(0, -yOffset, -zOffset);
                 if (isValidVerticalPortalFrameWithPackedIce(world, potentialCenter)) {
                     return potentialCenter;
                 }
@@ -293,20 +293,20 @@ public class SlipPortalHandler {
      */
     private static void handleHorizontalPortals(net.minecraft.server.MinecraftServer server, ServerLevel endWorld) {
         // Check players for teleportation
-        for (ServerPlayer player : server.getPlayerManager().getPlayerList()) {
+        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
             net.minecraft.world.level.Level world = ((net.noahsarch.deeperdark.duck.EntityAccessor)player).deeperdark$getWorld();
-            if (!world.getRegistryKey().equals(THE_END)) {
+            if (!world.dimension().equals(THE_END)) {
                 continue;
             }
 
-            BlockPos playerPos = player.getBlockPos();
-            UUID playerId = player.getUuid();
+            BlockPos playerPos = player.blockPosition();
+            UUID playerId = player.getUUID();
             boolean playerInPortalNow = false;
 
             for (HorizontalPortalData portal : activeHorizontalPortals.values()) {
                 if (portal.waterBlocks.contains(playerPos)) {
                     playerInPortalNow = true;
-                    long currentTime = ((net.noahsarch.deeperdark.duck.EntityAccessor)player).deeperdark$getWorld().getTime();
+                    long currentTime = ((net.noahsarch.deeperdark.duck.EntityAccessor)player).deeperdark$getWorld().getGameTime();
 
                     if (playerCooldowns.containsKey(playerId)) {
                         long lastTeleport = playerCooldowns.get(playerId);
@@ -344,7 +344,7 @@ public class SlipPortalHandler {
             // Maintain water blocks and prevent flow below
             maintainHorizontalPortalWater(endWorld, portal);
 
-            if (endWorld.getTime() % 2 == 0) {
+            if (endWorld.getGameTime() % 2 == 0) {
                 spawnHorizontalPortalParticles(endWorld, portal);
             }
         }
@@ -355,20 +355,20 @@ public class SlipPortalHandler {
      */
     private static void handleVerticalPortals(net.minecraft.server.MinecraftServer server, ServerLevel slipWorld) {
         // Check players for teleportation to the Overworld
-        for (ServerPlayer player : server.getPlayerManager().getPlayerList()) {
+        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
             net.minecraft.world.level.Level world = ((net.noahsarch.deeperdark.duck.EntityAccessor)player).deeperdark$getWorld();
-            if (!world.getRegistryKey().equals(THE_SLIP)) {
+            if (!world.dimension().equals(THE_SLIP)) {
                 continue;
             }
 
-            BlockPos playerPos = player.getBlockPos();
-            UUID playerId = player.getUuid();
+            BlockPos playerPos = player.blockPosition();
+            UUID playerId = player.getUUID();
             boolean playerInPortalNow = false;
 
             for (VerticalPortalData portal : activeVerticalPortals.values()) {
                 if (portal.waterBlocks.contains(playerPos)) {
                     playerInPortalNow = true;
-                    long currentTime = ((net.noahsarch.deeperdark.duck.EntityAccessor)player).deeperdark$getWorld().getTime();
+                    long currentTime = ((net.noahsarch.deeperdark.duck.EntityAccessor)player).deeperdark$getWorld().getGameTime();
 
                     // Only check cooldown if player is not currently marked as in portal
                     if (!playersInPortal.contains(playerId)) {
@@ -409,7 +409,7 @@ public class SlipPortalHandler {
             // Maintain contained water blocks
             maintainVerticalPortalWater(slipWorld, portal);
 
-            if (slipWorld.getTime() % 2 == 0) {
+            if (slipWorld.getGameTime() % 2 == 0) {
                 spawnVerticalPortalParticles(slipWorld, portal);
             }
         }
@@ -421,28 +421,28 @@ public class SlipPortalHandler {
     private static boolean isValidHorizontalPortalFrame(Level world, BlockPos center) {
         // North side (z = -2)
         for (int x = -1; x <= 1; x++) {
-            if (!world.getBlockState(center.add(x, 0, -2)).isOf(Blocks.BLUE_ICE)) {
+            if (!world.getBlockState(center.offset(x, 0, -2)).is(Blocks.BLUE_ICE)) {
                 return false;
             }
         }
 
         // South side (z = 2)
         for (int x = -1; x <= 1; x++) {
-            if (!world.getBlockState(center.add(x, 0, 2)).isOf(Blocks.BLUE_ICE)) {
+            if (!world.getBlockState(center.offset(x, 0, 2)).is(Blocks.BLUE_ICE)) {
                 return false;
             }
         }
 
         // West side (x = -2)
         for (int z = -1; z <= 1; z++) {
-            if (!world.getBlockState(center.add(-2, 0, z)).isOf(Blocks.BLUE_ICE)) {
+            if (!world.getBlockState(center.offset(-2, 0, z)).is(Blocks.BLUE_ICE)) {
                 return false;
             }
         }
 
         // East side (x = 2)
         for (int z = -1; z <= 1; z++) {
-            if (!world.getBlockState(center.add(2, 0, z)).isOf(Blocks.BLUE_ICE)) {
+            if (!world.getBlockState(center.offset(2, 0, z)).is(Blocks.BLUE_ICE)) {
                 return false;
             }
         }
@@ -459,11 +459,11 @@ public class SlipPortalHandler {
 
         // Check horizontal bars (top and bottom)
         for (int x = -1; x <= 1; x++) {
-            if (!world.getBlockState(center.add(x, -2, 0)).isOf(Blocks.BLUE_ICE)) {
+            if (!world.getBlockState(center.offset(x, -2, 0)).is(Blocks.BLUE_ICE)) {
                 isNorthSouthValid = false;
                 break;
             }
-            if (!world.getBlockState(center.add(x, 2, 0)).isOf(Blocks.BLUE_ICE)) {
+            if (!world.getBlockState(center.offset(x, 2, 0)).is(Blocks.BLUE_ICE)) {
                 isNorthSouthValid = false;
                 break;
             }
@@ -472,11 +472,11 @@ public class SlipPortalHandler {
         // Check vertical bars (left and right)
         if (isNorthSouthValid) {
             for (int y = -1; y <= 1; y++) {
-                if (!world.getBlockState(center.add(-2, y, 0)).isOf(Blocks.BLUE_ICE)) {
+                if (!world.getBlockState(center.offset(-2, y, 0)).is(Blocks.BLUE_ICE)) {
                     isNorthSouthValid = false;
                     break;
                 }
-                if (!world.getBlockState(center.add(2, y, 0)).isOf(Blocks.BLUE_ICE)) {
+                if (!world.getBlockState(center.offset(2, y, 0)).is(Blocks.BLUE_ICE)) {
                     isNorthSouthValid = false;
                     break;
                 }
@@ -488,7 +488,7 @@ public class SlipPortalHandler {
             boolean hasPackedIce = false;
             for (int x = -1; x <= 1; x++) {
                 for (int y = -1; y <= 1; y++) {
-                    if (world.getBlockState(center.add(x, y, 0)).isOf(Blocks.PACKED_ICE)) {
+                    if (world.getBlockState(center.offset(x, y, 0)).is(Blocks.PACKED_ICE)) {
                         hasPackedIce = true;
                         break;
                     }
@@ -509,11 +509,11 @@ public class SlipPortalHandler {
 
         // Check horizontal bars (top and bottom)
         for (int z = -1; z <= 1; z++) {
-            if (!world.getBlockState(center.add(0, -2, z)).isOf(Blocks.BLUE_ICE)) {
+            if (!world.getBlockState(center.offset(0, -2, z)).is(Blocks.BLUE_ICE)) {
                 isEastWestValid = false;
                 break;
             }
-            if (!world.getBlockState(center.add(0, 2, z)).isOf(Blocks.BLUE_ICE)) {
+            if (!world.getBlockState(center.offset(0, 2, z)).is(Blocks.BLUE_ICE)) {
                 isEastWestValid = false;
                 break;
             }
@@ -522,11 +522,11 @@ public class SlipPortalHandler {
         // Check vertical bars (left and right)
         if (isEastWestValid) {
             for (int y = -1; y <= 1; y++) {
-                if (!world.getBlockState(center.add(0, y, -2)).isOf(Blocks.BLUE_ICE)) {
+                if (!world.getBlockState(center.offset(0, y, -2)).is(Blocks.BLUE_ICE)) {
                     isEastWestValid = false;
                     break;
                 }
-                if (!world.getBlockState(center.add(0, y, 2)).isOf(Blocks.BLUE_ICE)) {
+                if (!world.getBlockState(center.offset(0, y, 2)).is(Blocks.BLUE_ICE)) {
                     isEastWestValid = false;
                     break;
                 }
@@ -538,7 +538,7 @@ public class SlipPortalHandler {
             boolean hasPackedIce = false;
             for (int z = -1; z <= 1; z++) {
                 for (int y = -1; y <= 1; y++) {
-                    if (world.getBlockState(center.add(0, y, z)).isOf(Blocks.PACKED_ICE)) {
+                    if (world.getBlockState(center.offset(0, y, z)).is(Blocks.PACKED_ICE)) {
                         hasPackedIce = true;
                         break;
                     }
@@ -558,7 +558,7 @@ public class SlipPortalHandler {
      */
     private static boolean isHorizontalPortalFrameIntact(ServerLevel world, HorizontalPortalData portal) {
         for (BlockPos framePos : portal.frameBlocks) {
-            if (!world.getBlockState(framePos).isOf(Blocks.BLUE_ICE)) {
+            if (!world.getBlockState(framePos).is(Blocks.BLUE_ICE)) {
                 return false;
             }
         }
@@ -570,7 +570,7 @@ public class SlipPortalHandler {
      */
     private static boolean isVerticalPortalFrameIntact(ServerLevel world, VerticalPortalData portal) {
         for (BlockPos framePos : portal.frameBlocks) {
-            if (!world.getBlockState(framePos).isOf(Blocks.BLUE_ICE)) {
+            if (!world.getBlockState(framePos).is(Blocks.BLUE_ICE)) {
                 return false;
             }
         }
@@ -586,26 +586,26 @@ public class SlipPortalHandler {
 
         // Collect frame blocks
         for (int x = -1; x <= 1; x++) {
-            frameBlocks.add(center.add(x, 0, -2));
-            frameBlocks.add(center.add(x, 0, 2));
+            frameBlocks.add(center.offset(x, 0, -2));
+            frameBlocks.add(center.offset(x, 0, 2));
         }
         for (int z = -1; z <= 1; z++) {
-            frameBlocks.add(center.add(-2, 0, z));
-            frameBlocks.add(center.add(2, 0, z));
+            frameBlocks.add(center.offset(-2, 0, z));
+            frameBlocks.add(center.offset(2, 0, z));
         }
 
         // Fill the 3x3 center with water
         for (int x = -1; x <= 1; x++) {
             for (int z = -1; z <= 1; z++) {
-                BlockPos waterPos = center.add(x, 0, z);
-                world.setBlockState(waterPos, Blocks.WATER.getDefaultState(), 2);
+                BlockPos waterPos = center.offset(x, 0, z);
+                world.setBlock(waterPos, Blocks.WATER.defaultBlockState(), 2);
                 waterBlocks.add(waterPos);
             }
         }
 
         // Place light block above the center for illumination
-        BlockPos lightBlockPos = center.up();
-        world.setBlockState(lightBlockPos, Blocks.LIGHT.getDefaultState(), 2);
+        BlockPos lightBlockPos = center.above();
+        world.setBlock(lightBlockPos, Blocks.LIGHT.defaultBlockState(), 2);
 
         // Register the portal
         activeHorizontalPortals.put(center, new HorizontalPortalData(center, frameBlocks, waterBlocks, lightBlockPos));
@@ -614,7 +614,7 @@ public class SlipPortalHandler {
         world.playSound(
             null,
             center,
-            SoundEvents.BLOCK_PORTAL_TRIGGER,
+            SoundEvents.PORTAL_TRIGGER,
             SoundSource.BLOCKS,
             1.0F,
             1.0F
@@ -622,11 +622,11 @@ public class SlipPortalHandler {
 
         // Spawn initial particle burst
         for (int i = 0; i < 50; i++) {
-            double offsetX = (world.random.nextDouble() - 0.5) * 3;
-            double offsetY = world.random.nextDouble() * 0.5;
-            double offsetZ = (world.random.nextDouble() - 0.5) * 3;
+            double offsetX = (world.getRandom().nextDouble() - 0.5) * 3;
+            double offsetY = world.getRandom().nextDouble() * 0.5;
+            double offsetZ = (world.getRandom().nextDouble() - 0.5) * 3;
 
-            world.spawnParticles(
+            world.sendParticles(
                 ParticleTypes.PORTAL,
                 center.getX() + 0.5 + offsetX,
                 center.getY() + offsetY,
@@ -645,9 +645,9 @@ public class SlipPortalHandler {
         // Replace any water blocks that appear below the portal (similar to vertical portal containment)
         for (int x = -1; x <= 1; x++) {
             for (int z = -1; z <= 1; z++) {
-                BlockPos belowPos = portal.centerPos.add(x, -1, z);
-                if (world.getBlockState(belowPos).isOf(Blocks.WATER)) {
-                    world.setBlockState(belowPos, Blocks.AIR.getDefaultState(), 2);
+                BlockPos belowPos = portal.centerPos.offset(x, -1, z);
+                if (world.getBlockState(belowPos).is(Blocks.WATER)) {
+                    world.setBlock(belowPos, Blocks.AIR.defaultBlockState(), 2);
                 }
             }
         }
@@ -660,21 +660,21 @@ public class SlipPortalHandler {
         // Remove water blocks
         for (BlockPos waterPos : portal.waterBlocks) {
             BlockState state = world.getBlockState(waterPos);
-            if (state.isOf(Blocks.WATER)) {
-                world.setBlockState(waterPos, Blocks.AIR.getDefaultState(), 3);
+            if (state.is(Blocks.WATER)) {
+                world.setBlock(waterPos, Blocks.AIR.defaultBlockState(), 3);
             }
         }
 
         // Remove light block
-        if (world.getBlockState(portal.lightBlockPos).isOf(Blocks.LIGHT)) {
-            world.setBlockState(portal.lightBlockPos, Blocks.AIR.getDefaultState(), 3);
+        if (world.getBlockState(portal.lightBlockPos).is(Blocks.LIGHT)) {
+            world.setBlock(portal.lightBlockPos, Blocks.AIR.defaultBlockState(), 3);
         }
 
         // Play deactivation sound
         world.playSound(
             null,
             portal.centerPos,
-            SoundEvents.BLOCK_FIRE_EXTINGUISH,
+            SoundEvents.FIRE_EXTINGUISH,
             SoundSource.BLOCKS,
             1.0F,
             0.8F
@@ -687,12 +687,12 @@ public class SlipPortalHandler {
     private static void spawnHorizontalPortalParticles(ServerLevel world, HorizontalPortalData portal) {
         // Spawn particles in the water area
         for (BlockPos waterPos : portal.waterBlocks) {
-            if (world.random.nextInt(3) == 0) {
-                double x = waterPos.getX() + world.random.nextDouble();
+            if (world.getRandom().nextInt(3) == 0) {
+                double x = waterPos.getX() + world.getRandom().nextDouble();
                 double y = waterPos.getY() + 0.1;
-                double z = waterPos.getZ() + world.random.nextDouble();
+                double z = waterPos.getZ() + world.getRandom().nextDouble();
 
-                world.spawnParticles(
+                world.sendParticles(
                     ParticleTypes.PORTAL,
                     x, y, z,
                     5,
@@ -703,17 +703,17 @@ public class SlipPortalHandler {
         }
 
         // Spawn particles around the frame
-        if (world.random.nextInt(2) == 0) {
+        if (world.getRandom().nextInt(2) == 0) {
             BlockPos randomFrame = portal.frameBlocks.stream()
-                .skip(world.random.nextInt(portal.frameBlocks.size()))
+                .skip(world.getRandom().nextInt(portal.frameBlocks.size()))
                 .findFirst()
                 .orElse(portal.centerPos);
 
-            double x = randomFrame.getX() + world.random.nextDouble();
-            double y = randomFrame.getY() + world.random.nextDouble();
-            double z = randomFrame.getZ() + world.random.nextDouble();
+            double x = randomFrame.getX() + world.getRandom().nextDouble();
+            double y = randomFrame.getY() + world.getRandom().nextDouble();
+            double z = randomFrame.getZ() + world.getRandom().nextDouble();
 
-            world.spawnParticles(
+            world.sendParticles(
                 ParticleTypes.SNOWFLAKE,
                 x, y, z,
                 5,
@@ -737,54 +737,54 @@ public class SlipPortalHandler {
             // Frame parallel to X axis (North/South facing)
             // Horizontal bars
             for (int x = -1; x <= 1; x++) {
-                frameBlocks.add(center.add(x, -2, 0));
-                frameBlocks.add(center.add(x, 2, 0));
+                frameBlocks.add(center.offset(x, -2, 0));
+                frameBlocks.add(center.offset(x, 2, 0));
             }
             // Vertical bars
             for (int y = -1; y <= 1; y++) {
-                frameBlocks.add(center.add(-2, y, 0));
-                frameBlocks.add(center.add(2, y, 0));
+                frameBlocks.add(center.offset(-2, y, 0));
+                frameBlocks.add(center.offset(2, y, 0));
             }
 
             // Fill the 3x3 center with flowing water
             for (int x = -1; x <= 1; x++) {
                 for (int y = -1; y <= 1; y++) {
-                    BlockPos waterPos = center.add(x, y, 0);
-                    world.setBlockState(waterPos, Blocks.WATER.getDefaultState(), 2);
+                    BlockPos waterPos = center.offset(x, y, 0);
+                    world.setBlock(waterPos, Blocks.WATER.defaultBlockState(), 2);
                     waterBlocks.add(waterPos);
                 }
             }
 
             // Place light block in front of the portal
-            BlockPos lightBlockPos = center.offset(facing);
-            world.setBlockState(lightBlockPos, Blocks.LIGHT.getDefaultState(), 2);
+            BlockPos lightBlockPos = center.relative(facing);
+            world.setBlock(lightBlockPos, Blocks.LIGHT.defaultBlockState(), 2);
 
             activeVerticalPortals.put(center, new VerticalPortalData(center, facing, frameBlocks, waterBlocks, lightBlockPos));
         } else {
             // Frame parallel to Z axis (East/West facing)
             // Horizontal bars
             for (int z = -1; z <= 1; z++) {
-                frameBlocks.add(center.add(0, -2, z));
-                frameBlocks.add(center.add(0, 2, z));
+                frameBlocks.add(center.offset(0, -2, z));
+                frameBlocks.add(center.offset(0, 2, z));
             }
             // Vertical bars
             for (int y = -1; y <= 1; y++) {
-                frameBlocks.add(center.add(0, y, -2));
-                frameBlocks.add(center.add(0, y, 2));
+                frameBlocks.add(center.offset(0, y, -2));
+                frameBlocks.add(center.offset(0, y, 2));
             }
 
             // Fill the 3x3 center with flowing water
             for (int z = -1; z <= 1; z++) {
                 for (int y = -1; y <= 1; y++) {
-                    BlockPos waterPos = center.add(0, y, z);
-                    world.setBlockState(waterPos, Blocks.WATER.getDefaultState(), 2);
+                    BlockPos waterPos = center.offset(0, y, z);
+                    world.setBlock(waterPos, Blocks.WATER.defaultBlockState(), 2);
                     waterBlocks.add(waterPos);
                 }
             }
 
             // Place light block in front of the portal
-            BlockPos lightBlockPos = center.offset(facing);
-            world.setBlockState(lightBlockPos, Blocks.LIGHT.getDefaultState(), 2);
+            BlockPos lightBlockPos = center.relative(facing);
+            world.setBlock(lightBlockPos, Blocks.LIGHT.defaultBlockState(), 2);
 
             activeVerticalPortals.put(center, new VerticalPortalData(center, facing, frameBlocks, waterBlocks, lightBlockPos));
         }
@@ -793,7 +793,7 @@ public class SlipPortalHandler {
         world.playSound(
             null,
             center,
-            SoundEvents.BLOCK_PORTAL_TRIGGER,
+            SoundEvents.PORTAL_TRIGGER,
             SoundSource.BLOCKS,
             1.0F,
             1.0F
@@ -801,11 +801,11 @@ public class SlipPortalHandler {
 
         // Spawn initial particle burst
         for (int i = 0; i < 50; i++) {
-            double offsetX = (world.random.nextDouble() - 0.5) * 3;
-            double offsetY = (world.random.nextDouble() - 0.5) * 3;
-            double offsetZ = (world.random.nextDouble() - 0.5) * 3;
+            double offsetX = (world.getRandom().nextDouble() - 0.5) * 3;
+            double offsetY = (world.getRandom().nextDouble() - 0.5) * 3;
+            double offsetZ = (world.getRandom().nextDouble() - 0.5) * 3;
 
-            world.spawnParticles(
+            world.sendParticles(
                 ParticleTypes.PORTAL,
                 center.getX() + 0.5 + offsetX,
                 center.getY() + offsetY,
@@ -833,52 +833,52 @@ public class SlipPortalHandler {
             // Frame parallel to X axis (North/South facing)
             // Collect frame blocks
             for (int x = -1; x <= 1; x++) {
-                frameBlocks.add(center.add(x, -2, 0));
-                frameBlocks.add(center.add(x, 2, 0));
+                frameBlocks.add(center.offset(x, -2, 0));
+                frameBlocks.add(center.offset(x, 2, 0));
             }
             for (int y = -1; y <= 1; y++) {
-                frameBlocks.add(center.add(-2, y, 0));
-                frameBlocks.add(center.add(2, y, 0));
+                frameBlocks.add(center.offset(-2, y, 0));
+                frameBlocks.add(center.offset(2, y, 0));
             }
 
             // Convert packed ice to water in the 3x3 center
             for (int x = -1; x <= 1; x++) {
                 for (int y = -1; y <= 1; y++) {
-                    BlockPos waterPos = center.add(x, y, 0);
-                    world.setBlockState(waterPos, Blocks.WATER.getDefaultState(), 2);
+                    BlockPos waterPos = center.offset(x, y, 0);
+                    world.setBlock(waterPos, Blocks.WATER.defaultBlockState(), 2);
                     waterBlocks.add(waterPos);
                 }
             }
 
             // Place light block in front of the portal
-            BlockPos lightBlockPos = center.offset(facing);
-            world.setBlockState(lightBlockPos, Blocks.LIGHT.getDefaultState(), 2);
+            BlockPos lightBlockPos = center.relative(facing);
+            world.setBlock(lightBlockPos, Blocks.LIGHT.defaultBlockState(), 2);
 
             activeVerticalPortals.put(center, new VerticalPortalData(center, facing, frameBlocks, waterBlocks, lightBlockPos));
         } else {
             // Frame parallel to Z axis (East/West facing)
             // Collect frame blocks
             for (int z = -1; z <= 1; z++) {
-                frameBlocks.add(center.add(0, -2, z));
-                frameBlocks.add(center.add(0, 2, z));
+                frameBlocks.add(center.offset(0, -2, z));
+                frameBlocks.add(center.offset(0, 2, z));
             }
             for (int y = -1; y <= 1; y++) {
-                frameBlocks.add(center.add(0, y, -2));
-                frameBlocks.add(center.add(0, y, 2));
+                frameBlocks.add(center.offset(0, y, -2));
+                frameBlocks.add(center.offset(0, y, 2));
             }
 
             // Convert packed ice to water in the 3x3 center
             for (int z = -1; z <= 1; z++) {
                 for (int y = -1; y <= 1; y++) {
-                    BlockPos waterPos = center.add(0, y, z);
-                    world.setBlockState(waterPos, Blocks.WATER.getDefaultState(), 2);
+                    BlockPos waterPos = center.offset(0, y, z);
+                    world.setBlock(waterPos, Blocks.WATER.defaultBlockState(), 2);
                     waterBlocks.add(waterPos);
                 }
             }
 
             // Place light block in front of the portal
-            BlockPos lightBlockPos = center.offset(facing);
-            world.setBlockState(lightBlockPos, Blocks.LIGHT.getDefaultState(), 2);
+            BlockPos lightBlockPos = center.relative(facing);
+            world.setBlock(lightBlockPos, Blocks.LIGHT.defaultBlockState(), 2);
 
             activeVerticalPortals.put(center, new VerticalPortalData(center, facing, frameBlocks, waterBlocks, lightBlockPos));
         }
@@ -887,7 +887,7 @@ public class SlipPortalHandler {
         world.playSound(
             null,
             center,
-            SoundEvents.BLOCK_PORTAL_TRIGGER,
+            SoundEvents.PORTAL_TRIGGER,
             SoundSource.BLOCKS,
             1.0F,
             1.0F
@@ -895,11 +895,11 @@ public class SlipPortalHandler {
 
         // Spawn initial particle burst
         for (int i = 0; i < 50; i++) {
-            double offsetX = (world.random.nextDouble() - 0.5) * 3;
-            double offsetY = (world.random.nextDouble() - 0.5) * 3;
-            double offsetZ = (world.random.nextDouble() - 0.5) * 3;
+            double offsetX = (world.getRandom().nextDouble() - 0.5) * 3;
+            double offsetY = (world.getRandom().nextDouble() - 0.5) * 3;
+            double offsetZ = (world.getRandom().nextDouble() - 0.5) * 3;
 
-            world.spawnParticles(
+            world.sendParticles(
                 ParticleTypes.PORTAL,
                 center.getX() + 0.5 + offsetX,
                 center.getY() + offsetY,
@@ -917,8 +917,8 @@ public class SlipPortalHandler {
     private static void maintainVerticalPortalWater(ServerLevel world, VerticalPortalData portal) {
         // Re-place any missing water blocks to keep the portal contained
         for (BlockPos waterPos : portal.waterBlocks) {
-            if (!world.getBlockState(waterPos).isOf(Blocks.WATER)) {
-                world.setBlockState(waterPos, Blocks.WATER.getDefaultState(), 2);
+            if (!world.getBlockState(waterPos).is(Blocks.WATER)) {
+                world.setBlock(waterPos, Blocks.WATER.defaultBlockState(), 2);
             }
         }
     }
@@ -930,21 +930,21 @@ public class SlipPortalHandler {
         // Remove water blocks
         for (BlockPos waterPos : portal.waterBlocks) {
             BlockState state = world.getBlockState(waterPos);
-            if (state.isOf(Blocks.WATER)) {
-                world.setBlockState(waterPos, Blocks.AIR.getDefaultState(), 3);
+            if (state.is(Blocks.WATER)) {
+                world.setBlock(waterPos, Blocks.AIR.defaultBlockState(), 3);
             }
         }
 
         // Remove light block
-        if (world.getBlockState(portal.lightBlockPos).isOf(Blocks.LIGHT)) {
-            world.setBlockState(portal.lightBlockPos, Blocks.AIR.getDefaultState(), 3);
+        if (world.getBlockState(portal.lightBlockPos).is(Blocks.LIGHT)) {
+            world.setBlock(portal.lightBlockPos, Blocks.AIR.defaultBlockState(), 3);
         }
 
         // Play deactivation sound
         world.playSound(
             null,
             portal.centerPos,
-            SoundEvents.BLOCK_FIRE_EXTINGUISH,
+            SoundEvents.FIRE_EXTINGUISH,
             SoundSource.BLOCKS,
             1.0F,
             0.8F
@@ -957,12 +957,12 @@ public class SlipPortalHandler {
     private static void spawnVerticalPortalParticles(ServerLevel world, VerticalPortalData portal) {
         // Spawn particles in the water area
         for (BlockPos waterPos : portal.waterBlocks) {
-            if (world.random.nextInt(3) == 0) {
-                double x = waterPos.getX() + world.random.nextDouble();
-                double y = waterPos.getY() + world.random.nextDouble();
-                double z = waterPos.getZ() + world.random.nextDouble();
+            if (world.getRandom().nextInt(3) == 0) {
+                double x = waterPos.getX() + world.getRandom().nextDouble();
+                double y = waterPos.getY() + world.getRandom().nextDouble();
+                double z = waterPos.getZ() + world.getRandom().nextDouble();
 
-                world.spawnParticles(
+                world.sendParticles(
                     ParticleTypes.PORTAL,
                     x, y, z,
                     5,
@@ -973,17 +973,17 @@ public class SlipPortalHandler {
         }
 
         // Spawn particles around the frame
-        if (world.random.nextInt(2) == 0) {
+        if (world.getRandom().nextInt(2) == 0) {
             BlockPos randomFrame = portal.frameBlocks.stream()
-                .skip(world.random.nextInt(portal.frameBlocks.size()))
+                .skip(world.getRandom().nextInt(portal.frameBlocks.size()))
                 .findFirst()
                 .orElse(portal.centerPos);
 
-            double x = randomFrame.getX() + world.random.nextDouble();
-            double y = randomFrame.getY() + world.random.nextDouble();
-            double z = randomFrame.getZ() + world.random.nextDouble();
+            double x = randomFrame.getX() + world.getRandom().nextDouble();
+            double y = randomFrame.getY() + world.getRandom().nextDouble();
+            double z = randomFrame.getZ() + world.getRandom().nextDouble();
 
-            world.spawnParticles(
+            world.sendParticles(
                 ParticleTypes.SNOWFLAKE,
                 x, y, z,
                 5,
@@ -1000,20 +1000,20 @@ public class SlipPortalHandler {
     private static boolean isValidVerticalPortalFrameWithPackedIce_NorthSouth(Level world, BlockPos center) {
         // Check horizontal bars (top and bottom)
         for (int x = -1; x <= 1; x++) {
-            if (!world.getBlockState(center.add(x, -2, 0)).isOf(Blocks.BLUE_ICE)) {
+            if (!world.getBlockState(center.offset(x, -2, 0)).is(Blocks.BLUE_ICE)) {
                 return false;
             }
-            if (!world.getBlockState(center.add(x, 2, 0)).isOf(Blocks.BLUE_ICE)) {
+            if (!world.getBlockState(center.offset(x, 2, 0)).is(Blocks.BLUE_ICE)) {
                 return false;
             }
         }
 
         // Check vertical bars (left and right)
         for (int y = -1; y <= 1; y++) {
-            if (!world.getBlockState(center.add(-2, y, 0)).isOf(Blocks.BLUE_ICE)) {
+            if (!world.getBlockState(center.offset(-2, y, 0)).is(Blocks.BLUE_ICE)) {
                 return false;
             }
-            if (!world.getBlockState(center.add(2, y, 0)).isOf(Blocks.BLUE_ICE)) {
+            if (!world.getBlockState(center.offset(2, y, 0)).is(Blocks.BLUE_ICE)) {
                 return false;
             }
         }
@@ -1022,7 +1022,7 @@ public class SlipPortalHandler {
         boolean hasPackedIce = false;
         for (int x = -1; x <= 1; x++) {
             for (int y = -1; y <= 1; y++) {
-                if (world.getBlockState(center.add(x, y, 0)).isOf(Blocks.PACKED_ICE)) {
+                if (world.getBlockState(center.offset(x, y, 0)).is(Blocks.PACKED_ICE)) {
                     hasPackedIce = true;
                     break;
                 }
@@ -1041,12 +1041,12 @@ public class SlipPortalHandler {
             return false;
         }
 
-        ServerLevel slipWorld = ((ServerPlayerAccessor)player).deeperdark$getServer().getWorld(THE_SLIP);
+        ServerLevel slipWorld = ((ServerPlayerAccessor)player).deeperdark$getServer().getLevel(THE_SLIP);
         if (slipWorld == null) {
             return false;
         }
 
-        BlockPos playerPos = player.getBlockPos();
+        BlockPos playerPos = player.blockPosition();
 
         // Find which portal the player is in and use its center position
         BlockPos portalCenter = null;
@@ -1071,7 +1071,7 @@ public class SlipPortalHandler {
             player.getX(),
             player.getY(),
             player.getZ(),
-            SoundEvents.BLOCK_PORTAL_TRAVEL,
+            SoundEvents.PORTAL_TRAVEL,
             SoundSource.PLAYERS,
             1.0F,
             1.0F
@@ -1083,19 +1083,19 @@ public class SlipPortalHandler {
             slipWorld,
             targetVec,
             Vec3.ZERO,
-            player.getYaw(),
-            player.getPitch(),
-            TeleportTransition.NO_OP
+            player.getYRot(),
+            player.getXRot(),
+            TeleportTransition.DO_NOTHING
         );
 
         // Teleport the player
-        player.teleportTo(target);
+        player.teleport(target);
 
         // Play sound in destination world
         slipWorld.playSound(
             null,
             targetPos,
-            SoundEvents.BLOCK_PORTAL_TRAVEL,
+            SoundEvents.PORTAL_TRAVEL,
             SoundSource.PLAYERS,
             1.0F,
             1.0F
@@ -1112,7 +1112,7 @@ public class SlipPortalHandler {
             return false;
         }
 
-        ServerLevel overworldWorld = ((ServerPlayerAccessor)player).deeperdark$getServer().getWorld(OVERWORLD);
+        ServerLevel overworldWorld = ((ServerPlayerAccessor)player).deeperdark$getServer().getLevel(OVERWORLD);
         if (overworldWorld == null) {
             return false;
         }
@@ -1122,9 +1122,9 @@ public class SlipPortalHandler {
 
         if (waypointPos != null) {
             // Verify waypoint still exists
-            BlockPos flowerPos = waypointPos.up();
-            if (overworldWorld.getBlockState(waypointPos).isOf(Blocks.BLUE_ICE) &&
-                overworldWorld.getBlockState(flowerPos).isOf(Blocks.WILDFLOWERS)) {
+            BlockPos flowerPos = waypointPos.above();
+            if (overworldWorld.getBlockState(waypointPos).is(Blocks.BLUE_ICE) &&
+                overworldWorld.getBlockState(flowerPos).is(Blocks.WILDFLOWERS)) {
                 // Use existing waypoint
                 teleportPlayerToWaypoint(player, overworldWorld, waypointPos);
                 return true;
@@ -1149,7 +1149,7 @@ public class SlipPortalHandler {
         }
 
         // Create waypoint marker (one block lower so ice is in ground)
-        BlockPos waypointBasePos = surfacePos.down();
+        BlockPos waypointBasePos = surfacePos.below();
         createWaypointMarker(overworldWorld, waypointBasePos);
 
         // Store waypoint location
@@ -1181,12 +1181,12 @@ public class SlipPortalHandler {
                     );
 
                     // Find the highest solid block (surface)
-                    BlockPos surfacePos = world.getTopPosition(net.minecraft.world.level.levelgen.Heightmap.Type.WORLD_SURFACE, checkPos);
+                    BlockPos surfacePos = world.getHeightmapPos(net.minecraft.world.level.levelgen.Heightmap.Types.WORLD_SURFACE, checkPos);
 
                     // Make sure there's solid ground and air above
-                    if (world.getBlockState(surfacePos).isSolidBlock(world, surfacePos) &&
-                        world.getBlockState(surfacePos.up()).isAir() &&
-                        world.getBlockState(surfacePos.up(2)).isAir()) {
+                    if (world.getBlockState(surfacePos).isSolid() &&
+                        world.getBlockState(surfacePos.above()).isAir() &&
+                        world.getBlockState(surfacePos.above(2)).isAir()) {
                         return surfacePos;
                     }
                 }
@@ -1194,7 +1194,7 @@ public class SlipPortalHandler {
         }
 
         // Fallback: use the top position at the scaled location
-        return world.getTopPosition(net.minecraft.world.level.levelgen.Heightmap.Type.WORLD_SURFACE, startPos);
+        return world.getHeightmapPos(net.minecraft.world.level.levelgen.Heightmap.Types.WORLD_SURFACE, startPos);
     }
 
     /**
@@ -1202,17 +1202,17 @@ public class SlipPortalHandler {
      */
     private static void createWaypointMarker(ServerLevel world, BlockPos pos) {
         // Place blue ice block (in the ground)
-        world.setBlockState(pos, Blocks.BLUE_ICE.getDefaultState(), 3);
+        world.setBlock(pos, Blocks.BLUE_ICE.defaultBlockState(), 3);
 
         // Place pink petals on top (at surface level)
-        BlockPos flowerPos = pos.up();
-        world.setBlockState(flowerPos, Blocks.WILDFLOWERS.getDefaultState(), 3);
+        BlockPos flowerPos = pos.above();
+        world.setBlock(flowerPos, Blocks.WILDFLOWERS.defaultBlockState(), 3);
 
         // Play a magical sound
         world.playSound(
             null,
             pos,
-            SoundEvents.BLOCK_PORTAL_TRIGGER,
+            SoundEvents.PORTAL_TRIGGER,
             SoundSource.BLOCKS,
             0.5F,
             1.5F
@@ -1220,11 +1220,11 @@ public class SlipPortalHandler {
 
         // Spawn particle burst
         for (int i = 0; i < 10; i++) {
-            double offsetX = (world.random.nextDouble() - 0.5) * 2;
-            double offsetY = world.random.nextDouble() * 2;
-            double offsetZ = (world.random.nextDouble() - 0.5) * 2;
+            double offsetX = (world.getRandom().nextDouble() - 0.5) * 2;
+            double offsetY = world.getRandom().nextDouble() * 2;
+            double offsetZ = (world.getRandom().nextDouble() - 0.5) * 2;
 
-            world.spawnParticles(
+            world.sendParticles(
                 ParticleTypes.END_ROD,
                 flowerPos.getX() + 0.5 + offsetX,
                 flowerPos.getY() + offsetY,
@@ -1246,32 +1246,32 @@ public class SlipPortalHandler {
             player.getX(),
             player.getY(),
             player.getZ(),
-            SoundEvents.BLOCK_PORTAL_TRAVEL,
+            SoundEvents.PORTAL_TRAVEL,
             SoundSource.PLAYERS,
             1.0F,
             1.0F
         );
 
         // Teleport player to stand on the waypoint
-        BlockPos spawnPos = waypointPos.up();
+        BlockPos spawnPos = waypointPos.above();
         Vec3 targetVec = new Vec3(spawnPos.getX() + 0.5, spawnPos.getY(), spawnPos.getZ() + 0.5);
         TeleportTransition target = new TeleportTransition(
             overworldWorld,
             targetVec,
             Vec3.ZERO,
-            player.getYaw(),
-            player.getPitch(),
-            TeleportTransition.NO_OP
+            player.getYRot(),
+            player.getXRot(),
+            TeleportTransition.DO_NOTHING
         );
 
         // Teleport the player
-        player.teleportTo(target);
+        player.teleport(target);
 
         // Play sound in destination world
         overworldWorld.playSound(
             null,
             spawnPos,
-            SoundEvents.BLOCK_PORTAL_TRAVEL,
+            SoundEvents.PORTAL_TRAVEL,
             SoundSource.PLAYERS,
             1.0F,
             1.0F
@@ -1284,24 +1284,24 @@ public class SlipPortalHandler {
     private static void handleOverworldWaypoints(ServerLevel overworldWorld) {
         // Spawn particles around waypoint flowers
         for (BlockPos waypointPos : slipToOverworldWaypoints.values()) {
-            BlockPos flowerPos = waypointPos.up();
+            BlockPos flowerPos = waypointPos.above();
 
             // Check if the waypoint is still intact (blue ice + pink petals)
-            if (!overworldWorld.getBlockState(waypointPos).isOf(Blocks.BLUE_ICE) ||
-                !overworldWorld.getBlockState(flowerPos).isOf(Blocks.WILDFLOWERS)) {
+            if (!overworldWorld.getBlockState(waypointPos).is(Blocks.BLUE_ICE) ||
+                !overworldWorld.getBlockState(flowerPos).is(Blocks.WILDFLOWERS)) {
                 continue;
             }
 
             // Spawn particles across the entire top surface of the block
             // Moved half a block down (from 0.9 to 0.4)
-            double x = flowerPos.getX() + overworldWorld.random.nextDouble();
+            double x = flowerPos.getX() + overworldWorld.getRandom().nextDouble();
             double y = flowerPos.getY() + 0.4;
-            double z = flowerPos.getZ() + overworldWorld.random.nextDouble();
+            double z = flowerPos.getZ() + overworldWorld.getRandom().nextDouble();
 
             // Half the count (was 1, now spawning half as often which effectively halves count)
             // Half the speed (was 0.005, now 0.0025)
-            if (overworldWorld.random.nextInt(2) == 0) {
-                overworldWorld.spawnParticles(
+            if (overworldWorld.getRandom().nextInt(2) == 0) {
+                overworldWorld.sendParticles(
                     ParticleTypes.END_ROD,
                     x, y, z,
                     1,
@@ -1354,7 +1354,7 @@ public class SlipPortalHandler {
 
                     // Search vertically from high to low to prefer spawning at higher Y levels
                     for (int yOffset = VERTICAL_SEARCH_RANGE; yOffset >= -VERTICAL_SEARCH_RANGE; yOffset--) {
-                        BlockPos checkPos = basePos.add(0, yOffset, 0);
+                        BlockPos checkPos = basePos.offset(0, yOffset, 0);
 
                         if (isSuitableVerticalPortalLocation(world, checkPos)) {
                             // Prefer locations with higher Y values
@@ -1388,15 +1388,15 @@ public class SlipPortalHandler {
         // Need a 5x5 vertical area clear (checking North-South orientation)
         for (int x = -2; x <= 2; x++) {
             for (int y = -2; y <= 2; y++) {
-                if (!world.getBlockState(pos.add(x, y, 0)).isAir()) {
+                if (!world.getBlockState(pos.offset(x, y, 0)).isAir()) {
                     return false;
                 }
             }
         }
 
         // Check for solid ground below the portal (3 blocks down)
-        BlockPos groundCheck = pos.down(3);
-        if (!world.getBlockState(groundCheck).isSolidBlock(world, groundCheck)) {
+        BlockPos groundCheck = pos.below(3);
+        if (!world.getBlockState(groundCheck).isSolid()) {
             return false;
         }
 
@@ -1406,7 +1406,7 @@ public class SlipPortalHandler {
             for (int z = -1; z <= 1; z++) {
                 // Check a few blocks above the portal
                 for (int y = 3; y <= 5; y++) {
-                    BlockPos checkPos = pos.add(x, y, z);
+                    BlockPos checkPos = pos.offset(x, y, z);
                     if (!world.getBlockState(checkPos).isAir()) {
                         // There's a block above - might be inside a cave/wall
                         // Only reject if we're completely enclosed
@@ -1414,7 +1414,7 @@ public class SlipPortalHandler {
                         // Check all directions around the portal
                         for (int dx = -3; dx <= 3; dx++) {
                             for (int dz = -1; dz <= 1; dz++) {
-                                if (!world.getBlockState(pos.add(dx, 2, dz)).isAir()) {
+                                if (!world.getBlockState(pos.offset(dx, 2, dz)).isAir()) {
                                     enclosedCount++;
                                 }
                             }
@@ -1440,22 +1440,22 @@ public class SlipPortalHandler {
         if (isNorthSouth) {
             // Frame parallel to X axis
             for (int x = -1; x <= 1; x++) {
-                world.setBlockState(center.add(x, -2, 0), Blocks.BLUE_ICE.getDefaultState(), 3);
-                world.setBlockState(center.add(x, 2, 0), Blocks.BLUE_ICE.getDefaultState(), 3);
+                world.setBlock(center.offset(x, -2, 0), Blocks.BLUE_ICE.defaultBlockState(), 3);
+                world.setBlock(center.offset(x, 2, 0), Blocks.BLUE_ICE.defaultBlockState(), 3);
             }
             for (int y = -1; y <= 1; y++) {
-                world.setBlockState(center.add(-2, y, 0), Blocks.BLUE_ICE.getDefaultState(), 3);
-                world.setBlockState(center.add(2, y, 0), Blocks.BLUE_ICE.getDefaultState(), 3);
+                world.setBlock(center.offset(-2, y, 0), Blocks.BLUE_ICE.defaultBlockState(), 3);
+                world.setBlock(center.offset(2, y, 0), Blocks.BLUE_ICE.defaultBlockState(), 3);
             }
         } else {
             // Frame parallel to Z axis
             for (int z = -1; z <= 1; z++) {
-                world.setBlockState(center.add(0, -2, z), Blocks.BLUE_ICE.getDefaultState(), 3);
-                world.setBlockState(center.add(0, 2, z), Blocks.BLUE_ICE.getDefaultState(), 3);
+                world.setBlock(center.offset(0, -2, z), Blocks.BLUE_ICE.defaultBlockState(), 3);
+                world.setBlock(center.offset(0, 2, z), Blocks.BLUE_ICE.defaultBlockState(), 3);
             }
             for (int y = -1; y <= 1; y++) {
-                world.setBlockState(center.add(0, y, -2), Blocks.BLUE_ICE.getDefaultState(), 3);
-                world.setBlockState(center.add(0, y, 2), Blocks.BLUE_ICE.getDefaultState(), 3);
+                world.setBlock(center.offset(0, y, -2), Blocks.BLUE_ICE.defaultBlockState(), 3);
+                world.setBlock(center.offset(0, y, 2), Blocks.BLUE_ICE.defaultBlockState(), 3);
             }
         }
 
@@ -1466,7 +1466,7 @@ public class SlipPortalHandler {
         world.playSound(
             null,
             center,
-            SoundEvents.BLOCK_GLASS_PLACE,
+            SoundEvents.GLASS_PLACE,
             SoundSource.BLOCKS,
             1.0F,
             0.8F
@@ -1482,30 +1482,30 @@ public class SlipPortalHandler {
         // Create 5x5 packed ice platform below the portal
         for (int x = -2; x <= 2; x++) {
             for (int z = -2; z <= 2; z++) {
-                BlockPos platformPos = center.add(x, -3, z);
-                world.setBlockState(platformPos, Blocks.PACKED_ICE.getDefaultState(), 3);
+                BlockPos platformPos = center.offset(x, -3, z);
+                world.setBlock(platformPos, Blocks.PACKED_ICE.defaultBlockState(), 3);
             }
         }
 
         if (isNorthSouth) {
             // Frame parallel to X axis
             for (int x = -1; x <= 1; x++) {
-                world.setBlockState(center.add(x, -2, 0), Blocks.BLUE_ICE.getDefaultState(), 3);
-                world.setBlockState(center.add(x, 2, 0), Blocks.BLUE_ICE.getDefaultState(), 3);
+                world.setBlock(center.offset(x, -2, 0), Blocks.BLUE_ICE.defaultBlockState(), 3);
+                world.setBlock(center.offset(x, 2, 0), Blocks.BLUE_ICE.defaultBlockState(), 3);
             }
             for (int y = -1; y <= 1; y++) {
-                world.setBlockState(center.add(-2, y, 0), Blocks.BLUE_ICE.getDefaultState(), 3);
-                world.setBlockState(center.add(2, y, 0), Blocks.BLUE_ICE.getDefaultState(), 3);
+                world.setBlock(center.offset(-2, y, 0), Blocks.BLUE_ICE.defaultBlockState(), 3);
+                world.setBlock(center.offset(2, y, 0), Blocks.BLUE_ICE.defaultBlockState(), 3);
             }
         } else {
             // Frame parallel to Z axis
             for (int z = -1; z <= 1; z++) {
-                world.setBlockState(center.add(0, -2, z), Blocks.BLUE_ICE.getDefaultState(), 3);
-                world.setBlockState(center.add(0, 2, z), Blocks.BLUE_ICE.getDefaultState(), 3);
+                world.setBlock(center.offset(0, -2, z), Blocks.BLUE_ICE.defaultBlockState(), 3);
+                world.setBlock(center.offset(0, 2, z), Blocks.BLUE_ICE.defaultBlockState(), 3);
             }
             for (int y = -1; y <= 1; y++) {
-                world.setBlockState(center.add(0, y, -2), Blocks.BLUE_ICE.getDefaultState(), 3);
-                world.setBlockState(center.add(0, y, 2), Blocks.BLUE_ICE.getDefaultState(), 3);
+                world.setBlock(center.offset(0, y, -2), Blocks.BLUE_ICE.defaultBlockState(), 3);
+                world.setBlock(center.offset(0, y, 2), Blocks.BLUE_ICE.defaultBlockState(), 3);
             }
         }
 
@@ -1516,7 +1516,7 @@ public class SlipPortalHandler {
         world.playSound(
             null,
             center,
-            SoundEvents.BLOCK_GLASS_PLACE,
+            SoundEvents.GLASS_PLACE,
             SoundSource.BLOCKS,
             1.0F,
             0.8F

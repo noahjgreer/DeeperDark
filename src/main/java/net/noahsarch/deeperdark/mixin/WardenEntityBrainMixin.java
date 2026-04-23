@@ -29,8 +29,8 @@ public class WardenEntityBrainMixin {
         Warden warden = (Warden)(Object)this;
 
         // Only ignore scentless entities when the warden is in the SNIFFING pose
-        if (warden.isInPose(Pose.SNIFFING)) {
-            if (entity instanceof LivingEntity livingEntity && livingEntity.hasStatusEffect(MobEffects.WIND_CHARGED)) {
+        if (warden.hasPose(Pose.SNIFFING)) {
+            if (entity instanceof LivingEntity livingEntity && livingEntity.hasEffect(MobEffects.WIND_CHARGED)) {
                 // The entity has Scentless effect and Warden is sniffing, so ignore it
                 cir.setReturnValue(false);
             }

@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(AbstractBoat.class)
 public abstract class AbstractBoatEntityMixin extends Entity {
 
-    @Shadow private AbstractBoat.Status location;
+    @Shadow private AbstractBoat.Status status;
 
     @Unique
     private float deeperdark$speed = 1.0f;
@@ -32,23 +32,8 @@ public abstract class AbstractBoatEntityMixin extends Entity {
     }
 
     @Override
-    public float getStepHeight() {
+    public float maxUpStep() {
         return 1.2F;
-    }
-
-    @Inject(method = "getNearbySlipperiness", at = @At("HEAD"), cancellable = true)
-    private void deeperdark$getNearbySlipperiness(CallbackInfoReturnable<Float> cir) {
-        if (this.location == AbstractBoat.Status.IN_AIR) {
-            // Return high slipperiness to maintain horizontal velocity
-            cir.setReturnValue(0.98F);
-        }
-    }
-
-    @Inject(method = "updateVelocity", at = @At("TAIL"))
-    private void deeperdark$updateVelocity(CallbackInfo ci) {
-        if (this.deeperdark$speed != 1.0f) {
-             this.setVelocity(this.getVelocity().multiply(this.deeperdark$speed, 1.0, this.deeperdark$speed));
-        }
     }
 
     @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
@@ -61,4 +46,3 @@ public abstract class AbstractBoatEntityMixin extends Entity {
         this.deeperdark$speed = view.getFloatOr("DeeperDarkSpeed", 1.0f);
     }
 }
-

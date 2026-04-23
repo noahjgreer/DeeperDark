@@ -47,7 +47,7 @@ public abstract class PotionMasterMixin implements PotionMasterDuck {
 
     @Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
     public void readCustomData(ValueInput view, CallbackInfo ci) {
-        this.isPotionMaster = view.getBoolean("DeeperDarkPotionMaster", false);
+        this.isPotionMaster = view.getBooleanOr("DeeperDarkPotionMaster", false);
     }
 
     @Inject(method = "fillRecipes", at = @At("HEAD"), cancellable = true)
@@ -81,6 +81,6 @@ public abstract class PotionMasterMixin implements PotionMasterDuck {
             // So resetCustomer() is NOT called.
             return false;
         }
-        return instance.matchesKey(key);
+        return instance.is(key);
     }
 }

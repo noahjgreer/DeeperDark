@@ -21,12 +21,12 @@ public class CustomBlockPickBlock {
         // This won't catch actual middle-click (that's client-only),
         // but we can provide a workaround using right-click while sneaking
         UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
-            if (world.isClient() || hand != InteractionHand.MAIN_HAND) {
+            if (world.isClientSide() || hand != InteractionHand.MAIN_HAND) {
                 return InteractionResult.PASS;
             }
 
             // Only trigger if player is sneaking and holding nothing or the same custom block
-            if (!player.isSneaking()) {
+            if (!player.isShiftKeyDown()) {
                 return InteractionResult.PASS;
             }
 
@@ -49,11 +49,11 @@ public class CustomBlockPickBlock {
 
             // Try to put it in the selected slot
             int selectedSlot = serverPlayer.getInventory().getSelectedSlot();
-            ItemStack currentStack = serverPlayer.getInventory().getStack(selectedSlot);
+            ItemStack currentStack = serverPlayer.getInventory().getItem(selectedSlot);
 
             // Only replace if slot is empty or contains the same item
-            if (currentStack.isEmpty() || ItemStack.areItemsAndComponentsEqual(currentStack, pickStack)) {
-                serverPlayer.getInventory().setStack(selectedSlot, pickStack);
+            if (currentStack.isEmpty() || ItemStack.isSameItemSameComponents(currentStack, pickStack)) {
+                serverPlayer.getInventory().setItem(selectedSlot, pickStack);
                 return InteractionResult.SUCCESS;
             }
 
@@ -66,12 +66,12 @@ public class CustomBlockPickBlock {
      */
     private static ItemStack getCustomBlockItem(Level world, BlockPos pos) {
         AABB box = new AABB(pos);
-        var displays = world.getEntitiesByClass(
+        var displays = world.getEntitiesOfClass(
             Display.ItemDisplay.class,
             box,
             entity -> {
                 ItemStack stack = entity.getItemStack();
-                return stack.contains(DataComponents.ITEM_MODEL);
+                return stack.has(DataComponents.ITEM_MODEL);
             }
         );
 
@@ -87,9 +87,9 @@ public class CustomBlockPickBlock {
      * Check if player has the item in their inventory
      */
     private static boolean hasItemInInventory(ServerPlayer player, ItemStack item) {
-        for (int i = 0; i < player.getInventory().size(); i++) {
-            ItemStack stack = player.getInventory().getStack(i);
-            if (ItemStack.areItemsAndComponentsEqual(stack, item)) {
+        for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
+            ItemStack stack = player.getInventory().getItem(i);
+            if (ItemStack.isSameItemSameComponents(stack, item)) {
                 return true;
             }
         }

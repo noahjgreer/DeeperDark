@@ -33,15 +33,15 @@ public class CustomBlockManager {
      * @return true if successfully placed, false if blocked.
      */
     public static boolean place(Level world, BlockPos pos, ItemStack stack, Block baseBlock, Consumer<ItemDisplay> displayConfigurator) {
-        if (world.isClient()) return false;
+        if (world.isClientSide()) return false;
 
         // Collision Check: Prevent placing if entity is inside
-        if (!world.canPlace(baseBlock.getDefaultState(), pos, CollisionContext.absent())) {
+        if (!world.isUnobstructed(baseBlock.defaultBlockState(), pos, CollisionContext.empty())) {
             return false; // Can't place
         }
 
         // Place Base Block
-        world.setBlockState(pos, baseBlock.getDefaultState());
+        world.setBlock(pos, baseBlock.defaultBlockState(), 3);
 
         // Prepare stack logic for tracker
         ItemStack displayStack = stack.copy();
@@ -60,12 +60,12 @@ public class CustomBlockManager {
             ItemDisplay display = EntityType.ITEM_DISPLAY.create(world, EntitySpawnReason.MOB_SUMMONED);
             if (display != null) {
                 // Default center pos
-                display.refreshPositionAndAngles(pos.getX() + 0.5, pos.getY() + 0.5005, pos.getZ() + 0.5, 0, 0);
+                display.setPos(pos.getX() + 0.5, pos.getY() + 0.5005, pos.getZ() + 0.5);
 
                 ItemStack initialStack = stack.copy();
                 initialStack.setCount(1);
                 display.setItemStack(initialStack);
-                display.setItemDisplayContext(ItemDisplayContext.HEAD);
+                display.setItemTransform(ItemDisplayContext.HEAD);
 
                 // Default transformation
                 Transformation transform = new Transformation(
@@ -84,15 +84,15 @@ public class CustomBlockManager {
                 int maxBlock = 0;
                 int maxSky = 0;
                 for (net.minecraft.core.Direction dir : net.minecraft.core.Direction.values()) {
-                    BlockPos neighbor = pos.offset(dir);
-                    int b = world.getLightLevel(net.minecraft.world.LightType.BLOCK, neighbor);
-                    int s = world.getLightLevel(net.minecraft.world.LightType.SKY, neighbor);
+                    BlockPos neighbor = pos.relative(dir);
+                    int b = world.getBrightness(net.minecraft.world.level.LightLayer.BLOCK, neighbor);
+                    int s = world.getBrightness(net.minecraft.world.level.LightLayer.SKY, neighbor);
                     if (b > maxBlock) maxBlock = b;
                     if (s > maxSky) maxSky = s;
                 }
-                display.setBrightness(new net.minecraft.util.Brightness(maxBlock, maxSky));
+                display.setBrightnessOverride(new net.minecraft.util.Brightness(maxBlock, maxSky));
 
-                world.spawnEntity(display);
+                serverWorld.addFreshEntity(display);
 
                 // Now register to tracker with the final state
                 tracker.addBlock(pos, baseBlock, display.getItemStack(), transform);
@@ -108,7 +108,7 @@ public class CustomBlockManager {
      */
     public static boolean onBreak(Level world, BlockPos pos, BlockState state, Player player, Identifier targetModelId, SoundType breakSound, Runnable customAction, java.util.function.UnaryOperator<ItemStack> dropTransformer) {
 
-        if (!world.isClient() && world instanceof ServerLevel serverWorld) {
+        if (!world.isClientSide() && world instanceof ServerLevel serverWorld) {
             CustomBlockTracker tracker = CustomBlockTracker.get(serverWorld);
             if (tracker.hasBlock(pos)) {
                 // Remove from tracker
@@ -119,21 +119,21 @@ public class CustomBlockManager {
 
         // Use strict box to prevent finding neighbors (e.g. block below)
         AABB box = new AABB(pos);
-        List<ItemDisplay> displays = world.getEntitiesByClass(ItemDisplay.class, box, entity -> true);
+        List<ItemDisplay> displays = world.getEntitiesOfClass(ItemDisplay.class, box, entity -> true);
 
         for (ItemDisplay display : displays) {
              ItemStack stack = display.getItemStack();
              Identifier modelId = stack.get(DataComponents.ITEM_MODEL);
 
              if (modelId != null && modelId.equals(targetModelId)) {
-                 if (!world.isClient()) {
+                 if (!world.isClientSide()) {
                      // Drops
-                     if (!player.isCreative() && player.canHarvest(state)) {
+                     if (!player.isCreative() && player.hasCorrectToolForDrops(state)) {
                          ItemStack dropStack = stack;
                          if (dropTransformer != null) {
                              dropStack = dropTransformer.apply(stack);
                          }
-                         net.minecraft.world.level.block.Block.dropStack(world, pos, dropStack);
+                         net.minecraft.world.level.block.Block.popResource(world, pos, dropStack);
                      }
 
                      // Custom logic (like particles)
@@ -142,7 +142,7 @@ public class CustomBlockManager {
                      }
 
                      // Set air to prevent vanilla drop logic
-                     world.setBlockState(pos, net.minecraft.world.level.block.Blocks.AIR.getDefaultState());
+                     world.setBlock(pos, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 3);
                  }
 
                  // Clean up entity

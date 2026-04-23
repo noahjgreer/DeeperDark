@@ -21,37 +21,30 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(LiquidBlock.class)
 public class FluidBlockMixin {
     @Unique
-    private static final ResourceKey<Level> THE_SLIP = ResourceKey.create(Registries.WORLD, Identifier.fromNamespaceAndPath("minecraft", "the_slip"));
+    private static final ResourceKey<Level> THE_SLIP = ResourceKey.create(Registries.DIMENSION, Identifier.fromNamespaceAndPath("minecraft", "the_slip"));
 
-    @Inject(method = "onBlockAdded", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "onPlace", at = @At("HEAD"), cancellable = true)
     private void onWaterOrLavaPlaced(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify, CallbackInfo ci) {
-        if (world.getRegistryKey().equals(THE_SLIP)) {
+        if (world.dimension().equals(THE_SLIP)) {
             LiquidBlock thisBlock = (LiquidBlock) (Object) this;
 
-            // Check if this is water
             if (thisBlock == Blocks.WATER) {
-                // Don't convert portal water to ice!
                 if (SlipPortalHandler.isPortalWaterBlock(pos)) {
                     return;
                 }
 
-                // Also check if this is near a portal (within 3 blocks) - prevents cocoon
                 if (SlipPortalHandler.isNearPortal(pos, 3)) {
-                    // Remove the water instead of converting to ice
-                    world.setBlockState(pos, Blocks.AIR.getDefaultState(), Block.NOTIFY_ALL);
+                    world.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
                     ci.cancel();
                     return;
                 }
 
-                // Convert to packed ice
-                world.setBlockState(pos, Blocks.PACKED_ICE.getDefaultState(), Block.NOTIFY_ALL);
-                world.playSound(null, pos, SoundEvents.ENTITY_ZOMBIE_VILLAGER_CURE, SoundSource.BLOCKS, 1.0F, 2.0F);
+                world.setBlock(pos, Blocks.PACKED_ICE.defaultBlockState(), Block.UPDATE_ALL);
+                world.playSound(null, pos, SoundEvents.ZOMBIE_VILLAGER_CURE, SoundSource.BLOCKS, 1.0F, 2.0F);
             }
-            // Check if this is lava
             else if (thisBlock == Blocks.LAVA) {
-                // Convert to blackstone
-                world.setBlockState(pos, Blocks.BLACKSTONE.getDefaultState(), Block.NOTIFY_ALL);
-                world.playSound(null, pos, Blocks.ANCIENT_DEBRIS.getDefaultState().getSoundGroup().getBreakSound(),
+                world.setBlock(pos, Blocks.BLACKSTONE.defaultBlockState(), Block.UPDATE_ALL);
+                world.playSound(null, pos, Blocks.ANCIENT_DEBRIS.defaultBlockState().getSoundType().getBreakSound(),
                         SoundSource.BLOCKS, 1.0F, 1.0F);
             }
         }

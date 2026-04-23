@@ -5,7 +5,7 @@ import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.sounds.SoundSource;
@@ -22,7 +22,7 @@ public class RottenFleshBlockEvents {
     public static void register() {
         // Placement Logic
         UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
-            ItemStack stack = player.getStackInHand(hand);
+            ItemStack stack = player.getItemInHand(hand);
             if (stack.isEmpty()) return InteractionResult.PASS;
 
             // Check for item_model component
@@ -33,25 +33,24 @@ public class RottenFleshBlockEvents {
 
             BlockPos pos = hitResult.getBlockPos();
             BlockState state = world.getBlockState(pos);
-            Direction side = hitResult.getSide();
-            BlockPos placePos = pos.offset(side);
+            Direction side = hitResult.getDirection();
+            BlockPos placePos = pos.relative(side);
 
-            if (!world.getBlockState(placePos).canReplace(new UseOnContext(player, hand, stack, hitResult))) {
+            if (!world.getBlockState(placePos).canBeReplaced(new BlockPlaceContext(player, hand, stack, hitResult))) {
                  return InteractionResult.PASS;
             }
 
-            if (!player.isSneaking() && isInteractable(state, world, pos)) {
+            if (!player.isShiftKeyDown() && isInteractable(state, world, pos)) {
                  return InteractionResult.PASS;
             }
 
-            if (!world.isClient()) {
+            if (!world.isClientSide()) {
                 // Place Nether Wart Block with Rotten Flesh Block Display
                 if (CustomBlockManager.place(world, placePos, stack, Blocks.NETHER_WART_BLOCK, null)) {
-                    // Use NETHER_WART sound
                     world.playSound(null, placePos, SoundType.NETHER_WART.getPlaceSound(), SoundSource.BLOCKS, 1f, 1f);
 
                     if (!player.isCreative()) {
-                        stack.decrement(1);
+                        stack.shrink(1);
                     }
                 }
             }
@@ -71,12 +70,11 @@ public class RottenFleshBlockEvents {
     }
 
     private static boolean isInteractable(BlockState state, Level world, BlockPos pos) {
-        return state.createScreenHandlerFactory(world, pos) != null ||
+        return state.getMenuProvider(world, pos) != null ||
                state.getBlock() instanceof net.minecraft.world.level.block.DoorBlock ||
-               state.getBlock() instanceof net.minecraft.world.level.block.TrapdoorBlock ||
+               state.getBlock() instanceof net.minecraft.world.level.block.TrapDoorBlock ||
                state.getBlock() instanceof net.minecraft.world.level.block.FenceGateBlock ||
                state.getBlock() instanceof net.minecraft.world.level.block.ButtonBlock ||
                state.getBlock() instanceof net.minecraft.world.level.block.LeverBlock;
     }
 }
-

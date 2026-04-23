@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.Overwrite;
 @Mixin(ShulkerBoxBlockEntity.class)
 public class ShulkerBoxBlockEntityMixin {
     @Overwrite
-    public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
+    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction dir) {
         return true;
     }
 }
