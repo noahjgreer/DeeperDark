@@ -32,8 +32,9 @@ public class ModVillagers {
     }
 
     public static final Int2ObjectMap<TradeFactory[]> POTION_MASTER_TRADES = new Int2ObjectOpenHashMap<>();
+    private static volatile boolean tradesRegistered = false;
 
-    public static void registerTrades() {
+    private static void registerTrades() {
         // Level 1
         List<TradeFactory> level1 = new ArrayList<>();
         level1.add(new RandomBuyFactory(Items.GLASS_BOTTLE, 3, 6, 12, 5));
@@ -80,9 +81,24 @@ public class ModVillagers {
         POTION_MASTER_TRADES.put(5, level5.toArray(new TradeFactory[0]));
     }
 
+    public static void ensureTradesRegistered() {
+        if (tradesRegistered) {
+            return;
+        }
+
+        synchronized (ModVillagers.class) {
+            if (tradesRegistered) {
+                return;
+            }
+
+            registerTrades();
+            tradesRegistered = true;
+        }
+    }
+
     public static void registerVillagers() {
         Deeperdark.LOGGER.info("Registering Villagers for " + Deeperdark.MOD_ID);
-        registerTrades();
+        // Trade data is created lazily once vanilla registries/components are fully bound.
     }
 
     private static class MultiEffectPotionFactory implements TradeFactory {

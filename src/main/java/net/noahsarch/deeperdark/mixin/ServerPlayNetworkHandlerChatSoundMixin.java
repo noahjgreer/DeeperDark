@@ -1,7 +1,6 @@
 package net.noahsarch.deeperdark.mixin;
 
 import net.minecraft.network.protocol.game.ServerboundChatPacket;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.server.level.ServerPlayer;
 import net.noahsarch.deeperdark.sound.ChatSoundManager;
@@ -17,12 +16,13 @@ public abstract class ServerPlayNetworkHandlerChatSoundMixin {
     @Shadow
     public ServerPlayer player;
 
-    @Shadow
-    protected MinecraftServer server;
-
     @Inject(method = "handleChat", at = @At("TAIL"))
     private void deeperdark$playChatSound(ServerboundChatPacket packet, CallbackInfo ci) {
-        MinecraftServer server = this.server;
+        if (this.player == null) {
+            return;
+        }
+
+        var server = this.player.level().getServer();
         if (server == null) {
             return;
         }

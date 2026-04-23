@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(PlayerList.class)
 public abstract class PlayerManagerJoinSoundMixin {
 
-    @Inject(method = "onPlayerConnect", at = @At("TAIL"))
+    @Inject(method = "placeNewPlayer", at = @At("TAIL"))
     private void deeperdark$playJoinSound(Connection connection, ServerPlayer player, CommonListenerCookie clientData, CallbackInfo ci) {
         ChatSoundManager.playJoinMessageSound(player);
     }

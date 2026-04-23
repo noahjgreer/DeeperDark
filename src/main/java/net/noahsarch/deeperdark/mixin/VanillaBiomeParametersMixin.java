@@ -18,7 +18,7 @@ public class VanillaBiomeParametersMixin {
     @Unique
     private static final ResourceKey<Biome> BLACK_MESA = ResourceKey.create(Registries.BIOME, Identifier.fromNamespaceAndPath("minecraft", "black_mesa"));
 
-    @Inject(method = "getBadlandsBiome", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "pickBadlandsBiome", at = @At("HEAD"), cancellable = true)
     private void deeperdark$replaceBadlandsWithBlackMesa(int humidity, Climate.Parameter weirdness, CallbackInfoReturnable<ResourceKey<Biome>> cir) {
         if (humidity == 2) {
             // Make black_mesa much rarer: deterministic selection based on the weirdness range.

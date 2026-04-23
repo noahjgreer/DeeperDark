@@ -24,10 +24,10 @@ import net.minecraft.world.level.gamerules.GameRules;
 public class ExplosionImplMixin {
 
     @Redirect(
-        method = "destroyBlocks(Ljava/util/List;)V",
+        method = "interactWithBlocks(Ljava/util/List;)V",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/block/BlockState;onExploded(Lnet/minecraft/server/world/ServerLevel;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/world/explosion/Explosion;Ljava/util/function/BiConsumer;)V"
+            target = "Lnet/minecraft/world/level/block/state/BlockState;onExplosionHit(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/Explosion;Ljava/util/function/BiConsumer;)V"
         )
     )
     private void deeperdark$forceAllBlockDrops(BlockState state, ServerLevel world, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> stackMerger) {
@@ -49,10 +49,10 @@ public class ExplosionImplMixin {
     }
 
     @Redirect(
-        method = "destroyBlocks(Ljava/util/List;)V",
+        method = "interactWithBlocks(Ljava/util/List;)V",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/block/Block;dropStack(Lnet/minecraft/world/Level;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/item/ItemStack;)V"
+            target = "Lnet/minecraft/world/level/block/Block;popResource(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/item/ItemStack;)V"
         )
     )
     private void deeperdark$alwaysDropStack(Level world, BlockPos pos, ItemStack stack) {

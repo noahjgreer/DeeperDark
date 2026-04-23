@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(NaturalSpawner.class)
 public class SpawnHelperMixin {
-    @Inject(method = "canSpawn", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "isValidSpawnPostitionForType", at = @At("HEAD"), cancellable = true)
     private static void checkWorldBorder(ServerLevel world, MobCategory group, StructureManager structureAccessor, ChunkGenerator chunkGenerator, MobSpawnSettings.SpawnerData spawnEntry, BlockPos.MutableBlockPos pos, double squaredDistance, CallbackInfoReturnable<Boolean> cir) {
         if (!WorldBorderHandler.isSafe(pos.getX(), pos.getZ())) {
             cir.setReturnValue(false);

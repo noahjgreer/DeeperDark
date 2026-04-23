@@ -25,6 +25,7 @@ import net.noahsarch.deeperdark.event.SiphonEvents;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.server.permissions.Permission;
 import net.minecraft.server.permissions.PermissionLevel;
@@ -35,7 +36,7 @@ import net.minecraft.server.permissions.PermissionLevel;
  */
 public class DeeperDarkCommands {
 
-    private static final Map<String, ItemStack> REGISTRY = new HashMap<>();
+    private static final Map<String, Supplier<ItemStack>> REGISTRY = new HashMap<>();
 
     public static void register() {
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
@@ -45,49 +46,48 @@ public class DeeperDarkCommands {
     }
 
     private static void registerItems() {
-        // Gunpowder Block (Sugar base)
-        ItemStack gunpowderBlock = new ItemStack(Items.SUGAR);
-        gunpowderBlock.set(DataComponents.ITEM_MODEL, GunpowderBlockEvents.GUNPOWDER_BLOCK_MODEL_ID);
-        // User requested localized name fix via recipe, but here we give default logic or let the client handle translation key if set
-        // Adding custom name for clarity
-        gunpowderBlock.set(DataComponents.ITEM_NAME, Component.translatable("item.deeperdark.gunpowder_block"));
-        REGISTRY.put("gunpowder_block", gunpowderBlock);
-
-        // Leather Block (Brown Wool base)
-        ItemStack leatherBlock = new ItemStack(Items.SUGAR);
-        leatherBlock.set(DataComponents.ITEM_MODEL, net.noahsarch.deeperdark.event.LeatherBlockEvents.LEATHER_BLOCK_MODEL_ID);
-        leatherBlock.set(DataComponents.ITEM_NAME, Component.translatable("item.deeperdark.leather_block"));
-        REGISTRY.put("leather_block", leatherBlock);
-
-        // Flint Block (Cobbled Deepslate base)
-        ItemStack flintBlock = new ItemStack(Items.SUGAR);
-        flintBlock.set(DataComponents.ITEM_MODEL, net.noahsarch.deeperdark.event.FlintBlockEvents.FLINT_BLOCK_MODEL_ID);
-        flintBlock.set(DataComponents.ITEM_NAME, Component.translatable("item.deeperdark.flint_block"));
-        REGISTRY.put("flint_block", flintBlock);
-
-        // Rotten Flesh Block (Nether Wart Block base)
-        ItemStack rottenFleshBlock = new ItemStack(Items.SUGAR);
-        rottenFleshBlock.set(DataComponents.ITEM_MODEL, net.noahsarch.deeperdark.event.RottenFleshBlockEvents.ROTTEN_FLESH_BLOCK_MODEL_ID);
-        rottenFleshBlock.set(DataComponents.ITEM_NAME, Component.translatable("item.deeperdark.rotten_flesh_block"));
-        REGISTRY.put("rotten_flesh_block", rottenFleshBlock);
-
-        // Golden Cauldron (Cauldron base, item model)
-        ItemStack goldenCauldron = new ItemStack(Items.SUGAR);
-        goldenCauldron.set(DataComponents.ITEM_MODEL, GoldenCauldronEvents.GOLDEN_CAULDRON_ITEM_MODEL_ID);
-        goldenCauldron.set(DataComponents.ITEM_NAME, Component.translatable("item.deeperdark.golden_cauldron"));
-        REGISTRY.put("golden_cauldron", goldenCauldron);
-
-        // Siphon (Hopper base)
-        ItemStack siphon = new ItemStack(Items.SUGAR);
-        siphon.set(DataComponents.ITEM_MODEL, SiphonEvents.SIPHON_MODEL_ID);
-        siphon.set(DataComponents.ITEM_NAME, Component.translatable("item.deeperdark.siphon"));
-        REGISTRY.put("siphon", siphon);
-
-        // Leather Scrap (Sugar base)
-        ItemStack leatherScrap = new ItemStack(Items.SUGAR);
-        leatherScrap.set(DataComponents.ITEM_MODEL, net.minecraft.resources.Identifier.withDefaultNamespace("leather_scrap"));
-        leatherScrap.set(DataComponents.ITEM_NAME, Component.translatable("item.deeperdark.leather_scrap"));
-        REGISTRY.put("leather_scrap", leatherScrap);
+        REGISTRY.put("gunpowder_block", () -> {
+            ItemStack s = new ItemStack(Items.SUGAR);
+            s.set(DataComponents.ITEM_MODEL, GunpowderBlockEvents.GUNPOWDER_BLOCK_MODEL_ID);
+            s.set(DataComponents.ITEM_NAME, Component.translatable("item.deeperdark.gunpowder_block"));
+            return s;
+        });
+        REGISTRY.put("leather_block", () -> {
+            ItemStack s = new ItemStack(Items.SUGAR);
+            s.set(DataComponents.ITEM_MODEL, net.noahsarch.deeperdark.event.LeatherBlockEvents.LEATHER_BLOCK_MODEL_ID);
+            s.set(DataComponents.ITEM_NAME, Component.translatable("item.deeperdark.leather_block"));
+            return s;
+        });
+        REGISTRY.put("flint_block", () -> {
+            ItemStack s = new ItemStack(Items.SUGAR);
+            s.set(DataComponents.ITEM_MODEL, net.noahsarch.deeperdark.event.FlintBlockEvents.FLINT_BLOCK_MODEL_ID);
+            s.set(DataComponents.ITEM_NAME, Component.translatable("item.deeperdark.flint_block"));
+            return s;
+        });
+        REGISTRY.put("rotten_flesh_block", () -> {
+            ItemStack s = new ItemStack(Items.SUGAR);
+            s.set(DataComponents.ITEM_MODEL, net.noahsarch.deeperdark.event.RottenFleshBlockEvents.ROTTEN_FLESH_BLOCK_MODEL_ID);
+            s.set(DataComponents.ITEM_NAME, Component.translatable("item.deeperdark.rotten_flesh_block"));
+            return s;
+        });
+        REGISTRY.put("golden_cauldron", () -> {
+            ItemStack s = new ItemStack(Items.SUGAR);
+            s.set(DataComponents.ITEM_MODEL, GoldenCauldronEvents.GOLDEN_CAULDRON_ITEM_MODEL_ID);
+            s.set(DataComponents.ITEM_NAME, Component.translatable("item.deeperdark.golden_cauldron"));
+            return s;
+        });
+        REGISTRY.put("siphon", () -> {
+            ItemStack s = new ItemStack(Items.SUGAR);
+            s.set(DataComponents.ITEM_MODEL, SiphonEvents.SIPHON_MODEL_ID);
+            s.set(DataComponents.ITEM_NAME, Component.translatable("item.deeperdark.siphon"));
+            return s;
+        });
+        REGISTRY.put("leather_scrap", () -> {
+            ItemStack s = new ItemStack(Items.SUGAR);
+            s.set(DataComponents.ITEM_MODEL, net.minecraft.resources.Identifier.withDefaultNamespace("leather_scrap"));
+            s.set(DataComponents.ITEM_NAME, Component.translatable("item.deeperdark.leather_scrap"));
+            return s;
+        });
     }
 
     private static void registerCommands(CommandDispatcher<CommandSourceStack> dispatcher) {
@@ -276,15 +276,15 @@ public class DeeperDarkCommands {
         CommandSourceStack source = context.getSource();
         String itemName = StringArgumentType.getString(context, "item");
 
-        ItemStack stack = REGISTRY.get(itemName);
-        if (stack == null) {
+        Supplier<ItemStack> factory = REGISTRY.get(itemName);
+        if (factory == null) {
             source.sendFailure(Component.literal("Unknown item: " + itemName).withStyle(ChatFormatting.RED));
             return 0;
         }
 
         try {
             net.minecraft.server.level.ServerPlayer player = source.getPlayerOrException();
-            ItemStack giveStack = stack.copy();
+            ItemStack giveStack = factory.get();
             giveStack.setCount(amount);
 
             boolean inserted = player.getInventory().add(giveStack);

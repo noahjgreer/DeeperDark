@@ -52,6 +52,7 @@ public abstract class PotionMasterMixin implements PotionMasterDuck {
     @Inject(method = "updateTrades", at = @At("HEAD"), cancellable = true)
     public void fillRecipes(ServerLevel world, CallbackInfo ci) {
         if (this.isPotionMaster) {
+            ModVillagers.ensureTradesRegistered();
             Villager villager = (Villager) (Object) this;
             VillagerData villagerData = this.getVillagerData();
             // We use the villager's level to determine trades from our custom map
