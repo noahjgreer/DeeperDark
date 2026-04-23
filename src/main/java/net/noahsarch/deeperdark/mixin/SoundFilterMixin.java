@@ -28,7 +28,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ServerCommonPacketListenerImpl.class)
 public abstract class SoundFilterMixin {
 
-    @Inject(method = "sendPacket", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "send(Lnet/minecraft/network/protocol/Packet;)V", at = @At("HEAD"), cancellable = true)
     private void deeperdark$filterSoundPackets(Packet<?> packet, CallbackInfo ci) {
         // Only filter PlaySoundS2CPackets
         if (!(packet instanceof ClientboundSoundPacket soundPacket)) return;

@@ -9,7 +9,7 @@ import java.util.Map;
 
 @Mixin(AxeItem.class)
 public interface AxeItemAccessor {
-    @Accessor("STRIPPED_BLOCKS")
+    @Accessor("STRIPPABLES")
     static Map<Block, Block> getStrippedBlocks() {
         throw new AssertionError();
     }

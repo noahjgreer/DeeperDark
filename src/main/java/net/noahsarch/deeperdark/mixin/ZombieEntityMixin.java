@@ -19,7 +19,7 @@ public class ZombieEntityMixin {
     /**
      * Modify the zombie attributes builder to use config value for FOLLOW_RANGE
      */
-    @Inject(method = "createZombieAttributes", at = @At("RETURN"), cancellable = true)
+    @Inject(method = "createAttributes", at = @At("RETURN"), cancellable = true)
     private static void deeperdark$modifyZombieAttributes(CallbackInfoReturnable<AttributeSupplier.Builder> cir) {
         AttributeSupplier.Builder builder = cir.getReturnValue();
         // Override the FOLLOW_RANGE with config value

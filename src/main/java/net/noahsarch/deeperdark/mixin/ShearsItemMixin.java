@@ -24,7 +24,7 @@ import net.minecraft.world.item.context.UseOnContext;
 
 @Mixin(ShearsItem.class)
 public class ShearsItemMixin {
-    @Inject(method = "useOnBlock", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "useOn", at = @At("HEAD"), cancellable = true)
     private void onUseOnBlock(UseOnContext context, CallbackInfoReturnable<InteractionResult> cir) {
         Level world = context.getLevel();
         BlockPos blockPos = context.getClickedPos();

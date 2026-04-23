@@ -30,7 +30,7 @@ public abstract class FishingBobberEntityMixin {
     /**
      * Inject into the use method to potentially spawn a charged creeper instead of giving loot
      */
-    @Inject(method = "use", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "retrieve", at = @At("HEAD"), cancellable = true)
     private void deeperdark$fishUpChargedCreeper(ItemStack usedItem, CallbackInfoReturnable<Integer> cir) {
         FishingHook self = (FishingHook) (Object) this;
         Player player = this.getPlayerOwner();

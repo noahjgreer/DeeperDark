@@ -55,7 +55,7 @@ public class CraftingResultSlotMixin {
      * Play crafting sound when item is taken from crafting result slot.
      * Uses debouncing to prevent sound spam when shift-clicking to craft multiple items.
      */
-    @Inject(method = "onTakeItem", at = @At("HEAD"))
+    @Inject(method = "onTake", at = @At("HEAD"))
     private void deeperdark$playCraftingSound(Player player, ItemStack stack, CallbackInfo ci) {
         Level world = ((EntityAccessor)player).deeperdark$getWorld();
         if (player instanceof ServerPlayer serverPlayer && world instanceof ServerLevel serverWorld) {

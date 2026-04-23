@@ -13,7 +13,7 @@ public class NoiseChunkGeneratorMixin {
      * @reason Remove the hardcoded -54 lava sea level
      */
     @Overwrite
-    private static Aquifer.FluidPicker createFluidLevelSampler(NoiseGeneratorSettings settings) {
+    private static Aquifer.FluidPicker createFluidPicker(NoiseGeneratorSettings settings) {
         return (x, y, z) -> new Aquifer.FluidStatus(settings.seaLevel(), settings.defaultFluid());
     }
 }

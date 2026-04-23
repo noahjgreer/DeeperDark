@@ -179,7 +179,7 @@ public class ModVillagers {
     }
 
     private static class RandomSellFactory implements TradeFactory {
-        private final ItemStack sell;
+        private final net.minecraft.world.item.Item sellItem;
         private final int minPrice;
         private final int maxPrice;
         private final int minCount;
@@ -189,11 +189,11 @@ public class ModVillagers {
         private final float multiplier;
 
         public RandomSellFactory(net.minecraft.world.item.Item item, int minPrice, int maxPrice, int minCount, int maxCount, int maxUses, int experience) {
-            this(new ItemStack(item), minPrice, maxPrice, minCount, maxCount, maxUses, experience, 0.05F);
+            this(item, minPrice, maxPrice, minCount, maxCount, maxUses, experience, 0.05F);
         }
 
-        public RandomSellFactory(ItemStack stack, int minPrice, int maxPrice, int minCount, int maxCount, int maxUses, int experience, float multiplier) {
-            this.sell = stack;
+        public RandomSellFactory(net.minecraft.world.item.Item item, int minPrice, int maxPrice, int minCount, int maxCount, int maxUses, int experience, float multiplier) {
+            this.sellItem = item;
             this.minPrice = minPrice;
             this.maxPrice = maxPrice;
             this.minCount = minCount;
@@ -207,8 +207,7 @@ public class ModVillagers {
         public MerchantOffer create(ServerLevel world, Entity entity, RandomSource random) {
             int price = net.minecraft.util.Mth.nextInt(random, this.minPrice, this.maxPrice);
             int count = net.minecraft.util.Mth.nextInt(random, this.minCount, this.maxCount);
-            ItemStack stack = this.sell.copy();
-            stack.setCount(count);
+            ItemStack stack = new ItemStack(this.sellItem, count);
             return new MerchantOffer(new ItemCost(Items.EMERALD, price), stack, this.maxUses, this.experience, this.multiplier);
         }
     }

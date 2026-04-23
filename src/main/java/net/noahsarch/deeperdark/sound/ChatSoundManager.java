@@ -64,7 +64,6 @@ public class ChatSoundManager {
         if (rawSoundId == null || rawSoundId.isBlank()) return;
 
         MinecraftServer server = sourcePlayer.level().getServer();
-        if (server == null) return;
 
         Identifier soundId = parseSoundId(rawSoundId.trim());
         if (soundId == null) return;

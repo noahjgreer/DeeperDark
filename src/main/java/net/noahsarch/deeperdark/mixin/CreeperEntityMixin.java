@@ -78,7 +78,7 @@ public abstract class CreeperEntityMixin {
      * Modifies explosion radius for baby creepers by temporarily changing the explosionRadius field.
      * We reduce it at the start of explode() - the explosion uses explosionRadius * chargedMultiplier
      */
-    @Inject(method = "explode()V", at = @At("HEAD"))
+    @Inject(method = "explodeCreeper()V", at = @At("HEAD"))
     private void deeperdark$modifyExplosionRadiusAndSpawnParticles(CallbackInfo ci) {
         Creeper self = (Creeper) (Object) this;
         Level world = ((EntityAccessor)self).deeperdark$getWorld();

@@ -38,10 +38,10 @@ public class DeeperDarkCommands {
     private static final Map<String, ItemStack> REGISTRY = new HashMap<>();
 
     public static void register() {
-        // Register items to simpler names
-        registerItems();
-
-        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> registerCommands(dispatcher));
+        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+            registerItems();
+            registerCommands(dispatcher);
+        });
     }
 
     private static void registerItems() {

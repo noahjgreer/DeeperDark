@@ -2,6 +2,7 @@ package net.noahsarch.deeperdark.mixin;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelSimulatedReader;
+import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.levelgen.feature.TreeFeature;
 import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
 import org.spongepowered.asm.mixin.Mixin;
@@ -23,8 +24,8 @@ public class TreeFeatureMixin {
      * Instead of checking blocks in a radius at each height level, we only check
      * the center column (the trunk position).
      */
-    @Inject(method = "getTopPosition", at = @At("HEAD"), cancellable = true)
-    private void deeperdark$skipHorizontalChecks(LevelSimulatedReader world, int height, BlockPos pos, TreeConfiguration config, CallbackInfoReturnable<Integer> cir) {
+    @Inject(method = "getMaxFreeTreeHeight", at = @At("HEAD"), cancellable = true)
+    private void deeperdark$skipHorizontalChecks(WorldGenLevel world, int height, BlockPos pos, TreeConfiguration config, CallbackInfoReturnable<Integer> cir) {
         BlockPos.MutableBlockPos mutable = new BlockPos.MutableBlockPos();
 
         // Only check the center column (vertical checks only)
@@ -32,7 +33,7 @@ public class TreeFeatureMixin {
             mutable.set(pos.getX(), pos.getY() + y, pos.getZ());
 
             // Check if the trunk position can be replaced
-            if (!config.trunkPlacer.isFree((net.minecraft.world.level.WorldGenLevel) world, mutable)) {
+            if (!config.trunkPlacer.isFree(world, mutable)) {
                 // If we can't place at this vertical position, return adjusted height
                 cir.setReturnValue(y - 2);
                 return;
@@ -53,7 +54,7 @@ public class TreeFeatureMixin {
      * Helper method to check for vines (mirrors TreeFeature.isVine)
      */
     @Unique
-    private static boolean isVine(LevelSimulatedReader world, BlockPos pos) {
+    private static boolean isVine(WorldGenLevel world, BlockPos pos) {
         return world.isStateAtPosition(pos, state -> state.is(net.minecraft.world.level.block.Blocks.VINE));
     }
 }

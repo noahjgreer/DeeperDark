@@ -13,7 +13,7 @@ import net.minecraft.world.item.alchemy.PotionContents;
 
 @Mixin(Item.class)
 public class PotionItemMixin {
-    @Inject(method = "finishUsing", at = @At("RETURN"))
+    @Inject(method = "finishUsingItem", at = @At("RETURN"))
     private void onPotionConsumed(ItemStack stack, Level world, LivingEntity user, CallbackInfoReturnable<ItemStack> cir) {
         if (!world.isClientSide() && stack.getItem() instanceof net.minecraft.world.item.PotionItem) {
             // Check if this is our custom scentless potion

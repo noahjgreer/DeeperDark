@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(TemplateStructurePiece.class)
 public interface SimpleStructurePieceAccessor {
-    @Accessor("placementData")
+    @Accessor("placeSettings")
     StructurePlaceSettings deeperdark$getPlacementData();
 }
 

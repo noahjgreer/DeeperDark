@@ -18,7 +18,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import net.noahsarch.deeperdark.villager.ModVillagers;
 
 @Mixin(Villager.class)
 public abstract class PotionMasterMixin implements PotionMasterDuck {
@@ -50,7 +49,7 @@ public abstract class PotionMasterMixin implements PotionMasterDuck {
         this.isPotionMaster = view.getBooleanOr("DeeperDarkPotionMaster", false);
     }
 
-    @Inject(method = "fillRecipes", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "updateTrades", at = @At("HEAD"), cancellable = true)
     public void fillRecipes(ServerLevel world, CallbackInfo ci) {
         if (this.isPotionMaster) {
             Villager villager = (Villager) (Object) this;
@@ -73,7 +72,7 @@ public abstract class PotionMasterMixin implements PotionMasterDuck {
 
     // We redirect the matchesKey check in mobTick to prevent the villager from resetting its customer
     // when it has the NONE profession (which we forcing for visuals) but is a Potion Master.
-    @Redirect(method = "mobTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/registry/entry/Holder;matchesKey(Lnet/minecraft/registry/ResourceKey;)Z"))
+    @Redirect(method = "customServerAiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/Holder;is(Lnet/minecraft/resources/ResourceKey;)Z"))
     public boolean deeperdark$preventCustomerReset(Holder<VillagerProfession> instance, ResourceKey<VillagerProfession> key) {
         if (this.isPotionMaster && key.equals(VillagerProfession.NONE)) {
             // Logic: if we are a Potion Master and the code checks if we match NONE, return false!

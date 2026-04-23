@@ -20,7 +20,7 @@ public class WardenEntityBrainMixin {
      * The Warden can still detect and chase these entities through other means (vibrations, etc.)
      */
     @Inject(
-            method = "isValidTarget",
+            method = "canTargetEntity",
             at = @At("HEAD"),
             cancellable = true
     )

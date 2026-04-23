@@ -14,7 +14,7 @@ import java.util.Map;
 
 @Mixin(AxeItem.class)
 public class AxeItemMixin {
-    @Inject(method = "useOnBlock", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "useOn", at = @At("HEAD"), cancellable = true)
     private void onUseOnBlock(UseOnContext context, CallbackInfoReturnable<InteractionResult> cir) {
         Map<Block, Block> strippedBlocks = AxeItemAccessor.getStrippedBlocks();
         BlockState state = context.getLevel().getBlockState(context.getClickedPos());

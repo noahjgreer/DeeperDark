@@ -23,7 +23,7 @@ import net.minecraft.world.level.levelgen.structure.Structure.GenerationContext;
 @Mixin(WoodlandMansionStructure.class)
 public class WoodlandMansionStructureMixin {
 
-    @Inject(method = "addPieces", at = @At("TAIL"))
+    @Inject(method = "generatePieces", at = @At("TAIL"))
     private void deeperdark$replaceWithPaleOak(StructurePiecesBuilder collector, GenerationContext context, BlockPos pos, Rotation rotation, CallbackInfo ci) {
         List<StructurePiece> pieces = ((StructurePiecesCollectorAccessor) collector).getPieces();
         boolean isPaleMansion = false;

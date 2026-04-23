@@ -27,7 +27,7 @@ import java.util.UUID;
 @Mixin(ZombieVillager.class)
 public abstract class ZombieVillagerEntityMixin {
 
-    @Shadow private void setConverting(@Nullable UUID uuid, int delay) {}
+    @Shadow private void startConverting(@Nullable UUID uuid, int delay) {}
 
     @Unique
     private boolean deeperdark$isExplosiveCure = false;
@@ -53,7 +53,7 @@ public abstract class ZombieVillagerEntityMixin {
                 }
                 Level world = ((EntityAccessor)self).deeperdark$getWorld();
                 if (!world.isClientSide()) {
-                    this.setConverting(player.getUUID(), self.getRandom().nextInt(2401) + 3600);
+                    this.startConverting(player.getUUID(), self.getRandom().nextInt(2401) + 3600);
 
                     this.deeperdark$isExplosiveCure = true;
 

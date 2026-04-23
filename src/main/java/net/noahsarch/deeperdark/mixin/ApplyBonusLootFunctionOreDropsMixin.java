@@ -32,8 +32,8 @@ public class ApplyBonusLootFunctionOreDropsMixin {
     @Shadow @Final private Holder<Enchantment> enchantment;
 
     @Inject(
-        method = "process(Lnet/minecraft/item/ItemStack;Lnet/minecraft/loot/context/LootContext;)Lnet/minecraft/item/ItemStack;",
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;setCount(I)V"),
+        method = "run",
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;setCount(I)V"),
         cancellable = true
     )
     private void applyCustomFortuneLogic(ItemStack stack, LootContext context, CallbackInfoReturnable<ItemStack> cir) {
