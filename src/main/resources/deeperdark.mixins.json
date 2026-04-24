@@ -72,7 +72,14 @@
     "SoundFilterMixin",
     "ServerPlayNetworkHandlerChatSoundMixin",
     "PlayerManagerJoinSoundMixin",
-    "ServerPlayerEntityDeathSoundMixin"
+    "ServerPlayerEntityDeathSoundMixin",
+    "LeavesBeGoneServerLevelMixin",
+    "LeavesBeGoneLevelChunkMixin",
+    "LeavesBeGoneLeavesBlockMixin",
+    "UnloadedActivityChunkAccessMixin",
+    "UnloadedActivityLevelChunkMixin",
+    "UnloadedActivitySerializableChunkDataMixin",
+    "UnloadedActivityServerLevelMixin"
   ],
   "injectors": {
     "defaultRequire": 1

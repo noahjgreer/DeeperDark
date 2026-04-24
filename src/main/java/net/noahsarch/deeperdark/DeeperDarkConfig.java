@@ -127,6 +127,27 @@ public class DeeperDarkConfig {
             config.chatSoundExclusions = normalized;
         }
 
+        if (config.leavesDecayMaxTicks < config.leavesDecayMinTicks) {
+            config.leavesDecayMaxTicks = config.leavesDecayMinTicks;
+            changed = true;
+        }
+
+
+        if (config.unloadedActivityMaxOccurrencesPerBlock < 0) {
+            config.unloadedActivityMaxOccurrencesPerBlock = 0;
+            changed = true;
+        }
+
+        if (config.unloadedActivityMaxChunkUpdates < 0) {
+            config.unloadedActivityMaxChunkUpdates = 0;
+            changed = true;
+        }
+
+        if (config.unloadedActivityMaxKnownChunkUpdates < 0) {
+            config.unloadedActivityMaxKnownChunkUpdates = 0;
+            changed = true;
+        }
+
         return changed;
     }
 
@@ -182,6 +203,23 @@ public class DeeperDarkConfig {
         // Chat sounds configuration
         public Map<String, ChatSoundProfile> chatSounds = createDefaultChatSounds();
         public List<String> chatSoundExclusions = new ArrayList<>();
+
+        // Leaves Be Gone (server-only port) configuration
+        public boolean leavesBeGoneEnabled = true;
+        public int leavesDecayMinTicks = 5;
+        public int leavesDecayMaxTicks = 20;
+        public boolean leavesBeGoneIgnoreOtherLeafTypes = false;
+
+        // Unloaded Activity (server-only port) configuration
+        public boolean unloadedActivityEnabled = true;
+        public int unloadedActivityTickDifferenceThreshold = 1;
+        public int unloadedActivityMaxChunkUpdates = 10;
+        public int unloadedActivityMaxKnownChunkUpdates = 100;
+        public boolean unloadedActivityRememberBlockPositions = true;
+        public boolean unloadedActivityRandomizeBlockUpdates = false;
+        public boolean unloadedActivityUpdateAllChunksWhenSleep = true;
+        public int unloadedActivityMaxOccurrencesPerBlock = 100;
+        public int unloadedActivityMaxNegativeBinomialAttempts = 10;
 
         // Creature configuration
         public net.noahsarch.deeperdark.creature.CreatureConfig creature = new net.noahsarch.deeperdark.creature.CreatureConfig();
@@ -306,6 +344,22 @@ public class DeeperDarkConfig {
                     #       pitch: 1.0
                     #       pitchDeviance: 0.2
                     # chatSoundExclusions: lowercase player names who opted out via /ddclient chat_sounds false.
+                    #
+                    # Leaves Be Gone (server-only port):
+                    # leavesBeGoneEnabled: if true, detached leaves are scheduled for fast random-tick decay.
+                    # leavesDecayMinTicks/leavesDecayMaxTicks: random delay range (ticks) before a detached leaf decays.
+                    # leavesBeGoneIgnoreOtherLeafTypes: if true, leaves of different species do not support each other.
+                    #
+                    # Unloaded Activity (server-only port):
+                    # unloadedActivityEnabled: if true, chunks simulate catch-up random ticks when ticked after being unloaded.
+                    # unloadedActivityTickDifferenceThreshold: minimum tick gap before a chunk gets catch-up simulation (default: 1).
+                    # unloadedActivityMaxChunkUpdates: max unknown chunks updated per server tick (default: 10).
+                    # unloadedActivityMaxKnownChunkUpdates: max known (cached block list) chunks updated per server tick (default: 100).
+                    # unloadedActivityRememberBlockPositions: cache randomly-ticking block positions per chunk (faster re-simulation).
+                    # unloadedActivityRandomizeBlockUpdates: shuffle block order each simulation (default: false).
+                    # unloadedActivityUpdateAllChunksWhenSleep: bypass per-tick limits when players sleep (default: true).
+                    # unloadedActivityMaxOccurrencesPerBlock: max random ticks simulated per block per catch-up (default: 100).
+                    # unloadedActivityMaxNegativeBinomialAttempts: attempts for negative-binomial duration sampling (default: 10).
                     #
                     """;
 
