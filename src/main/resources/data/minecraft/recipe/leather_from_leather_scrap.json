@@ -1,86 +1,58 @@
 {
-  "type": "minecraft:crafting_shapeless",
-  "category": "misc",
+  "type": "deeperdark:crafting_component_shapeless",
   "ingredients": [
     {
-      "fabric:type": "deeperdark:component_ingredient",
-      "stack": {
-        "id": "minecraft:sugar",
-        "components": {
-          "minecraft:item_model": "leather_scrap"
-        }
+      "id": "minecraft:sugar",
+      "components": {
+        "minecraft:item_model": "leather_scrap"
       }
     },
     {
-      "fabric:type": "deeperdark:component_ingredient",
-      "stack": {
-        "id": "minecraft:sugar",
-        "components": {
-          "minecraft:item_model": "leather_scrap"
-        }
+      "id": "minecraft:sugar",
+      "components": {
+        "minecraft:item_model": "leather_scrap"
       }
     },
     {
-      "fabric:type": "deeperdark:component_ingredient",
-      "stack": {
-        "id": "minecraft:sugar",
-        "components": {
-          "minecraft:item_model": "leather_scrap"
-        }
+      "id": "minecraft:sugar",
+      "components": {
+        "minecraft:item_model": "leather_scrap"
       }
     },
     {
-      "fabric:type": "deeperdark:component_ingredient",
-      "stack": {
-        "id": "minecraft:sugar",
-        "components": {
-          "minecraft:item_model": "leather_scrap"
-        }
+      "id": "minecraft:sugar",
+      "components": {
+        "minecraft:item_model": "leather_scrap"
       }
     },
     {
-      "fabric:type": "deeperdark:component_ingredient",
-      "stack": {
-        "id": "minecraft:sugar",
-        "components": {
-          "minecraft:item_model": "leather_scrap"
-        }
+      "id": "minecraft:sugar",
+      "components": {
+        "minecraft:item_model": "leather_scrap"
       }
     },
     {
-      "fabric:type": "deeperdark:component_ingredient",
-      "stack": {
-        "id": "minecraft:sugar",
-        "components": {
-          "minecraft:item_model": "leather_scrap"
-        }
+      "id": "minecraft:sugar",
+      "components": {
+        "minecraft:item_model": "leather_scrap"
       }
     },
     {
-      "fabric:type": "deeperdark:component_ingredient",
-      "stack": {
-        "id": "minecraft:sugar",
-        "components": {
-          "minecraft:item_model": "leather_scrap"
-        }
+      "id": "minecraft:sugar",
+      "components": {
+        "minecraft:item_model": "leather_scrap"
       }
     },
     {
-      "fabric:type": "deeperdark:component_ingredient",
-      "stack": {
-        "id": "minecraft:sugar",
-        "components": {
-          "minecraft:item_model": "leather_scrap"
-        }
+      "id": "minecraft:sugar",
+      "components": {
+        "minecraft:item_model": "leather_scrap"
       }
     },
     {
-      "fabric:type": "deeperdark:component_ingredient",
-      "stack": {
-        "id": "minecraft:sugar",
-        "components": {
-          "minecraft:item_model": "leather_scrap"
-        }
+      "id": "minecraft:sugar",
+      "components": {
+        "minecraft:item_model": "leather_scrap"
       }
     }
   ],
