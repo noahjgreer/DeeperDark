@@ -1,20 +1,15 @@
 {
-  "type": "minecraft:crafting_shapeless",
-  "category": "misc",
+  "type": "deeperdark:crafting_component_shapeless",
   "ingredients": [
     {
-      "fabric:type": "deeperdark:component_ingredient",
-      "stack": {
-        "id": "minecraft:sugar",
-        "components": {
-          "minecraft:item_model": "rotten_flesh_block"
-        }
+      "id": "minecraft:sugar",
+      "components": {
+        "minecraft:item_model": "rotten_flesh_block"
       }
     }
   ],
   "result": {
-    "count": 9,
-    "id": "minecraft:rotten_flesh"
+    "id": "minecraft:rotten_flesh",
+    "count": 9
   }
 }
-
