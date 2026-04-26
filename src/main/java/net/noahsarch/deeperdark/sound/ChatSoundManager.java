@@ -73,7 +73,8 @@ public class ChatSoundManager {
         double randomOffset = (sourcePlayer.level().getRandom().nextDouble() * 2.0 - 1.0) * deviance;
         float finalPitch = (float) Math.max(0.01, basePitch + randomOffset);
 
-        List<String> exclusions = DeeperDarkConfig.get().chatSoundExclusions;
+        DeeperDarkConfig.ConfigInstance config = DeeperDarkConfig.get();
+        List<String> exclusions = config.chatSoundExclusions;
 
         for (ServerPlayer target : server.getPlayerList().getPlayers()) {
             String targetName = target.getName().getString().toLowerCase(Locale.ROOT);
@@ -81,16 +82,31 @@ public class ChatSoundManager {
                 continue;
             }
 
+            float volume = getVolumeFor(target, config);
+
             // Play at the receiver's location so chat sounds are globally audible regardless of distance.
             target.connection.send(new ClientboundSoundPacket(
                     soundEntry,
                     SoundSource.PLAYERS,
                     target.getX(), target.getY(), target.getZ(),
-                    1.0f,
+                    volume,
                     finalPitch,
                     sourcePlayer.level().getRandom().nextLong()
             ));
         }
+    }
+
+    private static float getVolumeFor(ServerPlayer target, DeeperDarkConfig.ConfigInstance config) {
+        if (config.chatSoundVolumes == null || config.chatSoundVolumes.isEmpty()) return 0.8f;
+        String name = target.getName().getString();
+        Double vol = config.chatSoundVolumes.get(name);
+        if (vol != null) return (float) Math.max(0.0, Math.min(1.0, vol));
+        for (Map.Entry<String, Double> entry : config.chatSoundVolumes.entrySet()) {
+            if (entry.getKey().equalsIgnoreCase(name)) {
+                return (float) Math.max(0.0, Math.min(1.0, entry.getValue()));
+            }
+        }
+        return 0.8f;
     }
 
     private static Identifier parseSoundId(String rawSoundId) {
