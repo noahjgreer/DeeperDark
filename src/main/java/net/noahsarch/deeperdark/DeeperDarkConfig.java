@@ -26,6 +26,12 @@ public class DeeperDarkConfig {
 
     private static ConfigInstance instance;
 
+    public static class AutoUpdaterConfig {
+        public String repoURL = "https://github.com/noahjgreer/DeeperDark/releases/latest";
+        public boolean canDenyUpdate = false;
+        public boolean canRestartLater = false;
+    }
+
     public static class ChatSoundProfile {
         public String sendMessageSound = "";
         public String deathMessageSound = "";
@@ -136,6 +142,11 @@ public class DeeperDarkConfig {
             changed = true;
         }
 
+        if (config.autoUpdater == null) {
+            config.autoUpdater = new AutoUpdaterConfig();
+            changed = true;
+        }
+
         return changed;
     }
 
@@ -212,6 +223,9 @@ public class DeeperDarkConfig {
 
         // Creature configuration
         public net.noahsarch.deeperdark.creature.CreatureConfig creature = new net.noahsarch.deeperdark.creature.CreatureConfig();
+
+        // Auto-updater configuration
+        public AutoUpdaterConfig autoUpdater = new AutoUpdaterConfig();
     }
 
     public static void load() {
@@ -353,6 +367,11 @@ public class DeeperDarkConfig {
                     # unloadedActivityMaxOccurrencesPerBlock: max random ticks simulated per block per catch-up (default: 100).
                     # unloadedActivityMaxNegativeBinomialAttempts: attempts for negative-binomial duration sampling (default: 10).
                     #
+                    # Auto-Updater Configuration (client-side only):
+                    # autoUpdater.repoURL: GitHub releases page URL used to check for and download updates.
+                    # autoUpdater.canDenyUpdate: if true, players can click "Update Later" to skip; if false, that button is disabled.
+                    # autoUpdater.canRestartLater: if true, players can delay restarting after an update installs; if false, "Restart Later" is disabled.
+                    #
                     """;
 
             DumperOptions options = new DumperOptions();
@@ -364,6 +383,7 @@ public class DeeperDarkConfig {
             org.yaml.snakeyaml.representer.Representer representer = new org.yaml.snakeyaml.representer.Representer(options);
             representer.addClassTag(ConfigInstance.class, org.yaml.snakeyaml.nodes.Tag.MAP);
             representer.addClassTag(ChatSoundProfile.class, org.yaml.snakeyaml.nodes.Tag.MAP);
+            representer.addClassTag(AutoUpdaterConfig.class, org.yaml.snakeyaml.nodes.Tag.MAP);
 
             Yaml yaml = new Yaml(representer, options);
 

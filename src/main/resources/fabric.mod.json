@@ -17,6 +17,9 @@
 	"entrypoints": {
 		"main": [
 			"net.noahsarch.deeperdark.Deeperdark"
+		],
+		"client": [
+			"net.noahsarch.deeperdark.DeeperDarkClient"
 		]
 	},
 	"mixins": [

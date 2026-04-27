@@ -87,5 +87,22 @@
   "subtitles.deeperdark.entity.snake.death": "Snake dies",
   "subtitles.deeperdark.entity.snake.tongue": "Snake flicks tongue",
   "death.attack.creature": "%1$s was slain by something",
-  "death.attack.creature.player": "%1$s was slain by something"
+  "death.attack.creature.player": "%1$s was slain by something",
+
+  "autoUpdater.title": "DeeperDark Auto Updater",
+  "autoUpdater.error": "An error occurred:",
+  "autoUpdater.update.check": "Checking for updates...",
+  "autoUpdater.update.available.l1": "An update to the mod has been found.",
+  "autoUpdater.update.available.l2": "Current version: %s",
+  "autoUpdater.update.available.l3": "Latest version: %s",
+  "autoUpdater.update.available.l4": "Would you like to update now?",
+  "autoUpdater.update.confirm": "Install",
+  "autoUpdater.update.decline": "Update Later",
+  "autoUpdater.install.splash": "Downloading...",
+  "autoUpdater.install.success": "The latest version has been successfully installed!\n\nPlease restart your client to finalize changes.",
+  "autoUpdater.install.fail": "Installation failed. Sorry about that!\n\nPlease try and install the latest update manually, or send me a DM.",
+  "autoUpdater.install.option.restart": "Restart Now",
+  "autoUpdater.install.option.restartLater": "Restart Later (Don't)",
+  "autoUpdater.install.option.fail.continue": "Continue to Title Screen",
+  "autoUpdater.install.option.fail.exit": "Exit Minecraft"
 }

@@ -107,6 +107,144 @@ jar {
 	}
 }
 
+// ──────────────────────────────────────────────────────────────────────────────
+// GitHub Release task
+//
+// Usage:
+//   gradlew buildGitRelease
+//
+// Requires a GitHub personal-access-token with the 'repo' scope.
+// Provide it via the GITHUB_TOKEN environment variable (recommended) OR by
+// adding  githubToken=<token>  to your local gradle.properties (do NOT commit).
+//
+// Optional project property:
+//   -PgithubPreRelease=true   marks the release as a pre-release on GitHub
+// ──────────────────────────────────────────────────────────────────────────────
+tasks.register('buildGitRelease') {
+    group = 'publishing'
+    description = 'Builds the remapped mod JAR and publishes it as a GitHub release.'
+    dependsOn remapJar
+
+    doLast {
+        // ── 1. Resolve token ─────────────────────────────────────────────────────
+        def token = System.getenv('GITHUB_TOKEN') ?: project.findProperty('githubToken')?.toString()
+        if (!token) {
+            throw new GradleException(
+                'GitHub token not found.\n' +
+                'Set the GITHUB_TOKEN environment variable, or add githubToken=<token> to your\n' +
+                'local gradle.properties (and keep that file out of source control).'
+            )
+        }
+
+        // ── 2. Read remote origin URL from .git/config ───────────────────────────
+        def gitConfigFile = file('.git/config')
+        if (!gitConfigFile.exists()) {
+            throw new GradleException("No .git/config found — is this a git repository?")
+        }
+
+        def inOrigin = false
+        def remoteUrl = null
+        for (line in gitConfigFile.readLines()) {
+            def trimmed = line.trim()
+            if (trimmed == '[remote "origin"]') {
+                inOrigin = true
+            } else if (trimmed.startsWith('[')) {
+                inOrigin = false
+            } else if (inOrigin && trimmed.startsWith('url')) {
+                remoteUrl = trimmed.replaceFirst(/^url\s*=\s*/, '').trim()
+                break
+            }
+        }
+        if (!remoteUrl) {
+            throw new GradleException("Could not find 'origin' remote URL in .git/config")
+        }
+
+        // ── 3. Extract owner/repo ────────────────────────────────────────────────
+        // Handles both https://github.com/owner/repo.git and git@github.com:owner/repo.git
+        def repoMatcher = (remoteUrl =~ /github\.com[\/:](.+?)(?:\.git)?$/)
+        if (!repoMatcher.find()) {
+            throw new GradleException("Remote does not appear to be a GitHub URL: ${remoteUrl}")
+        }
+        def ownerRepo = repoMatcher.group(1)
+
+        // ── 4. Resolve JAR file and derive names ─────────────────────────────────
+        def jarFile = remapJar.archiveFile.get().asFile
+        if (!jarFile.exists()) {
+            throw new GradleException("Remapped JAR not found at: ${jarFile}")
+        }
+        def releaseName  = jarFile.name - '.jar'
+        def tagName      = "v${project.version}"
+        def isPreRelease = (project.findProperty('githubPreRelease') ?: 'false').toString().toBoolean()
+
+        logger.lifecycle("Publishing '${releaseName}' → github.com/${ownerRepo}  tag: ${tagName}")
+
+        // ── 5. Create the release ────────────────────────────────────────────────
+        def apiBase      = "https://api.github.com/repos/${ownerRepo}"
+        def releaseJson  = groovy.json.JsonOutput.toJson([
+            tag_name  : tagName,
+            name      : releaseName,
+            body      : '',
+            draft     : false,
+            prerelease: isPreRelease
+        ])
+
+        def createConn = (HttpURLConnection) new URL("${apiBase}/releases").openConnection()
+        createConn.requestMethod = 'POST'
+        createConn.setRequestProperty('Authorization',       "Bearer ${token}")
+        createConn.setRequestProperty('Content-Type',        'application/json')
+        createConn.setRequestProperty('Accept',              'application/vnd.github+json')
+        createConn.setRequestProperty('X-GitHub-Api-Version','2022-11-28')
+        createConn.setRequestProperty('User-Agent',          'DeeperDark-Gradle')
+        createConn.doOutput = true
+        createConn.outputStream.withWriter('UTF-8') { it << releaseJson }
+
+        def createStatus = createConn.responseCode
+        def createBody   = (createStatus < 400 ? createConn.inputStream : createConn.errorStream)?.text
+        createConn.disconnect()
+
+        if (createStatus != 201) {
+            throw new GradleException("Release creation failed (HTTP ${createStatus}):\n${createBody}")
+        }
+
+        def releaseData = new groovy.json.JsonSlurper().parseText(createBody)
+        def uploadBase  = releaseData.upload_url.replaceAll(/\{[^}]+\}$/, '')
+        logger.lifecycle("Release created (id=${releaseData.id}). Uploading JAR...")
+
+        // ── 6. Upload the JAR as a release asset ─────────────────────────────────
+        def encodedName = URLEncoder.encode(jarFile.name, 'UTF-8')
+        def uploadConn  = (HttpURLConnection) new URL("${uploadBase}?name=${encodedName}").openConnection()
+        uploadConn.requestMethod = 'POST'
+        uploadConn.setRequestProperty('Authorization',       "Bearer ${token}")
+        uploadConn.setRequestProperty('Content-Type',        'application/octet-stream')
+        uploadConn.setRequestProperty('Accept',              'application/vnd.github+json')
+        uploadConn.setRequestProperty('X-GitHub-Api-Version','2022-11-28')
+        uploadConn.setRequestProperty('User-Agent',          'DeeperDark-Gradle')
+        uploadConn.setFixedLengthStreamingMode(jarFile.length())
+        uploadConn.doOutput = true
+
+        jarFile.withInputStream { is ->
+            def out = uploadConn.outputStream
+            def buf = new byte[65536]
+            int n
+            while ((n = is.read(buf)) != -1) out.write(buf, 0, n)
+            out.flush()
+        }
+
+        def uploadStatus = uploadConn.responseCode
+        def uploadBody   = (uploadStatus < 400 ? uploadConn.inputStream : uploadConn.errorStream)?.text
+        uploadConn.disconnect()
+
+        if (uploadStatus != 201) {
+            throw new GradleException("JAR upload failed (HTTP ${uploadStatus}):\n${uploadBody}")
+        }
+
+        def assetData = new groovy.json.JsonSlurper().parseText(uploadBody)
+        logger.lifecycle("Done!")
+        logger.lifecycle("  Release : ${releaseData.html_url}")
+        logger.lifecycle("  Download: ${assetData.browser_download_url}")
+    }
+}
+
 // configure the maven publication
 publishing {
 	publications {
