@@ -80,7 +80,16 @@
     "UnloadedActivityChunkAccessMixin",
     "UnloadedActivityLevelChunkMixin",
     "UnloadedActivitySerializableChunkDataMixin",
-    "UnloadedActivityServerLevelMixin"
+    "UnloadedActivityServerLevelMixin",
+    "ArmorSlotMixin",
+    "ArmorStandMixin",
+    "EnchantmentMenuMixin",
+    "InventoryMenuMixin",
+    "ServerboundChatPacketMixin",
+    "ShulkerBoxSlotMixin"
+  ],
+  "client": [
+    "ChatScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1

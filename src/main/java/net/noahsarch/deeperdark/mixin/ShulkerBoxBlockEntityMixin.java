@@ -13,4 +13,5 @@ public class ShulkerBoxBlockEntityMixin {
     public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction dir) {
         return true;
     }
+
 }

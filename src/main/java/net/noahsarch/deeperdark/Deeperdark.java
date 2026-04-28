@@ -65,6 +65,11 @@ public class Deeperdark implements ModInitializer {
 				net.noahsarch.deeperdark.recipe.ComponentShapelessRecipe.SERIALIZER_ID,
 				net.noahsarch.deeperdark.recipe.ComponentShapelessRecipe.SERIALIZER);
 
+		// Register wool shearing recipe (wool + shears = 4 string)
+		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER,
+				net.noahsarch.deeperdark.recipe.WoolShearingRecipe.SERIALIZER_ID,
+				net.noahsarch.deeperdark.recipe.WoolShearingRecipe.SERIALIZER);
+
 		// Register tick handler for custom block tracker
 		net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_LEVEL_TICK.register(serverWorld -> {
 			// Run every 20 ticks (1 second) to be gentle
@@ -134,6 +139,9 @@ public class Deeperdark implements ModInitializer {
 
 		// Register moss growth handler for cobblestone/stone brick mossing
 		net.noahsarch.deeperdark.event.MossGrowthHandler.register();
+
+		// Register player leash handler (leash players with a lead)
+		net.noahsarch.deeperdark.event.PlayerLeashHandler.register();
 
 		// Register creature system
 		net.noahsarch.deeperdark.creature.CreatureManager.register();
