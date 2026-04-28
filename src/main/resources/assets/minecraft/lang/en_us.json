@@ -88,7 +88,6 @@
   "subtitles.deeperdark.entity.snake.tongue": "Snake flicks tongue",
   "death.attack.creature": "%1$s was slain by something",
   "death.attack.creature.player": "%1$s was slain by something",
-
   "autoUpdater.title": "DeeperDark Auto Updater",
   "autoUpdater.error": "An error occurred:",
   "autoUpdater.update.check": "Checking for updates...",
@@ -104,5 +103,6 @@
   "autoUpdater.install.option.restart": "Restart Now",
   "autoUpdater.install.option.restartLater": "Restart Later (Don't)",
   "autoUpdater.install.option.fail.continue": "Continue to Title Screen",
-  "autoUpdater.install.option.fail.exit": "Exit Minecraft"
+  "autoUpdater.install.option.fail.exit": "Exit Minecraft",
+  "intro.copyright": "\"Open Your Maw\" was made by FinniTheFox, the logo sound is the valve sound duhh. There is a lot of space here to write text. Do you actually have time to read all of this? :3c"
 }

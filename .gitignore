@@ -104,3 +104,4 @@ replay_pid*
 /temp-decompile
 src/main/resources/assets/deeperdark/sounds/ambient/creature/ambience.aup3
 /tobeported/
+gradle.properties

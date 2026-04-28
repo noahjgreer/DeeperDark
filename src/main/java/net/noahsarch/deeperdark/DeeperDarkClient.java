@@ -5,7 +5,9 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.gui.screens.TitleScreen;
+import net.noahsarch.deeperdark.autoupdate.AutoUpdater;
 import net.noahsarch.deeperdark.autoupdate.AutoUpdaterScreen;
+import net.noahsarch.deeperdark.intro.DeeperDarkLogoScreen;
 
 @Environment(EnvType.CLIENT)
 public class DeeperDarkClient implements ClientModInitializer {
@@ -19,7 +21,8 @@ public class DeeperDarkClient implements ClientModInitializer {
                 DeeperDarkConfig.AutoUpdaterConfig cfg = DeeperDarkConfig.get().autoUpdater;
                 if (cfg != null && cfg.repoURL != null && !cfg.repoURL.isBlank()) {
                     updateCheckShown = true;
-                    client.setScreen(new AutoUpdaterScreen());
+                    AutoUpdater.processPendingDeletes();
+                    client.setScreen(new AutoUpdaterScreen(new DeeperDarkLogoScreen(new TitleScreen(), 1.0)));
                 }
             }
         });

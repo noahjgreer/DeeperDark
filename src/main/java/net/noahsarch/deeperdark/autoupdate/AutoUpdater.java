@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -102,9 +103,10 @@ public class AutoUpdater {
 
         Path modsDir = currentJar.getParent();
 
-        // Derive new filename from the download URL
+        // Derive new filename from the download URL, decoding percent-encoding (e.g. %2B → +)
         String rawUrl = info.downloadUrl();
-        String newFileName = rawUrl.substring(rawUrl.lastIndexOf('/') + 1);
+        String encodedName = rawUrl.substring(rawUrl.lastIndexOf('/') + 1);
+        String newFileName = URLDecoder.decode(encodedName, StandardCharsets.UTF_8);
         Path newJar = modsDir.resolve(newFileName);
         Path tempJar = modsDir.resolve(newFileName + ".tmp");
 
@@ -142,31 +144,86 @@ public class AutoUpdater {
         Files.move(tempJar, newJar, StandardCopyOption.REPLACE_EXISTING);
         LOGGER.info("[AutoUpdater] Downloaded new JAR to: {}", newJar);
 
-        // Clean up the old JAR so Fabric doesn't load both on restart
-        cleanupOldJar(currentJar);
+        // Schedule the old JAR for removal on next startup (Windows holds the file open)
+        schedulePendingDelete(modsDir, currentJar);
     }
 
-    private static void cleanupOldJar(Path oldJar) {
-        // Direct delete works on Linux/Mac; on Windows the file is held by the JVM
+    // ===== Pending-delete (startup cleanup) =====
+
+    private static final String PENDING_DELETE_FILE = ".deeperdark-pending-delete";
+
+    /**
+     * Called at startup before the update check. Removes any JARs that couldn't be
+     * deleted in the previous session because the JVM held them open (Windows).
+     */
+    public static void processPendingDeletes() {
+        Path modsDir = getModsDir();
+        if (modsDir == null) return;
+        Path marker = modsDir.resolve(PENDING_DELETE_FILE);
+        if (!Files.exists(marker)) return;
+
+        try {
+            for (String line : Files.readAllLines(marker, StandardCharsets.UTF_8)) {
+                String trimmed = line.strip();
+                if (trimmed.isEmpty()) continue;
+                Path target = Path.of(trimmed);
+                tryDelete(target);
+                tryDelete(target.resolveSibling(target.getFileName().toString() + ".bak"));
+            }
+            Files.deleteIfExists(marker);
+        } catch (IOException e) {
+            LOGGER.warn("[AutoUpdater] Failed to process pending deletes: {}", e.getMessage());
+        }
+    }
+
+    private static void schedulePendingDelete(Path modsDir, Path oldJar) {
+        // Try immediate removal first (works on Linux/Mac and sometimes Windows)
         try {
             Files.delete(oldJar);
             LOGGER.info("[AutoUpdater] Deleted old JAR: {}", oldJar);
             return;
         } catch (IOException ignored) {}
 
-        // Rename to .bak so Fabric Loader ignores it (doesn't end in .jar)
+        // On Windows the JVM memory-maps the JAR; write it to the pending-delete file
+        // so the next launch cleans it up before Fabric loads any mods.
+        Path marker = modsDir.resolve(PENDING_DELETE_FILE);
         try {
-            Path renamed = oldJar.resolveSibling(oldJar.getFileName().toString() + ".bak");
-            Files.move(oldJar, renamed, StandardCopyOption.REPLACE_EXISTING);
-            // Also register for deletion when the JVM exits cleanly (Restart Now path)
-            renamed.toFile().deleteOnExit();
-            LOGGER.info("[AutoUpdater] Renamed old JAR to: {}", renamed);
-            return;
-        } catch (IOException ignored) {}
+            Files.writeString(marker, oldJar.toAbsolutePath().toString() + "\n",
+                    StandardCharsets.UTF_8,
+                    java.nio.file.StandardOpenOption.CREATE,
+                    java.nio.file.StandardOpenOption.APPEND);
+            LOGGER.info("[AutoUpdater] Scheduled old JAR for deletion on next launch: {}", oldJar);
+        } catch (IOException e) {
+            LOGGER.warn("[AutoUpdater] Could not schedule pending delete: {}", e.getMessage());
+        }
 
-        // Last resort: register with the JVM for deletion on clean exit
-        oldJar.toFile().deleteOnExit();
-        LOGGER.warn("[AutoUpdater] Could not remove old JAR immediately; registered deleteOnExit: {}", oldJar);
+        // Also try rename-to-.bak so Fabric ignores it even if delete at next launch fails
+        try {
+            Path bak = oldJar.resolveSibling(oldJar.getFileName().toString() + ".bak");
+            Files.move(oldJar, bak, StandardCopyOption.REPLACE_EXISTING);
+            LOGGER.info("[AutoUpdater] Renamed old JAR to .bak: {}", bak);
+        } catch (IOException ignored) {}
+    }
+
+    private static void tryDelete(Path path) {
+        try {
+            Files.deleteIfExists(path);
+            LOGGER.info("[AutoUpdater] Deleted: {}", path);
+        } catch (IOException ignored) {}
+    }
+
+    private static Path getModsDir() {
+        return FabricLoader.getInstance()
+                .getModContainer("deeperdark")
+                .map(c -> {
+                    try {
+                        Path jar = c.getOrigin().getPaths().get(0);
+                        return Files.isDirectory(jar) ? null : jar.getParent();
+                    } catch (Exception e) {
+                        return null;
+                    }
+                })
+                .orElse(null);
     }
 
     private static HttpURLConnection openConnection(String urlStr) throws IOException {

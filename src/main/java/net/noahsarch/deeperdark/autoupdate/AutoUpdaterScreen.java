@@ -1,16 +1,30 @@
 package net.noahsarch.deeperdark.autoupdate;
 
+import com.mojang.blaze3d.pipeline.BlendFunction;
+import com.mojang.blaze3d.pipeline.ColorTargetState;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.noahsarch.deeperdark.DeeperDarkConfig;
 
 @Environment(EnvType.CLIENT)
 public class AutoUpdaterScreen extends Screen {
+
+    private static final RenderPipeline FADE_PIPELINE = RenderPipeline
+            .builder(RenderPipelines.GUI_SNIPPET)
+            .withLocation(Identifier.fromNamespaceAndPath("deeperdark", "pipeline/autoupdater_fade"))
+            .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
+            .build();
+
+    private static final float FADE_OUT_DURATION_TICKS = 15.0f; // 0.75 seconds
+
+    private final Screen nextScreen;
 
     private enum State {
         CHECKING,
@@ -31,9 +45,12 @@ public class AutoUpdaterScreen extends Screen {
 
     private boolean checkStarted = false;
     private int tickCounter = 0;
+    private boolean fadingOut = false;
+    private float fadeOutAlpha = 0.0f;
 
-    public AutoUpdaterScreen() {
+    public AutoUpdaterScreen(Screen nextScreen) {
         super(Component.translatable("autoUpdater.title"));
+        this.nextScreen = nextScreen;
     }
 
     // ===== Lifecycle =====
@@ -51,6 +68,13 @@ public class AutoUpdaterScreen extends Screen {
     public void tick() {
         super.tick();
         tickCounter++;
+        if (fadingOut) {
+            fadeOutAlpha = Math.min(1.0f, fadeOutAlpha + 1.0f / FADE_OUT_DURATION_TICKS);
+            if (fadeOutAlpha >= 1.0f) {
+                this.minecraft.setScreen(nextScreen);
+            }
+            return;
+        }
         // Detect state changes from background threads; rebuild widgets on the main thread
         if (state != prevState) {
             prevState = state;
@@ -132,7 +156,7 @@ public class AutoUpdaterScreen extends Screen {
 
     @Override
     public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
-        this.extractMenuBackground(g);
+        g.fill(0, 0, this.width, this.height, 0xFF000000);
 
         int cx = this.width / 2;
         int cy = this.height / 2;
@@ -158,6 +182,12 @@ public class AutoUpdaterScreen extends Screen {
 
         // Render buttons / children
         super.extractRenderState(g, mouseX, mouseY, partialTick);
+
+        // Fade-out overlay — drawn last so it covers everything including buttons
+        if (fadingOut && fadeOutAlpha > 0.0f) {
+            int a = (int)(fadeOutAlpha * 255);
+            g.fill(FADE_PIPELINE, 0, 0, this.width, this.height, a << 24);
+        }
     }
 
     private void renderChecking(GuiGraphicsExtractor g, int cx, int cy) {
@@ -265,7 +295,10 @@ public class AutoUpdaterScreen extends Screen {
     // ===== Helpers =====
 
     private void goToTitleScreen() {
-        this.minecraft.setScreen(new TitleScreen());
+        if (!fadingOut) {
+            fadingOut = true;
+            clearWidgets();
+        }
     }
 
     private static DeeperDarkConfig.AutoUpdaterConfig getConfig() {

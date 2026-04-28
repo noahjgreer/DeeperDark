@@ -1,4 +1,12 @@
 {
+  "intro": {
+    "sounds": [
+      {
+        "name": "deeperdark:intro",
+        "stream": true
+      }
+    ]
+  },
   "block.note_block.organ": {
     "sounds": [
       "deeperdark:block/note_block/organ"
