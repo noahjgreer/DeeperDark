@@ -12,6 +12,7 @@ import net.noahsarch.deeperdark.ported.UnloadedActivityPort;
 import net.noahsarch.deeperdark.sound.ModSounds;
 import net.noahsarch.deeperdark.villager.ModVillagers;
 import net.noahsarch.deeperdark.worldgen.SlipChunkGenerator;
+import net.noahsarch.deeperdark.block.ModBlocks;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.world.item.Items;
 import org.slf4j.Logger;
@@ -42,6 +43,10 @@ public class Deeperdark implements ModInitializer {
 		// Register custom sounds (not in registry, just creates SoundEvent objects)
 		ModSounds.registerSounds();
 
+		// Register custom blocks/items before recipes or events use them
+		ModBlocks.initialize();
+		// ModItems.initialize();
+
 		// Register the Slip chunk generator
 		Registry.register(net.minecraft.core.registries.BuiltInRegistries.CHUNK_GENERATOR,
 				Identifier.fromNamespaceAndPath(MOD_ID, "slip_room_generator"),
@@ -50,12 +55,6 @@ public class Deeperdark implements ModInitializer {
 		PALE_MANSION_PROCESSOR = Registry.register(net.minecraft.core.registries.BuiltInRegistries.STRUCTURE_PROCESSOR, Identifier.fromNamespaceAndPath(MOD_ID, "pale_mansion_processor"), () -> PaleMansionProcessor.CODEC);
 
 		SiphonEvents.register();
-		GoldenCauldronEvents.register();
-		GunpowderBlockEvents.register();
-		net.noahsarch.deeperdark.event.LeatherBlockEvents.register();
-		net.noahsarch.deeperdark.event.FlintBlockEvents.register();
-		net.noahsarch.deeperdark.event.RottenFleshBlockEvents.register();
-		net.noahsarch.deeperdark.event.CustomBlockPickBlock.register();
 
 		// Register custom ingredient for crafting
 		net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredientSerializer.register(net.noahsarch.deeperdark.recipe.ComponentIngredient.Serializer.INSTANCE);

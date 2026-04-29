@@ -15,15 +15,7 @@
     ]
   },
   "result": {
-    "id": "minecraft:sugar",
-    "components": {
-      "minecraft:item_model": "minecraft:siphon",
-      "minecraft:item_name": {
-        "translate": "item.deeperdark.siphon",
-        "fallback": "Siphon"
-      },
-      "minecraft:rarity": "common"
-    },
+    "id": "deeperdark:siphon",
     "count": 1
   }
 }

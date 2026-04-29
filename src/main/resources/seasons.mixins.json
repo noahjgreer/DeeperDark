@@ -1,0 +1,28 @@
+{
+  "required": true,
+  "package": "io.github.lucaargolo.seasons.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "mixins": [
+    "AbstractBlockMixin",
+    "AnimalEntityMixin",
+    "BiomeMixin",
+    "FreezeTopLayerFeatureMixin",
+    "IceBlockMixin",
+    "LakeFeatureMixin",
+    "ServerWorldMixin",
+    "SnowBlockMixin",
+    "SugarCaneBlockMixin",
+    "VanillaFertilizablesMixin",
+    "WorldViewMixin"
+  ],
+  "client": [
+    "ItemMixin",
+    "WorldRendererMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}

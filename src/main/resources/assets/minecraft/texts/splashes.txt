@@ -21,9 +21,9 @@ Beware of snakes!
 Beware of foxes!
 Here be dragons!
 Beware of dragons!
-A dragon, with fur?
-A fox, with wings?
-A snake, with "arms"?
+A dragon with fur?
+A fox with wings?
+Non-existant arms?
 Is that a snake, or a proot?
 I can smell you!
 I see you!
@@ -67,3 +67,34 @@ Don't look away!
 What's that behind you?
 Not made by Valve
 So generous!
+Bomb them!
+Bomb them, again!
+Airstrike!
+Time, Dr. Freeman?
+Is it really that time?
+In the flesh!
+In the hazard suit!
+Most of it was government property!
+I think you've earned it!
+Quite a nasty piece of work!
+I am impressed.
+You have limitless potential!
+Rather an anticlimax!
+Time to choose!
+It's time to choose.
+No regrets!
+Rise and shine!
+Your hour has come again.
+The right man in the wrong place can make all the difference in the world!
+Wake up and smell the ashes!
+These are extraordinary times!
+I'm really not at liberty to say!
+This is where I get off.
+You're not supposed to be here!
+Forget all about this!
+Safely seen to White Forest
+An inconvenient heart-to-heart
+Crowbar + Steel corridor
+Quelling!
+Prepare for unforeseen consequences!
+Unforeseen consequences!

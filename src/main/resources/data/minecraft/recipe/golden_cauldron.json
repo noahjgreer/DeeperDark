@@ -10,14 +10,7 @@
     "###"
   ],
   "result": {
-    "components": {
-      "minecraft:item_model": "minecraft:golden_cauldron_item",
-      "minecraft:item_name": {
-        "translate": "item.minecraft.golden_cauldron",
-        "fallback": "Golden Cauldron"
-      }
-    },
-    "count": 1,
-    "id": "minecraft:sugar"
+    "id": "deeperdark:golden_cauldron",
+    "count": 1
   }
 }

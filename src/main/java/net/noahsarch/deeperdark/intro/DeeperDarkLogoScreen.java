@@ -21,7 +21,7 @@ import org.lwjgl.glfw.GLFW;
 @Environment(EnvType.CLIENT)
 public class DeeperDarkLogoScreen extends Screen {
 
-    private static final Identifier TEXTURE_ID = Identifier.fromNamespaceAndPath("deeperdark", "intro.png");
+    private static final Identifier TEXTURE_ID = Identifier.fromNamespaceAndPath("deeperdark", "textures/gui/intro.png");
     private static final SoundEvent INTRO_SOUND = SoundEvent.createVariableRangeEvent(
             Identifier.fromNamespaceAndPath("deeperdark", "intro"));
 

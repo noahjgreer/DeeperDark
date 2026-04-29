@@ -1,0 +1,9 @@
+{
+    "replace": false,
+    "values": [
+        "deeperdark:gunpowder_block",
+        "deeperdark:flint_block",
+        "deeperdark:golden_cauldron",
+        "deeperdark:siphon"
+    ]
+}

@@ -1,0 +1,24 @@
+{
+  "tooltip.seasons.spring": "Весна",
+  "tooltip.seasons.summer": "Лето",
+  "tooltip.seasons.fall": "Осень",
+  "tooltip.seasons.winter": "Зима",
+  "tooltip.seasons.faster_grow": "Растёт быстрее в этом сезоне",
+  "tooltip.seasons.normal_grow": "Нормально растёт в этом сезоне",
+  "tooltip.seasons.slowed_grow": "Растёт медленнее в этом сезоне",
+  "tooltip.seasons.not_grow": "Не растёт в этом сезоне",
+  "tooltip.seasons.show_more": "Нажмите %s, чтобы узнать подробности",
+  "tooltip.seasons.season_delimitator": ": ",
+  "tooltip.seasons.season_speed": "%s%s%s%% скорости",
+  "tooltip.seasons.combined_grow": "%s (%s%%)",
+
+  "chat.seasons.mod_installed": "Похоже, у вас установлен %s!",
+  "chat.seasons.compatibility": "Установите этот аддон и получите полную совместимость с Fabric Seasons.",
+  "chat.seasons.mod_not_installed": "Похоже, у вас не установлен %s!",
+  "chat.seasons.extras": "Установите аддон, чтобы улучшить игровой опыт новыми блоками и предметами.",
+  "chat.seasons.available_at": "Доступен на: ",
+  "chat.seasons.show_once": "Это сообщение появится только один раз.",
+
+  "commands.seasons.query_1": "Текущий сезон: %s.",
+  "commands.seasons.query_2": "Осталось %s дней (%s тактов) до %s."
+}

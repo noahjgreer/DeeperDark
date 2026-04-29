@@ -14,16 +14,20 @@
 	"license": "CC0-1.0",
 	"icon": "assets/deeperdark/icon.png",
 	"environment": "*",
+	"accessWidener": "seasons.accesswidener",
 	"entrypoints": {
 		"main": [
-			"net.noahsarch.deeperdark.Deeperdark"
+			"net.noahsarch.deeperdark.Deeperdark",
+			"io.github.lucaargolo.seasons.FabricSeasons"
 		],
 		"client": [
-			"net.noahsarch.deeperdark.DeeperDarkClient"
+			"net.noahsarch.deeperdark.DeeperDarkClient",
+			"io.github.lucaargolo.seasons.FabricSeasonsClient"
 		]
 	},
 	"mixins": [
-		"deeperdark.mixins.json"
+		"deeperdark.mixins.json",
+		"seasons.mixins.json"
 	],
 	"depends": {
 		"fabricloader": ">=0.19.2",

@@ -10,15 +10,7 @@
     "###"
   ],
   "result": {
-    "components": {
-      "minecraft:item_name": {
-        "translate": "item.deeperdark.flint_block",
-        "fallback": "Block of Flint"
-      },
-      "minecraft:item_model": "flint_block"
-    },
-    "count": 1,
-    "id": "minecraft:sugar"
+    "id": "deeperdark:flint_block",
+    "count": 1
   }
 }
-

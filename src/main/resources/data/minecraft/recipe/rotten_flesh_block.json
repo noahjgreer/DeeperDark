@@ -10,15 +10,7 @@
     "###"
   ],
   "result": {
-    "components": {
-      "minecraft:item_name": {
-        "translate": "item.deeperdark.rotten_flesh_block",
-        "fallback": "Block of Rotten Flesh"
-      },
-      "minecraft:item_model": "rotten_flesh_block"
-    },
-    "count": 1,
-    "id": "minecraft:sugar"
+    "id": "deeperdark:rotten_flesh_block",
+    "count": 1
   }
 }
-

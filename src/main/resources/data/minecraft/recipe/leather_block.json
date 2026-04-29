@@ -10,15 +10,7 @@
     "###"
   ],
   "result": {
-    "components": {
-      "minecraft:item_name": {
-        "translate": "item.deeperdark.leather_block",
-        "fallback": "Block of Leather"
-      },
-      "minecraft:item_model": "leather_block"
-    },
-    "count": 1,
-    "id": "minecraft:sugar"
+    "id": "deeperdark:leather_block",
+    "count": 1
   }
 }
-
