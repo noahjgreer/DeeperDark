@@ -45,6 +45,13 @@ public class FoliageSeasonColors implements SimpleSynchronousResourceReloadListe
         return Optional.empty();
     }
 
+    public static Optional<Integer> getBlendedSeasonFoliageColor(Biome biome, Identifier biomeIdentifier, Season current, Season next, float t) {
+        if (foliageColorMap.containsKey(biomeIdentifier)) {
+            return Optional.of(foliageColorMap.get(biomeIdentifier).getBlendedColor(current, next, t));
+        }
+        return Optional.empty();
+    }
+
     public static int getColor(Season season, double temperature, double humidity) {
         humidity *= temperature;
         int i = (int) ((1.0D - temperature) * 255.0D);
@@ -57,6 +64,13 @@ public class FoliageSeasonColors implements SimpleSynchronousResourceReloadListe
         };
     }
 
+    public static int getBlendedColor(Season current, Season next, float t, double temperature, double humidity) {
+        return SeasonColor.lerpColor(
+                getColor(current, temperature, humidity),
+                getColor(next,    temperature, humidity),
+                t);
+    }
+
     public static int getSpruceColor(Season season) {
         return minecraftSpruceFoliage.getColor(season);
     }
@@ -67,6 +81,10 @@ public class FoliageSeasonColors implements SimpleSynchronousResourceReloadListe
 
     public static int getDefaultColor(Season season) {
         return minecraftDefaultFoliage.getColor(season);
+    }
+
+    public static int getBlendedDefaultColor(Season current, Season next, float t) {
+        return minecraftDefaultFoliage.getBlendedColor(current, next, t);
     }
 
     @Override

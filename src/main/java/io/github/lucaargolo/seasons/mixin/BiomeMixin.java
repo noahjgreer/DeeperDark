@@ -104,8 +104,9 @@ public abstract class BiomeMixin implements BiomeMixed {
         Minecraft client = Minecraft.getInstance();
         if (client.level == null) return;
         if (!FabricSeasons.CONFIG.isValidInDimension(client.level.dimension())) return;
-        Season season = FabricSeasons.getCurrentSeason(client.level);
-        cir.setReturnValue(GrassSeasonColors.getColor(season,
+        Season current = FabricSeasons.getCurrentSeason(client.level);
+        float t = FabricSeasons.getSeasonTransitionFraction(client.level);
+        cir.setReturnValue(GrassSeasonColors.getBlendedColor(current, current.getNext(), t,
                 Mth.clamp(climateSettings.temperature(), 0.0F, 1.0F),
                 Mth.clamp(climateSettings.downfall(), 0.0F, 1.0F)));
     }
@@ -116,8 +117,9 @@ public abstract class BiomeMixin implements BiomeMixed {
         Minecraft client = Minecraft.getInstance();
         if (client.level == null) return;
         if (!FabricSeasons.CONFIG.isValidInDimension(client.level.dimension())) return;
-        Season season = FabricSeasons.getCurrentSeason(client.level);
-        cir.setReturnValue(FoliageSeasonColors.getColor(season,
+        Season current = FabricSeasons.getCurrentSeason(client.level);
+        float t = FabricSeasons.getSeasonTransitionFraction(client.level);
+        cir.setReturnValue(FoliageSeasonColors.getBlendedColor(current, current.getNext(), t,
                 Mth.clamp(climateSettings.temperature(), 0.0F, 1.0F),
                 Mth.clamp(climateSettings.downfall(), 0.0F, 1.0F)));
     }
@@ -132,26 +134,28 @@ public abstract class BiomeMixin implements BiomeMixed {
         Minecraft client = Minecraft.getInstance();
         if (client.level == null) return;
         if (!FabricSeasons.CONFIG.isValidInDimension(client.level.dimension())) return;
-        Season season = FabricSeasons.getCurrentSeason(client.level);
+        Season current = FabricSeasons.getCurrentSeason(client.level);
+        float t = FabricSeasons.getSeasonTransitionFraction(client.level);
         Biome self = (Biome) (Object) this;
 
         // Swamp uses per-position noise — never cache
         if (specialEffects.grassColorModifier() == BiomeSpecialEffects.GrassColorModifier.SWAMP) {
             double noise = Biome.BIOME_INFO_NOISE.getValue(x * 0.0225, z * 0.0225, false);
             cir.setReturnValue(noise < -0.1
-                    ? GrassSeasonColors.getSwampColor1(season)
-                    : GrassSeasonColors.getSwampColor2(season));
+                    ? GrassSeasonColors.getBlendedSwampColor1(current, current.getNext(), t)
+                    : GrassSeasonColors.getBlendedSwampColor2(current, current.getNext(), t));
             return;
         }
 
-        if (ColorsCache.hasGrassCache(self)) {
-            ColorsCache.getGrassCache(self).ifPresent(cir::setReturnValue);
+        Optional<Integer> grassCached = ColorsCache.getGrassCache(self);
+        if (grassCached != null) {
+            grassCached.ifPresent(cir::setReturnValue);
             return;
         }
 
         Identifier biomeId = seasons$resolveBiomeId(client);
         if (biomeId != null) {
-            Optional<Integer> seasonColor = GrassSeasonColors.getSeasonGrassColor(self, biomeId, season);
+            Optional<Integer> seasonColor = GrassSeasonColors.getBlendedSeasonGrassColor(self, biomeId, current, current.getNext(), t);
             ColorsCache.createGrassCache(self, seasonColor);
             seasonColor.ifPresent(cir::setReturnValue);
         }
@@ -167,18 +171,20 @@ public abstract class BiomeMixin implements BiomeMixed {
         Minecraft client = Minecraft.getInstance();
         if (client.level == null) return;
         if (!FabricSeasons.CONFIG.isValidInDimension(client.level.dimension())) return;
-        Season season = FabricSeasons.getCurrentSeason(client.level);
+        Season current = FabricSeasons.getCurrentSeason(client.level);
+        float t = FabricSeasons.getSeasonTransitionFraction(client.level);
         Biome self = (Biome) (Object) this;
 
-        if (ColorsCache.hasFoliageCache(self)) {
-            ColorsCache.getFoliageCache(self).ifPresent(cir::setReturnValue);
+        Optional<Integer> foliageCached = ColorsCache.getFoliageCache(self);
+        if (foliageCached != null) {
+            foliageCached.ifPresent(cir::setReturnValue);
             return;
         }
 
         Identifier biomeId = seasons$resolveBiomeId(client);
 
         if (biomeId != null) {
-            Optional<Integer> seasonColor = FoliageSeasonColors.getSeasonFoliageColor(self, biomeId, season);
+            Optional<Integer> seasonColor = FoliageSeasonColors.getBlendedSeasonFoliageColor(self, biomeId, current, current.getNext(), t);
             if (seasonColor.isPresent()) {
                 ColorsCache.createFoliageCache(self, seasonColor);
                 cir.setReturnValue(seasonColor.get());
@@ -188,7 +194,7 @@ public abstract class BiomeMixin implements BiomeMixed {
 
         // Biomes with a solid foliage color override use the default season foliage palette
         if (specialEffects.foliageColorOverride().isPresent()) {
-            int color = FoliageSeasonColors.getDefaultColor(season);
+            int color = FoliageSeasonColors.getBlendedDefaultColor(current, current.getNext(), t);
             ColorsCache.createFoliageCache(self, Optional.of(color));
             cir.setReturnValue(color);
             return;

@@ -6,11 +6,13 @@ import io.github.lucaargolo.seasons.payload.UpdateCropsPaycket;
 import io.github.lucaargolo.seasons.resources.CropConfigs;
 import io.github.lucaargolo.seasons.resources.FoliageSeasonColors;
 import io.github.lucaargolo.seasons.resources.GrassSeasonColors;
+import io.github.lucaargolo.seasons.utils.ColorsCache;
 import io.github.lucaargolo.seasons.utils.CompatWarnState;
 import io.github.lucaargolo.seasons.utils.ModConfig;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
@@ -23,6 +25,14 @@ public class FabricSeasonsClient implements ClientModInitializer {
     public void onInitializeClient() {
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new GrassSeasonColors());
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new FoliageSeasonColors());
+
+        // Clear the biome color cache every tick so chunk sections rebuilt this tick
+        // use the current interpolated season color rather than a stale discrete value.
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            if (client.level != null) {
+                ColorsCache.clearCache();
+            }
+        });
 
         ClientPlayNetworking.registerGlobalReceiver(ConfigSyncPacket.ID, (payload, context) -> {
             try {

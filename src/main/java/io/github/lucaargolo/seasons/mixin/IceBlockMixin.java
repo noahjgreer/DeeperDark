@@ -6,7 +6,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.IceBlock;
@@ -50,7 +49,12 @@ public abstract class IceBlockMixin extends Block implements Meltable {
                     }
                 }
                 ci.cancel();
+                return;
             }
+            // Warm enough and not manually placed: melt regardless of light level.
+            // Vanilla requires light >= 11, but season-induced ice must melt when warmth returns.
+            this.melt(state, world, pos);
+            ci.cancel();
         }
     }
 }

@@ -40,4 +40,16 @@ public class SeasonColor {
             case WINTER -> winterColor;
         };
     }
+
+    public int getBlendedColor(Season current, Season next, float t) {
+        return lerpColor(getColor(current), getColor(next), t);
+    }
+
+    public static int lerpColor(int a, int b, float t) {
+        int b0 = Math.round(( a        & 0xFF) * (1 - t) + ( b        & 0xFF) * t);
+        int b1 = Math.round(((a >>  8) & 0xFF) * (1 - t) + ((b >>  8) & 0xFF) * t);
+        int b2 = Math.round(((a >> 16) & 0xFF) * (1 - t) + ((b >> 16) & 0xFF) * t);
+        int b3 = Math.round(((a >> 24) & 0xFF) * (1 - t) + ((b >> 24) & 0xFF) * t);
+        return (b3 << 24) | (b2 << 16) | (b1 << 8) | b0;
+    }
 }

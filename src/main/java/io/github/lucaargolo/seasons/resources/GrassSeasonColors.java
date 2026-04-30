@@ -44,6 +44,13 @@ public class GrassSeasonColors implements SimpleSynchronousResourceReloadListene
         return Optional.empty();
     }
 
+    public static Optional<Integer> getBlendedSeasonGrassColor(Biome biome, Identifier biomeIdentifier, Season current, Season next, float t) {
+        if (grassColorMap.containsKey(biomeIdentifier)) {
+            return Optional.of(grassColorMap.get(biomeIdentifier).getBlendedColor(current, next, t));
+        }
+        return Optional.empty();
+    }
+
     public static int getColor(Season season, double temperature, double humidity) {
         humidity *= temperature;
         int i = (int) ((1.0D - temperature) * 255.0D);
@@ -57,12 +64,27 @@ public class GrassSeasonColors implements SimpleSynchronousResourceReloadListene
         };
     }
 
+    public static int getBlendedColor(Season current, Season next, float t, double temperature, double humidity) {
+        return SeasonColor.lerpColor(
+                getColor(current, temperature, humidity),
+                getColor(next,    temperature, humidity),
+                t);
+    }
+
     public static int getSwampColor1(Season season) {
         return minecraftSwampGrass1.getColor(season);
     }
 
     public static int getSwampColor2(Season season) {
         return minecraftSwampGrass2.getColor(season);
+    }
+
+    public static int getBlendedSwampColor1(Season current, Season next, float t) {
+        return minecraftSwampGrass1.getBlendedColor(current, next, t);
+    }
+
+    public static int getBlendedSwampColor2(Season current, Season next, float t) {
+        return minecraftSwampGrass2.getBlendedColor(current, next, t);
     }
 
     @Override

@@ -26,6 +26,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.clock.WorldClock;
+import net.minecraft.world.clock.WorldClocks;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.saveddata.SavedData;
@@ -87,12 +89,27 @@ public class FabricSeasons implements ModInitializer {
     // Season calculation
     // -------------------------------------------------------------------------
 
+    private static Holder<WorldClock> overworldClockHolder = null;
+
+    private static Holder<WorldClock> getOverworldClockHolder(Level world) {
+        if (overworldClockHolder == null) {
+            overworldClockHolder = world.registryAccess()
+                .lookupOrThrow(Registries.WORLD_CLOCK)
+                .getOrThrow(WorldClocks.OVERWORLD);
+        }
+        return overworldClockHolder;
+    }
+
+    public static long getOverworldTime(Level world) {
+        return world.clockManager().getTotalTicks(getOverworldClockHolder(world));
+    }
+
     public static Season getCurrentSeason(Level world) {
         if (!CONFIG.isValidInDimension(world.dimension())) return Season.SPRING;
         if (CONFIG.isSeasonLocked()) return CONFIG.getLockedSeason();
         if (CONFIG.isSeasonTiedWithSystemTime()) return getSystemTimeSeason();
 
-        long time = world.getLevelData().getGameTime() % CONFIG.getYearLength();
+        long time = getOverworldTime(world) % CONFIG.getYearLength();
         Season season = CONFIG.getStartingSeason();
         long accumulated = 0;
         for (int i = 0; i < 4; i++) {
@@ -107,9 +124,25 @@ public class FabricSeasons implements ModInitializer {
         return currentSeason.getNext();
     }
 
+    public static float getSeasonTransitionFraction(Level world) {
+        if (CONFIG.isSeasonLocked() || CONFIG.isSeasonTiedWithSystemTime()) return 0.0f;
+        long time = getOverworldTime(world) % CONFIG.getYearLength();
+        Season season = CONFIG.getStartingSeason();
+        long accumulated = 0;
+        for (int i = 0; i < 4; i++) {
+            long len = season.getSeasonLength();
+            accumulated += len;
+            if (time < accumulated) {
+                return (float)(time - (accumulated - len)) / (float)len;
+            }
+            season = season.getNext();
+        }
+        return 0.0f;
+    }
+
     public static long getTimeToNextSeason(Level world) {
         if (CONFIG.isSeasonLocked() || CONFIG.isSeasonTiedWithSystemTime()) return 0;
-        long time = world.getLevelData().getGameTime() % CONFIG.getYearLength();
+        long time = getOverworldTime(world) % CONFIG.getYearLength();
         Season season = CONFIG.getStartingSeason();
         long accumulated = 0;
         for (int i = 0; i < 4; i++) {
