@@ -53,9 +53,9 @@ public class WoolShearingRecipe extends CustomRecipe {
         for (int i = 0; i < input.size(); i++) {
             ItemStack stack = input.getItem(i);
             if (stack.is(Items.SHEARS)) {
-                if (stack.getDamageValue() + 1 < stack.getMaxDamage()) {
+                if (stack.getDamageValue() + 6 < stack.getMaxDamage()) {
                     ItemStack damaged = stack.copy();
-                    damaged.setDamageValue(stack.getDamageValue() + 1);
+                    damaged.setDamageValue(stack.getDamageValue() + 6);
                     remaining.set(i, damaged);
                 }
                 break;

@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import io.github.lucaargolo.seasons.commands.SeasonCommand;
 import io.github.lucaargolo.seasons.mixed.BiomeMixed;
 import io.github.lucaargolo.seasons.payload.ConfigSyncPacket;
+import io.github.lucaargolo.seasons.payload.SeasonTimeSyncPacket;
 import io.github.lucaargolo.seasons.payload.UpdateCropsPaycket;
 import io.github.lucaargolo.seasons.resources.CropConfigs;
 import io.github.lucaargolo.seasons.utils.*;
@@ -91,6 +92,22 @@ public class FabricSeasons implements ModInitializer {
 
     private static Holder<WorldClock> overworldClockHolder = null;
 
+    // Client-side: time anchor received from the server via SeasonTimeSyncPacket.
+    // We advance it by the delta in vanilla gameTime so no per-tick packet is needed.
+    private static long clientOverworldTimeBase = 0;
+    private static long clientGameTimeBase = 0;
+    private static boolean clientTimeSynced = false;
+
+    public static void setClientOverworldTime(long overworldTime, long gameTime) {
+        clientOverworldTimeBase = overworldTime;
+        clientGameTimeBase = gameTime;
+        clientTimeSynced = true;
+    }
+
+    public static boolean isClientTimeSynced() {
+        return clientTimeSynced;
+    }
+
     private static Holder<WorldClock> getOverworldClockHolder(Level world) {
         if (overworldClockHolder == null) {
             overworldClockHolder = world.registryAccess()
@@ -101,6 +118,9 @@ public class FabricSeasons implements ModInitializer {
     }
 
     public static long getOverworldTime(Level world) {
+        if (world.isClientSide() && clientTimeSynced) {
+            return clientOverworldTimeBase + (world.getGameTime() - clientGameTimeBase);
+        }
         return world.clockManager().getTotalTicks(getOverworldClockHolder(world));
     }
 
@@ -239,17 +259,38 @@ public class FabricSeasons implements ModInitializer {
         loadConfig();
         registerSeeds();
 
-        PayloadTypeRegistry.clientboundPlay().register(ConfigSyncPacket.ID,    ConfigSyncPacket.CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(UpdateCropsPaycket.ID,  UpdateCropsPaycket.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(ConfigSyncPacket.ID,       ConfigSyncPacket.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(UpdateCropsPaycket.ID,     UpdateCropsPaycket.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(SeasonTimeSyncPacket.ID,   SeasonTimeSyncPacket.CODEC);
 
         ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(new CropConfigs());
 
         ServerTickEvents.START_SERVER_TICK.register(GreenhouseCache::tick);
 
+        ServerTickEvents.START_SERVER_TICK.register(server -> {
+            if (server.getTickCount() % 400 == 0) {
+                ServerLevel overworld = server.getLevel(Level.OVERWORLD);
+                if (overworld != null) {
+                    SeasonTimeSyncPacket packet = new SeasonTimeSyncPacket(
+                            getOverworldTime(overworld), overworld.getGameTime());
+                    server.getPlayerList().getPlayers().forEach(p -> ServerPlayNetworking.send(p, packet));
+                }
+            }
+        });
+
         CommandRegistrationCallback.EVENT.register((dispatcher, registries, environment) ->
                 SeasonCommand.register(dispatcher));
 
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+            ServerLevel overworld = server.getLevel(Level.OVERWORLD);
+            if (overworld != null) {
+                try {
+                    ServerPlayNetworking.send(handler.player, new SeasonTimeSyncPacket(
+                            getOverworldTime(overworld), overworld.getGameTime()));
+                } catch (IllegalStateException ignored) {
+                    // Integrated server clock not yet initialized; the periodic 400-tick sender will sync shortly
+                }
+            }
             ServerPlayNetworking.send(handler.player, new ConfigSyncPacket(GSON.toJson(CONFIG)));
             ServerPlayNetworking.send(handler.player,
                     UpdateCropsPaycket.fromConfig(CropConfigs.getDefaultCropConfig(), CropConfigs.getCropConfigMap()));

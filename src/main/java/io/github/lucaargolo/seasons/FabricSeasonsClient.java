@@ -2,6 +2,7 @@ package io.github.lucaargolo.seasons;
 
 import com.google.gson.JsonParseException;
 import io.github.lucaargolo.seasons.payload.ConfigSyncPacket;
+import io.github.lucaargolo.seasons.payload.SeasonTimeSyncPacket;
 import io.github.lucaargolo.seasons.payload.UpdateCropsPaycket;
 import io.github.lucaargolo.seasons.resources.CropConfigs;
 import io.github.lucaargolo.seasons.resources.FoliageSeasonColors;
@@ -47,6 +48,14 @@ public class FabricSeasonsClient implements ClientModInitializer {
 
         ClientPlayNetworking.registerGlobalReceiver(UpdateCropsPaycket.ID, (payload, context) ->
                 CropConfigs.receiveConfig(payload.cropConfig(), payload.cropConfigMap()));
+
+        ClientPlayNetworking.registerGlobalReceiver(SeasonTimeSyncPacket.ID, (payload, context) -> {
+            boolean firstSync = !FabricSeasons.isClientTimeSynced();
+            FabricSeasons.setClientOverworldTime(payload.overworldTime(), payload.gameTime());
+            if (firstSync && context.client().levelRenderer != null) {
+                context.client().execute(() -> context.client().levelRenderer.allChanged());
+            }
+        });
 
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
             if (FabricSeasons.CONFIG.shouldNotifyCompat()) {

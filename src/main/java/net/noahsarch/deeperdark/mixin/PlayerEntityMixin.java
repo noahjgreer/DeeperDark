@@ -1,5 +1,8 @@
 package net.noahsarch.deeperdark.mixin;
 
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Leashable;
 import net.minecraft.world.entity.LivingEntity;
@@ -60,14 +63,35 @@ public abstract class PlayerEntityMixin extends LivingEntity implements Leashabl
     }
 
     @Override
+    public double leashSnapDistance() {
+        return 24.0;
+    }
+
+    @Override
+    public double leashElasticDistance() {
+        return 6.0;
+    }
+
+    @Override
+    public void dropLeash() {
+        // removeLeash() broadcasts an unlink packet to trackers (for third-party observers).
+        // The custom PlayerLeashPacket tells the leashed player's own client (snap/auto-break case).
+        Entity self = (Entity)(Object)this;
+        if (!self.level().isClientSide() && self instanceof ServerPlayer sp) {
+            ServerPlayNetworking.send(sp, new net.noahsarch.deeperdark.payload.PlayerLeashPacket(self.getId(), -1));
+        }
+        this.removeLeash();
+    }
+
+    @Override
     public InteractionResult interact(Player player, InteractionHand hand, Vec3 pos) {
         ItemStack itemStack = player.getItemInHand(hand);
-        if (itemStack.getItem() == Items.LEAD && this.canBeLeashed()) {
-            if (!this.isLeashed()) {
-                this.setLeashedTo(player, true);
+        if (itemStack.is(Items.LEAD) && this.canBeLeashed() && !this.isLeashed()) {
+            this.setLeashedTo(player, true);
+            if (!player.hasInfiniteMaterials()) {
                 itemStack.shrink(1);
-                return InteractionResult.SUCCESS;
             }
+            return InteractionResult.SUCCESS;
         }
         return super.interact(player, hand, pos);
     }

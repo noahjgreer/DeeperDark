@@ -72,7 +72,7 @@ public class ModBlocks {
     );
     public static final Block LEATHER_BLOCK = register(
         "leather_block",
-        Block::new,
+        SwordShearableBlock::new,
         BlockBehaviour.Properties.of()
             .strength(1.0F)
             .sound(SoundType.WET_SPONGE),
@@ -89,7 +89,7 @@ public class ModBlocks {
     );
     public static final Block ROTTEN_FLESH_BLOCK = register(
         "rotten_flesh_block",
-        Block::new,
+        SwordShearableBlock::new,
         BlockBehaviour.Properties.of()
             .strength(0.8F)
             .sound(SoundType.WEEPING_VINES),

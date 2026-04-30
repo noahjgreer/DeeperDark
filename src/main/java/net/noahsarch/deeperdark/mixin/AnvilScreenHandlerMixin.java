@@ -154,7 +154,7 @@ public abstract class AnvilScreenHandlerMixin extends ItemCombinerMenu {
                     return;
                 }
 
-                totalCost = enchantmentsAdded > 0 ? 7 : 0;
+                totalCost = 6;
             }
         }
 
