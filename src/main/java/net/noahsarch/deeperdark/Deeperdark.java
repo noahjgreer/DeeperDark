@@ -5,6 +5,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.Identifier;
 import net.noahsarch.deeperdark.event.*;
+import net.noahsarch.deeperdark.item.ModItems;
 import net.noahsarch.deeperdark.portal.SlipPortalHandler;
 import net.noahsarch.deeperdark.potion.CustomBrewingRecipeHandler;
 import net.noahsarch.deeperdark.ported.LeavesBeGonePort;
@@ -45,7 +46,7 @@ public class Deeperdark implements ModInitializer {
 
 		// Register custom blocks/items before recipes or events use them
 		ModBlocks.initialize();
-		// ModItems.initialize();
+		ModItems.initialize();
 
 		// Register the Slip chunk generator
 		Registry.register(net.minecraft.core.registries.BuiltInRegistries.CHUNK_GENERATOR,

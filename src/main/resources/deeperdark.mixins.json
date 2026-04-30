@@ -89,9 +89,6 @@
     "ServerboundChatPacketMixin",
     "ShulkerBoxSlotMixin"
   ],
-  "client": [
-    "ChatScreenMixin"
-  ],
   "injectors": {
     "defaultRequire": 1
   },
