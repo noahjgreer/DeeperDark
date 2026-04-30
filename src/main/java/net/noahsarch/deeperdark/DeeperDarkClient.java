@@ -6,6 +6,7 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Leashable;
 import net.noahsarch.deeperdark.autoupdate.AutoUpdater;
@@ -63,6 +64,9 @@ public class DeeperDarkClient implements ClientModInitializer {
                     updateCheckShown = true;
                     AutoUpdater.processPendingDeletes();
                     client.setScreen(new AutoUpdaterScreen(new DeeperDarkLogoScreen(new TitleScreen(), 1.0)));
+                    // TitleScreen was briefly active before we took over, causing the MusicManager to
+                    // queue menu music. Stop it so the intro plays in silence.
+                    client.getSoundManager().stop(null, SoundSource.MUSIC);
                 }
             }
         });

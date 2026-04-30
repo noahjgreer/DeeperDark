@@ -10,6 +10,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Leashable;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
 import net.noahsarch.deeperdark.payload.PlayerLeashPacket;
@@ -29,9 +30,14 @@ public class PlayerLeashHandler {
 
             if (leashable.isLeashed() && player == leashable.getLeashHolder()) {
                 leashable.removeLeash();
-                // removeLeash() broadcasts to trackers; custom packet tells the leashed player's own client
                 ServerPlayNetworking.send((ServerPlayer) target, new PlayerLeashPacket(target.getId(), -1));
-                level.playSound(null, player.blockPosition(), SoundEvents.LEAD_BREAK, SoundSource.PLAYERS, 1.0F, 1.0F);
+                if (!player.hasInfiniteMaterials()) {
+                    ItemStack lead = new ItemStack(Items.LEAD);
+                    if (!player.getInventory().add(lead)) {
+                        player.drop(lead, false);
+                    }
+                }
+                level.playSound(null, player.blockPosition(), SoundEvents.LEAD_UNTIED, SoundSource.PLAYERS, 1.0F, 1.0F);
             } else if (!target.getUUID().equals(player.getUUID())) {
                 leashable.setLeashedTo(player, true);
                 // setLeashedTo broadcasts to trackers; custom packet tells the leashed player's own client
