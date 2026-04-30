@@ -3,6 +3,7 @@
   "package": "net.noahsarch.deeperdark.mixin",
   "compatibilityLevel": "JAVA_25",
   "mixins": [
+    "AnvilScreenHandlerMixin",
     "AbstractBoatEntityMixin",
     "BeaconBlockEntityMixin",
     "AbstractSkeletonEntityMixin",

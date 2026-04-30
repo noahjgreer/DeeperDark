@@ -31,10 +31,13 @@ public abstract class AnvilScreenHandlerMixin extends ItemCombinerMenu {
     private DataSlot cost;
 
     @Shadow
-    private String newItemName;
+    private String itemName;
 
     @Shadow
     private int repairItemCountCost;
+
+    @Shadow
+    private boolean onlyRenaming;
 
     public AnvilScreenHandlerMixin(MenuType<?> type, int syncId, Inventory playerInventory, ContainerLevelAccess context, ItemCombinerMenuSlotDefinition forgingSlotsManager) {
         super(type, syncId, playerInventory, context, forgingSlotsManager);
@@ -44,7 +47,7 @@ public abstract class AnvilScreenHandlerMixin extends ItemCombinerMenu {
     private void deeperdark$customUpdateResult(CallbackInfo ci) {
         ItemStack inputStack = this.inputSlots.getItem(0);
 
-        if (inputStack.isEmpty() || !inputStack.isEnchantable()) {
+        if (inputStack.isEmpty() || !EnchantmentHelper.canStoreEnchantments(inputStack)) {
             this.resultSlots.setItem(0, ItemStack.EMPTY);
             this.cost.set(0);
             ci.cancel();
@@ -57,12 +60,12 @@ public abstract class AnvilScreenHandlerMixin extends ItemCombinerMenu {
                 EnchantmentHelper.getEnchantmentsForCrafting(resultStack));
 
         this.repairItemCountCost = 0;
+        this.onlyRenaming = false;
         int totalCost = 0;
         int enchantmentsAdded = 0;
-        boolean isRenameOnly = true;
+        boolean isRenameOnly = secondStack.isEmpty();
 
         if (!secondStack.isEmpty()) {
-            isRenameOnly = false;
             boolean hasStoredEnchantments = secondStack.has(DataComponents.STORED_ENCHANTMENTS);
 
             if (resultStack.isDamageableItem() && inputStack.isValidRepairItem(secondStack)) {
@@ -82,7 +85,7 @@ public abstract class AnvilScreenHandlerMixin extends ItemCombinerMenu {
                 }
 
                 this.repairItemCountCost = repairCount;
-                totalCost = 0;
+                totalCost = 5;
             } else {
                 if (!hasStoredEnchantments && (resultStack.getItem() != secondStack.getItem() || !resultStack.isDamageableItem())) {
                     this.resultSlots.setItem(0, ItemStack.EMPTY);
@@ -118,7 +121,7 @@ public abstract class AnvilScreenHandlerMixin extends ItemCombinerMenu {
 
                     Enchantment enchantment = enchantmentEntry.value();
                     boolean canApply = enchantment.canEnchant(inputStack);
-                    if (this.player.isCreative() || inputStack.getItem() == net.minecraft.world.item.Items.ENCHANTED_BOOK) {
+                    if (this.player.hasInfiniteMaterials() || inputStack.getItem() == net.minecraft.world.item.Items.ENCHANTED_BOOK) {
                         canApply = true;
                     }
 
@@ -151,15 +154,15 @@ public abstract class AnvilScreenHandlerMixin extends ItemCombinerMenu {
                     return;
                 }
 
-                totalCost = enchantmentsAdded * 5;
+                totalCost = enchantmentsAdded > 0 ? 7 : 0;
             }
         }
 
         boolean renamed = false;
-        if (this.newItemName != null && !StringUtil.isBlank(this.newItemName)) {
-            if (!this.newItemName.equals(inputStack.getHoverName().getString())) {
+        if (this.itemName != null && !StringUtil.isBlank(this.itemName)) {
+            if (!this.itemName.equals(inputStack.getHoverName().getString())) {
                 renamed = true;
-                resultStack.set(DataComponents.CUSTOM_NAME, Component.literal(this.newItemName));
+                resultStack.set(DataComponents.CUSTOM_NAME, Component.literal(this.itemName));
                 if (isRenameOnly) {
                     totalCost = 1;
                 }
@@ -170,6 +173,10 @@ public abstract class AnvilScreenHandlerMixin extends ItemCombinerMenu {
             if (isRenameOnly) {
                 totalCost = 1;
             }
+        }
+
+        if (isRenameOnly && renamed) {
+            this.onlyRenaming = true;
         }
 
         this.cost.set(totalCost);
