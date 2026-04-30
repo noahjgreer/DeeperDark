@@ -108,6 +108,12 @@ public class FabricSeasons implements ModInitializer {
         return clientTimeSynced;
     }
 
+    public static void resetClientTime() {
+        clientTimeSynced = false;
+        clientOverworldTimeBase = 0;
+        clientGameTimeBase = 0;
+    }
+
     private static Holder<WorldClock> getOverworldClockHolder(Level world) {
         if (overworldClockHolder == null) {
             overworldClockHolder = world.registryAccess()
