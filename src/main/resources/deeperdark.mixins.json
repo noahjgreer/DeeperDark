@@ -87,7 +87,8 @@
     "EnchantmentMenuMixin",
     "InventoryMenuMixin",
     "ServerboundChatPacketMixin",
-    "ShulkerBoxSlotMixin"
+    "ShulkerBoxSlotMixin",
+    "MinecraftMusicMixin"
   ],
   "injectors": {
     "defaultRequire": 1
