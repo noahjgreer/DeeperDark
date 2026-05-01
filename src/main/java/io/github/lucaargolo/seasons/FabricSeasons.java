@@ -274,7 +274,7 @@ public class FabricSeasons implements ModInitializer {
         ServerTickEvents.START_SERVER_TICK.register(GreenhouseCache::tick);
 
         ServerTickEvents.START_SERVER_TICK.register(server -> {
-            if (server.getTickCount() % 400 == 0) {
+            if (server.getTickCount() % 100 == 0) {
                 ServerLevel overworld = server.getLevel(Level.OVERWORLD);
                 if (overworld != null) {
                     SeasonTimeSyncPacket packet = new SeasonTimeSyncPacket(
@@ -294,7 +294,7 @@ public class FabricSeasons implements ModInitializer {
                     ServerPlayNetworking.send(handler.player, new SeasonTimeSyncPacket(
                             getOverworldTime(overworld), overworld.getGameTime()));
                 } catch (IllegalStateException ignored) {
-                    // Integrated server clock not yet initialized; the periodic 400-tick sender will sync shortly
+                    // Integrated server clock not yet initialized; the periodic 100-tick sender will sync shortly
                 }
             }
             ServerPlayNetworking.send(handler.player, new ConfigSyncPacket(GSON.toJson(CONFIG)));

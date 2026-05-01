@@ -156,9 +156,22 @@ public abstract class BiomeMixin implements BiomeMixed {
         Identifier biomeId = seasons$resolveBiomeId(client);
         if (biomeId != null) {
             Optional<Integer> seasonColor = GrassSeasonColors.getBlendedSeasonGrassColor(self, biomeId, current, current.getNext(), t);
-            ColorsCache.createGrassCache(self, seasonColor);
-            seasonColor.ifPresent(cir::setReturnValue);
+            if (seasonColor.isPresent()) {
+                ColorsCache.createGrassCache(self, seasonColor);
+                cir.setReturnValue(seasonColor.get());
+                return;
+            }
         }
+
+        // No biome-specific JSON override — compute directly from the seasonal colormap and apply
+        // the biome's grassColorModifier (handles DARK_FOREST tint, etc.).
+        // This runs even when there is no biomeId so it always takes effect on the client.
+        int seasonal = GrassSeasonColors.getBlendedColor(current, current.getNext(), t,
+                Mth.clamp(climateSettings.temperature(), 0.0F, 1.0F),
+                Mth.clamp(climateSettings.downfall(), 0.0F, 1.0F));
+        int finalColor = specialEffects.grassColorModifier().modifyColor(x, z, seasonal);
+        ColorsCache.createGrassCache(self, Optional.of(finalColor));
+        cir.setReturnValue(finalColor);
     }
 
     // -------------------------------------------------------------------------
@@ -200,9 +213,14 @@ public abstract class BiomeMixin implements BiomeMixed {
             return;
         }
 
-        if (biomeId != null) {
-            ColorsCache.createFoliageCache(self, Optional.empty());
-        }
+        // No biome-specific JSON or vanilla override — compute from the seasonal foliage colormap.
+        // This ensures standard biomes (oak/jungle/etc.) always receive seasonal foliage tinting
+        // regardless of whether the HEAD injection on getFoliageColorFromTexture fires.
+        int seasonal = FoliageSeasonColors.getBlendedColor(current, current.getNext(), t,
+                Mth.clamp(climateSettings.temperature(), 0.0F, 1.0F),
+                Mth.clamp(climateSettings.downfall(), 0.0F, 1.0F));
+        ColorsCache.createFoliageCache(self, Optional.of(seasonal));
+        cir.setReturnValue(seasonal);
     }
 
     // -------------------------------------------------------------------------

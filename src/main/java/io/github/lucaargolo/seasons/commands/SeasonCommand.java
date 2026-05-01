@@ -2,7 +2,9 @@ package io.github.lucaargolo.seasons.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
 import io.github.lucaargolo.seasons.FabricSeasons;
+import io.github.lucaargolo.seasons.payload.SeasonTimeSyncPacket;
 import io.github.lucaargolo.seasons.utils.Season;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.Holder;
@@ -143,6 +145,7 @@ public class SeasonCommand {
             .getOrThrow(WorldClocks.OVERWORLD);
         int i = (int) (source.getLevel().clockManager().getTotalTicks(clock) % 24000L);
         source.sendSuccess(() -> Component.translatable("commands.time.set", i), true);
+        broadcastTimeSync(source);
         return i;
     }
 
@@ -159,6 +162,16 @@ public class SeasonCommand {
             .getOrThrow(WorldClocks.OVERWORLD);
         int i = (int) (source.getLevel().clockManager().getTotalTicks(clock) % 24000L);
         source.sendSuccess(() -> Component.translatable("commands.time.set", i), true);
+        broadcastTimeSync(source);
         return i;
+    }
+
+    private static void broadcastTimeSync(CommandSourceStack source) {
+        ServerLevel overworld = source.getServer().getLevel(Level.OVERWORLD);
+        if (overworld == null) return;
+        SeasonTimeSyncPacket packet = new SeasonTimeSyncPacket(
+                FabricSeasons.getOverworldTime(overworld), overworld.getGameTime());
+        source.getServer().getPlayerList().getPlayers()
+                .forEach(p -> ServerPlayNetworking.send(p, packet));
     }
 }

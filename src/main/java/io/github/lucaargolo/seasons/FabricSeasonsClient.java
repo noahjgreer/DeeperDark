@@ -78,10 +78,15 @@ public class FabricSeasonsClient implements ClientModInitializer {
         ClientPlayNetworking.registerGlobalReceiver(UpdateCropsPaycket.ID, (payload, context) ->
                 CropConfigs.receiveConfig(payload.cropConfig(), payload.cropConfigMap()));
 
-        // On time sync: update client's season clock and schedule a section dirty pass
-        // so all visible chunks update to the correct seasonal colors without a full allChanged() flash.
+        // On time sync: update client's season clock, immediately clear the tint caches
+        // (so the next section compile doesn't re-use stale BlockTintCache entries), and
+        // schedule a section dirty pass to force all visible sections to recompile.
         ClientPlayNetworking.registerGlobalReceiver(SeasonTimeSyncPacket.ID, (payload, context) -> {
             FabricSeasons.setClientOverworldTime(payload.overworldTime(), payload.gameTime());
+            var level = context.client().level;
+            if (level != null) {
+                level.clearTintCaches();
+            }
             colorsDirtyNeeded = true;
         });
 
