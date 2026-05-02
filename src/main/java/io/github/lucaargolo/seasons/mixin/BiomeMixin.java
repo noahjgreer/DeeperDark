@@ -9,6 +9,7 @@ import io.github.lucaargolo.seasons.utils.Season;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
@@ -102,10 +103,11 @@ public abstract class BiomeMixin implements BiomeMixed {
     @Inject(at = @At("HEAD"), method = "getGrassColorFromTexture()I", cancellable = true)
     private void seasons$getGrassColorFromTexture(CallbackInfoReturnable<Integer> cir) {
         Minecraft client = Minecraft.getInstance();
-        if (client.level == null) return;
-        if (!FabricSeasons.CONFIG.isValidInDimension(client.level.dimension())) return;
-        Season current = FabricSeasons.getCurrentSeason(client.level);
-        float t = FabricSeasons.getSeasonTransitionFraction(client.level);
+        var level = client.level;
+        if (level == null) return;
+        if (!FabricSeasons.CONFIG.isValidInDimension(level.dimension())) return;
+        Season current = FabricSeasons.getCurrentSeason(level);
+        float t = FabricSeasons.getSeasonTransitionFraction(level);
         cir.setReturnValue(GrassSeasonColors.getBlendedColor(current, current.getNext(), t,
                 Mth.clamp(climateSettings.temperature(), 0.0F, 1.0F),
                 Mth.clamp(climateSettings.downfall(), 0.0F, 1.0F)));
@@ -115,10 +117,11 @@ public abstract class BiomeMixin implements BiomeMixed {
     @Inject(at = @At("HEAD"), method = "getFoliageColorFromTexture()I", cancellable = true)
     private void seasons$getFoliageColorFromTexture(CallbackInfoReturnable<Integer> cir) {
         Minecraft client = Minecraft.getInstance();
-        if (client.level == null) return;
-        if (!FabricSeasons.CONFIG.isValidInDimension(client.level.dimension())) return;
-        Season current = FabricSeasons.getCurrentSeason(client.level);
-        float t = FabricSeasons.getSeasonTransitionFraction(client.level);
+        var level = client.level;
+        if (level == null) return;
+        if (!FabricSeasons.CONFIG.isValidInDimension(level.dimension())) return;
+        Season current = FabricSeasons.getCurrentSeason(level);
+        float t = FabricSeasons.getSeasonTransitionFraction(level);
         cir.setReturnValue(FoliageSeasonColors.getBlendedColor(current, current.getNext(), t,
                 Mth.clamp(climateSettings.temperature(), 0.0F, 1.0F),
                 Mth.clamp(climateSettings.downfall(), 0.0F, 1.0F)));
@@ -132,10 +135,11 @@ public abstract class BiomeMixin implements BiomeMixed {
     @Inject(at = @At("TAIL"), method = "getGrassColor(DD)I", cancellable = true)
     private void seasons$getGrassColor(double x, double z, CallbackInfoReturnable<Integer> cir) {
         Minecraft client = Minecraft.getInstance();
-        if (client.level == null) return;
-        if (!FabricSeasons.CONFIG.isValidInDimension(client.level.dimension())) return;
-        Season current = FabricSeasons.getCurrentSeason(client.level);
-        float t = FabricSeasons.getSeasonTransitionFraction(client.level);
+        var level = client.level;
+        if (level == null) return;
+        if (!FabricSeasons.CONFIG.isValidInDimension(level.dimension())) return;
+        Season current = FabricSeasons.getCurrentSeason(level);
+        float t = FabricSeasons.getSeasonTransitionFraction(level);
         Biome self = (Biome) (Object) this;
 
         // Swamp uses per-position noise — never cache
@@ -153,7 +157,7 @@ public abstract class BiomeMixin implements BiomeMixed {
             return;
         }
 
-        Identifier biomeId = seasons$resolveBiomeId(client);
+        Identifier biomeId = seasons$resolveBiomeId(level);
         if (biomeId != null) {
             Optional<Integer> seasonColor = GrassSeasonColors.getBlendedSeasonGrassColor(self, biomeId, current, current.getNext(), t);
             if (seasonColor.isPresent()) {
@@ -182,10 +186,11 @@ public abstract class BiomeMixin implements BiomeMixed {
     @Inject(at = @At("TAIL"), method = "getFoliageColor()I", cancellable = true)
     private void seasons$getFoliageColor(CallbackInfoReturnable<Integer> cir) {
         Minecraft client = Minecraft.getInstance();
-        if (client.level == null) return;
-        if (!FabricSeasons.CONFIG.isValidInDimension(client.level.dimension())) return;
-        Season current = FabricSeasons.getCurrentSeason(client.level);
-        float t = FabricSeasons.getSeasonTransitionFraction(client.level);
+        var level = client.level;
+        if (level == null) return;
+        if (!FabricSeasons.CONFIG.isValidInDimension(level.dimension())) return;
+        Season current = FabricSeasons.getCurrentSeason(level);
+        float t = FabricSeasons.getSeasonTransitionFraction(level);
         Biome self = (Biome) (Object) this;
 
         Optional<Integer> foliageCached = ColorsCache.getFoliageCache(self);
@@ -194,7 +199,7 @@ public abstract class BiomeMixin implements BiomeMixed {
             return;
         }
 
-        Identifier biomeId = seasons$resolveBiomeId(client);
+        Identifier biomeId = seasons$resolveBiomeId(level);
 
         if (biomeId != null) {
             Optional<Integer> seasonColor = FoliageSeasonColors.getBlendedSeasonFoliageColor(self, biomeId, current, current.getNext(), t);
@@ -229,19 +234,17 @@ public abstract class BiomeMixin implements BiomeMixed {
 
     /** Resolves and caches this biome's registry identifier; O(n) only on first call per instance. */
     @Unique
-    private @Nullable Identifier seasons$resolveBiomeId(Minecraft client) {
+    private @Nullable Identifier seasons$resolveBiomeId(ClientLevel level) {
         if (!seasons$biomeIdResolved) {
             seasons$biomeIdResolved = true;
-            if (client.level != null) {
-                Biome self = (Biome) (Object) this;
-                var found = client.level.registryAccess()
-                        .lookupOrThrow(Registries.BIOME)
-                        .listElements()
-                        .filter(ref -> ref.value() == self)
-                        .findFirst();
-                if (found.isPresent()) {
-                    seasons$cachedBiomeId = found.get().key().identifier();
-                }
+            Biome self = (Biome) (Object) this;
+            var found = level.registryAccess()
+                    .lookupOrThrow(Registries.BIOME)
+                    .listElements()
+                    .filter(ref -> ref.value() == self)
+                    .findFirst();
+            if (found.isPresent()) {
+                seasons$cachedBiomeId = found.get().key().identifier();
             }
         }
         return seasons$cachedBiomeId;

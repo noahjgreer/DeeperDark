@@ -1,0 +1,11 @@
+{
+  "parent": "minecraft:block/template_cauldron_level2",
+  "textures": {
+    "particle": "deeperdark:block/golden_cauldron_side",
+    "top": "deeperdark:block/golden_cauldron_top",
+    "bottom": "deeperdark:block/golden_cauldron_bottom",
+    "side": "deeperdark:block/golden_cauldron_side",
+    "inside": "deeperdark:block/golden_cauldron_inner",
+    "content": "minecraft:block/water_still"
+  }
+}
