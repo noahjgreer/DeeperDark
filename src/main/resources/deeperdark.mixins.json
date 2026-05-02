@@ -87,7 +87,9 @@
     "EnchantmentMenuMixin",
     "InventoryMenuMixin",
     "ServerboundChatPacketMixin",
-    "ShulkerBoxSlotMixin",
+    "ShulkerBoxSlotMixin"
+  ],
+  "client": [
     "MinecraftMusicMixin"
   ],
   "injectors": {
