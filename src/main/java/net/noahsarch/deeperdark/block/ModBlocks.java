@@ -2,16 +2,21 @@ package net.noahsarch.deeperdark.block;
 
 import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
 import net.minecraft.core.Registry;
+import net.minecraft.core.cauldron.CauldronInteractions;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.biome.Biome.Precipitation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 import net.noahsarch.deeperdark.Deeperdark;
 
 import java.util.function.Function;
@@ -95,6 +100,11 @@ public class ModBlocks {
             .sound(SoundType.WEEPING_VINES),
         true
     );
+    //  CAULDRON = register("cauldron", CauldronBlock::new, Properties.of().mapColor(MapColor.STONE).requiresCorrectToolForDrops().strength(2.0F).noOcclusion());
+    //  WATER_CAULDRON = register("water_cauldron", (p) -> new LayeredCauldronBlock(Precipitation.RAIN, CauldronInteractions.WATER, p), Properties.ofLegacyCopy(CAULDRON));
+    //  LAVA_CAULDRON = register("lava_cauldron", LavaCauldronBlock::new, Properties.ofLegacyCopy(CAULDRON).lightLevel((statex) -> 15));
+    //  POWDER_SNOW_CAULDRON = register("powder_snow_cauldron", (p) -> new LayeredCauldronBlock(Precipitation.SNOW, CauldronInteractions.POWDER_SNOW, p), Properties.ofLegacyCopy(CAULDRON));
+
     public static final Block GOLDEN_CAULDRON = register(
         "golden_cauldron",
         GoldenCauldronBlock::new,
@@ -103,6 +113,35 @@ public class ModBlocks {
             .requiresCorrectToolForDrops()
             .sound(SoundType.METAL),
         true
+    );
+    public static final Block WATER_GOLDEN_CAULDRON = register(
+        "water_golden_cauldron",
+        (p) -> new GoldenLayeredCauldronBlock(
+            Precipitation.RAIN,
+            CauldronInteractions.WATER,
+            Items.WATER_BUCKET,
+            SoundEvents.BUCKET_FILL,
+            p),
+        Properties.ofLegacyCopy(GOLDEN_CAULDRON),
+        false
+    );
+    public static final Block LAVA_GOLDEN_CAULDRON = register(
+        "lava_golden_cauldron",
+        GoldenLavaCauldronBlock::new,
+        Properties.ofLegacyCopy(GOLDEN_CAULDRON)
+            .lightLevel((statex) -> 15),
+        false
+    );
+    public static final Block POWDER_SNOW_GOLDEN_CAULDRON = register(
+        "powder_snow_golden_cauldron",
+        (p) -> new GoldenLayeredCauldronBlock(
+            Precipitation.SNOW,
+            CauldronInteractions.POWDER_SNOW,
+            Items.POWDER_SNOW_BUCKET,
+            SoundEvents.BUCKET_FILL_POWDER_SNOW,
+            p),
+        Properties.ofLegacyCopy(GOLDEN_CAULDRON),
+        false
     );
     public static final Block SIPHON = register(
         "siphon",
