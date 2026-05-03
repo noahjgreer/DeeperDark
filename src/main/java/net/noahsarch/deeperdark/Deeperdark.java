@@ -12,7 +12,6 @@ import net.noahsarch.deeperdark.item.ModItems;
 import net.noahsarch.deeperdark.portal.SlipPortalHandler;
 import net.noahsarch.deeperdark.potion.CustomBrewingRecipeHandler;
 import net.noahsarch.deeperdark.ported.LeavesBeGonePort;
-import net.noahsarch.deeperdark.ported.UnloadedActivityPort;
 import net.noahsarch.deeperdark.sound.ModSounds;
 import net.noahsarch.deeperdark.villager.ModVillagers;
 import net.noahsarch.deeperdark.worldgen.SlipChunkGenerator;
@@ -140,7 +139,6 @@ public class Deeperdark implements ModInitializer {
 
 		// Server-side ports for unmaintained 1.21.11 mods.
 		LeavesBeGonePort.register();
-		UnloadedActivityPort.register();
 
 		// Register moss growth handler for cobblestone/stone brick mossing
 		net.noahsarch.deeperdark.event.MossGrowthHandler.register();
