@@ -172,5 +172,23 @@
       }
     ],
     "subtitle": "subtitles.deeperdark.entity.creature.hush"
+  },
+  "block.glass_door.open": {
+    "sounds": [
+      {
+        "name": "deeperdark:entity/block/glass_door/open1",
+        "attenuation_distance": 16
+      }
+    ],
+    "subtitle": "subtitles.deeperdark.block.glass_door.open"
+  },
+  "block.glass_door.close": {
+    "sounds": [
+      {
+        "name": "deeperdark:entity/block/glass_door/close1",
+        "attenuation_distance": 16
+      }
+    ],
+    "subtitle": "subtitles.deeperdark.block.glass_door.close"
   }
 }

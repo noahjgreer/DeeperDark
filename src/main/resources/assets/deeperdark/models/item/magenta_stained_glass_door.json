@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "deeperdark:item/magenta_stained_glass_door"
+  }
+}

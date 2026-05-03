@@ -1,5 +1,5 @@
 {
-  "parent": "minecraft:block/door_top_right",
+  "parent": "minecraft:block/door_top_left",
   "textures": {
     "bottom": "deeperdark:block/glass_door_bottom",
     "top": "deeperdark:block/glass_door_top"
