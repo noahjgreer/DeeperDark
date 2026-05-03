@@ -1,0 +1,8 @@
+{
+  "parent": "deeperdark:block/pane_door_top_right",
+  "textures": {
+    "bottom": "deeperdark:block/glass_door_bottom",
+    "top": "deeperdark:block/glass_door_top",
+    "pane": "minecraft:block/glass_pane_top"
+  }
+}
