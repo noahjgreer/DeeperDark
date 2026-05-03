@@ -123,6 +123,6 @@
   "block.deeperdark.red_stained_glass_door": "Red Stained Glass Door",
   "block.deeperdark.white_stained_glass_door": "White Stained Glass Door",
   "block.deeperdark.yellow_stained_glass_door": "Yellow Stained Glass Door",
-  "subtitles.block.deeperdark.block.glass_door.open": "Door opens",
-  "subtitles.block.deeperdark.block.glass_door.close": "Door closes"
+  "subtitles.deeperdark.block.glass_door.open": "Door opens",
+  "subtitles.deeperdark.block.glass_door.close": "Door closes"
 }

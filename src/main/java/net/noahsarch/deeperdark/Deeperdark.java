@@ -61,6 +61,11 @@ public class Deeperdark implements ModInitializer {
 
 		SiphonEvents.register();
 
+		// Register glass door dye recipe
+		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER,
+			Identifier.fromNamespaceAndPath(MOD_ID, "crafting_dyed_glass_door"),
+			net.noahsarch.deeperdark.recipe.DyedGlassDoorRecipe.SERIALIZER);
+
 		// Register custom ingredient for crafting
 		net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredientSerializer.register(net.noahsarch.deeperdark.recipe.ComponentIngredient.Serializer.INSTANCE);
 

@@ -176,7 +176,7 @@
   "block.glass_door.open": {
     "sounds": [
       {
-        "name": "deeperdark:entity/block/glass_door/open1",
+        "name": "deeperdark:block/glass_door/open1",
         "attenuation_distance": 16
       }
     ],
@@ -185,10 +185,19 @@
   "block.glass_door.close": {
     "sounds": [
       {
-        "name": "deeperdark:entity/block/glass_door/close1",
+        "name": "deeperdark:block/glass_door/close1",
         "attenuation_distance": 16
       }
     ],
     "subtitle": "subtitles.deeperdark.block.glass_door.close"
+  },
+  "item.magnet.activate": {
+    "sounds": [
+      {
+        "name": "deeperdark:item/magnet/activate",
+        "attenuation_distance": 16
+      }
+    ],
+    "subtitle": "subtitles.deeperdark.item.magnet.activate"
   }
 }

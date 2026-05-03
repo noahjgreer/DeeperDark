@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "glass_door",
+  "key": {
+    "#": "minecraft:purple_stained_glass"
+  },
+  "pattern": [
+    "##",
+    "##",
+    "##"
+  ],
+  "result": {
+    "count": 3,
+    "id": "deeperdark:purple_stained_glass_door"
+  }
+}
