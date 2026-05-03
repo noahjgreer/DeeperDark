@@ -127,7 +127,12 @@ public class FabricSeasons implements ModInitializer {
         if (world.isClientSide() && clientTimeSynced) {
             return clientOverworldTimeBase + (world.getGameTime() - clientGameTimeBase);
         }
-        return world.clockManager().getTotalTicks(getOverworldClockHolder(world));
+        try {
+            return world.clockManager().getTotalTicks(getOverworldClockHolder(world));
+        } catch (IllegalStateException e) {
+            // Clock not yet initialized on brand-new worlds; treat as time 0 (SPRING)
+            return 0L;
+        }
     }
 
     public static Season getCurrentSeason(Level world) {
