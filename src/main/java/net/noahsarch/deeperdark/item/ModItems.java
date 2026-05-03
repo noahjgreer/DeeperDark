@@ -27,7 +27,7 @@ public class ModItems {
         CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.INGREDIENTS)
             .register(creativeTab -> creativeTab.accept(ModItems.LEATHER_SCRAP));
 
-        CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.COMBAT)
+        CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.TOOLS_AND_UTILITIES)
             .register(creativeTab -> {
                 creativeTab.accept(COPPER_ITEM_MAGNET);
                 creativeTab.accept(IRON_ITEM_MAGNET);

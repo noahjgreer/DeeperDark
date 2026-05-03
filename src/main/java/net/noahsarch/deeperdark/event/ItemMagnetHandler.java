@@ -116,7 +116,7 @@ public class ItemMagnetHandler {
             Vec3 newVel;
             if (activating) {
                 // Same strong pull for all materials — items fly toward the player
-                newVel = dir.scale(1.5);
+                newVel = dir.scale(3.0);
             } else {
                 // Directly set velocity toward magnet, scaled by proximity (squared falloff)
                 double t = 1.0 - (dist / radius);
@@ -124,6 +124,7 @@ public class ItemMagnetHandler {
             }
 
             item.setDeltaMovement(newVel);
+            item.hurtMarked = true;
         }
     }
 
