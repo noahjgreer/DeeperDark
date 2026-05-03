@@ -124,5 +124,6 @@
   "block.deeperdark.white_stained_glass_door": "White Stained Glass Door",
   "block.deeperdark.yellow_stained_glass_door": "Yellow Stained Glass Door",
   "subtitles.deeperdark.block.glass_door.open": "Door opens",
-  "subtitles.deeperdark.block.glass_door.close": "Door closes"
+  "subtitles.deeperdark.block.glass_door.close": "Door closes",
+  "subtitles.deeperdark.item.magnet.activate": "Magnet activates"
 }
