@@ -125,5 +125,10 @@
   "block.deeperdark.yellow_stained_glass_door": "Yellow Stained Glass Door",
   "subtitles.deeperdark.block.glass_door.open": "Door opens",
   "subtitles.deeperdark.block.glass_door.close": "Door closes",
-  "subtitles.deeperdark.item.magnet.activate": "Magnet activates"
+  "subtitles.deeperdark.item.magnet.activate": "Magnet activates",
+  "item.deeperdark.copper_item_magnet": "Copper Item Magnet",
+  "item.deeperdark.iron_item_magnet": "Iron Item Magnet",
+  "item.deeperdark.golden_item_magnet": "Golden Item Magnet",
+  "item.deeperdark.diamond_item_magnet": "Diamond Item Magnet",
+  "item.deeperdark.netherite_item_magnet": "Netherite Item Magnet"
 }

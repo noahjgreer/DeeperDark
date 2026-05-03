@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "M": "minecraft:diamond",
+    "R": "minecraft:redstone",
+    "Q": "minecraft:quartz"
+  },
+  "pattern": [
+    "MRM",
+    "QRQ",
+    "QQQ"
+  ],
+  "result": {
+    "id": "deeperdark:diamond_item_magnet"
+  }
+}

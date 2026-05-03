@@ -20,6 +20,7 @@ public class ModSounds {
 
     public static final SoundEvent GLASS_DOOR_OPEN  = register("block.glass_door.open");
     public static final SoundEvent GLASS_DOOR_CLOSE = register("block.glass_door.close");
+    public static final SoundEvent ITEM_MAGNET_ACTIVATE = register("item.magnet.activate");
 
     private static SoundEvent register(String name) {
         Identifier id = Identifier.fromNamespaceAndPath(Deeperdark.MOD_ID, name);

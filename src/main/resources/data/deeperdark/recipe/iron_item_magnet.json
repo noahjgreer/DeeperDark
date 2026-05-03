@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "M": "minecraft:iron_ingot",
+    "R": "minecraft:redstone",
+    "Q": "minecraft:quartz"
+  },
+  "pattern": [
+    "MRM",
+    "QRQ",
+    "QQQ"
+  ],
+  "result": {
+    "id": "deeperdark:iron_item_magnet"
+  }
+}

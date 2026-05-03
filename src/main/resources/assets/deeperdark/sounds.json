@@ -194,7 +194,15 @@
   "item.magnet.activate": {
     "sounds": [
       {
-        "name": "deeperdark:item/magnet/activate",
+        "name": "deeperdark:item/magnet/activate/activate1",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "deeperdark:item/magnet/activate/activate2",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "deeperdark:item/magnet/activate/activate3",
         "attenuation_distance": 16
       }
     ],

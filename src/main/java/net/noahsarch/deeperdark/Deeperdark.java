@@ -136,6 +136,9 @@ public class Deeperdark implements ModInitializer {
 
         PlayerTickHandler.register();
 
+        // Register item magnet tick handler
+        net.noahsarch.deeperdark.event.ItemMagnetHandler.register();
+
         // Register Slip portal mechanic
         SlipPortalHandler.register();
 

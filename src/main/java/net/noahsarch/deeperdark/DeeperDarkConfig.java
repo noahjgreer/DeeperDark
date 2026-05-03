@@ -32,6 +32,26 @@ public class DeeperDarkConfig {
         public boolean canRestartLater = false;
     }
 
+    public static class ItemMagnetVariantConfig {
+        public double radius;
+        public double passiveStrength;
+
+        public ItemMagnetVariantConfig() {}
+
+        public ItemMagnetVariantConfig(double radius, double passiveStrength) {
+            this.radius = radius;
+            this.passiveStrength = passiveStrength;
+        }
+    }
+
+    public static class ItemMagnetConfig {
+        public ItemMagnetVariantConfig copper   = new ItemMagnetVariantConfig(10,  0.25);
+        public ItemMagnetVariantConfig iron     = new ItemMagnetVariantConfig(25,  0.5);
+        public ItemMagnetVariantConfig gold     = new ItemMagnetVariantConfig(35,  0.625);
+        public ItemMagnetVariantConfig diamond  = new ItemMagnetVariantConfig(50,  0.75);
+        public ItemMagnetVariantConfig netherite = new ItemMagnetVariantConfig(85, 1.0);
+    }
+
     public static class ChatSoundProfile {
         public String sendMessageSound = "";
         public String deathMessageSound = "";
@@ -147,6 +167,11 @@ public class DeeperDarkConfig {
             changed = true;
         }
 
+        if (config.itemMagnet == null) {
+            config.itemMagnet = new ItemMagnetConfig();
+            changed = true;
+        }
+
         return changed;
     }
 
@@ -226,6 +251,9 @@ public class DeeperDarkConfig {
 
         // Auto-updater configuration
         public AutoUpdaterConfig autoUpdater = new AutoUpdaterConfig();
+
+        // Item magnet configuration
+        public ItemMagnetConfig itemMagnet = new ItemMagnetConfig();
     }
 
     public static void load() {
@@ -384,6 +412,8 @@ public class DeeperDarkConfig {
             representer.addClassTag(ConfigInstance.class, org.yaml.snakeyaml.nodes.Tag.MAP);
             representer.addClassTag(ChatSoundProfile.class, org.yaml.snakeyaml.nodes.Tag.MAP);
             representer.addClassTag(AutoUpdaterConfig.class, org.yaml.snakeyaml.nodes.Tag.MAP);
+            representer.addClassTag(ItemMagnetConfig.class, org.yaml.snakeyaml.nodes.Tag.MAP);
+            representer.addClassTag(ItemMagnetVariantConfig.class, org.yaml.snakeyaml.nodes.Tag.MAP);
 
             Yaml yaml = new Yaml(representer, options);
 

@@ -1,6 +1,6 @@
 {
-    "model": {
-        "type": "minecraft:model",
-        "model": "deeperdark:item/netherite_item_magnet"
-    }
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "deeperdark:item/netherite_item_magnet"
+  }
 }
