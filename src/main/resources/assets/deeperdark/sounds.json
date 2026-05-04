@@ -207,5 +207,166 @@
       }
     ],
     "subtitle": "subtitles.deeperdark.item.magnet.activate"
+  },
+  "block.box.break": {
+    "sounds": [
+      {
+        "name": "deeperdark:block/box/break1",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "deeperdark:block/box/break2",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "deeperdark:block/box/break3",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "deeperdark:block/box/break4",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "deeperdark:block/box/break5",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "deeperdark:block/box/break6",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "deeperdark:block/box/break7",
+        "attenuation_distance": 16
+      }
+    ],
+    "subtitle": "subtitles.deeperdark.block.box.break"
+  },
+  "block.box.step": {
+    "sounds": [
+      {
+        "name": "deeperdark:block/box/step1",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "deeperdark:block/box/step2",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "deeperdark:block/box/step3",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "deeperdark:block/box/step4",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "deeperdark:block/box/step5",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "deeperdark:block/box/step6",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "deeperdark:block/box/step7",
+        "attenuation_distance": 16
+      }
+    ],
+    "subtitle": "subtitles.deeperdark.block.box.step"
+  },
+  "block.box.hit": {
+    "sounds": [
+      {
+        "name": "deeperdark:block/box/hit1",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "deeperdark:block/box/hit2",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "deeperdark:block/box/hit3",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "deeperdark:block/box/hit4",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "deeperdark:block/box/hit5",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "deeperdark:block/box/hit6",
+        "attenuation_distance": 16
+      }
+    ],
+    "subtitle": "subtitles.deeperdark.block.box.hit"
+  },
+  "block.box.open": {
+    "sounds": [
+      {
+        "name": "deeperdark:block/box/open1",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "deeperdark:block/box/open2",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "deeperdark:block/box/open3",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "deeperdark:block/box/open4",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "deeperdark:block/box/open5",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "deeperdark:block/box/open6",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "deeperdark:block/box/open7",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "deeperdark:block/box/open8",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "deeperdark:block/box/open9",
+        "attenuation_distance": 16
+      }
+    ],
+    "subtitle": "subtitles.deeperdark.block.box.open"
+  },
+  "block.box.close": {
+    "sounds": [
+      {
+        "name": "deeperdark:block/box/close1",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "deeperdark:block/box/close2",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "deeperdark:block/box/close3",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "deeperdark:block/box/close4",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "deeperdark:block/box/close5",
+        "attenuation_distance": 16
+      }
+    ],
+    "subtitle": "subtitles.deeperdark.block.box.close"
   }
 }

@@ -21,6 +21,11 @@ public class ModSounds {
     public static final SoundEvent GLASS_DOOR_OPEN  = register("block.glass_door.open");
     public static final SoundEvent GLASS_DOOR_CLOSE = register("block.glass_door.close");
     public static final SoundEvent ITEM_MAGNET_ACTIVATE = register("item.magnet.activate");
+    public static final SoundEvent BOX_BREAK = register("block.box.break");
+    public static final SoundEvent BOX_STEP = register("block.box.step");
+    public static final SoundEvent BOX_HIT = register("block.box.hit");
+    public static final SoundEvent BOX_OPEN = register("block.box.open");
+    public static final SoundEvent BOX_CLOSE = register("block.box.close");
 
     private static SoundEvent register(String name) {
         Identifier id = Identifier.fromNamespaceAndPath(Deeperdark.MOD_ID, name);

@@ -22,6 +22,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.material.PushReaction;
 import net.noahsarch.deeperdark.Deeperdark;
+import net.noahsarch.deeperdark.sound.ModSoundType;
 import net.noahsarch.deeperdark.sound.ModSounds;
 
 import java.util.function.Function;
@@ -77,6 +78,7 @@ public class ModBlocks {
         CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register(content -> {
             content.accept(GOLDEN_CAULDRON);
             content.accept(SIPHON);
+            content.accept(BOX);
         });
     }
 
@@ -173,6 +175,14 @@ public class ModBlocks {
             .requiresCorrectToolForDrops()
             .sound(SoundType.STONE)
             .lightLevel(state -> 7),
+        true
+    );
+    public static final Block BOX = register(
+        "box",
+        BoxBlock::new,
+        BlockBehaviour.Properties.of()
+            .strength(1.0F)
+            .sound(ModSoundType.BOX),
         true
     );
 
