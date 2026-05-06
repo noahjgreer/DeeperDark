@@ -17,6 +17,7 @@ import net.noahsarch.deeperdark.villager.ModVillagers;
 import net.noahsarch.deeperdark.worldgen.SlipChunkGenerator;
 import net.noahsarch.deeperdark.block.ModBlockEntities;
 import net.noahsarch.deeperdark.block.ModBlocks;
+import net.noahsarch.deeperdark.menu.ModMenus;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.world.item.Items;
 import org.slf4j.Logger;
@@ -50,6 +51,7 @@ public class Deeperdark implements ModInitializer {
 		// Register custom blocks/items before recipes or events use them
 		ModBlocks.initialize();
 		ModBlockEntities.initialize();
+		ModMenus.initialize();
 		ModItems.initialize();
 
 		// Register the Slip chunk generator
@@ -80,6 +82,11 @@ public class Deeperdark implements ModInitializer {
 		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER,
 				net.noahsarch.deeperdark.recipe.WoolShearingRecipe.SERIALIZER_ID,
 				net.noahsarch.deeperdark.recipe.WoolShearingRecipe.SERIALIZER);
+
+		// Register box upgrade recipe (preserves inventory contents when upgrading tiers)
+		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER,
+				net.noahsarch.deeperdark.recipe.BoxUpgradeRecipe.SERIALIZER_ID,
+				net.noahsarch.deeperdark.recipe.BoxUpgradeRecipe.SERIALIZER);
 
 		// Register tick handler for custom block tracker
 		net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_LEVEL_TICK.register(serverWorld -> {

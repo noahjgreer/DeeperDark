@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "deeperdark:block/reinforced_box",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "deeperdark:block/reinforced_box"
+    },
+    "facing=south": {
+      "model": "deeperdark:block/reinforced_box",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "deeperdark:block/reinforced_box",
+      "y": 270
+    }
+  }
+}

@@ -1,6 +1,6 @@
 {
     "model": {
         "type": "minecraft:model",
-        "model": "deeperdark:block/box"
+        "model": "deeperdark:block/reinforced_box"
     }
 }

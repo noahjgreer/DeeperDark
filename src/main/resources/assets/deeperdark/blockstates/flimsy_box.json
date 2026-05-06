@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "deeperdark:block/flimsy_box",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "deeperdark:block/flimsy_box"
+    },
+    "facing=south": {
+      "model": "deeperdark:block/flimsy_box",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "deeperdark:block/flimsy_box",
+      "y": 270
+    }
+  }
+}

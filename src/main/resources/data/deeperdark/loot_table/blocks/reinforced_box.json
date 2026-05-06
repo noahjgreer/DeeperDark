@@ -17,11 +17,11 @@
               "source": "block_entity"
             }
           ],
-          "name": "deeperdark:box"
+          "name": "deeperdark:reinforced_box"
         }
       ],
       "rolls": 1
     }
   ],
-  "random_sequence": "deeperdark:blocks/box"
+  "random_sequence": "deeperdark:blocks/reinforced_box"
 }

@@ -1,0 +1,5 @@
+{
+  "type": "deeperdark:box_upgrade",
+  "from": "deeperdark:flimsy_box",
+  "to": "deeperdark:sturdy_box"
+}

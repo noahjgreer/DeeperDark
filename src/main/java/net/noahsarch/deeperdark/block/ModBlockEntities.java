@@ -11,7 +11,12 @@ public class ModBlockEntities {
     public static final BlockEntityType<BoxBlockEntity> BOX = Registry.register(
         BuiltInRegistries.BLOCK_ENTITY_TYPE,
         Identifier.fromNamespaceAndPath(Deeperdark.MOD_ID, "box"),
-        FabricBlockEntityTypeBuilder.create(BoxBlockEntity::new, ModBlocks.BOX).build()
+        FabricBlockEntityTypeBuilder.create(
+            BoxBlockEntity::new,
+            ModBlocks.FLIMSY_BOX,
+            ModBlocks.STURDY_BOX,
+            ModBlocks.REINFORCED_BOX
+        ).build()
     );
 
     public static void initialize() {

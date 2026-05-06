@@ -1,0 +1,12 @@
+{
+	"parent": "minecraft:block/cube",
+	"textures": {
+		"down": "deeperdark:block/flimsy_box_bottom",
+		"east": "deeperdark:block/flimsy_box_east_west",
+		"west": "deeperdark:block/flimsy_box_east_west",
+		"north": "deeperdark:block/flimsy_box_north_south",
+		"south": "deeperdark:block/flimsy_box_north_south",
+		"up": "deeperdark:block/flimsy_box_top",
+		"particle": "deeperdark:block/flimsy_box_east_west"
+	}
+}

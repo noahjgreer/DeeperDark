@@ -78,7 +78,9 @@ public class ModBlocks {
         CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register(content -> {
             content.accept(GOLDEN_CAULDRON);
             content.accept(SIPHON);
-            content.accept(BOX);
+            content.accept(FLIMSY_BOX);
+            content.accept(STURDY_BOX);
+            content.accept(REINFORCED_BOX);
         });
     }
 
@@ -177,8 +179,24 @@ public class ModBlocks {
             .lightLevel(state -> 7),
         true
     );
-    public static final Block BOX = register(
-        "box",
+    public static final Block REINFORCED_BOX = register(
+        "reinforced_box",
+        BoxBlock::new,
+        BlockBehaviour.Properties.of()
+            .strength(1.0F)
+            .sound(ModSoundType.BOX),
+        true
+    );
+    public static final Block FLIMSY_BOX = register(
+        "flimsy_box",
+        BoxBlock::new,
+        BlockBehaviour.Properties.of()
+            .strength(1.0F)
+            .sound(ModSoundType.BOX),
+        true
+    );
+    public static final Block STURDY_BOX = register(
+        "sturdy_box",
         BoxBlock::new,
         BlockBehaviour.Properties.of()
             .strength(1.0F)

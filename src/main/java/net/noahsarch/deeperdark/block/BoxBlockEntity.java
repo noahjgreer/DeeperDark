@@ -16,17 +16,19 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.noahsarch.deeperdark.menu.BoxMenu;
+import net.noahsarch.deeperdark.menu.ModMenus;
 import net.noahsarch.deeperdark.sound.ModSounds;
 
 public class BoxBlockEntity extends RandomizableContainerBlockEntity {
-    public static final int CONTAINER_SIZE = 9;
-    private static final Component DEFAULT_NAME = Component.translatable("container.deeperdark.box");
-
-    private NonNullList<ItemStack> items = NonNullList.withSize(CONTAINER_SIZE, ItemStack.EMPTY);
+    private final BoxTier tier;
+    private NonNullList<ItemStack> items;
     private int openCount;
 
     public BoxBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.BOX, pos, state);
+        this.tier = BoxTier.fromState(state);
+        this.items = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
     }
 
     @Override
@@ -48,7 +50,7 @@ public class BoxBlockEntity extends RandomizableContainerBlockEntity {
 
     @Override
     public int getContainerSize() {
-        return CONTAINER_SIZE;
+        return this.tier.getSlotCount();
     }
 
     @Override
@@ -63,12 +65,12 @@ public class BoxBlockEntity extends RandomizableContainerBlockEntity {
 
     @Override
     protected Component getDefaultName() {
-        return DEFAULT_NAME;
+        return this.tier.getTitle();
     }
 
     @Override
     protected AbstractContainerMenu createMenu(int containerId, Inventory inventory) {
-        return new DispenserMenu(containerId, inventory, this);
+        return this.tier.createMenu(containerId, inventory, this);
     }
 
     @Override
@@ -115,5 +117,61 @@ public class BoxBlockEntity extends RandomizableContainerBlockEntity {
             0.5F,
             this.level.getRandom().nextFloat() * 0.1F + 0.9F
         );
+    }
+
+    private enum BoxTier {
+        FLIMSY(3, 1, "container.deeperdark.flimsy_box") {
+            @Override
+            protected AbstractContainerMenu createMenu(int containerId, Inventory inventory, BoxBlockEntity entity) {
+                return new BoxMenu(ModMenus.FLIMSY_BOX, containerId, inventory, entity, getRows());
+            }
+        },
+        STURDY(6, 2, "container.deeperdark.sturdy_box") {
+            @Override
+            protected AbstractContainerMenu createMenu(int containerId, Inventory inventory, BoxBlockEntity entity) {
+                return new BoxMenu(ModMenus.STURDY_BOX, containerId, inventory, entity, getRows());
+            }
+        },
+        REINFORCED(9, 3, "container.deeperdark.reinforced_box") {
+            @Override
+            protected AbstractContainerMenu createMenu(int containerId, Inventory inventory, BoxBlockEntity entity) {
+                return new DispenserMenu(containerId, inventory, entity);
+            }
+        };
+
+        private final int slotCount;
+        private final int rows;
+        private final Component title;
+
+        BoxTier(int slotCount, int rows, String titleKey) {
+            this.slotCount = slotCount;
+            this.rows = rows;
+            this.title = Component.translatable(titleKey);
+        }
+
+        public int getSlotCount() {
+            return this.slotCount;
+        }
+
+        public Component getTitle() {
+            return this.title;
+        }
+
+        public int getRows() {
+            return this.rows;
+        }
+
+        protected abstract AbstractContainerMenu createMenu(int containerId, Inventory inventory, BoxBlockEntity entity);
+
+        private static BoxTier fromState(BlockState state) {
+            if (state.is(ModBlocks.FLIMSY_BOX)) {
+                return FLIMSY;
+            }
+            if (state.is(ModBlocks.STURDY_BOX)) {
+                return STURDY;
+            }
+
+            return REINFORCED;
+        }
     }
 }

@@ -1,0 +1,12 @@
+{
+	"parent": "minecraft:block/cube",
+	"textures": {
+		"down": "deeperdark:block/sturdy_box_bottom",
+		"east": "deeperdark:block/sturdy_box_east_west",
+		"west": "deeperdark:block/sturdy_box_east_west",
+		"north": "deeperdark:block/sturdy_box_north_south",
+		"south": "deeperdark:block/sturdy_box_north_south",
+		"up": "deeperdark:block/sturdy_box_top",
+		"particle": "deeperdark:block/sturdy_box_east_west"
+	}
+}

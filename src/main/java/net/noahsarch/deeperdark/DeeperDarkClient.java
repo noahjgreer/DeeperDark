@@ -6,11 +6,14 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Leashable;
 import net.noahsarch.deeperdark.autoupdate.AutoUpdater;
 import net.noahsarch.deeperdark.autoupdate.AutoUpdaterScreen;
+import net.noahsarch.deeperdark.client.screen.BoxScreen;
 import net.noahsarch.deeperdark.intro.DeeperDarkLogoScreen;
+import net.noahsarch.deeperdark.menu.ModMenus;
 import net.noahsarch.deeperdark.payload.PlayerLeashPacket;
 
 @Environment(EnvType.CLIENT)
@@ -20,6 +23,9 @@ public class DeeperDarkClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        MenuScreens.register(ModMenus.FLIMSY_BOX, BoxScreen::new);
+        MenuScreens.register(ModMenus.STURDY_BOX, BoxScreen::new);
+
         ClientPlayNetworking.registerGlobalReceiver(PlayerLeashPacket.ID, (payload, context) -> {
             context.client().execute(() -> {
                 if (context.client().level == null) return;

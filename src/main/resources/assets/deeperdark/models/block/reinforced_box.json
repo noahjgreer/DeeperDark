@@ -1,0 +1,12 @@
+{
+	"parent": "minecraft:block/cube",
+	"textures": {
+		"down": "deeperdark:block/reinforced_box_bottom",
+		"east": "deeperdark:block/reinforced_box_east_west",
+		"west": "deeperdark:block/reinforced_box_east_west",
+		"north": "deeperdark:block/reinforced_box_north_south",
+		"south": "deeperdark:block/reinforced_box_north_south",
+		"up": "deeperdark:block/reinforced_box_top",
+		"particle": "deeperdark:block/reinforced_box_east_west"
+	}
+}
