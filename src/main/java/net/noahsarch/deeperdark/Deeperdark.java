@@ -15,6 +15,7 @@ import net.noahsarch.deeperdark.ported.LeavesBeGonePort;
 import net.noahsarch.deeperdark.sound.ModSounds;
 import net.noahsarch.deeperdark.villager.ModVillagers;
 import net.noahsarch.deeperdark.worldgen.SlipChunkGenerator;
+import net.noahsarch.deeperdark.block.ModBlockEntities;
 import net.noahsarch.deeperdark.block.ModBlocks;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.world.item.Items;
@@ -48,6 +49,7 @@ public class Deeperdark implements ModInitializer {
 
 		// Register custom blocks/items before recipes or events use them
 		ModBlocks.initialize();
+		ModBlockEntities.initialize();
 		ModItems.initialize();
 
 		// Register the Slip chunk generator

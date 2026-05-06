@@ -7,6 +7,8 @@ import com.mojang.blaze3d.platform.DestFactor;
 import com.mojang.blaze3d.platform.SourceFactor;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.User;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
@@ -20,8 +22,19 @@ import org.lwjgl.glfw.GLFW;
 
 @Environment(EnvType.CLIENT)
 public class DeeperDarkLogoScreen extends Screen {
+    // Use Minecraft type instance to avoid ambiguous MinecraftClient type resolution
+    private static final User user = Minecraft.getInstance().getUser();
 
-    private static final Identifier TEXTURE_ID = Identifier.fromNamespaceAndPath("deeperdark", "textures/gui/intro.png");
+
+    // Decide TEXTURE_ID based on current username for special easter egg cases
+    private static final Identifier TEXTURE_ID = Identifier.fromNamespaceAndPath("deeperdark",
+            switch (user.getName().toLowerCase()) {
+                case "joemcd" -> "textures/gui/intro_fluffy.png";
+                case "joe_fluffy"     -> "textures/gui/intro_fluffy.png";
+                default         -> "textures/gui/intro.png";
+            });
+
+
     private static final SoundEvent INTRO_SOUND = SoundEvent.createVariableRangeEvent(
             Identifier.fromNamespaceAndPath("deeperdark", "intro"));
 
