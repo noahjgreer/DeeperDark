@@ -26,7 +26,7 @@ public class BoxMenu extends AbstractContainerMenu {
 
         // Center box slots in the space between the title area (y=18) and player inventory label (y=72).
         // Available height = 54; slots height = rows * 18.
-        int slotTop = 18 + (54 - rows * 18) / 2;
+        int slotTop = 17 + (54 - rows * 18) / 2;
         addBoxSlots(container, 62, slotTop);
         addStandardInventorySlots(playerInventory, 8, 84);
     }
