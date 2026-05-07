@@ -145,6 +145,9 @@ public class Deeperdark implements ModInitializer {
 
         PlayerTickHandler.register();
 
+        // Register collar trinket effects
+        net.noahsarch.deeperdark.event.CollarEvents.register();
+
         // Register item magnet tick handler
         net.noahsarch.deeperdark.event.ItemMagnetHandler.register();
 

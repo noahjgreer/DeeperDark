@@ -56,6 +56,7 @@ public class ModBlocks {
             content.accept(LEATHER_BLOCK);
             content.accept(FLINT_BLOCK);
             content.accept(ROTTEN_FLESH_BLOCK);
+            content.accept(ENDER_PEARL_BLOCK);
             content.accept(GLASS_DOOR);
             content.accept(WHITE_STAINED_GLASS_DOOR);
             content.accept(ORANGE_STAINED_GLASS_DOOR);
@@ -201,6 +202,15 @@ public class ModBlocks {
         BlockBehaviour.Properties.of()
             .strength(1.0F)
             .sound(ModSoundType.BOX),
+        true
+    );
+    public static final Block ENDER_PEARL_BLOCK = register(
+        "ender_pearl_block",
+        Block::new,
+        BlockBehaviour.Properties.of()
+            .strength(0.5F)
+            .requiresCorrectToolForDrops()
+            .sound(ModSoundType.ENDER_PEARL_BLOCK),
         true
     );
 

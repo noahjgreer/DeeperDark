@@ -4,6 +4,7 @@
         "deeperdark:gunpowder_block",
         "deeperdark:flint_block",
         "deeperdark:golden_cauldron",
-        "deeperdark:siphon"
+        "deeperdark:siphon",
+        "deeperdark:ender_pearl_block"
     ]
 }

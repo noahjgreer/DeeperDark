@@ -344,6 +344,27 @@
     ],
     "subtitle": "subtitles.deeperdark.block.box.open"
   },
+  "item.collar.jingle": {
+    "sounds": [
+      { "name": "deeperdark:item/collar/jingle/jingle1", "attenuation_distance": 8 },
+      { "name": "deeperdark:item/collar/jingle/jingle2", "attenuation_distance": 8 },
+      { "name": "deeperdark:item/collar/jingle/jingle3", "attenuation_distance": 8 },
+      { "name": "deeperdark:item/collar/jingle/jingle4", "attenuation_distance": 8 },
+      { "name": "deeperdark:item/collar/jingle/jingle5", "attenuation_distance": 8 },
+      { "name": "deeperdark:item/collar/jingle/jingle6", "attenuation_distance": 8 },
+      { "name": "deeperdark:item/collar/jingle/jingle7", "attenuation_distance": 8 },
+      { "name": "deeperdark:item/collar/jingle/jingle8", "attenuation_distance": 8 },
+      { "name": "deeperdark:item/collar/jingle/jingle9", "attenuation_distance": 8 },
+      { "name": "deeperdark:item/collar/jingle/jingle10", "attenuation_distance": 8 },
+      { "name": "deeperdark:item/collar/jingle/jingle11", "attenuation_distance": 8 },
+      { "name": "deeperdark:item/collar/jingle/jingle12", "attenuation_distance": 8 },
+      { "name": "deeperdark:item/collar/jingle/jingle13", "attenuation_distance": 8 },
+      { "name": "deeperdark:item/collar/jingle/jingle14", "attenuation_distance": 8 },
+      { "name": "deeperdark:item/collar/jingle/jingle15", "attenuation_distance": 8 },
+      { "name": "deeperdark:item/collar/jingle/jingle16", "attenuation_distance": 8 }
+    ],
+    "subtitle": "subtitles.deeperdark.item.collar.jingle"
+  },
   "block.box.close": {
     "sounds": [
       {

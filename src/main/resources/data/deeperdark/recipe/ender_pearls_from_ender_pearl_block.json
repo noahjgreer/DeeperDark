@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "deeperdark:ender_pearl_block"
+  ],
+  "result": {
+    "count": 9,
+    "id": "ender_pearl"
+  }
+}

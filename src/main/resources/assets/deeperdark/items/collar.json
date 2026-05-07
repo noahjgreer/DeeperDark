@@ -1,0 +1,63 @@
+{
+  "model": {
+    "type": "minecraft:composite",
+    "models": [
+      {
+        "type": "minecraft:model",
+        "model": "deeperdark:item/collar",
+        "tints": [
+          {
+            "type": "minecraft:dye",
+            "default": -6265536
+          }
+        ]
+      },
+      {
+        "type": "minecraft:model",
+        "model": "deeperdark:item/collar_overlay"
+      },
+      {
+        "type": "minecraft:condition",
+        "property": "minecraft:custom_model_data",
+        "index": 0,
+        "on_true": { "type": "minecraft:model", "model": "deeperdark:item/collar_trinket_sponge" },
+        "on_false": { "type": "minecraft:empty" }
+      },
+      {
+        "type": "minecraft:condition",
+        "property": "minecraft:custom_model_data",
+        "index": 1,
+        "on_true": { "type": "minecraft:model", "model": "deeperdark:item/collar_trinket_gold" },
+        "on_false": { "type": "minecraft:empty" }
+      },
+      {
+        "type": "minecraft:condition",
+        "property": "minecraft:custom_model_data",
+        "index": 2,
+        "on_true": { "type": "minecraft:model", "model": "deeperdark:item/collar_trinket_bell" },
+        "on_false": { "type": "minecraft:empty" }
+      },
+      {
+        "type": "minecraft:condition",
+        "property": "minecraft:custom_model_data",
+        "index": 3,
+        "on_true": { "type": "minecraft:model", "model": "deeperdark:item/collar_trinket_magnet" },
+        "on_false": { "type": "minecraft:empty" }
+      },
+      {
+        "type": "minecraft:condition",
+        "property": "minecraft:custom_model_data",
+        "index": 4,
+        "on_true": { "type": "minecraft:model", "model": "deeperdark:item/collar_trinket_blaze_rod" },
+        "on_false": { "type": "minecraft:empty" }
+      },
+      {
+        "type": "minecraft:condition",
+        "property": "minecraft:custom_model_data",
+        "index": 5,
+        "on_true": { "type": "minecraft:model", "model": "deeperdark:item/collar_trinket_glow_berries" },
+        "on_false": { "type": "minecraft:empty" }
+      }
+    ]
+  }
+}

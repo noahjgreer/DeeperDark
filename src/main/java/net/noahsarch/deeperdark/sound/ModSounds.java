@@ -26,6 +26,7 @@ public class ModSounds {
     public static final SoundEvent BOX_HIT = register("block.box.hit");
     public static final SoundEvent BOX_OPEN = register("block.box.open");
     public static final SoundEvent BOX_CLOSE = register("block.box.close");
+    public static final SoundEvent COLLAR_JINGLE = register("item.collar.jingle");
 
     private static SoundEvent register(String name) {
         Identifier id = Identifier.fromNamespaceAndPath(Deeperdark.MOD_ID, name);

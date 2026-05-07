@@ -1,18 +1,30 @@
 package net.noahsarch.deeperdark.item;
 
+import java.util.List;
 import java.util.function.Function;
 
 import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
 import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.component.CustomModelData;
 import net.noahsarch.deeperdark.Deeperdark;
 
 public class ModItems {
+
+    // Six false flags for trinket layer visibility: sponge, gold, bell, magnet, blaze_rod, glow_berries
+    private static final CustomModelData COLLAR_DEFAULT_CMD = new CustomModelData(
+        List.of(), List.of(false, false, false, false, false, false), List.of(), List.of());
+
+    public static final CollarItem COLLAR = register(
+        "collar",
+        props -> new CollarItem(props),
+        new Item.Properties().stacksTo(1).component(DataComponents.CUSTOM_MODEL_DATA, COLLAR_DEFAULT_CMD));
     public static <T extends Item> T register(String name, Function<Item.Properties, T> itemFactory, Item.Properties settings) {
         ResourceKey<Item> itemKey = ResourceKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Deeperdark.MOD_ID, name));
 
@@ -35,6 +47,9 @@ public class ModItems {
                 creativeTab.accept(DIAMOND_ITEM_MAGNET);
                 creativeTab.accept(NETHERITE_ITEM_MAGNET);
             });
+
+        CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.COMBAT)
+            .register(creativeTab -> creativeTab.accept(COLLAR));
     }
 
     public static final Item LEATHER_SCRAP = register(

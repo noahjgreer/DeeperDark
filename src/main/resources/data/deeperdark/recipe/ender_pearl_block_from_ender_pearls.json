@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "AAA",
+    "AAA",
+    "AAA"
+  ],
+  "key": {
+    "A": "minecraft:ender_pearl"
+  },
+  "result": {
+    "count": 1,
+    "id": "deeperdark:ender_pearl_block"
+  }
+}

@@ -7,9 +7,15 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ItemStack;
 import net.noahsarch.deeperdark.Deeperdark;
 
 public class ModMenus {
+    public static final MenuType<CollarMenu> COLLAR = register(
+        "collar",
+        ModMenus::createCollarMenu
+    );
+
     public static final MenuType<BoxMenu> FLIMSY_BOX = register(
         "flimsy_box",
         ModMenus::createFlimsyMenu
@@ -19,6 +25,10 @@ public class ModMenus {
         "sturdy_box",
         ModMenus::createSturdyMenu
     );
+
+    private static CollarMenu createCollarMenu(int containerId, Inventory inventory) {
+        return new CollarMenu(COLLAR, containerId, inventory, ItemStack.EMPTY);
+    }
 
     private static BoxMenu createFlimsyMenu(int containerId, Inventory inventory) {
         return new BoxMenu(FLIMSY_BOX, containerId, inventory, new SimpleContainer(3), 1);

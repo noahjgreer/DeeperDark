@@ -79,6 +79,8 @@
     "LeavesBeGoneLevelChunkMixin",
     "LeavesBeGoneLeavesBlockMixin",
     "ArmorSlotMixin",
+    "CollarPlayerMixin",
+    "PiglinAiMixin",
     "ArmorStandMixin",
     "EnchantmentMenuMixin",
     "InventoryMenuMixin",
