@@ -7,6 +7,7 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.core.Holder;
 import net.minecraft.world.inventory.AnvilMenu;
 import net.minecraft.world.inventory.ItemCombinerMenu;
@@ -46,6 +47,72 @@ public abstract class AnvilScreenHandlerMixin extends ItemCombinerMenu {
     @Inject(method = "createResult", at = @At("HEAD"), cancellable = true)
     private void deeperdark$customUpdateResult(CallbackInfo ci) {
         ItemStack inputStack = this.inputSlots.getItem(0);
+
+        // Blaze rod durability repair: left=damaged blaze rod, right=blaze powder
+        if (!inputStack.isEmpty() && inputStack.is(Items.BLAZE_ROD) && inputStack.has(DataComponents.MAX_DAMAGE)) {
+            ItemStack rightStack = this.inputSlots.getItem(1);
+            ItemStack result = inputStack.copy();
+            this.repairItemCountCost = 0;
+            this.onlyRenaming = false;
+            int totalCost = 0;
+
+            if (!rightStack.isEmpty()) {
+                if (rightStack.is(Items.BLAZE_POWDER) && inputStack.getDamageValue() > 0) {
+                    int repairPerUnit = inputStack.getOrDefault(DataComponents.MAX_DAMAGE, 1200) / 4;
+                    int currentDamage = inputStack.getDamageValue();
+                    int repairCount = 0;
+                    while (currentDamage > 0 && repairCount < rightStack.getCount()) {
+                        currentDamage = Math.max(0, currentDamage - repairPerUnit);
+                        repairCount++;
+                    }
+                    result.setDamageValue(currentDamage);
+                    this.repairItemCountCost = repairCount;
+                    totalCost = repairCount;
+                    // Fully repaired: restore to a normal stackable blaze rod
+                    if (currentDamage <= 0) {
+                        result.remove(DataComponents.DAMAGE);
+                        result.remove(DataComponents.MAX_DAMAGE);
+                        result.remove(DataComponents.MAX_STACK_SIZE);
+                    }
+                } else {
+                    // Invalid second item for a damaged blaze rod
+                    this.resultSlots.setItem(0, ItemStack.EMPTY);
+                    this.cost.set(0);
+                    ci.cancel();
+                    return;
+                }
+            }
+
+            // Handle rename
+            boolean renamed = false;
+            if (this.itemName != null && !StringUtil.isBlank(this.itemName)) {
+                if (!this.itemName.equals(inputStack.getHoverName().getString())) {
+                    renamed = true;
+                    result.set(DataComponents.CUSTOM_NAME, Component.literal(this.itemName));
+                    if (rightStack.isEmpty()) totalCost = 1;
+                }
+            } else if (inputStack.has(DataComponents.CUSTOM_NAME)) {
+                renamed = true;
+                result.remove(DataComponents.CUSTOM_NAME);
+                if (rightStack.isEmpty()) totalCost = 1;
+            }
+
+            if (rightStack.isEmpty() && renamed) this.onlyRenaming = true;
+
+            if (totalCost <= 0 && !renamed) {
+                this.resultSlots.setItem(0, ItemStack.EMPTY);
+                this.cost.set(0);
+                ci.cancel();
+                return;
+            }
+
+            result.set(DataComponents.REPAIR_COST, 0);
+            this.cost.set(totalCost);
+            this.resultSlots.setItem(0, result);
+            this.broadcastChanges();
+            ci.cancel();
+            return;
+        }
 
         if (inputStack.isEmpty() || !EnchantmentHelper.canStoreEnchantments(inputStack)) {
             this.resultSlots.setItem(0, ItemStack.EMPTY);

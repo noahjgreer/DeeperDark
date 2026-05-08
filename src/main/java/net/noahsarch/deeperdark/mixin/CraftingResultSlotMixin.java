@@ -1,7 +1,10 @@
 package net.noahsarch.deeperdark.mixin;
 
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.core.Holder;
 import net.minecraft.world.inventory.ResultSlot;
@@ -33,6 +36,7 @@ import java.util.WeakHashMap;
 public class CraftingResultSlotMixin {
 
     @Shadow @Final private Player player;
+    @Shadow @Final private CraftingContainer craftSlots;
 
     @Unique
     private static final Identifier CRAFTING_SOUND_ID = Identifier.fromNamespaceAndPath(Deeperdark.MOD_ID, "block.crafting_table.craft");
@@ -55,6 +59,20 @@ public class CraftingResultSlotMixin {
      * Play crafting sound when item is taken from crafting result slot.
      * Uses debouncing to prevent sound spam when shift-clicking to craft multiple items.
      */
+    @Inject(method = "onTake", at = @At("HEAD"), cancellable = true)
+    private void deeperdark$blockDamagedBlazeRodCraft(Player player, ItemStack stack, CallbackInfo ci) {
+        for (int i = 0; i < craftSlots.getContainerSize(); i++) {
+            ItemStack s = craftSlots.getItem(i);
+            if (s.is(Items.BLAZE_ROD) && s.has(DataComponents.MAX_DAMAGE) && s.getDamageValue() > 0) {
+                // The result item is already on the cursor when onTake fires; zero it out so
+                // the player receives nothing, then cancel to skip ingredient consumption.
+                stack.setCount(0);
+                ci.cancel();
+                return;
+            }
+        }
+    }
+
     @Inject(method = "onTake", at = @At("HEAD"))
     private void deeperdark$playCraftingSound(Player player, ItemStack stack, CallbackInfo ci) {
         Level world = ((EntityAccessor)player).deeperdark$getWorld();

@@ -40,9 +40,15 @@ public class CollarMenu extends AbstractContainerMenu {
 
         container.startOpen(playerInventory.player);
 
-        // 5 trinket slots in a row (hopper layout: x=44,62,80,98,116  y=20)
+        // 5 trinket slots in a row (hopper layout: x=44,62,80,98,116  y=20), max 1 item per slot
         for (int i = 0; i < TRINKET_SLOTS; i++) {
-            this.addSlot(new Slot(container, i, 44 + i * 18, 20));
+            final int slotIndex = i;
+            this.addSlot(new Slot(container, slotIndex, 44 + slotIndex * 18, 20) {
+                @Override
+                public int getMaxStackSize() { return 1; }
+                @Override
+                public int getMaxStackSize(ItemStack stack) { return 1; }
+            });
         }
 
         // Player inventory (3 rows of 9)
