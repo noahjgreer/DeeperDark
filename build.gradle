@@ -119,7 +119,7 @@ jar {
 //
 // Requires a GitHub personal-access-token with the 'repo' scope.
 // Provide it via the GITHUB_TOKEN environment variable (recommended) OR by
-// adding  githubToken=<token>  to your local gradle.properties (do NOT commit).
+// placing the token in a .token file at the repo root (single line, gitignored).
 //
 // Optional project property:
 //   -PgithubPreRelease=true   marks the release as a pre-release on GitHub
@@ -131,12 +131,19 @@ tasks.register('buildGitRelease') {
 
     doLast {
         // ── 1. Resolve token ─────────────────────────────────────────────────────
-        def token = System.getenv('GITHUB_TOKEN') ?: project.findProperty('githubToken')?.toString()
+        def token = System.getenv('GITHUB_TOKEN')
+        if (!token) {
+            def tokenFile = file('.token')
+            if (tokenFile.exists()) {
+                token = tokenFile.text
+            }
+        }
+        token = token?.trim()
         if (!token) {
             throw new GradleException(
                 'GitHub token not found.\n' +
-                'Set the GITHUB_TOKEN environment variable, or add githubToken=<token> to your\n' +
-                'local gradle.properties (and keep that file out of source control).'
+                'Set the GITHUB_TOKEN environment variable, or create a .token file at the repo\n' +
+                'root containing your token on a single line (keep it out of source control).'
             )
         }
 

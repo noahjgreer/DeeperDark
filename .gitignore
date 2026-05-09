@@ -106,7 +106,7 @@ replay_pid*
 # Unimportant files
 src/main/resources/assets/deeperdark/sounds/ambient/creature/ambience.aup3
 /tobeported/
-gradle.properties
+/.token
 /.claude/
 /.wiki/
 /com/mojang/
