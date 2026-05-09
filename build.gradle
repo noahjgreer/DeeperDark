@@ -43,7 +43,12 @@ dependencies {
 	include implementation('org.yaml:snakeyaml:2.1')
 
 	// LambDynamicLights soft dependency (compile-only; not bundled, must be provided at runtime)
-	compileOnly files("C:/Users/Admin/AppData/Roaming/PrismLauncher/instances/Fabulously Optimized/minecraft/.fabric/processedMods/lambdynlights_api-4.10.2+26.1.2-72f30f705bda1a25.jar")
+	compileOnly files(
+		"C:/Users/Admin/AppData/Roaming/PrismLauncher/instances/Fabulously Optimized/minecraft/.fabric/processedMods/lambdynlights_api-4.10.2+26.1.2-72f30f705bda1a25.jar",
+		"libs/yumi-commons-event-2.0.0.jar",
+		"libs/yumi-commons-core-2.0.0.jar",
+		"libs/yumi-commons-collections-2.0.0.jar"
+	)
 }
 
 processResources {
