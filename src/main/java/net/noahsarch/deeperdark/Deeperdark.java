@@ -91,6 +91,11 @@ public class Deeperdark implements ModInitializer {
 				net.noahsarch.deeperdark.recipe.BoxUpgradeRecipe.SERIALIZER_ID,
 				net.noahsarch.deeperdark.recipe.BoxUpgradeRecipe.SERIALIZER);
 
+		// Register collar upgrade recipe (preserves dye, trinkets, fuel when upgrading tiers)
+		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER,
+				net.noahsarch.deeperdark.recipe.CollarUpgradeRecipe.SERIALIZER_ID,
+				net.noahsarch.deeperdark.recipe.CollarUpgradeRecipe.SERIALIZER);
+
 		// Register tick handler for custom block tracker
 		net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_LEVEL_TICK.register(serverWorld -> {
 			// Run every 20 ticks (1 second) to be gentle

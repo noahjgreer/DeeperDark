@@ -121,9 +121,31 @@ public class CollarBenchMenu extends AbstractContainerMenu {
 
             @Override
             public void onTake(Player taker, ItemStack stack) {
-                // Read cost before clearing (slotsChanged will reset costSlot to 0)
+                // Read cost/fuel additions before clearing (slotsChanged resets slots to 0)
                 int cost = costSlot.get();
-                // Consume inputs and force slot sync (direct setItem bypasses slot.setChanged)
+                int actualFire  = addFireSlot.get();
+                int actualWater = addWaterSlot.get();
+                // Return excess fuel items to player
+                ItemStack fuelStack = beContainer.getItem(FUEL_INPUT_SLOT);
+                if (!fuelStack.isEmpty()) {
+                    int total = fuelStack.getCount();
+                    int consumed = 0;
+                    if (fuelStack.is(Items.BLAZE_POWDER)) {
+                        consumed = (int) Math.ceil((double) actualFire / 30);
+                    } else if (fuelStack.is(Items.BLAZE_ROD)) {
+                        consumed = (int) Math.ceil((double) actualFire / 60);
+                    } else if (fuelStack.is(Items.SPONGE) || fuelStack.is(Items.WET_SPONGE)) {
+                        consumed = (int) Math.ceil((double) actualWater / 1000);
+                    }
+                    consumed = Math.min(consumed, total);
+                    int remaining = total - consumed;
+                    if (remaining > 0) {
+                        ItemStack returnStack = fuelStack.copy();
+                        returnStack.setCount(remaining);
+                        taker.getInventory().placeItemBackInInventory(returnStack);
+                    }
+                }
+                // Consume inputs
                 beContainer.setItem(COLLAR_INPUT_SLOT, ItemStack.EMPTY);
                 beContainer.setItem(FUEL_INPUT_SLOT, ItemStack.EMPTY);
                 CollarBenchMenu.this.slotsChanged(beContainer);
@@ -166,6 +188,7 @@ public class CollarBenchMenu extends AbstractContainerMenu {
             this.addSlot(new Slot(trinketContainer, i, x, y) {
                 @Override
                 public boolean mayPlace(ItemStack stack) {
+                    if (stack.getItem() instanceof CollarItem) return false;
                     CollarTier tier = getActiveTier();
                     return tier != null && tier.isSlotActive(idx);
                 }
@@ -404,10 +427,12 @@ public class CollarBenchMenu extends AbstractContainerMenu {
                 if (!this.moveItemStackTo(stack, FUEL_INPUT_SLOT, FUEL_INPUT_SLOT + 1, false)) {
                     return ItemStack.EMPTY;
                 }
-            } else {
+            } else if (!(stack.getItem() instanceof CollarItem)) {
                 if (!this.moveItemStackTo(stack, TRINKET_START, TRINKET_START + TRINKET_COUNT, false)) {
                     return ItemStack.EMPTY;
                 }
+            } else {
+                return ItemStack.EMPTY;
             }
         } else {
             // collar_input, fuel_input, or trinket → player inventory
@@ -430,20 +455,36 @@ public class CollarBenchMenu extends AbstractContainerMenu {
         resultContainer.setItem(0, ItemStack.EMPTY);
 
         if (isTrinketsDirty()) {
-            // Free cancel: return the collar with its CURRENT trinket state (no XP/fuel charged).
-            // Any trinkets the player already removed are in their inventory; any they added get
-            // embedded in the returned collar. Total item count is always conserved — no dupe.
+            // True rollback: return the original collar unchanged.
+            // Items the player removed are already in their inventory.
+            // Items the player added are still in trinketContainer — return those too.
             if (!lastCollarStack.isEmpty()) {
-                ItemStack cancelledCollar = lastCollarStack.copy();
-                NonNullList<ItemStack> currentTrinkets = NonNullList.withSize(TRINKET_COUNT, ItemStack.EMPTY);
-                for (int i = 0; i < TRINKET_COUNT; i++) {
-                    currentTrinkets.set(i, trinketContainer.getItem(i).copy());
-                    trinketContainer.setItem(i, ItemStack.EMPTY);
-                }
-                cancelledCollar.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(currentTrinkets));
-                updateModelFlags(cancelledCollar, currentTrinkets);
-                player.getInventory().placeItemBackInInventory(cancelledCollar);
+                player.getInventory().placeItemBackInInventory(lastCollarStack.copy());
                 beContainer.setItem(COLLAR_INPUT_SLOT, ItemStack.EMPTY);
+            }
+            // Build pool of original trinket items to detect newly-added ones
+            List<ItemStack> originalPool = new ArrayList<>();
+            for (int i = 0; i < TRINKET_COUNT; i++) {
+                if (!originalTrinketSlots.get(i).isEmpty()) {
+                    originalPool.add(originalTrinketSlots.get(i).copy());
+                }
+            }
+            for (int i = 0; i < TRINKET_COUNT; i++) {
+                ItemStack current = trinketContainer.getItem(i);
+                if (!current.isEmpty()) {
+                    boolean fromOriginal = false;
+                    for (int j = 0; j < originalPool.size(); j++) {
+                        if (ItemStack.isSameItemSameComponents(originalPool.get(j), current)) {
+                            originalPool.remove(j);
+                            fromOriginal = true;
+                            break;
+                        }
+                    }
+                    if (!fromOriginal) {
+                        player.getInventory().placeItemBackInInventory(current.copy());
+                    }
+                }
+                trinketContainer.setItem(i, ItemStack.EMPTY);
             }
             // Return fuel (never consumed on cancel)
             ItemStack fuel = beContainer.getItem(FUEL_INPUT_SLOT);

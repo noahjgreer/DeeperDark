@@ -177,7 +177,7 @@ public class CollarEvents {
 
         // Fire damage prevention: drain 1 fire tick per game tick while burning.
         // Actual fire damage is cancelled by the ServerPlayerEntityMixin hurtServer() injection.
-        if (fireTicks > 0 && player.isOnFire()) {
+        if (fireTicks > 0 && player.isOnFire() && !player.hasEffect(MobEffects.FIRE_RESISTANCE)) {
             fireTicks = Math.max(0, fireTicks - 1);
             if (fireTicks == 0) {
                 level.playSound(null, player.getX(), player.getY(), player.getZ(),

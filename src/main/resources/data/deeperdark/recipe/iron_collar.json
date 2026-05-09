@@ -1,17 +1,6 @@
 {
-  "type": "minecraft:crafting_shaped",
-  "category": "misc",
-  "key": {
-    "I": "minecraft:iron_ingot",
-    "C": "deeperdark:copper_collar"
-  },
-  "pattern": [
-    "III",
-    "ICI",
-    "III"
-  ],
-  "result": {
-    "id": "deeperdark:iron_collar",
-    "count": 1
-  }
+  "type": "deeperdark:collar_upgrade",
+  "from": "deeperdark:copper_collar",
+  "to": "deeperdark:iron_collar",
+  "material": "minecraft:iron_ingot"
 }

@@ -1,17 +1,6 @@
 {
-  "type": "minecraft:crafting_shaped",
-  "category": "misc",
-  "key": {
-    "C": "minecraft:copper_ingot",
-    "L": "deeperdark:leather_collar"
-  },
-  "pattern": [
-    "CCC",
-    "CLC",
-    "CCC"
-  ],
-  "result": {
-    "id": "deeperdark:copper_collar",
-    "count": 1
-  }
+  "type": "deeperdark:collar_upgrade",
+  "from": "deeperdark:leather_collar",
+  "to": "deeperdark:copper_collar",
+  "material": "minecraft:copper_ingot"
 }

@@ -219,8 +219,7 @@ public class ModBlocks {
         "collarbench",
         CollarBenchBlock::new,
         BlockBehaviour.Properties.of()
-            .strength(2.5F)
-            .requiresCorrectToolForDrops()
+            .strength(1.125F)
             .sound(SoundType.WOOD),
         true
     );

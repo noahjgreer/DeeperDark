@@ -42,6 +42,8 @@ dependencies {
 	// YAML config support - include it in the jar
 	include implementation('org.yaml:snakeyaml:2.1')
 
+	// LambDynamicLights soft dependency (compile-only; not bundled, must be provided at runtime)
+	compileOnly files("C:/Users/Admin/AppData/Roaming/PrismLauncher/instances/Fabulously Optimized/minecraft/.fabric/processedMods/lambdynlights_api-4.10.2+26.1.2-72f30f705bda1a25.jar")
 }
 
 processResources {

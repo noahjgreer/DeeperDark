@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:crafting_dye",
+  "category": "misc",
+  "dye": "#minecraft:dyes",
+  "group": "dyed_collar",
+  "result": {
+    "id": "deeperdark:leather_collar"
+  },
+  "target": "deeperdark:leather_collar"
+}

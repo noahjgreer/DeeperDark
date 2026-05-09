@@ -1,17 +1,6 @@
 {
-  "type": "minecraft:crafting_shaped",
-  "category": "misc",
-  "key": {
-    "D": "minecraft:diamond",
-    "I": "deeperdark:iron_collar"
-  },
-  "pattern": [
-    "DDD",
-    "DID",
-    "DDD"
-  ],
-  "result": {
-    "id": "deeperdark:diamond_collar",
-    "count": 1
-  }
+  "type": "deeperdark:collar_upgrade",
+  "from": "deeperdark:iron_collar",
+  "to": "deeperdark:diamond_collar",
+  "material": "minecraft:diamond"
 }

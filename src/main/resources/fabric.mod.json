@@ -23,6 +23,9 @@
 		"client": [
 			"net.noahsarch.deeperdark.DeeperDarkClient",
 			"io.github.lucaargolo.seasons.FabricSeasonsClient"
+		],
+		"lambdynlights:initializer": [
+			"net.noahsarch.deeperdark.compat.DeeperDarkDynamicLightsInit"
 		]
 	},
 	"mixins": [
@@ -36,6 +39,6 @@
 		"fabric-api": "*"
 	},
 	"suggests": {
-		"another-mod": "*"
+		"lambdynlights": ">=4.0.0"
 	}
 }

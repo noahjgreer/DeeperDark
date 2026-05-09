@@ -44,7 +44,7 @@ public class ModItems {
     public static final CollarItem NETHERITE_COLLAR = register(
         "netherite_collar",
         props -> new CollarItem(net.noahsarch.deeperdark.item.CollarTier.NETHERITE, props),
-        new Item.Properties().stacksTo(1).component(DataComponents.CUSTOM_MODEL_DATA, COLLAR_DEFAULT_CMD));
+        new Item.Properties().stacksTo(1).fireResistant().component(DataComponents.CUSTOM_MODEL_DATA, COLLAR_DEFAULT_CMD));
     public static <T extends Item> T register(String name, Function<Item.Properties, T> itemFactory, Item.Properties settings) {
         ResourceKey<Item> itemKey = ResourceKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Deeperdark.MOD_ID, name));
 
@@ -106,5 +106,5 @@ public class ModItems {
     public static final ItemMagnetItem NETHERITE_ITEM_MAGNET = register(
         "netherite_item_magnet",
         props -> new ItemMagnetItem(ItemMagnetItem.MagnetType.NETHERITE, props),
-        new Item.Properties());
+        new Item.Properties().fireResistant());
 }
