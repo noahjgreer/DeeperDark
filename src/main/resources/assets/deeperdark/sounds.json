@@ -1,4 +1,10 @@
 {
+  "block.collarbench.use": {
+    "sounds": [
+      "deeperdark:block/collarbench/use"
+    ],
+    "subtitle": "subtitles.deeperdark.block.collarbench.use"
+  },
   "intro": {
     "sounds": [
       {

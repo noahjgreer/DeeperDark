@@ -11,6 +11,11 @@ import net.minecraft.world.item.ItemStack;
 import net.noahsarch.deeperdark.Deeperdark;
 
 public class ModMenus {
+    public static final MenuType<CollarBenchMenu> COLLAR_BENCH = register(
+        "collar_bench",
+        ModMenus::createCollarBenchMenu
+    );
+
     public static final MenuType<CollarMenu> COLLAR = register(
         "collar",
         ModMenus::createCollarMenu
@@ -25,6 +30,10 @@ public class ModMenus {
         "sturdy_box",
         ModMenus::createSturdyMenu
     );
+
+    private static CollarBenchMenu createCollarBenchMenu(int containerId, Inventory inventory) {
+        return new CollarBenchMenu(COLLAR_BENCH, containerId, inventory, new SimpleContainer(2));
+    }
 
     private static CollarMenu createCollarMenu(int containerId, Inventory inventory) {
         return new CollarMenu(COLLAR, containerId, inventory, ItemStack.EMPTY);

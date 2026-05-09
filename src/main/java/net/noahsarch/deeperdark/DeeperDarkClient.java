@@ -24,6 +24,7 @@ public class DeeperDarkClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         MenuScreens.register(ModMenus.COLLAR, net.noahsarch.deeperdark.client.screen.CollarScreen::new);
+        MenuScreens.register(ModMenus.COLLAR_BENCH, net.noahsarch.deeperdark.client.screen.CollarBenchScreen::new);
         MenuScreens.register(ModMenus.FLIMSY_BOX, BoxScreen::new);
         MenuScreens.register(ModMenus.STURDY_BOX, BoxScreen::new);
 

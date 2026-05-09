@@ -82,6 +82,7 @@ public class ModBlocks {
             content.accept(FLIMSY_BOX);
             content.accept(STURDY_BOX);
             content.accept(REINFORCED_BOX);
+            content.accept(COLLAR_BENCH);
         });
     }
 
@@ -211,6 +212,16 @@ public class ModBlocks {
             .strength(0.5F)
             .requiresCorrectToolForDrops()
             .sound(ModSoundType.ENDER_PEARL_BLOCK),
+        true
+    );
+
+    public static final Block COLLAR_BENCH = register(
+        "collarbench",
+        CollarBenchBlock::new,
+        BlockBehaviour.Properties.of()
+            .strength(2.5F)
+            .requiresCorrectToolForDrops()
+            .sound(SoundType.WOOD),
         true
     );
 

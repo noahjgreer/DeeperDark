@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "N": "minecraft:netherite_ingot",
+    "D": "deeperdark:diamond_collar"
+  },
+  "pattern": [
+    "NNN",
+    "NDN",
+    "NNN"
+  ],
+  "result": {
+    "id": "deeperdark:netherite_collar",
+    "count": 1
+  }
+}

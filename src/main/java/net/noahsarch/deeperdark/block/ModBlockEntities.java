@@ -8,6 +8,15 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.noahsarch.deeperdark.Deeperdark;
 
 public class ModBlockEntities {
+    public static final BlockEntityType<CollarBenchBlockEntity> COLLAR_BENCH = Registry.register(
+        BuiltInRegistries.BLOCK_ENTITY_TYPE,
+        Identifier.fromNamespaceAndPath(Deeperdark.MOD_ID, "collarbench"),
+        FabricBlockEntityTypeBuilder.create(
+            CollarBenchBlockEntity::new,
+            ModBlocks.COLLAR_BENCH
+        ).build()
+    );
+
     public static final BlockEntityType<BoxBlockEntity> BOX = Registry.register(
         BuiltInRegistries.BLOCK_ENTITY_TYPE,
         Identifier.fromNamespaceAndPath(Deeperdark.MOD_ID, "box"),

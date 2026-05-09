@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "#": "minecraft:leather"
+  },
+  "pattern": [
+    "###"
+  ],
+  "result": {
+    "id": "deeperdark:leather_collar",
+    "count": 1
+  }
+}

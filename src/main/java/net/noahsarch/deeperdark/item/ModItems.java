@@ -21,9 +21,29 @@ public class ModItems {
     private static final CustomModelData COLLAR_DEFAULT_CMD = new CustomModelData(
         List.of(), List.of(false, false, false, false, false, false), List.of(), List.of());
 
-    public static final CollarItem COLLAR = register(
-        "collar",
-        props -> new CollarItem(props),
+    public static final CollarItem LEATHER_COLLAR = register(
+        "leather_collar",
+        props -> new CollarItem(net.noahsarch.deeperdark.item.CollarTier.LEATHER, props),
+        new Item.Properties().stacksTo(1).component(DataComponents.CUSTOM_MODEL_DATA, COLLAR_DEFAULT_CMD));
+
+    public static final CollarItem COPPER_COLLAR = register(
+        "copper_collar",
+        props -> new CollarItem(net.noahsarch.deeperdark.item.CollarTier.COPPER, props),
+        new Item.Properties().stacksTo(1).component(DataComponents.CUSTOM_MODEL_DATA, COLLAR_DEFAULT_CMD));
+
+    public static final CollarItem IRON_COLLAR = register(
+        "iron_collar",
+        props -> new CollarItem(net.noahsarch.deeperdark.item.CollarTier.IRON, props),
+        new Item.Properties().stacksTo(1).component(DataComponents.CUSTOM_MODEL_DATA, COLLAR_DEFAULT_CMD));
+
+    public static final CollarItem DIAMOND_COLLAR = register(
+        "diamond_collar",
+        props -> new CollarItem(net.noahsarch.deeperdark.item.CollarTier.DIAMOND, props),
+        new Item.Properties().stacksTo(1).component(DataComponents.CUSTOM_MODEL_DATA, COLLAR_DEFAULT_CMD));
+
+    public static final CollarItem NETHERITE_COLLAR = register(
+        "netherite_collar",
+        props -> new CollarItem(net.noahsarch.deeperdark.item.CollarTier.NETHERITE, props),
         new Item.Properties().stacksTo(1).component(DataComponents.CUSTOM_MODEL_DATA, COLLAR_DEFAULT_CMD));
     public static <T extends Item> T register(String name, Function<Item.Properties, T> itemFactory, Item.Properties settings) {
         ResourceKey<Item> itemKey = ResourceKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Deeperdark.MOD_ID, name));
@@ -49,7 +69,13 @@ public class ModItems {
             });
 
         CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.COMBAT)
-            .register(creativeTab -> creativeTab.accept(COLLAR));
+            .register(creativeTab -> {
+                creativeTab.accept(LEATHER_COLLAR);
+                creativeTab.accept(COPPER_COLLAR);
+                creativeTab.accept(IRON_COLLAR);
+                creativeTab.accept(DIAMOND_COLLAR);
+                creativeTab.accept(NETHERITE_COLLAR);
+            });
     }
 
     public static final Item LEATHER_SCRAP = register(

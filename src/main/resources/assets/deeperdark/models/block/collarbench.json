@@ -1,0 +1,26 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle":   "deeperdark:block/collarbench_top",
+    "top":        "deeperdark:block/collarbench_top",
+    "bottom":     "deeperdark:block/collarbench_bottom",
+    "north":      "deeperdark:block/collarbench_north_south",
+    "south":      "deeperdark:block/collarbench_north_south",
+    "east":       "deeperdark:block/collarbench_east_west",
+    "west":       "deeperdark:block/collarbench_east_west"
+  },
+  "elements": [
+    {
+      "from": [0, 0, 0],
+      "to": [16, 16, 16],
+      "faces": {
+        "down":  { "texture": "#bottom", "cullface": "down" },
+        "up":    { "texture": "#top",    "cullface": "up"   },
+        "north": { "texture": "#north",  "cullface": "north"},
+        "south": { "texture": "#south",  "cullface": "south"},
+        "west":  { "texture": "#west",   "cullface": "west" },
+        "east":  { "texture": "#east",   "cullface": "east" }
+      }
+    }
+  ]
+}

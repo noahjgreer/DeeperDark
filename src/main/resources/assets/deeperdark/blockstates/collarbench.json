@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "deeperdark:block/collarbench" },
+    "facing=south": { "model": "deeperdark:block/collarbench", "y": 180 },
+    "facing=east":  { "model": "deeperdark:block/collarbench", "y": 90  },
+    "facing=west":  { "model": "deeperdark:block/collarbench", "y": 270 }
+  }
+}

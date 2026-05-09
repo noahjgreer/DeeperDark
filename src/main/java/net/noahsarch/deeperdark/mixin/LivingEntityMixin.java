@@ -37,7 +37,7 @@ public class LivingEntityMixin {
         }
     }
 
-    @Inject(method = "getVoicePitch", at = @At("RETURN"), cancellable = true)
+@Inject(method = "getVoicePitch", at = @At("RETURN"), cancellable = true)
     private void deeperdark$getVoicePitch(CallbackInfoReturnable<Float> cir) {
         LivingEntity self = (LivingEntity) (Object) this;
 

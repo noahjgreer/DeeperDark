@@ -30,8 +30,11 @@ import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.noahsarch.deeperdark.DeeperDarkConfig;
+import net.noahsarch.deeperdark.component.CollarFuelData;
+import net.noahsarch.deeperdark.component.ModComponents;
 import net.noahsarch.deeperdark.duck.CollarHolder;
 import net.noahsarch.deeperdark.item.CollarItem;
+import net.noahsarch.deeperdark.item.CollarTier;
 import net.noahsarch.deeperdark.item.ItemMagnetItem;
 import net.noahsarch.deeperdark.sound.ModSounds;
 
@@ -118,6 +121,12 @@ public class CollarEvents {
             }
         }
 
+        // Fuel-based fire resistance and water breathing (tiered collars only)
+        CollarItem collarItem = (CollarItem) collar.getItem();
+        if (collarItem.getTier() != null) {
+            trinketsDirty |= tickFuelEffects(player, collar, collarItem.getTier(), level);
+        }
+
         if (hasBell) {
             tickBellJingle(player, level);
         }
@@ -158,6 +167,40 @@ public class CollarEvents {
         if (trinketsDirty) {
             collar.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(trinkets));
         }
+    }
+
+    private static boolean tickFuelEffects(ServerPlayer player, ItemStack collar, CollarTier tier, ServerLevel level) {
+        CollarFuelData fuel = collar.getOrDefault(ModComponents.COLLAR_FUEL, CollarFuelData.EMPTY);
+        int fireTicks  = fuel.fireTicks();
+        int waterTicks = fuel.waterTicks();
+        boolean dirty = false;
+
+        // Fire damage prevention: drain 1 fire tick per game tick while burning.
+        // Actual fire damage is cancelled by the ServerPlayerEntityMixin hurtServer() injection.
+        if (fireTicks > 0 && player.isOnFire()) {
+            fireTicks = Math.max(0, fireTicks - 1);
+            if (fireTicks == 0) {
+                level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                    SoundEvents.ITEM_BREAK, SoundSource.PLAYERS, 1.0f, 2.0f);
+            }
+            dirty = true;
+        }
+
+        // Drowning prevention: drain 1 water tick per game tick while submerged with no air.
+        // The actual drown damage is cancelled by the ServerPlayerEntityMixin hurtServer() injection.
+        if (waterTicks > 0 && player.isUnderWater() && player.getAirSupply() <= 0) {
+            waterTicks = Math.max(0, waterTicks - 1);
+            if (waterTicks == 0) {
+                level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                    SoundEvents.ITEM_BREAK, SoundSource.PLAYERS, 1.0f, 2.0f);
+            }
+            dirty = true;
+        }
+
+        if (dirty) {
+            collar.set(ModComponents.COLLAR_FUEL, new CollarFuelData(fireTicks, waterTicks));
+        }
+        return dirty;
     }
 
     private static boolean tickBlazeRod(ServerPlayer player, ItemStack rod, ServerLevel level) {

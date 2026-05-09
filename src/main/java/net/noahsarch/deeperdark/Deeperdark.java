@@ -48,6 +48,9 @@ public class Deeperdark implements ModInitializer {
 		// Register custom sounds (not in registry, just creates SoundEvent objects)
 		ModSounds.registerSounds();
 
+		// Register custom data components
+		net.noahsarch.deeperdark.component.ModComponents.initialize();
+
 		// Register custom blocks/items before recipes or events use them
 		ModBlocks.initialize();
 		ModBlockEntities.initialize();
