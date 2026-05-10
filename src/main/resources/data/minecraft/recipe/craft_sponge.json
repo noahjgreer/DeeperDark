@@ -10,9 +10,7 @@
     "x": [
       "minecraft:pufferfish"
     ],
-    "w": [
-      "minecraft:yellow_wool"
-    ]
+    "w": "#minecraft:wool"
   },
   "result": {
     "id": "minecraft:sponge",
