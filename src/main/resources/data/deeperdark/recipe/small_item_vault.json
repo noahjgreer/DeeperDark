@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "H": "minecraft:iron_ingot",
+    "O": "minecraft:ender_pearl"
+  },
+  "pattern": [
+    "HHH",
+    "HOH",
+    "HHH"
+  ],
+  "result": {
+    "id": "deeperdark:small_item_vault",
+    "count": 1
+  }
+}

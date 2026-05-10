@@ -455,20 +455,18 @@ public class CollarBenchMenu extends AbstractContainerMenu {
         resultContainer.setItem(0, ItemStack.EMPTY);
 
         if (isTrinketsDirty()) {
-            // True rollback: return the original collar unchanged.
-            // Items the player removed are already in their inventory.
-            // Items the player added are still in trinketContainer — return those too.
-            if (!lastCollarStack.isEmpty()) {
-                player.getInventory().placeItemBackInInventory(lastCollarStack.copy());
-                beContainer.setItem(COLLAR_INPUT_SLOT, ItemStack.EMPTY);
-            }
-            // Build pool of original trinket items to detect newly-added ones
+            // Reconciled cancel — avoids both dupes and free additions:
+            // • Items the player REMOVED are already in their inventory; don't re-embed them.
+            // • Items the player ADDED are still in trinketContainer; return them, don't embed.
+            // • Items that are still in their original slot remain embedded in the returned collar.
+            // Build a pool of original items to match against current slots.
             List<ItemStack> originalPool = new ArrayList<>();
             for (int i = 0; i < TRINKET_COUNT; i++) {
                 if (!originalTrinketSlots.get(i).isEmpty()) {
                     originalPool.add(originalTrinketSlots.get(i).copy());
                 }
             }
+            NonNullList<ItemStack> reconciledTrinkets = NonNullList.withSize(TRINKET_COUNT, ItemStack.EMPTY);
             for (int i = 0; i < TRINKET_COUNT; i++) {
                 ItemStack current = trinketContainer.getItem(i);
                 if (!current.isEmpty()) {
@@ -476,15 +474,25 @@ public class CollarBenchMenu extends AbstractContainerMenu {
                     for (int j = 0; j < originalPool.size(); j++) {
                         if (ItemStack.isSameItemSameComponents(originalPool.get(j), current)) {
                             originalPool.remove(j);
+                            reconciledTrinkets.set(i, current.copy());
                             fromOriginal = true;
                             break;
                         }
                     }
                     if (!fromOriginal) {
+                        // Newly added by player — return it without embedding
                         player.getInventory().placeItemBackInInventory(current.copy());
                     }
                 }
                 trinketContainer.setItem(i, ItemStack.EMPTY);
+            }
+            // Build and return the reconciled collar
+            if (!lastCollarStack.isEmpty()) {
+                ItemStack cancelledCollar = lastCollarStack.copy();
+                cancelledCollar.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(reconciledTrinkets));
+                updateModelFlags(cancelledCollar, reconciledTrinkets);
+                player.getInventory().placeItemBackInInventory(cancelledCollar);
+                beContainer.setItem(COLLAR_INPUT_SLOT, ItemStack.EMPTY);
             }
             // Return fuel (never consumed on cancel)
             ItemStack fuel = beContainer.getItem(FUEL_INPUT_SLOT);

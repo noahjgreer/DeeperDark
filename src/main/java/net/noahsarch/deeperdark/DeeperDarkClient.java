@@ -12,6 +12,7 @@ import net.minecraft.world.entity.Leashable;
 import net.noahsarch.deeperdark.autoupdate.AutoUpdater;
 import net.noahsarch.deeperdark.autoupdate.AutoUpdaterScreen;
 import net.noahsarch.deeperdark.client.screen.BoxScreen;
+import net.noahsarch.deeperdark.client.screen.VaultScreen;
 import net.noahsarch.deeperdark.intro.DeeperDarkLogoScreen;
 import net.noahsarch.deeperdark.menu.ModMenus;
 import net.noahsarch.deeperdark.payload.PlayerLeashPacket;
@@ -27,6 +28,9 @@ public class DeeperDarkClient implements ClientModInitializer {
         MenuScreens.register(ModMenus.COLLAR_BENCH, net.noahsarch.deeperdark.client.screen.CollarBenchScreen::new);
         MenuScreens.register(ModMenus.FLIMSY_BOX, BoxScreen::new);
         MenuScreens.register(ModMenus.STURDY_BOX, BoxScreen::new);
+        MenuScreens.register(ModMenus.SMALL_VAULT, VaultScreen::new);
+        MenuScreens.register(ModMenus.MEDIUM_VAULT, VaultScreen::new);
+        MenuScreens.register(ModMenus.LARGE_VAULT, VaultScreen::new);
 
         ClientPlayNetworking.registerGlobalReceiver(PlayerLeashPacket.ID, (payload, context) -> {
             context.client().execute(() -> {

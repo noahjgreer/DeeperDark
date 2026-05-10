@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "deeperdark:block/large_item_vault_bottom",
+    "up": "deeperdark:block/large_item_vault_top",
+    "north": "deeperdark:block/large_item_vault_side",
+    "south": "deeperdark:block/large_item_vault_side",
+    "east": "deeperdark:block/large_item_vault_side",
+    "west": "deeperdark:block/large_item_vault_side",
+    "particle": "deeperdark:block/large_item_vault_side"
+  }
+}

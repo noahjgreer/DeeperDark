@@ -17,6 +17,17 @@ public class ModBlockEntities {
         ).build()
     );
 
+    public static final BlockEntityType<VaultBlockEntity> VAULT = Registry.register(
+        BuiltInRegistries.BLOCK_ENTITY_TYPE,
+        Identifier.fromNamespaceAndPath(Deeperdark.MOD_ID, "vault"),
+        FabricBlockEntityTypeBuilder.create(
+            VaultBlockEntity::new,
+            ModBlocks.SMALL_ITEM_VAULT,
+            ModBlocks.MEDIUM_ITEM_VAULT,
+            ModBlocks.LARGE_ITEM_VAULT
+        ).build()
+    );
+
     public static final BlockEntityType<BoxBlockEntity> BOX = Registry.register(
         BuiltInRegistries.BLOCK_ENTITY_TYPE,
         Identifier.fromNamespaceAndPath(Deeperdark.MOD_ID, "box"),

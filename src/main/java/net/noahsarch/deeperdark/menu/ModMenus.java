@@ -31,6 +31,21 @@ public class ModMenus {
         ModMenus::createSturdyMenu
     );
 
+    public static final MenuType<VaultMenu> SMALL_VAULT = register(
+        "small_item_vault",
+        ModMenus::createSmallVaultMenu
+    );
+
+    public static final MenuType<VaultMenu> MEDIUM_VAULT = register(
+        "medium_item_vault",
+        ModMenus::createMediumVaultMenu
+    );
+
+    public static final MenuType<VaultMenu> LARGE_VAULT = register(
+        "large_item_vault",
+        ModMenus::createLargeVaultMenu
+    );
+
     private static CollarBenchMenu createCollarBenchMenu(int containerId, Inventory inventory) {
         return new CollarBenchMenu(COLLAR_BENCH, containerId, inventory, new SimpleContainer(2));
     }
@@ -45,6 +60,18 @@ public class ModMenus {
 
     private static BoxMenu createSturdyMenu(int containerId, Inventory inventory) {
         return new BoxMenu(STURDY_BOX, containerId, inventory, new SimpleContainer(6), 2);
+    }
+
+    private static VaultMenu createSmallVaultMenu(int containerId, Inventory inventory) {
+        return new VaultMenu(SMALL_VAULT, containerId, inventory, 1);
+    }
+
+    private static VaultMenu createMediumVaultMenu(int containerId, Inventory inventory) {
+        return new VaultMenu(MEDIUM_VAULT, containerId, inventory, 3);
+    }
+
+    private static VaultMenu createLargeVaultMenu(int containerId, Inventory inventory) {
+        return new VaultMenu(LARGE_VAULT, containerId, inventory, 9);
     }
 
     private static <T extends net.minecraft.world.inventory.AbstractContainerMenu> MenuType<T> register(

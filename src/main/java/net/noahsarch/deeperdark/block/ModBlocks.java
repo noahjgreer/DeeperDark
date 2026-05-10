@@ -83,6 +83,9 @@ public class ModBlocks {
             content.accept(STURDY_BOX);
             content.accept(REINFORCED_BOX);
             content.accept(COLLAR_BENCH);
+            content.accept(SMALL_ITEM_VAULT);
+            content.accept(MEDIUM_ITEM_VAULT);
+            content.accept(LARGE_ITEM_VAULT);
         });
     }
 
@@ -212,6 +215,31 @@ public class ModBlocks {
             .strength(0.5F)
             .requiresCorrectToolForDrops()
             .sound(ModSoundType.ENDER_PEARL_BLOCK),
+        true
+    );
+
+    public static final Block SMALL_ITEM_VAULT = register(
+        "small_item_vault",
+        VaultBlock::new,
+        BlockBehaviour.Properties.of()
+            .strength(150F, 1200F)
+            .sound(VaultBlock.VAULT_SOUND_TYPE),
+        true
+    );
+    public static final Block MEDIUM_ITEM_VAULT = register(
+        "medium_item_vault",
+        VaultBlock::new,
+        BlockBehaviour.Properties.of()
+            .strength(150F, 1200F)
+            .sound(VaultBlock.VAULT_SOUND_TYPE),
+        true
+    );
+    public static final Block LARGE_ITEM_VAULT = register(
+        "large_item_vault",
+        VaultBlock::new,
+        BlockBehaviour.Properties.of()
+            .strength(150F, 1200F)
+            .sound(VaultBlock.VAULT_SOUND_TYPE),
         true
     );
 

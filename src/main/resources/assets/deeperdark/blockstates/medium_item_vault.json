@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "deeperdark:block/medium_item_vault",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "deeperdark:block/medium_item_vault"
+    },
+    "facing=south": {
+      "model": "deeperdark:block/medium_item_vault",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "deeperdark:block/medium_item_vault",
+      "y": 270
+    }
+  }
+}

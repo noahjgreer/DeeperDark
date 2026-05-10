@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "deeperdark:medium_item_vault"
+        }
+      ]
+    }
+  ],
+  "random_sequence": "deeperdark:blocks/medium_item_vault"
+}

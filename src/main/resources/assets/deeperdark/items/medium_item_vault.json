@@ -1,0 +1,6 @@
+{
+    "model": {
+        "type": "minecraft:model",
+        "model": "deeperdark:block/medium_item_vault"
+    }
+}

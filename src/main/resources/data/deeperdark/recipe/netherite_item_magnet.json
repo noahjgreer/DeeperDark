@@ -1,14 +1,8 @@
 {
   "type": "minecraft:smithing_transform",
-  "template": {
-    "item": "minecraft:netherite_upgrade_smithing_template"
-  },
-  "base": {
-    "item": "deeperdark:diamond_item_magnet"
-  },
-  "addition": {
-    "item": "minecraft:netherite_ingot"
-  },
+  "template": "minecraft:netherite_upgrade_smithing_template",
+  "base": "deeperdark:diamond_item_magnet",
+  "addition": "minecraft:netherite_ingot",
   "result": {
     "id": "deeperdark:netherite_item_magnet"
   }
