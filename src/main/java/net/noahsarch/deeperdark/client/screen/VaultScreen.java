@@ -28,7 +28,7 @@ public class VaultScreen extends AbstractContainerScreen<VaultMenu> {
 
     // Wiki-defined stats box X end (absolute panel pixel from leftPos)
     // Small: 24..117, Medium: 12..105, Large: 12..129
-    private static final int[] STATS_BOX_X_END = {0, 117, 105, 0, 0, 0, 0, 0, 0, 129};
+    private static final int[] STATS_BOX_X_END = {0, 117, 0, 105, 0, 0, 0, 0, 0, 129};
 
     private final Identifier texture;
     private final int maxTypes;
@@ -95,7 +95,7 @@ public class VaultScreen extends AbstractContainerScreen<VaultMenu> {
                 int count = menu.getStoredCount(i);
                 int yPos = topPos + statsStartY + i * 11;
                 if (maxTypes == 9) {
-                    yPos = (-3 + topPos) + statsStartY + i * 11;
+                    yPos = (-2 + topPos) + statsStartY + i * 11;
                 }
                 String line = truncateWithEllipsis(
                     String.format("%,d x %s", count, item.getHoverName().getString()));

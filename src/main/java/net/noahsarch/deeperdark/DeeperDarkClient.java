@@ -7,7 +7,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.MenuScreens;
-import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Leashable;
 import net.noahsarch.deeperdark.autoupdate.AutoUpdater;
@@ -35,7 +35,7 @@ public class DeeperDarkClient implements ClientModInitializer {
         MenuScreens.register(ModMenus.MEDIUM_VAULT, VaultScreen::new);
         MenuScreens.register(ModMenus.LARGE_VAULT, VaultScreen::new);
 
-        BlockEntityRendererRegistry.register(ModBlockEntities.VAULT, VaultBlockEntityRenderer::new);
+        BlockEntityRenderers.register(ModBlockEntities.VAULT, VaultBlockEntityRenderer::new);
 
         ClientPlayNetworking.registerGlobalReceiver(PlayerLeashPacket.ID, (payload, context) -> {
             context.client().execute(() -> {

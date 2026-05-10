@@ -65,7 +65,7 @@ public class VaultBlockEntityRenderer implements BlockEntityRenderer<VaultBlockE
         if (state.displayItem == null) return;
 
         poseStack.pushPose();
-        poseStack.translate(0.5f, 0.4f, 0.5f);
+        poseStack.translate(0.5f, 0.15f, 0.5f);
         poseStack.mulPose(Axis.YP.rotationDegrees(state.spin));
         poseStack.scale(2.0f, 2.0f, 2.0f);
         ItemEntityRenderer.renderMultipleFromCount(poseStack, nodes, state.lightCoords, state.displayItem, random);
