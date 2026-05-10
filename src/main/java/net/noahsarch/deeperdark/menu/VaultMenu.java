@@ -66,11 +66,11 @@ public class VaultMenu extends AbstractContainerMenu {
             vaultPos = new int[][]{{137, 32}};
             invX = 8; invY = 84;
         } else if (maxTypes == 3) {
-            vaultPos = new int[][]{{133, 50}, {120, 76}, {146, 76}};
-            invX = 8; invY = 100;
+            vaultPos = new int[][]{{134, 51}, {121, 77}, {147, 77}};
+            invX = 8; invY = 140;
         } else {
-            vaultPos = new int[][]{{149,22},{175,22},{201,22},{149,48},{175,48},{201,48},{149,74},{175,74},{201,74}};
-            invX = 36; invY = 134;
+            vaultPos = new int[][]{{149,38},{175,38},{201,38},{149,64},{175,64},{201,64},{149,90},{175,90},{201,90}};
+            invX = 36; invY = 137;
         }
 
         for (int i = 0; i < maxTypes; i++) {
@@ -88,15 +88,49 @@ public class VaultMenu extends AbstractContainerMenu {
         addStandardInventorySlots(playerInventory, invX, invY);
     }
 
-    // Deposit items from cursor onto a vault display slot
     @Override
     public void clicked(int slotId, int button, ContainerInput containerInput, Player player) {
         if (vault != null && slotId >= 0 && slotId < maxTypes && containerInput == ContainerInput.PICKUP) {
             ItemStack cursor = getCarried();
+
+            if (button == 1) {
+                // Right-click on a vault slot: take 1 item from vault onto cursor (if compatible)
+                VaultBlockEntity.VaultEntry entry = vault.getEntry(slotId);
+                if (entry != null && entry.count > 0) {
+                    if (cursor.isEmpty() || ItemStack.isSameItemSameComponents(cursor, entry.representative)) {
+                        ItemStack taken = vault.withdraw(slotId, 1);
+                        if (!taken.isEmpty()) {
+                            if (cursor.isEmpty()) {
+                                setCarried(taken);
+                            } else {
+                                cursor.grow(1);
+                                setCarried(cursor);
+                            }
+                            vault.setChanged();
+                        }
+                    }
+                }
+                return;
+            }
+
+            // Left-click: deposit cursor items if compatible, otherwise take a full stack
             if (!cursor.isEmpty() && vault.canAccept(cursor)) {
                 ItemStack remainder = vault.addItems(cursor.copy());
                 setCarried(remainder.isEmpty() ? ItemStack.EMPTY : remainder);
                 vault.setChanged();
+                return;
+            }
+            if (cursor.isEmpty()) {
+                // Left-click with empty cursor: take up to a full stack
+                VaultBlockEntity.VaultEntry entry = vault.getEntry(slotId);
+                if (entry != null && entry.count > 0) {
+                    int take = Math.min(entry.count, Math.min(entry.representative.getMaxStackSize(), 64));
+                    ItemStack taken = vault.withdraw(slotId, take);
+                    if (!taken.isEmpty()) {
+                        setCarried(taken);
+                        vault.setChanged();
+                    }
+                }
                 return;
             }
         }
@@ -130,20 +164,20 @@ public class VaultMenu extends AbstractContainerMenu {
 
             int available = vault.getCount(vds.entryIndex);
             if (available <= 0) return ItemStack.EMPTY;
-            int stackSize = Math.min(available, display.getMaxStackSize());
+            int stackSize = Math.min(available, Math.min(display.getMaxStackSize(), 64));
 
             ItemStack taken = vault.withdraw(vds.entryIndex, stackSize);
             if (taken.isEmpty()) return ItemStack.EMPTY;
 
             ItemStack toPlace = taken.copy();
             moveItemStackTo(toPlace, invStart, invEnd, true);
-            int placed = taken.getCount() - toPlace.getCount();
-
             if (!toPlace.isEmpty()) {
                 vault.addItems(toPlace);
             }
             vault.setChanged();
-            return placed > 0 ? taken.copyWithCount(placed) : ItemStack.EMPTY;
+            // Always return EMPTY to prevent the game from repeating quickMoveStack
+            // in a loop until the vault is exhausted (one batch per shift-click is intended)
+            return ItemStack.EMPTY;
 
         } else if (slotIndex >= invStart && vault != null) {
             // Player inventory → deposit directly into vault
@@ -193,7 +227,7 @@ public class VaultMenu extends AbstractContainerMenu {
     public static int getImageHeight(int maxTypes) {
         return switch (maxTypes) {
             case 1  -> 166;
-            case 3  -> 182;
+            case 3  -> 222;
             default -> 220;
         };
     }

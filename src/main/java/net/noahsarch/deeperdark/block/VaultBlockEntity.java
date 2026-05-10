@@ -3,16 +3,21 @@ package net.noahsarch.deeperdark.block;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponentGetter;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.Container;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
@@ -24,7 +29,7 @@ import net.noahsarch.deeperdark.menu.VaultMenu;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VaultBlockEntity extends BlockEntity implements MenuProvider {
+public class VaultBlockEntity extends BlockEntity implements MenuProvider, Container {
 
     public static class VaultEntry {
         public ItemStack representative;
@@ -131,6 +136,48 @@ public class VaultBlockEntity extends BlockEntity implements MenuProvider {
         return result;
     }
 
+    @Override
+    protected void collectImplicitComponents(DataComponentMap.Builder builder) {
+        super.collectImplicitComponents(builder);
+        List<ItemStack> stacks = new ArrayList<>();
+        for (VaultEntry entry : entries) {
+            // Split into maxStackSize batches so ItemStack.validateStrict passes
+            int batchSize = entry.representative.getMaxStackSize();
+            int remaining = entry.count;
+            while (remaining > 0) {
+                int batch = Math.min(remaining, batchSize);
+                stacks.add(entry.representative.copyWithCount(batch));
+                remaining -= batch;
+            }
+        }
+        if (!stacks.isEmpty()) {
+            builder.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(stacks));
+        }
+    }
+
+    @Override
+    protected void applyImplicitComponents(DataComponentGetter getter) {
+        super.applyImplicitComponents(getter);
+        ItemContainerContents contents = getter.get(DataComponents.CONTAINER);
+        if (contents == null) return;
+        entries.clear();
+        // Merge consecutive same-item stacks back into single entries
+        for (net.minecraft.world.item.ItemStackTemplate template : contents.nonEmptyItems()) {
+            ItemStack stack = template.create();
+            if (stack.isEmpty()) continue;
+            if (!entries.isEmpty()) {
+                VaultEntry last = entries.get(entries.size() - 1);
+                if (ItemStack.isSameItemSameComponents(last.representative, stack)) {
+                    last.count += stack.getCount();
+                    continue;
+                }
+            }
+            if (entries.size() < tier.maxTypes) {
+                entries.add(new VaultEntry(stack.copyWithCount(1), stack.getCount()));
+            }
+        }
+    }
+
     public boolean stillValid(Player player) {
         if (level == null) return false;
         if (level.getBlockEntity(worldPosition) != this) return false;
@@ -175,6 +222,33 @@ public class VaultBlockEntity extends BlockEntity implements MenuProvider {
     public AbstractContainerMenu createMenu(int containerId, Inventory inventory, Player player) {
         return new VaultMenu(tier.getMenuType(), containerId, inventory, this);
     }
+
+    // ---- Container (hopper support: deposit-only) ----
+
+    @Override public int getContainerSize() { return 1; }
+    @Override public boolean isEmpty() { return entries.isEmpty(); }
+
+    /** Always empty so hoppers see a free slot and will try to insert. */
+    @Override public ItemStack getItem(int slot) { return ItemStack.EMPTY; }
+
+    /** Hoppers don't extract from vaults. */
+    @Override public ItemStack removeItem(int slot, int amount) { return ItemStack.EMPTY; }
+    @Override public ItemStack removeItemNoUpdate(int slot) { return ItemStack.EMPTY; }
+
+    @Override
+    public void setItem(int slot, ItemStack stack) {
+        if (!stack.isEmpty()) {
+            addItems(stack);
+            setChanged();
+        }
+    }
+
+    @Override
+    public boolean canPlaceItem(int slot, ItemStack stack) { return canAccept(stack); }
+
+    @Override public void clearContent() { entries.clear(); setChanged(); }
+
+    // ---- End Container ----
 
     enum VaultTier {
         SMALL(1, "container.deeperdark.small_item_vault"),

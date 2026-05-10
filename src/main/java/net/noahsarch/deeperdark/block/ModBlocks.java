@@ -223,7 +223,8 @@ public class ModBlocks {
         VaultBlock::new,
         BlockBehaviour.Properties.of()
             .strength(150F, 1200F)
-            .sound(VaultBlock.VAULT_SOUND_TYPE),
+            .sound(VaultBlock.VAULT_SOUND_TYPE)
+            .noOcclusion(),
         true
     );
     public static final Block MEDIUM_ITEM_VAULT = register(
@@ -231,7 +232,8 @@ public class ModBlocks {
         VaultBlock::new,
         BlockBehaviour.Properties.of()
             .strength(150F, 1200F)
-            .sound(VaultBlock.VAULT_SOUND_TYPE),
+            .sound(VaultBlock.VAULT_SOUND_TYPE)
+            .noOcclusion(),
         true
     );
     public static final Block LARGE_ITEM_VAULT = register(
@@ -239,7 +241,8 @@ public class ModBlocks {
         VaultBlock::new,
         BlockBehaviour.Properties.of()
             .strength(150F, 1200F)
-            .sound(VaultBlock.VAULT_SOUND_TYPE),
+            .sound(VaultBlock.VAULT_SOUND_TYPE)
+            .noOcclusion(),
         true
     );
 
