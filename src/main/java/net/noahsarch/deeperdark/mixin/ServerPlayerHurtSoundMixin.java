@@ -9,11 +9,13 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ServerPlayer.class)
-public abstract class ServerPlayerEntityDeathSoundMixin {
+public abstract class ServerPlayerHurtSoundMixin {
 
-    @Inject(method = "die", at = @At("HEAD"))
-    private void deeperdark$playDeathSound(DamageSource damageSource, CallbackInfo ci) {
+    @Inject(method = "playHurtSound", at = @At("HEAD"), cancellable = true)
+    private void deeperdark$replaceHurtSound(DamageSource source, CallbackInfo ci) {
         ServerPlayer self = (ServerPlayer) (Object) this;
-        PlayerSoundManager.playDeathMessageSound(self);
+        if (PlayerSoundManager.playHurtSound(self)) {
+            ci.cancel();
+        }
     }
 }

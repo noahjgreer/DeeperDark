@@ -52,76 +52,71 @@ public class DeeperDarkConfig {
         public ItemMagnetVariantConfig netherite = new ItemMagnetVariantConfig(85, 1.0);
     }
 
-    public static class ChatSoundProfile {
+    public static class PlayerSoundProfile {
         public String sendMessageSound = "";
         public String deathMessageSound = "";
         public String joinMessageSound = "";
+        public String hurtSound = "";
         public double pitch = 1.0;
         public double pitchDeviance = 0.0;
 
-        public ChatSoundProfile() {
-        }
-
-        public ChatSoundProfile(String sendMessageSound, String deathMessageSound, String joinMessageSound, double pitch, double pitchDeviance) {
-            this.sendMessageSound = sendMessageSound;
-            this.deathMessageSound = deathMessageSound;
-            this.joinMessageSound = joinMessageSound;
-            this.pitch = pitch;
-            this.pitchDeviance = pitchDeviance;
+        public PlayerSoundProfile() {
         }
     }
 
     @SuppressWarnings("unchecked")
-    private static void convertChatSoundProfiles(ConfigInstance config) {
-        if (config.chatSounds == null) return;
-        // SnakeYAML deserializes Map<String, ChatSoundProfile> values as LinkedHashMap when
+    private static void convertPlayerSoundProfiles(ConfigInstance config) {
+        if (config.playerSounds == null) return;
+        // SnakeYAML deserializes Map<String, PlayerSoundProfile> values as LinkedHashMap when
         // no type tag is present in the YAML (e.g. user-edited files). Convert them explicitly.
-        Map<String, Object> raw = (Map<String, Object>) (Map<?, ?>) config.chatSounds;
-        Map<String, ChatSoundProfile> converted = new HashMap<>();
+        Map<String, Object> raw = (Map<String, Object>) (Map<?, ?>) config.playerSounds;
+        Map<String, PlayerSoundProfile> converted = new HashMap<>();
         for (Map.Entry<String, Object> entry : raw.entrySet()) {
             Object val = entry.getValue();
-            if (val instanceof ChatSoundProfile csp) {
+            if (val instanceof PlayerSoundProfile csp) {
                 converted.put(entry.getKey(), csp);
             } else if (val instanceof Map<?, ?> m) {
-                ChatSoundProfile profile = new ChatSoundProfile();
+                PlayerSoundProfile profile = new PlayerSoundProfile();
                 Object send = m.get("sendMessageSound");
                 Object death = m.get("deathMessageSound");
                 Object join = m.get("joinMessageSound");
+                Object hurt = m.get("hurtSound");
                 Object pitch = m.get("pitch");
                 Object deviance = m.get("pitchDeviance");
                 if (send instanceof String s) profile.sendMessageSound = s;
                 if (death instanceof String s) profile.deathMessageSound = s;
                 if (join instanceof String s) profile.joinMessageSound = s;
+                if (hurt instanceof String s) profile.hurtSound = s;
                 if (pitch instanceof Number n) profile.pitch = n.doubleValue();
                 if (deviance instanceof Number n) profile.pitchDeviance = n.doubleValue();
                 converted.put(entry.getKey(), profile);
             }
         }
-        config.chatSounds = converted;
+        config.playerSounds = converted;
     }
 
     private static boolean normalizeLoadedConfig(ConfigInstance config) {
         boolean changed = false;
 
-        // Fix deserialization: SnakeYAML may load ChatSoundProfile values as plain maps
-        convertChatSoundProfiles(config);
+        // Fix deserialization: SnakeYAML may load PlayerSoundProfile values as plain maps
+        convertPlayerSoundProfiles(config);
 
-        if (config.chatSounds == null) {
-            config.chatSounds = new HashMap<>();
+        if (config.playerSounds == null) {
+            config.playerSounds = new HashMap<>();
             changed = true;
         }
 
-        if (config.chatSoundVolumes == null) {
-            config.chatSoundVolumes = new HashMap<>();
+        if (config.playerSoundVolumes == null) {
+            config.playerSoundVolumes = new HashMap<>();
             changed = true;
         }
 
-        if (config.chatSoundExclusions == null) {
-            config.chatSoundExclusions = new ArrayList<>();
+        if (config.playerSoundExclusions == null) {
+            config.playerSoundExclusions = new ArrayList<>();
             changed = true;
         } else {
             List<String> normalized = new ArrayList<>();
-            for (String excluded : config.chatSoundExclusions) {
+            for (String excluded : config.playerSoundExclusions) {
                 if (excluded == null || excluded.isBlank()) {
                     changed = true;
                     continue;
@@ -138,7 +133,7 @@ public class DeeperDarkConfig {
                     changed = true;
                 }
             }
-            config.chatSoundExclusions = normalized;
+            config.playerSoundExclusions = normalized;
         }
 
         if (config.leavesDecayMaxTicks < config.leavesDecayMinTicks) {
@@ -224,10 +219,10 @@ public class DeeperDarkConfig {
         // Zombie behavior configuration
         public double zombieFollowRange = 35.0; // How far zombies can detect and track players (vanilla default: 35.0)
 
-        // Chat sounds configuration
-        public Map<String, ChatSoundProfile> chatSounds = new HashMap<>();
-        public List<String> chatSoundExclusions = new ArrayList<>();
-        public Map<String, Double> chatSoundVolumes = new HashMap<>();
+        // Player sounds configuration
+        public Map<String, PlayerSoundProfile> playerSounds = new HashMap<>();
+        public List<String> playerSoundExclusions = new ArrayList<>();
+        public Map<String, Double> playerSoundVolumes = new HashMap<>();
 
         // Leaves Be Gone (server-only port) configuration
         public boolean leavesBeGoneEnabled = true;
@@ -365,18 +360,19 @@ public class DeeperDarkConfig {
                     # Zombie Behavior Configuration:
                     # zombieFollowRange: how far zombies can detect and track players (vanilla default: 35.0)
                     #
-                    # Chat Sounds Configuration:
-                    # chatSounds: per-player sound settings used for chat/death/join events.
+                    # Player Sounds Configuration:
+                    # playerSounds: per-player sound settings used for message/death/join/hurt events.
                     #   Entry format:
                     #     PlayerName:
                     #       sendMessageSound: entity.cat.ambient
                     #       deathMessageSound: entity.cat.death
                     #       joinMessageSound: entity.cat.stray_ambient
+                    #       hurtSound: entity.cat.hurt  (played nearby only, replaces vanilla hurt sound)
                     #       pitch: 1.0
                     #       pitchDeviance: 0.2
-                    # chatSoundExclusions: lowercase player names who opted out via /ddclient chat_sounds false.
-                    # chatSoundVolumes: per-player volume (0.0-1.0) for hearing chat sounds. Default is 0.8.
-                    #   Set via /ddclient chat_sounds volume <0.0-1.0>. Example:
+                    # playerSoundExclusions: lowercase player names who opted out via /ddclient player_sounds false.
+                    # playerSoundVolumes: per-player volume (0.0-1.0) for hearing player sounds. Default is 0.8.
+                    #   Set via /ddclient player_sounds volume <0.0-1.0>. Example:
                     #     FinniTheFox: 0.5
                     #
                     # Leaves Be Gone (server-only port):
@@ -410,7 +406,7 @@ public class DeeperDarkConfig {
             // Use a representer to avoid global tag issues with nested classes
             org.yaml.snakeyaml.representer.Representer representer = new org.yaml.snakeyaml.representer.Representer(options);
             representer.addClassTag(ConfigInstance.class, org.yaml.snakeyaml.nodes.Tag.MAP);
-            representer.addClassTag(ChatSoundProfile.class, org.yaml.snakeyaml.nodes.Tag.MAP);
+            representer.addClassTag(PlayerSoundProfile.class, org.yaml.snakeyaml.nodes.Tag.MAP);
             representer.addClassTag(AutoUpdaterConfig.class, org.yaml.snakeyaml.nodes.Tag.MAP);
             representer.addClassTag(ItemMagnetConfig.class, org.yaml.snakeyaml.nodes.Tag.MAP);
             representer.addClassTag(ItemMagnetVariantConfig.class, org.yaml.snakeyaml.nodes.Tag.MAP);

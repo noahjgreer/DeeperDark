@@ -3,7 +3,7 @@ package net.noahsarch.deeperdark.mixin;
 import net.minecraft.network.protocol.game.ServerboundChatPacket;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.server.level.ServerPlayer;
-import net.noahsarch.deeperdark.sound.ChatSoundManager;
+import net.noahsarch.deeperdark.sound.PlayerSoundManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -27,6 +27,6 @@ public abstract class ServerPlayNetworkHandlerChatSoundMixin {
             return;
         }
 
-        server.execute(() -> ChatSoundManager.playSendMessageSound(this.player));
+        server.execute(() -> PlayerSoundManager.playSendMessageSound(this.player));
     }
 }

@@ -75,6 +75,7 @@
     "ServerPlayNetworkHandlerChatSoundMixin",
     "PlayerManagerJoinSoundMixin",
     "ServerPlayerEntityDeathSoundMixin",
+    "ServerPlayerHurtSoundMixin",
     "LeavesBeGoneServerLevelMixin",
     "LeavesBeGoneLevelChunkMixin",
     "LeavesBeGoneLeavesBlockMixin",

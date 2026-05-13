@@ -27,7 +27,7 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * Client-preference commands that players can run for personal settings.
- * Operators can additionally target other players via /ddclient chat_sounds set <player> ...
+ * Operators can additionally target other players via /ddclient player_sounds set <player> ...
  */
 public class DeeperDarkClientCommands {
 
@@ -35,10 +35,10 @@ public class DeeperDarkClientCommands {
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) ->
             dispatcher.register(Commands.literal("ddclient")
                 .requires(source -> source.getEntity() instanceof ServerPlayer)
-                .then(Commands.literal("chat_sounds")
-                    .executes(DeeperDarkClientCommands::executeChatSoundsQuery)
+                .then(Commands.literal("player_sounds")
+                    .executes(DeeperDarkClientCommands::executePlayerSoundsQuery)
                     .then(Commands.argument("enabled", BoolArgumentType.bool())
-                        .executes(DeeperDarkClientCommands::executeChatSoundsSet))
+                        .executes(DeeperDarkClientCommands::executePlayerSoundsSet))
 
                     // Volume (self only)
                     .then(Commands.literal("volume")
@@ -59,6 +59,10 @@ public class DeeperDarkClientCommands {
                         .then(Commands.argument("sound", StringArgumentType.word())
                             .suggests(DeeperDarkClientCommands::suggestSounds)
                             .executes(ctx -> executeSetSelfProfileField(ctx, "join"))))
+                    .then(Commands.literal("hurt")
+                        .then(Commands.argument("sound", StringArgumentType.word())
+                            .suggests(DeeperDarkClientCommands::suggestSounds)
+                            .executes(ctx -> executeSetSelfProfileField(ctx, "hurt"))))
                     .then(Commands.literal("pitch")
                         .then(Commands.argument("pitch", DoubleArgumentType.doubleArg(0.01, 4.0))
                             .executes(ctx -> executeSetSelfProfileField(ctx, "pitch"))))
@@ -83,6 +87,10 @@ public class DeeperDarkClientCommands {
                                 .then(Commands.argument("sound", StringArgumentType.word())
                                     .suggests(DeeperDarkClientCommands::suggestSounds)
                                     .executes(ctx -> executeSetOpProfileField(ctx, "join"))))
+                            .then(Commands.literal("hurt")
+                                .then(Commands.argument("sound", StringArgumentType.word())
+                                    .suggests(DeeperDarkClientCommands::suggestSounds)
+                                    .executes(ctx -> executeSetOpProfileField(ctx, "hurt"))))
                             .then(Commands.literal("pitch")
                                 .then(Commands.argument("pitch", DoubleArgumentType.doubleArg(0.01, 4.0))
                                     .executes(ctx -> executeSetOpProfileField(ctx, "pitch"))))
@@ -109,37 +117,37 @@ public class DeeperDarkClientCommands {
         );
     }
 
-    // ===== Chat sounds toggle =====
+    // ===== Player sounds toggle =====
 
-    private static int executeChatSoundsQuery(CommandContext<CommandSourceStack> context) {
+    private static int executePlayerSoundsQuery(CommandContext<CommandSourceStack> context) {
         ServerPlayer player = requirePlayer(context);
         if (player == null) return 0;
 
-        boolean enabled = isChatSoundsEnabledFor(player);
-        context.getSource().sendSuccess(() -> Component.literal("Chat sounds are currently ")
+        boolean enabled = isPlayerSoundsEnabledFor(player);
+        context.getSource().sendSuccess(() -> Component.literal("Player sounds are currently ")
             .withStyle(ChatFormatting.WHITE)
             .append(Component.literal(enabled ? "enabled" : "disabled")
                 .withStyle(enabled ? ChatFormatting.GREEN : ChatFormatting.RED)), false);
         return 1;
     }
 
-    private static int executeChatSoundsSet(CommandContext<CommandSourceStack> context) {
+    private static int executePlayerSoundsSet(CommandContext<CommandSourceStack> context) {
         ServerPlayer player = requirePlayer(context);
         if (player == null) return 0;
 
         boolean enabled = BoolArgumentType.getBool(context, "enabled");
         DeeperDarkConfig.ConfigInstance config = DeeperDarkConfig.get();
-        if (config.chatSoundExclusions == null) config.chatSoundExclusions = new ArrayList<>();
+        if (config.playerSoundExclusions == null) config.playerSoundExclusions = new ArrayList<>();
 
         String playerNameLower = player.getName().getString().toLowerCase(Locale.ROOT);
         if (enabled) {
-            removeIgnoreCase(config.chatSoundExclusions, playerNameLower);
-        } else if (!containsIgnoreCase(config.chatSoundExclusions, playerNameLower)) {
-            config.chatSoundExclusions.add(playerNameLower);
+            removeIgnoreCase(config.playerSoundExclusions, playerNameLower);
+        } else if (!containsIgnoreCase(config.playerSoundExclusions, playerNameLower)) {
+            config.playerSoundExclusions.add(playerNameLower);
         }
         DeeperDarkConfig.save();
 
-        context.getSource().sendSuccess(() -> Component.literal("Chat sounds ")
+        context.getSource().sendSuccess(() -> Component.literal("Player sounds ")
             .withStyle(ChatFormatting.WHITE)
             .append(Component.literal(enabled ? "enabled" : "disabled")
                 .withStyle(enabled ? ChatFormatting.GREEN : ChatFormatting.RED))
@@ -154,7 +162,7 @@ public class DeeperDarkClientCommands {
         if (player == null) return 0;
 
         double volume = getVolumeFor(player);
-        context.getSource().sendSuccess(() -> Component.literal("Chat sound volume: ")
+        context.getSource().sendSuccess(() -> Component.literal("Player sound volume: ")
             .withStyle(ChatFormatting.WHITE)
             .append(Component.literal(String.format("%.2f", volume)).withStyle(ChatFormatting.AQUA))
             .append(Component.literal(" (default: 0.80)").withStyle(ChatFormatting.GRAY)), false);
@@ -167,12 +175,12 @@ public class DeeperDarkClientCommands {
 
         double volume = DoubleArgumentType.getDouble(context, "volume");
         DeeperDarkConfig.ConfigInstance config = DeeperDarkConfig.get();
-        if (config.chatSoundVolumes == null) config.chatSoundVolumes = new HashMap<>();
+        if (config.playerSoundVolumes == null) config.playerSoundVolumes = new HashMap<>();
 
-        config.chatSoundVolumes.put(player.getName().getString(), volume);
+        config.playerSoundVolumes.put(player.getName().getString(), volume);
         DeeperDarkConfig.save();
 
-        context.getSource().sendSuccess(() -> Component.literal("Chat sound volume set to ")
+        context.getSource().sendSuccess(() -> Component.literal("Player sound volume set to ")
             .withStyle(ChatFormatting.WHITE)
             .append(Component.literal(String.format("%.2f", volume)).withStyle(ChatFormatting.AQUA))
             .append(Component.literal(".").withStyle(ChatFormatting.WHITE)), false);
@@ -193,7 +201,7 @@ public class DeeperDarkClientCommands {
     }
 
     private static int applyProfileField(CommandContext<CommandSourceStack> context, String targetName, String field) {
-        DeeperDarkConfig.ChatSoundProfile profile = getOrCreateProfile(targetName);
+        DeeperDarkConfig.PlayerSoundProfile profile = getOrCreateProfile(targetName);
 
         String displayValue;
         switch (field) {
@@ -210,6 +218,11 @@ public class DeeperDarkClientCommands {
             case "join" -> {
                 String sound = StringArgumentType.getString(context, "sound");
                 profile.joinMessageSound = sound;
+                displayValue = sound;
+            }
+            case "hurt" -> {
+                String sound = StringArgumentType.getString(context, "sound");
+                profile.hurtSound = sound;
                 displayValue = sound;
             }
             case "pitch" -> {
@@ -243,36 +256,36 @@ public class DeeperDarkClientCommands {
 
     // ===== Helpers =====
 
-    private static DeeperDarkConfig.ChatSoundProfile getOrCreateProfile(String playerName) {
+    private static DeeperDarkConfig.PlayerSoundProfile getOrCreateProfile(String playerName) {
         DeeperDarkConfig.ConfigInstance config = DeeperDarkConfig.get();
-        if (config.chatSounds == null) config.chatSounds = new HashMap<>();
-        DeeperDarkConfig.ChatSoundProfile profile = config.chatSounds.get(playerName);
+        if (config.playerSounds == null) config.playerSounds = new HashMap<>();
+        DeeperDarkConfig.PlayerSoundProfile profile = config.playerSounds.get(playerName);
         if (profile != null) return profile;
-        for (Map.Entry<String, DeeperDarkConfig.ChatSoundProfile> entry : config.chatSounds.entrySet()) {
+        for (Map.Entry<String, DeeperDarkConfig.PlayerSoundProfile> entry : config.playerSounds.entrySet()) {
             if (entry.getKey().equalsIgnoreCase(playerName)) return entry.getValue();
         }
-        profile = new DeeperDarkConfig.ChatSoundProfile();
-        config.chatSounds.put(playerName, profile);
+        profile = new DeeperDarkConfig.PlayerSoundProfile();
+        config.playerSounds.put(playerName, profile);
         return profile;
     }
 
     private static double getVolumeFor(ServerPlayer player) {
         DeeperDarkConfig.ConfigInstance config = DeeperDarkConfig.get();
-        if (config.chatSoundVolumes == null || config.chatSoundVolumes.isEmpty()) return 0.8;
+        if (config.playerSoundVolumes == null || config.playerSoundVolumes.isEmpty()) return 0.8;
         String name = player.getName().getString();
-        Double vol = config.chatSoundVolumes.get(name);
+        Double vol = config.playerSoundVolumes.get(name);
         if (vol != null) return vol;
-        for (Map.Entry<String, Double> entry : config.chatSoundVolumes.entrySet()) {
+        for (Map.Entry<String, Double> entry : config.playerSoundVolumes.entrySet()) {
             if (entry.getKey().equalsIgnoreCase(name)) return entry.getValue();
         }
         return 0.8;
     }
 
-    private static boolean isChatSoundsEnabledFor(ServerPlayer player) {
+    private static boolean isPlayerSoundsEnabledFor(ServerPlayer player) {
         DeeperDarkConfig.ConfigInstance config = DeeperDarkConfig.get();
-        if (config.chatSoundExclusions == null) return true;
+        if (config.playerSoundExclusions == null) return true;
         String playerNameLower = player.getName().getString().toLowerCase(Locale.ROOT);
-        return !containsIgnoreCase(config.chatSoundExclusions, playerNameLower);
+        return !containsIgnoreCase(config.playerSoundExclusions, playerNameLower);
     }
 
     private static ServerPlayer requirePlayer(CommandContext<CommandSourceStack> context) {
