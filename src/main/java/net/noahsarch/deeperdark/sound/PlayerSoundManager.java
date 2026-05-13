@@ -152,12 +152,13 @@ public class PlayerSoundManager {
     private static Identifier parseSoundId(String rawSoundId) {
         try {
             if (rawSoundId.contains(":")) {
-                return Identifier.withDefaultNamespace(rawSoundId);
+                int colon = rawSoundId.indexOf(':');
+                return Identifier.fromNamespaceAndPath(rawSoundId.substring(0, colon), rawSoundId.substring(colon + 1));
             }
             if (rawSoundId.startsWith("entity.snake.")) {
                 return Identifier.fromNamespaceAndPath("deeperdark", rawSoundId);
             }
-            return Identifier.withDefaultNamespace(rawSoundId);
+            return Identifier.fromNamespaceAndPath("minecraft", rawSoundId);
         } catch (Exception e) {
             LOGGER.warn("[PlayerSounds] Invalid sound id '{}': {}", rawSoundId, e.getMessage());
             return null;
