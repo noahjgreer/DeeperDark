@@ -243,7 +243,10 @@ public class VaultMenu extends AbstractContainerMenu {
             this.entryIndex = entryIndex;
         }
 
-        @Override public boolean mayPlace(ItemStack stack) { return false; }
+        @Override public boolean mayPlace(ItemStack stack) { return vault != null && vault.canAccept(stack); }
+
+        @Override public int getMaxStackSize() { return Integer.MAX_VALUE / 2; }
+        @Override public int getMaxStackSize(ItemStack stack) { return Integer.MAX_VALUE / 2; }
 
         @Override
         public boolean mayPickup(Player player) {
