@@ -42,12 +42,26 @@ dependencies {
 	// YAML config support - include it in the jar
 	include implementation('org.yaml:snakeyaml:2.1')
 
-	// LambDynamicLights soft dependency (compile-only; not bundled, must be provided at runtime)
-	compileOnly files(
-		"C:/Users/Admin/AppData/Roaming/PrismLauncher/instances/Fabulously Optimized/minecraft/.fabric/processedMods/lambdynlights_api-4.10.2+26.1.2-72f30f705bda1a25.jar",
+	// Optional dev-test mods are installed via the installDevMods task (see below).
+
+	// LambDynamicLights soft dependency (compile-only; not bundled, must be provided at runtime)    
+    compileOnly files(
+		"libs/lambdynamiclights-api-4.10.2+26.1.2.jar",
 		"libs/yumi-commons-event-2.0.0.jar",
 		"libs/yumi-commons-core-2.0.0.jar",
 		"libs/yumi-commons-collections-2.0.0.jar"
+	)
+
+	// ChestTracker + jackfredlib soft dependency (compile-only; not bundled)
+	compileOnly files(
+		"libs/chesttracker-2.8.2+26.1.2.jar",
+		"libs/jackfredlib-0.10.7+1.21.6.jar",
+		"libs/jackfredlib-base-1.4.1+1.21.6.jar"
+	)
+
+	// Stack to Nearby Chests soft dependency (compile-only; not bundled)
+	compileOnly files(
+		"libs/stack-to-nearby-chests-mc26.1.1-0.5.16.jar"
 	)
 }
 
@@ -117,6 +131,113 @@ jar {
 		rename { "${it}_${inputs.properties.archivesName}"}
 	}
 }
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Dev-mode optional mod installer
+//
+// MC 26.1.2 ships unobfuscated (official == named).  Loom's remapper still
+// fails on modLocalRuntime JARs because the empty mappings.tiny has no class
+// entries to satisfy access widener lookups.  This task sidesteps the remapper
+// entirely: it copies each optional mod JAR to run/mods/, patching every
+// .accesswidener and .classtweaker header from "official" to "named" (no-op
+// for class names, fixes the namespace declaration the loader checks).
+// Nested JARs (Jar-in-Jar) are patched recursively so their bundled deps work.
+//
+// Usage: ./gradlew installDevMods   (also runs automatically before runClient/runServer)
+// To remove: delete run/mods/
+// ──────────────────────────────────────────────────────────────────────────────
+import java.util.zip.*
+
+// Nested JARs to drop from jackfredlib — incompatible with MC 26.1.2 (use intermediary class names)
+def JACKFREDLIB_EXCLUDED = [
+    'META-INF/jars/jackfredlib-gps-1.0.7+1.21.6.jar',
+    'META-INF/jars/jackfredlib-extracommandsourcedata-1.1.1+1.21.6.jar'
+] as Set
+
+def patchJarNamespace  // forward declaration for recursion
+patchJarNamespace = { File src, File dst, Set excludeNestedJars = [] ->
+    dst.parentFile.mkdirs()
+    def buf = new byte[65536]
+    dst.withOutputStream { fos ->
+        def zout = new ZipOutputStream(new BufferedOutputStream(fos))
+        new ZipInputStream(src.newInputStream()).withCloseable { zin ->
+            def entry
+            while ((entry = zin.getNextEntry()) != null) {
+                // Skip excluded nested JARs entirely
+                if (excludeNestedJars.contains(entry.name)) {
+                    zin.readAllBytes()  // drain the entry
+                    continue
+                }
+                zout.putNextEntry(new ZipEntry(entry.name))
+                if (entry.name.endsWith('.accesswidener') || entry.name.endsWith('.classtweaker') || entry.name.endsWith('.ct')) {
+                    def text = new String(zin.readAllBytes(), 'UTF-8')
+                        .replaceFirst(/(?m)^((?:accessWidener|classTweaker)\s+v\d+\s+)(official|intermediary)\b/, '$1named')
+                    zout.write(text.getBytes('UTF-8'))
+                } else if (entry.name == 'fabric.mod.json' && !excludeNestedJars.isEmpty()) {
+                    // Strip excluded entries from the "jars" array in fabric.mod.json
+                    def text = new String(zin.readAllBytes(), 'UTF-8')
+                    excludeNestedJars.each { excluded ->
+                        def filename = excluded.replaceAll('.*/', '')
+                        text = text.replaceAll(/\{\s*"file"\s*:\s*"[^"]*${java.util.regex.Pattern.quote(filename)}[^"]*"\s*\}\s*,?\s*/, '')
+                        text = text.replaceAll(/,\s*\{\s*"file"\s*:\s*"[^"]*${java.util.regex.Pattern.quote(filename)}[^"]*"\s*\}/, '')
+                    }
+                    zout.write(text.getBytes('UTF-8'))
+                } else if (entry.name ==~ /META-INF\/jars\/.+\.jar/) {
+                    def ti = File.createTempFile('jij-in-', '.jar')
+                    def to = File.createTempFile('jij-out-', '.jar')
+                    try {
+                        ti.bytes = zin.readAllBytes()
+                        patchJarNamespace(ti, to)
+                        zout.write(to.bytes)
+                    } finally { ti.delete(); to.delete() }
+                } else {
+                    int n
+                    while ((n = zin.read(buf)) != -1) zout.write(buf, 0, n)
+                }
+                zout.closeEntry()
+            }
+        }
+        zout.close()
+    }
+}
+
+def devModPaths = [
+    'libs/lambdynamiclights-4.10.2+26.1.2.jar',
+    'libs/yumi-commons-event-2.0.0.jar',
+    'libs/yumi-commons-core-2.0.0.jar',
+    'libs/yumi-commons-collections-2.0.0.jar',
+    'libs/stack-to-nearby-chests-mc26.1.1-0.5.16.jar'
+    // ChestTracker and jackfredlib cannot run in this dev environment:
+    // their bytecode references MC classes by intermediary names (class_XXXX)
+    // which require Fabric's intermediary→named runtime remapper, but this
+    // project's empty mappings.tiny provides no translation.
+    // Test ChestTracker compat by running the built JAR in your actual game.
+]
+
+tasks.register('installDevMods') {
+    group = 'fabric'
+    description = 'Patches optional-mod JARs (official→named) and copies them to run/mods/.'
+    def runModsDir = project.file('run/mods')
+    inputs.files devModPaths.collect { project.file(it) }
+    outputs.upToDateWhen { false }  // always run; internal check skips unchanged files
+
+    doLast {
+        runModsDir.mkdirs()
+        devModPaths.each { rel ->
+            def src = project.file(rel)
+            if (!src.exists()) { logger.warn("Dev mod not found, skipping: $rel"); return }
+            def dst = new File(runModsDir, src.name)
+            if (!dst.exists() || dst.lastModified() < src.lastModified()) {
+                logger.lifecycle("Installing dev mod: ${src.name}")
+                def exclusions = src.name.startsWith('jackfredlib-') && !src.name.contains('jackfredlib-base') ? JACKFREDLIB_EXCLUDED : ([] as Set)
+                patchJarNamespace(src, dst, exclusions)
+            }
+        }
+    }
+}
+
+tasks.named('runClient') { dependsOn 'installDevMods' }
+tasks.named('runServer') { dependsOn 'installDevMods' }
 
 // ──────────────────────────────────────────────────────────────────────────────
 // GitHub Release task

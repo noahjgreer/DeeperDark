@@ -1,0 +1,9 @@
+{
+  "required": false,
+  "plugin": "net.noahsarch.deeperdark.mixin.compat.StackToNearbyChestsMixinPlugin",
+  "package": "net.noahsarch.deeperdark.mixin.compat",
+  "compatibilityLevel": "JAVA_25",
+  "mixins": [
+    "ForEachBlockContainerTaskMixin"
+  ]
+}

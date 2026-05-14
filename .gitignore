@@ -5,6 +5,9 @@ build/
 out/
 classes/
 
+# dev-mode optional mods (installed by installDevMods task, not for release)
+run/mods/
+
 # eclipse
 
 *.launch

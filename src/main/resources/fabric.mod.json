@@ -26,11 +26,15 @@
 		],
 		"lambdynlights:initializer": [
 			"net.noahsarch.deeperdark.compat.DeeperDarkDynamicLightsInit"
+		],
+		"chesttracker": [
+			"net.noahsarch.deeperdark.compat.DeeperDarkChestTrackerPlugin"
 		]
 	},
 	"mixins": [
 		"deeperdark.mixins.json",
-		"seasons.mixins.json"
+		"seasons.mixins.json",
+		"deeperdark.compat.stacktonearbychests.mixins.json"
 	],
 	"depends": {
 		"fabricloader": ">=0.19.2",
@@ -39,6 +43,8 @@
 		"fabric-api": "*"
 	},
 	"suggests": {
-		"lambdynlights": ">=4.0.0"
+		"lambdynlights": ">=4.0.0",
+		"chesttracker": ">=2.4.0",
+		"stack-to-nearby-chests": "*"
 	}
 }
