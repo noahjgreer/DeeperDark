@@ -221,7 +221,7 @@ public class VaultMenu extends AbstractContainerMenu {
     }
 
     public static int getImageWidth(int maxTypes) {
-        return maxTypes == 9 ? 226 : 176;
+        return maxTypes == 9 ? 230 : 176;
     }
 
     public static int getImageHeight(int maxTypes) {

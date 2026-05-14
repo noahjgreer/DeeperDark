@@ -28,6 +28,15 @@ import net.noahsarch.deeperdark.sound.ModSounds;
 import java.util.function.Function;
 
 public class ModBlocks {
+    private static Block registerStacksTo1(String name, Function<BlockBehaviour.Properties, Block> blockFactory, BlockBehaviour.Properties settings) {
+        ResourceKey<Block> blockKey = keyOfBlock(name);
+        Block block = blockFactory.apply(settings.setId(blockKey));
+        ResourceKey<Item> itemKey = keyOfItem(name);
+        BlockItem blockItem = new BlockItem(block, new Item.Properties().setId(itemKey).useBlockDescriptionPrefix().stacksTo(1));
+        Registry.register(BuiltInRegistries.ITEM, itemKey, blockItem);
+        return Registry.register(BuiltInRegistries.BLOCK, blockKey, block);
+    }
+
     private static Block register(String name, Function<BlockBehaviour.Properties, Block> blockFactory, BlockBehaviour.Properties settings, boolean shouldRegisterItem) {
 		// Create a registry key for the block
 		ResourceKey<Block> blockKey = keyOfBlock(name);
@@ -218,32 +227,29 @@ public class ModBlocks {
         true
     );
 
-    public static final Block SMALL_ITEM_VAULT = register(
+    public static final Block SMALL_ITEM_VAULT = registerStacksTo1(
         "small_item_vault",
         VaultBlock::new,
         BlockBehaviour.Properties.of()
             .strength(150F, 1200F)
             .sound(VaultBlock.VAULT_SOUND_TYPE)
-            .noOcclusion(),
-        true
+            .noOcclusion()
     );
-    public static final Block MEDIUM_ITEM_VAULT = register(
+    public static final Block MEDIUM_ITEM_VAULT = registerStacksTo1(
         "medium_item_vault",
         VaultBlock::new,
         BlockBehaviour.Properties.of()
             .strength(150F, 1200F)
             .sound(VaultBlock.VAULT_SOUND_TYPE)
-            .noOcclusion(),
-        true
+            .noOcclusion()
     );
-    public static final Block LARGE_ITEM_VAULT = register(
+    public static final Block LARGE_ITEM_VAULT = registerStacksTo1(
         "large_item_vault",
         VaultBlock::new,
         BlockBehaviour.Properties.of()
             .strength(150F, 1200F)
             .sound(VaultBlock.VAULT_SOUND_TYPE)
-            .noOcclusion(),
-        true
+            .noOcclusion()
     );
 
     public static final Block COLLAR_BENCH = register(
