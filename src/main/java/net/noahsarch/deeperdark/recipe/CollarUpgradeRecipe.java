@@ -2,6 +2,8 @@ package net.noahsarch.deeperdark.recipe;
 
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -10,13 +12,16 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.display.RecipeDisplay;
 import net.minecraft.world.level.Level;
 import net.noahsarch.deeperdark.item.CollarItem;
+import net.noahsarch.deeperdark.item.CollarTier;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -71,6 +76,30 @@ public class CollarUpgradeRecipe extends CustomRecipe {
         ItemStack source = input.getItem(4);
         ItemStack result = new ItemStack(toItem);
         result.applyComponents(source.getComponentsPatch());
+
+        // Remap trinkets: source active slots → destination active slots in order.
+        // applyComponents copies CONTAINER as-is (source slot indices), but the
+        // new tier may use different active slot indices, so we must repack.
+        if (fromItem instanceof CollarItem fromCollar && toItem instanceof CollarItem toCollar) {
+            CollarTier fromTier = fromCollar.getTier();
+            CollarTier toTier   = toCollar.getTier();
+
+            NonNullList<ItemStack> src = NonNullList.withSize(5, ItemStack.EMPTY);
+            result.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY).copyInto(src);
+
+            List<ItemStack> ordered = new ArrayList<>();
+            for (int idx : fromTier.activeSlotIndices) {
+                if (!src.get(idx).isEmpty()) ordered.add(src.get(idx).copy());
+            }
+
+            NonNullList<ItemStack> dest = NonNullList.withSize(5, ItemStack.EMPTY);
+            int[] destSlots = toTier.activeSlotIndices;
+            for (int i = 0; i < Math.min(ordered.size(), destSlots.length); i++) {
+                dest.set(destSlots[i], ordered.get(i));
+            }
+            result.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(dest));
+        }
+
         return result;
     }
 
