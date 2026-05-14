@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "minecraft:sandstone",
+  "result": {
+    "id": "deeperdark:sandstone_pillar",
+    "count": 1
+  }
+}

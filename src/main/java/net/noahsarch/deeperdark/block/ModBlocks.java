@@ -16,6 +16,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.biome.Biome.Precipitation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
@@ -66,6 +67,8 @@ public class ModBlocks {
             content.accept(FLINT_BLOCK);
             content.accept(ROTTEN_FLESH_BLOCK);
             content.accept(ENDER_PEARL_BLOCK);
+            content.accept(SANDSTONE_PILLAR);
+            content.accept(STONE_BRICK_PILLAR);
             content.accept(GLASS_DOOR);
             content.accept(WHITE_STAINED_GLASS_DOOR);
             content.accept(ORANGE_STAINED_GLASS_DOOR);
@@ -223,7 +226,8 @@ public class ModBlocks {
         BlockBehaviour.Properties.of()
             .strength(0.5F)
             .requiresCorrectToolForDrops()
-            .sound(ModSoundType.ENDER_PEARL_BLOCK),
+            .sound(ModSoundType.ENDER_PEARL_BLOCK)
+            .noOcclusion(),
         true
     );
 
@@ -258,6 +262,26 @@ public class ModBlocks {
         BlockBehaviour.Properties.of()
             .strength(1.125F)
             .sound(SoundType.WOOD),
+        true
+    );
+
+    public static final Block SANDSTONE_PILLAR = register(
+        "sandstone_pillar",
+        RotatedPillarBlock::new,
+        BlockBehaviour.Properties.of()
+            .strength(0.8F)
+            .requiresCorrectToolForDrops()
+            .sound(SoundType.STONE),
+        true
+    );
+
+    public static final Block STONE_BRICK_PILLAR = register(
+        "stone_brick_pillar",
+        RotatedPillarBlock::new,
+        BlockBehaviour.Properties.of()
+            .strength(1.5F, 6.0F)
+            .requiresCorrectToolForDrops()
+            .sound(SoundType.STONE),
         true
     );
 

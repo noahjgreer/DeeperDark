@@ -81,6 +81,8 @@ public class VaultMenu extends AbstractContainerMenu {
             } else {
                 addSlot(new Slot(displayContainer, i, x, y) {
                     @Override public boolean mayPlace(ItemStack stack) { return false; }
+                    @Override public int getMaxStackSize() { return Integer.MAX_VALUE / 2; }
+                    @Override public int getMaxStackSize(ItemStack stack) { return Integer.MAX_VALUE / 2; }
                 });
             }
         }

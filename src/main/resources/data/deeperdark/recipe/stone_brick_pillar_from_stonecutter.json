@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "minecraft:stone_bricks",
+  "result": {
+    "id": "deeperdark:stone_brick_pillar",
+    "count": 1
+  }
+}

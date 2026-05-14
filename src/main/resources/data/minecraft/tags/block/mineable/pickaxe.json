@@ -5,6 +5,8 @@
         "deeperdark:flint_block",
         "deeperdark:golden_cauldron",
         "deeperdark:siphon",
-        "deeperdark:ender_pearl_block"
+        "deeperdark:ender_pearl_block",
+        "deeperdark:sandstone_pillar",
+        "deeperdark:stone_brick_pillar"
     ]
 }
