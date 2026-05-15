@@ -69,6 +69,7 @@ public class ModBlocks {
             content.accept(ENDER_PEARL_BLOCK);
             content.accept(SANDSTONE_PILLAR);
             content.accept(STONE_BRICK_PILLAR);
+            content.accept(DEEPSLATE_BRICK_PILLAR);
             content.accept(GLASS_DOOR);
             content.accept(WHITE_STAINED_GLASS_DOOR);
             content.accept(ORANGE_STAINED_GLASS_DOOR);
@@ -282,6 +283,16 @@ public class ModBlocks {
             .strength(1.5F, 6.0F)
             .requiresCorrectToolForDrops()
             .sound(SoundType.STONE),
+        true
+    );
+
+    public static final Block DEEPSLATE_BRICK_PILLAR = register(
+        "deepslate_brick_pillar",
+        RotatedPillarBlock::new,
+        BlockBehaviour.Properties.of()
+            .strength(3.0F, 6.0F)
+            .requiresCorrectToolForDrops()
+            .sound(SoundType.DEEPSLATE_BRICKS),
         true
     );
 

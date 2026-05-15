@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column_horizontal",
+  "textures": {
+    "end": "deeperdark:block/deepslate_brick_pillar_top",
+    "side": "deeperdark:block/deepslate_brick_pillar"
+  }
+}
