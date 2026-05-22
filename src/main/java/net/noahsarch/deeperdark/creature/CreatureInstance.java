@@ -1,17 +1,14 @@
 package net.noahsarch.deeperdark.creature;
 
-import net.minecraft.world.entity.Display;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.UUID;
-import net.minecraft.world.entity.projectile.Projectile;
 
 /**
  * Represents a single creature instance in the world, tracking all of its internal state.
- * The creature is rendered server-side as an ItemDisplayEntity billboard.
+ * The creature is rendered client-side as a {@link CreatureEntity} billboard.
  */
 public class CreatureInstance {
 
@@ -39,8 +36,8 @@ public class CreatureInstance {
 
     // ===== Identity =====
     private final UUID creatureId;
-    private int displayEntityId = -1;
-    private UUID displayEntityUuid = null;
+    private int entityId = -1;
+    private UUID entityUuid = null;
 
     // ===== Position =====
     private Vec3 position;
@@ -49,8 +46,8 @@ public class CreatureInstance {
 
     // ===== Visual State =====
     private int textureVariant; // 0-3
-    private double currentJitterX = 0;
-    private double currentJitterZ = 0;
+    /** Current jitter intensity synced to the client-side renderer (in blocks). */
+    private float currentJitterIntensity = 0f;
 
     // ===== Behavioral State =====
     private Sequence currentSequence = Sequence.IDLE;
@@ -101,8 +98,8 @@ public class CreatureInstance {
     // ===== Getters =====
 
     public UUID getCreatureId() { return creatureId; }
-    public int getDisplayEntityId() { return displayEntityId; }
-    public UUID getDisplayEntityUuid() { return displayEntityUuid; }
+    public int getEntityId() { return entityId; }
+    public UUID getEntityUuid() { return entityUuid; }
     public Vec3 getPosition() { return position; }
     public ServerLevel getWorld() { return world; }
     public float getYaw() { return yaw; }
@@ -128,14 +125,13 @@ public class CreatureInstance {
     public int getEchoTicksRemaining() { return echoTicksRemaining; }
     public boolean isEchoTriggered() { return echoTriggered; }
     public int getDespawnTimer() { return despawnTimer; }
-    public double getCurrentJitterX() { return currentJitterX; }
-    public double getCurrentJitterZ() { return currentJitterZ; }
+    public float getCurrentJitterIntensity() { return currentJitterIntensity; }
     public int getOnScreenTicks() { return onScreenTicks; }
 
     // ===== Setters =====
 
-    public void setDisplayEntityId(int id) { this.displayEntityId = id; }
-    public void setDisplayEntityUuid(UUID uuid) { this.displayEntityUuid = uuid; }
+    public void setEntityId(int id) { this.entityId = id; }
+    public void setEntityUuid(UUID uuid) { this.entityUuid = uuid; }
     public void setPosition(Vec3 position) { this.position = position; }
     public void setYaw(float yaw) { this.yaw = yaw; }
     public void setTextureVariant(int variant) { this.textureVariant = variant; }
@@ -171,8 +167,7 @@ public class CreatureInstance {
     public void setEchoTicksRemaining(int ticks) { this.echoTicksRemaining = ticks; }
     public void setEchoTriggered(boolean triggered) { this.echoTriggered = triggered; }
     public void setDespawnTimer(int timer) { this.despawnTimer = timer; }
-    public void setCurrentJitterX(double jitter) { this.currentJitterX = jitter; }
-    public void setCurrentJitterZ(double jitter) { this.currentJitterZ = jitter; }
+    public void setCurrentJitterIntensity(float intensity) { this.currentJitterIntensity = Math.max(0f, intensity); }
     public void setOnScreenTicks(int ticks) { this.onScreenTicks = ticks; }
     public void incrementOnScreenTicks() { this.onScreenTicks++; }
 

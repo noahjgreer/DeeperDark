@@ -122,7 +122,6 @@ public class Deeperdark implements ModInitializer {
 
         // Register custom commands
         net.noahsarch.deeperdark.command.DeeperDarkCommands.register();
-		net.noahsarch.deeperdark.command.DeeperDarkClientCommands.register();
 
         ModVillagers.registerVillagers();
 
@@ -173,6 +172,9 @@ public class Deeperdark implements ModInitializer {
 
 		// Register player leash handler (leash players with a lead)
 		net.noahsarch.deeperdark.event.PlayerLeashHandler.register();
+
+		// Register creature entity type
+		net.noahsarch.deeperdark.entity.ModEntities.initialize();
 
 		// Register creature system
 		net.noahsarch.deeperdark.creature.CreatureManager.register();

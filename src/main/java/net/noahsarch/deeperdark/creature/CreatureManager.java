@@ -6,25 +6,20 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.server.permissions.Permission;
 import net.minecraft.server.permissions.PermissionLevel;
 import net.minecraft.resources.Identifier;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.EntitySpawnReason;
-import net.minecraft.world.entity.Display;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.projectile.Projectile;
-import net.minecraft.world.item.ItemDisplayContext;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.network.protocol.game.ClientboundEntityPositionSyncPacket;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
-import net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket;
 import net.minecraft.world.entity.Relative;
 import net.minecraft.world.entity.PositionMoveRotation;
 import net.minecraft.core.particles.ParticleTypes;
@@ -33,9 +28,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.network.chat.Component;
 import net.minecraft.ChatFormatting;
-import net.noahsarch.deeperdark.mixin.DisplayAccessor;
-import net.noahsarch.deeperdark.mixin.ItemDisplayAccessor;
-import com.mojang.math.Transformation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -43,8 +35,7 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.noahsarch.deeperdark.DeeperDarkConfig;
 import net.noahsarch.deeperdark.Deeperdark;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
+import net.noahsarch.deeperdark.entity.ModEntities;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -67,14 +58,6 @@ public class CreatureManager {
 
     /** Tick counter for spawn validity checks */
     private static int spawnValidityTick = 0;
-
-    /** Texture model identifiers for the 4 creature variants */
-    private static final Identifier[] CREATURE_MODELS = {
-            Identifier.withDefaultNamespace("creature0"),
-            Identifier.withDefaultNamespace("creature1"),
-            Identifier.withDefaultNamespace("creature2"),
-            Identifier.withDefaultNamespace("creature3")
-    };
 
     /** Active echo zones not tied to a creature anymore */
     private static final List<EchoZone> activeEchoZones = new ArrayList<>();
@@ -302,9 +285,9 @@ public class CreatureManager {
     private static void syncDebugGlow(CreatureConfig config) {
         boolean glowEnabled = config.enableDebugGlow;
         for (CreatureInstance creature : creatures.values()) {
-            if (creature.getDisplayEntityUuid() == null) continue;
+            if (creature.getEntityUuid() == null) continue;
             ServerLevel world = creature.getWorld();
-            Entity entity = world.getEntity(creature.getDisplayEntityUuid());
+            Entity entity = world.getEntity(creature.getEntityUuid());
             if (entity != null && entity.hasGlowingTag() != glowEnabled) {
                 entity.setGlowingTag(glowEnabled);
             }
@@ -612,12 +595,12 @@ public class CreatureManager {
             return;
         }
 
-        // Jitter logarithmic falloff over 2 seconds (40 ticks)
+        // Jitter intensity logarithmic falloff over 2 seconds (40 ticks) — synced to client renderer
         if (prepTicks <= 40) {
             double jitterFactor = 1.0 - Math.log(1 + prepTicks) / Math.log(41);
-            creature.setCurrentJitterX(creature.getCurrentJitterX() * jitterFactor);
-            creature.setCurrentJitterZ(creature.getCurrentJitterZ() * jitterFactor);
-            updateDisplayEntityPosition(creature);
+            float newIntensity = (float) (creature.getCurrentJitterIntensity() * jitterFactor);
+            creature.setCurrentJitterIntensity(newIntensity);
+            syncJitterIntensity(creature);
         }
 
         // Keep player frozen and looking at creature
@@ -1082,42 +1065,41 @@ public class CreatureManager {
             if (player.isSpectator()) continue;
 
             double distance = player.position().distanceTo(creaturePos);
-            if (distance > 64) continue; // Don't bother with very distant players
+            if (distance > 64) continue;
 
-            // Check if creature is on player's screen (simplified check: within 90 degree FOV)
             Vec3 playerLook = player.getViewVector(1.0f);
             Vec3 toCreature = creaturePos.add(0, 1.5, 0).subtract(player.getEyePosition()).normalize();
             double dotProduct = playerLook.dot(toCreature);
 
-            if (dotProduct <= 0) continue; // Behind the player
+            if (dotProduct <= 0) continue;
 
-            // Check if player is directly looking at the creature
             boolean directLook = isPlayerLookingAtCreature(player, creaturePos, world);
 
-            double jitterIntensity;
+            double jitter;
             if (directLook) {
-                // Intense shaking - full jitter
-                jitterIntensity = maxJitter;
+                jitter = maxJitter;
             } else if (dotProduct > 0.3) {
-                // On screen but not directly looking - linear intensity based on angle proximity
-                // dotProduct of 1.0 = looking right at it, 0.3 = edge of awareness
-                jitterIntensity = maxJitter * 0.3 * ((dotProduct - 0.3) / 0.7);
+                jitter = maxJitter * 0.3 * ((dotProduct - 0.3) / 0.7);
             } else {
                 continue;
             }
 
-            bestJitter = Math.max(bestJitter, jitterIntensity);
+            bestJitter = Math.max(bestJitter, jitter);
         }
 
-        if (bestJitter > 0) {
-            RandomSource rand = RandomSource.create();
-            creature.setCurrentJitterX((rand.nextDouble() * 2 - 1) * bestJitter);
-            creature.setCurrentJitterZ((rand.nextDouble() * 2 - 1) * bestJitter);
-            updateDisplayEntityPosition(creature);
-        } else if (creature.getCurrentJitterX() != 0 || creature.getCurrentJitterZ() != 0) {
-            creature.setCurrentJitterX(0);
-            creature.setCurrentJitterZ(0);
-            updateDisplayEntityPosition(creature);
+        float newIntensity = (float) bestJitter;
+        if (newIntensity != creature.getCurrentJitterIntensity()) {
+            creature.setCurrentJitterIntensity(newIntensity);
+            syncJitterIntensity(creature);
+        }
+    }
+
+    /** Pushes the current jitter intensity to the client-side CreatureEntity via SynchedEntityData. */
+    private static void syncJitterIntensity(CreatureInstance creature) {
+        if (creature.getEntityUuid() == null) return;
+        Entity entity = creature.getWorld().getEntity(creature.getEntityUuid());
+        if (entity instanceof CreatureEntity ce) {
+            ce.setJitterIntensity(creature.getCurrentJitterIntensity());
         }
     }
 
@@ -1185,74 +1167,36 @@ public class CreatureManager {
         }
     }
 
-    // ===== Display Entity Management =====
+    // ===== CreatureEntity Management =====
 
     private static void spawnDisplayEntity(CreatureInstance creature) {
         ServerLevel world = creature.getWorld();
 
-        Display.ItemDisplay display = (Display.ItemDisplay) EntityType.ITEM_DISPLAY.create(world, EntitySpawnReason.MOB_SUMMONED);
-        if (display == null) {
-            LOGGER.error("[Creature] Failed to create item display entity for creature {}", creature.getCreatureId());
+        CreatureEntity entity = ModEntities.CREATURE.create(world, EntitySpawnReason.MOB_SUMMONED);
+        if (entity == null) {
+            LOGGER.error("[Creature] Failed to create CreatureEntity for creature {}", creature.getCreatureId());
             return;
         }
 
         Vec3 pos = creature.getPosition();
-        // Offset Y by +1 so the billboard feet align with the ground level
-        display.setPos(pos.x + creature.getCurrentJitterX(), pos.y + 0.85, pos.z + creature.getCurrentJitterZ());
+        entity.setPos(pos.x, pos.y, pos.z);
+        entity.setTextureVariant(creature.getTextureVariant());
+        entity.setGlowingTag(DeeperDarkConfig.get().creature.enableDebugGlow);
 
-        // Set up the creature's item model
-        ItemStack displayStack = new ItemStack(Items.STICK);
-        displayStack.set(DataComponents.ITEM_MODEL, CREATURE_MODELS[creature.getTextureVariant()]);
-        ((ItemDisplayAccessor) display).deeperdark$setItemStack(displayStack);
-        ((ItemDisplayAccessor) display).deeperdark$setItemTransform(ItemDisplayContext.HEAD);
+        world.addFreshEntity(entity);
 
-        // Billboard mode: vertical only (no pitch, only yaw)
-        ((DisplayAccessor) display).deeperdark$setBillboardConstraints(Display.BillboardConstraints.VERTICAL);
-
-        // Scale: creature is 3 blocks tall. Default item model in HEAD context is 1 block.
-        // A flat model at 16x32 pixels (1x2 blocks) scaled to 3 blocks height = scale of 1.5
-        // Actually the model is 16x32 in a 512x1024 texture, so:
-        // The model goes from y=0 to y=32 (2 block tall), we want 3 blocks, so scale = 1.5
-        float scale = 1.5f;
-        display.setTransformation(new Transformation(
-                new Vector3f(0, 0, 0),
-                new Quaternionf(),
-                new Vector3f(scale, scale, scale),
-                new Quaternionf()
-        ));
-
-        // Smooth position interpolation for movement/jitter
-        ((DisplayAccessor) display).deeperdark$setTransformationInterpolationDuration(3);
-        ((DisplayAccessor) display).deeperdark$setTransformationInterpolationDelay(0);
-
-        // Good view range for cave visibility
-        display.setViewRange(1.0f);
-
-        // No shadow
-        display.setShadowRadius(0.0f);
-        display.setShadowStrength(0.0f);
-
-        display.setNoGravity(true);
-
-        // Debug glow: make creature visible through walls
-        display.setGlowingTag(DeeperDarkConfig.get().creature.enableDebugGlow);
-
-        world.addFreshEntity(display);
-
-        creature.setDisplayEntityId(display.getId());
-        creature.setDisplayEntityUuid(display.getUUID());
+        creature.setEntityId(entity.getId());
+        creature.setEntityUuid(entity.getUUID());
     }
 
     private static void despawnDisplayEntity(CreatureInstance creature) {
-        if (creature.getDisplayEntityUuid() == null) return;
+        if (creature.getEntityUuid() == null) return;
 
-        ServerLevel world = creature.getWorld();
-        Entity entity = world.getEntity(creature.getDisplayEntityUuid());
-        if (entity != null) {
-            entity.discard();
-        }
-        creature.setDisplayEntityId(-1);
-        creature.setDisplayEntityUuid(null);
+        Entity entity = creature.getWorld().getEntity(creature.getEntityUuid());
+        if (entity != null) entity.discard();
+
+        creature.setEntityId(-1);
+        creature.setEntityUuid(null);
     }
 
     /**
@@ -1265,30 +1209,26 @@ public class CreatureManager {
         creature.setWillRejectProjectiles(random.nextDouble() < config.projectileRejectionChance);
     }
 
+    /** Moves the CreatureEntity to the creature's current logical position. */
     private static void updateDisplayEntityPosition(CreatureInstance creature) {
-        if (creature.getDisplayEntityUuid() == null) return;
+        if (creature.getEntityUuid() == null) return;
 
-        ServerLevel world = creature.getWorld();
-        Entity entity = world.getEntity(creature.getDisplayEntityUuid());
-        if (entity instanceof Display.ItemDisplay display) {
+        Entity entity = creature.getWorld().getEntity(creature.getEntityUuid());
+        if (entity instanceof CreatureEntity ce) {
             Vec3 pos = creature.getPosition();
-            display.setPos(
-                    pos.x + creature.getCurrentJitterX(),
-                    pos.y + 0.85,
-                    pos.z + creature.getCurrentJitterZ()
-            );
-            // Re-trigger interpolation for smooth movement
-            ((DisplayAccessor) display).deeperdark$setTransformationInterpolationDelay(0);
+            ce.setPos(pos.x, pos.y, pos.z);
         }
     }
 
+    /**
+     * Billboarding is handled entirely client-side by the renderer using the camera yaw,
+     * so only the internal yaw on CreatureInstance is updated here (used for chase direction
+     * calculations, not for rendering).
+     */
     private static void updateCreatureFacing(CreatureInstance creature, MinecraftServer server) {
-        if (creature.getDisplayEntityUuid() == null) return;
-
         ServerLevel world = creature.getWorld();
         Vec3 creaturePos = creature.getPosition();
 
-        // Find nearest player to face
         ServerPlayer nearest = null;
         double nearestDist = Double.MAX_VALUE;
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
@@ -1302,15 +1242,8 @@ public class CreatureManager {
         }
 
         if (nearest != null) {
-            Vec3 playerPos = nearest.position();
-            Vec3 direction = playerPos.subtract(creaturePos);
-            float yaw = (float) (Math.atan2(-direction.x, direction.z) * (180.0 / Math.PI));
-            creature.setYaw(yaw);
-
-            Entity entity = world.getEntity(creature.getDisplayEntityUuid());
-            if (entity != null) {
-                entity.setYRot(yaw);
-            }
+            Vec3 direction = nearest.position().subtract(creaturePos);
+            creature.setYaw((float) (Math.atan2(-direction.x, direction.z) * (180.0 / Math.PI)));
         }
     }
 

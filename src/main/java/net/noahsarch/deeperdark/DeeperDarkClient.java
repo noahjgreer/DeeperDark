@@ -8,14 +8,17 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Leashable;
 import net.noahsarch.deeperdark.autoupdate.AutoUpdater;
 import net.noahsarch.deeperdark.autoupdate.AutoUpdaterScreen;
 import net.noahsarch.deeperdark.block.ModBlockEntities;
+import net.noahsarch.deeperdark.client.renderer.CreatureEntityRenderer;
 import net.noahsarch.deeperdark.client.renderer.VaultBlockEntityRenderer;
 import net.noahsarch.deeperdark.client.screen.BoxScreen;
 import net.noahsarch.deeperdark.client.screen.VaultScreen;
+import net.noahsarch.deeperdark.entity.ModEntities;
 import net.noahsarch.deeperdark.intro.DeeperDarkLogoScreen;
 import net.noahsarch.deeperdark.menu.ModMenus;
 import net.noahsarch.deeperdark.payload.PlayerLeashPacket;
@@ -36,6 +39,7 @@ public class DeeperDarkClient implements ClientModInitializer {
         MenuScreens.register(ModMenus.LARGE_VAULT, VaultScreen::new);
 
         BlockEntityRenderers.register(ModBlockEntities.VAULT, VaultBlockEntityRenderer::new);
+        EntityRenderers.register(ModEntities.CREATURE, CreatureEntityRenderer::new);
 
         ClientPlayNetworking.registerGlobalReceiver(PlayerLeashPacket.ID, (payload, context) -> {
             context.client().execute(() -> {
