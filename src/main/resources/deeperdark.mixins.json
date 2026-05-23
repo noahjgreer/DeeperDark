@@ -91,7 +91,8 @@
     "EntityRidingMixin"
   ],
   "client": [
-    "MinecraftMusicMixin"
+    "MinecraftMusicMixin",
+    "HumanoidArmorLayerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

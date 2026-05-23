@@ -1,14 +1,17 @@
 package net.noahsarch.deeperdark.mixin;
 
+import net.minecraft.network.protocol.game.ClientboundSetPassengersPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.server.level.ServerLevel;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -26,9 +29,35 @@ public abstract class ServerPlayerEntityMixin implements ServerPlayerAccessor {
 
     @Shadow @org.spongepowered.asm.mixin.Final private MinecraftServer server;
 
+    @Unique
+    private ServerPlayer deeperdark$pendingVehicleSync;
+
     @Override
     public MinecraftServer deeperdark$getServer() {
         return this.server;
+    }
+
+    @Inject(method = "hurtServer", at = @At("HEAD"), cancellable = true)
+    private void deeperdark$cancelRiderFallDamage(ServerLevel level, DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
+        if (((Entity)(Object)this).isPassenger() && source.is(DamageTypeTags.IS_FALL)) {
+            cir.setReturnValue(false);
+        }
+    }
+
+    @Inject(method = "removeVehicle", at = @At("HEAD"))
+    private void deeperdark$captureVehicle(CallbackInfo ci) {
+        Entity vehicle = ((Entity)(Object)this).getVehicle();
+        this.deeperdark$pendingVehicleSync = (vehicle instanceof ServerPlayer sp) ? sp : null;
+    }
+
+    @Inject(method = "removeVehicle", at = @At("RETURN"))
+    private void deeperdark$syncVehicleOnDismount(CallbackInfo ci) {
+        if (this.deeperdark$pendingVehicleSync != null) {
+            this.deeperdark$pendingVehicleSync.connection.send(
+                new ClientboundSetPassengersPacket((Entity) this.deeperdark$pendingVehicleSync)
+            );
+            this.deeperdark$pendingVehicleSync = null;
+        }
     }
 
     @Inject(method = "hurtServer", at = @At("HEAD"), cancellable = true)

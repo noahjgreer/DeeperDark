@@ -67,6 +67,21 @@ public abstract class PlayerEntityMixin extends LivingEntity implements Leashabl
         }
     }
 
+    @Inject(method = "tick", at = @At("TAIL"))
+    private void deeperdark$checkSaddleAndDismount(CallbackInfo ci) {
+        Entity self = (Entity)(Object)this;
+        if (!self.level().isClientSide() && self.isVehicle() && !deeperdark$hasSaddleEquipped()) {
+            self.ejectPassengers();
+        }
+    }
+
+    @Inject(method = "attack", at = @At("HEAD"), cancellable = true)
+    private void deeperdark$preventAttackingOwnRider(Entity target, CallbackInfo ci) {
+        if (target.getVehicle() == (Entity)(Object)this) {
+            ci.cancel();
+        }
+    }
+
     @Override
     public double leashSnapDistance() {
         return 24.0;
