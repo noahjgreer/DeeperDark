@@ -61,6 +61,19 @@ public abstract class InventoryMenuMixin extends AbstractContainerMenu {
             return;
         }
 
+        // Shift-click a saddle from main inventory/hotbar → HEAD slot (slot 5) if empty
+        if (slotIndex >= 9 && slotIndex <= 44 && slot.getItem().is(net.minecraft.world.item.Items.SADDLE)) {
+            Slot headSlot = this.slots.get(5);
+            if (!headSlot.hasItem()) {
+                ItemStack stack = slot.getItem();
+                ItemStack result = stack.copy();
+                headSlot.setByPlayer(stack.copy());
+                slot.setByPlayer(ItemStack.EMPTY);
+                cir.setReturnValue(result);
+                return;
+            }
+        }
+
         // Shift-click a CollarItem from any non-collar slot → move to collar slot if empty
         if (slot.getItem().getItem() instanceof CollarItem && !collarSlot.hasItem()) {
             ItemStack stack = slot.getItem();

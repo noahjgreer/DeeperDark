@@ -87,7 +87,8 @@
     "EnchantmentMenuMixin",
     "InventoryMenuMixin",
     "ServerboundChatPacketMixin",
-    "ShulkerBoxSlotMixin"
+    "ShulkerBoxSlotMixin",
+    "RidingPositionSyncMixin"
   ],
   "client": [
     "MinecraftMusicMixin"

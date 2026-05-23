@@ -2,6 +2,7 @@ package net.noahsarch.deeperdark.mixin;
 
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.protocol.game.ClientboundSetPassengersPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -113,8 +114,12 @@ public abstract class PlayerEntityMixin extends LivingEntity implements Leashabl
                 && player.getItemInHand(hand).isEmpty()
                 && !player.isPassenger()
                 && !this.isVehicle()
-                && deeperdark$hasSaddleEquipped()) {
-            player.startRiding(this, true, true);
+                && deeperdark$hasSaddleEquipped()
+                && player.startRiding(this, true, true)) {
+            // The tracker sends SetPassengers to observers but NOT to the vehicle player's own client
+            if ((Object)this instanceof ServerPlayer vehiclePlayer) {
+                vehiclePlayer.connection.send(new ClientboundSetPassengersPacket((Entity)(Object)this));
+            }
             return InteractionResult.SUCCESS;
         }
         return super.interact(player, hand, pos);
