@@ -112,9 +112,9 @@ public abstract class PlayerEntityMixin extends LivingEntity implements Leashabl
         if (hand == InteractionHand.MAIN_HAND
                 && player.getItemInHand(hand).isEmpty()
                 && !player.isPassenger()
-                && !this.hasPassengers()
+                && !this.isVehicle()
                 && deeperdark$hasSaddleEquipped()) {
-            player.startRiding(this, true);
+            player.startRiding(this, true, true);
             return InteractionResult.SUCCESS;
         }
         return super.interact(player, hand, pos);
