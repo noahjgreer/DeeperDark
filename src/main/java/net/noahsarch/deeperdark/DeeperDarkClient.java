@@ -5,16 +5,19 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityRenderLayerRegistrationCallback;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.entity.EntityRenderers;
+import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Leashable;
 import net.noahsarch.deeperdark.autoupdate.AutoUpdater;
 import net.noahsarch.deeperdark.autoupdate.AutoUpdaterScreen;
 import net.noahsarch.deeperdark.block.ModBlockEntities;
 import net.noahsarch.deeperdark.client.renderer.CreatureEntityRenderer;
+import net.noahsarch.deeperdark.client.renderer.SaddlePlayerLayer;
 import net.noahsarch.deeperdark.client.renderer.VaultBlockEntityRenderer;
 import net.noahsarch.deeperdark.client.screen.BoxScreen;
 import net.noahsarch.deeperdark.client.screen.VaultScreen;
@@ -40,10 +43,18 @@ public class DeeperDarkClient implements ClientModInitializer {
 
         BlockEntityRenderers.register(ModBlockEntities.VAULT, VaultBlockEntityRenderer::new);
         EntityRenderers.register(ModEntities.CREATURE, CreatureEntityRenderer::new);
+        LivingEntityRenderLayerRegistrationCallback.EVENT
+                .register((entityType, entityRenderer, registrationHelper, context) -> {
+                    if (entityRenderer instanceof AvatarRenderer<?> avatarRenderer) {
+                        registrationHelper
+                                .register(new SaddlePlayerLayer<>(avatarRenderer, context.getEquipmentRenderer()));
+                    }
+                });
 
         ClientPlayNetworking.registerGlobalReceiver(PlayerLeashPacket.ID, (payload, context) -> {
             context.client().execute(() -> {
-                if (context.client().level == null) return;
+                if (context.client().level == null)
+                    return;
                 // Find the leashed entity — check local player first since level.getEntity()
                 // may not find the local player in all code paths.
                 Entity leashed = context.client().level.getEntity(payload.leashedEntityId());
@@ -51,7 +62,8 @@ public class DeeperDarkClient implements ClientModInitializer {
                         && context.client().player.getId() == payload.leashedEntityId()) {
                     leashed = context.client().player;
                 }
-                if (!(leashed instanceof Leashable leashedLeashable)) return;
+                if (!(leashed instanceof Leashable leashedLeashable))
+                    return;
 
                 if (payload.holderEntityId() == -1) {
                     // Before clearing, grab holder reference for reverse-visual cleanup

@@ -93,8 +93,7 @@
   "client": [
     "MinecraftMusicMixin",
     "HumanoidArmorLayerMixin",
-    "PassengerPickableMixin",
-    "AvatarRendererMixin"
+    "PassengerPickableMixin"
   ],
   "injectors": {
     "defaultRequire": 1
