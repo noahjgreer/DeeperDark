@@ -3,6 +3,7 @@
     "values": [
         "deeperdark:flimsy_box",
         "deeperdark:sturdy_box",
-        "deeperdark:reinforced_box"
+        "deeperdark:reinforced_box",
+        "deeperdark:collarbench"
     ]
 }

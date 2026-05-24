@@ -33,13 +33,12 @@ public class VaultBlock extends BaseEntityBlock {
 
     // Obsidian-like sounds at pitch 0 (very low-pitched)
     static final SoundType VAULT_SOUND_TYPE = new SoundType(
-        1.0F, 0.0F,
-        SoundEvents.STONE_BREAK,
-        SoundEvents.STONE_STEP,
-        SoundEvents.STONE_PLACE,
-        SoundEvents.STONE_HIT,
-        SoundEvents.STONE_FALL
-    );
+            1.0F, 0.0F,
+            SoundEvents.STONE_BREAK,
+            SoundEvents.STONE_STEP,
+            SoundEvents.STONE_PLACE,
+            SoundEvents.STONE_HIT,
+            SoundEvents.STONE_FALL);
 
     public VaultBlock(BlockBehaviour.Properties properties) {
         super(properties);
@@ -57,18 +56,13 @@ public class VaultBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player,
+            BlockHitResult hitResult) {
         if (level instanceof ServerLevel && level.getBlockEntity(pos) instanceof VaultBlockEntity vault) {
             player.openMenu(vault);
             player.awardStat(Stats.OPEN_SHULKER_BOX);
         }
         return InteractionResult.SUCCESS;
-    }
-
-    @Override
-    public float getDestroyProgress(BlockState state, Player player, BlockGetter level, BlockPos pos) {
-        // Always 30 seconds (600 ticks) regardless of tool; creative skips this entirely
-        return 1.0F / 600;
     }
 
     @Override

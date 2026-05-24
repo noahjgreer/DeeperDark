@@ -8,6 +8,9 @@
         "deeperdark:ender_pearl_block",
         "deeperdark:sandstone_pillar",
         "deeperdark:stone_brick_pillar",
-        "deeperdark:deepslate_brick_pillar"
+        "deeperdark:deepslate_brick_pillar",
+        "deeperdark:small_item_vault",
+        "deeperdark:medium_item_vault",
+        "deeperdark:large_item_vault"
     ]
 }
