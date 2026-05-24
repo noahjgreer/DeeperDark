@@ -1,8 +1,13 @@
 package net.noahsarch.deeperdark.event;
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.attribute.EnvironmentAttributes;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.IceBlock;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -10,6 +15,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.animal.chicken.Chicken;
 import net.minecraft.world.entity.monster.EnderMan;
@@ -28,7 +34,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.RedStoneWireBlock;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.noahsarch.deeperdark.DeeperDarkConfig;
 import net.noahsarch.deeperdark.component.CollarFuelData;
 import net.noahsarch.deeperdark.component.ModComponents;
@@ -49,6 +59,14 @@ public class CollarEvents {
     private static final Map<UUID, Integer> lavaTickMap = new HashMap<>();
     private static final Map<UUID, Integer> jingleCooldown = new HashMap<>();
     private static final Map<UUID, ResourceKey<Level>> lastDimension = new HashMap<>();
+    private static final Map<UUID, BlockPos> redstoneActivatedMap = new HashMap<>();
+    // Reference-counted set of wire positions currently powered by a player trinket.
+    // Queried by RedStoneWireBlockMixin to suppress engine recalculation.
+    private static final Map<BlockPos, Integer> wirePlayerCount = new HashMap<>();
+
+    public static boolean isPlayerPoweredWire(BlockPos pos) {
+        return wirePlayerCount.containsKey(pos);
+    }
 
     public static void register() {
         ServerTickEvents.END_SERVER_TICK.register(server -> {
@@ -58,6 +76,10 @@ public class CollarEvents {
                     fireTickMap.remove(player.getUUID());
                     lavaTickMap.remove(player.getUUID());
                     jingleCooldown.remove(player.getUUID());
+                    BlockPos prevRedstone = redstoneActivatedMap.remove(player.getUUID());
+                    if (prevRedstone != null) {
+                        releaseRedstone((ServerLevel) player.level(), prevRedstone);
+                    }
                     continue;
                 }
                 tickCollarEffects(player, collar, (ServerLevel) player.level());
@@ -79,6 +101,8 @@ public class CollarEvents {
         boolean hasBlazeRod = false;
         boolean hasGlowBerries = false;
         boolean hasPumpkin = false;
+        boolean hasRedstone = false;
+        boolean hasLavaBucket = false;
 
         for (int i = 0; i < trinkets.size(); i++) {
             ItemStack trinket = trinkets.get(i);
@@ -116,6 +140,14 @@ public class CollarEvents {
                 hasPumpkin = true;
             }
 
+            if (trinket.is(Items.REDSTONE_BLOCK) || trinket.is(Items.REDSTONE_TORCH)) {
+                hasRedstone = true;
+            }
+
+            if (trinket.is(Items.LAVA_BUCKET)) {
+                hasLavaBucket = true;
+            }
+
             if (isAttractable(trinket)) {
                 hasAttractable = true;
             }
@@ -137,6 +169,12 @@ public class CollarEvents {
 
         if (hasPumpkin) {
             tickPumpkinEnderman(player, level);
+        }
+
+        tickRedstoneTrinket(hasRedstone, player, level);
+
+        if (hasLavaBucket) {
+            tickLavaBucketSnowMelt(player, level);
         }
 
         // Update CustomModelData flags so the item model can conditionally show trinket layers.
@@ -299,20 +337,31 @@ public class CollarEvents {
         DeeperDarkConfig.ItemMagnetVariantConfig cfg = getMagnetConfig(DeeperDarkConfig.get(), type);
         double radius = cfg.radius * 0.5;
         double passiveStrength = cfg.passiveStrength * 0.75;
+        double xpRadius = radius * 1.5;
 
+        Vec3 center = player.position();
         AABB searchBox = new AABB(
-            player.getX() - radius, player.getY() - radius, player.getZ() - radius,
-            player.getX() + radius, player.getY() + radius, player.getZ() + radius
+            center.x - xpRadius, center.y - xpRadius, center.z - xpRadius,
+            center.x + xpRadius, center.y + xpRadius, center.z + xpRadius
         );
 
-        level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, searchBox).forEach(item -> {
-            net.minecraft.world.phys.Vec3 diff = player.position().subtract(item.position());
+        for (net.minecraft.world.entity.item.ItemEntity item : level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, searchBox)) {
+            Vec3 diff = center.subtract(item.position());
             double dist = diff.length();
-            if (dist < 0.5 || dist > radius) return;
+            if (dist < 0.5 || dist > radius) continue;
             double t = 1.0 - (dist / radius);
             item.setDeltaMovement(diff.normalize().scale(passiveStrength * t * t * 0.5));
             item.hurtMarked = true;
-        });
+        }
+
+        for (ExperienceOrb orb : level.getEntitiesOfClass(ExperienceOrb.class, searchBox)) {
+            Vec3 diff = center.subtract(orb.position());
+            double dist = diff.length();
+            if (dist < 0.5 || dist > xpRadius) continue;
+            double t = 1.0 - (dist / xpRadius);
+            orb.setDeltaMovement(diff.normalize().scale(passiveStrength * t * t * 0.75));
+            orb.hurtMarked = true;
+        }
     }
 
     private static DeeperDarkConfig.ItemMagnetVariantConfig getMagnetConfig(DeeperDarkConfig.ConfigInstance cfg, ItemMagnetItem.MagnetType type) {
@@ -383,6 +432,89 @@ public class CollarEvents {
             || stack.is(Items.SALMON) || stack.is(Items.TROPICAL_FISH) || stack.is(Items.COOKED_COD)
             || stack.is(Items.COOKED_SALMON) || stack.is(Items.SWEET_BERRIES) || stack.is(Items.BAMBOO)
             || stack.is(Items.APPLE) || stack.is(Items.GOLDEN_APPLE) || stack.is(Items.GOLDEN_CARROT);
+    }
+
+    private static void tickRedstoneTrinket(boolean hasRedstone, ServerPlayer player, ServerLevel level) {
+        UUID uuid = player.getUUID();
+        BlockPos prev = redstoneActivatedMap.get(uuid);
+
+        if (!hasRedstone) {
+            if (prev != null) {
+                redstoneActivatedMap.remove(uuid);
+                releaseRedstone(level, prev);
+            }
+            return;
+        }
+
+        BlockPos feetPos = player.blockPosition();
+        BlockPos onWire = level.getBlockState(feetPos).is(Blocks.REDSTONE_WIRE) ? feetPos : null;
+
+        if (onWire != null) {
+            if (!onWire.equals(prev)) {
+                // Acquire the new wire BEFORE releasing the old one so the signal never
+                // momentarily drops to 0 mid-trail.  If we released first, the trail would
+                // go 0 → powered again, creating a rising edge that re-fires note blocks etc.
+                redstoneActivatedMap.put(uuid, onWire);
+                acquireRedstone(level, onWire);
+                if (prev != null) releaseRedstone(level, prev);
+            }
+            // While on the same wire the mixin holds power at 15 — nothing to do each tick
+        } else if (prev != null) {
+            redstoneActivatedMap.remove(uuid);
+            releaseRedstone(level, prev);
+        }
+    }
+
+    private static void acquireRedstone(ServerLevel level, BlockPos pos) {
+        wirePlayerCount.merge(pos, 1, Integer::sum);
+        BlockState state = level.getBlockState(pos);
+        if (state.is(Blocks.REDSTONE_WIRE)) {
+            // Flag 2: update server state + clients, no neighbor cascade here
+            level.setBlock(pos, state.setValue(RedStoneWireBlock.POWER, 15), 2);
+            // One neighbour update so connected devices (pistons, note blocks, etc.) fire once
+            level.updateNeighborsAt(pos, Blocks.REDSTONE_WIRE);
+        }
+    }
+
+    private static void releaseRedstone(ServerLevel level, BlockPos pos) {
+        int newCount = wirePlayerCount.getOrDefault(pos, 1) - 1;
+        if (newCount <= 0) {
+            wirePlayerCount.remove(pos);
+            BlockState state = level.getBlockState(pos);
+            if (state.is(Blocks.REDSTONE_WIRE)) {
+                level.setBlock(pos, state.setValue(RedStoneWireBlock.POWER, 0), 2);
+                level.updateNeighborsAt(pos, Blocks.REDSTONE_WIRE);
+            }
+        } else {
+            wirePlayerCount.put(pos, newCount);
+        }
+    }
+
+    private static void tickLavaBucketSnowMelt(ServerPlayer player, ServerLevel level) {
+        // Mimic vanilla randomTick scatter: 3 random attempts per tick over a small radius
+        RandomSource random = level.getRandom();
+        int radius = 3;
+        BlockPos center = player.blockPosition();
+        for (int i = 0; i < 3; i++) {
+            int dx = random.nextInt(radius * 2 + 1) - radius;
+            int dy = random.nextInt(3) - 1;
+            int dz = random.nextInt(radius * 2 + 1) - radius;
+            BlockPos pos = center.offset(dx, dy, dz);
+            BlockState state = level.getBlockState(pos);
+            if (state.is(Blocks.SNOW)) {
+                Block.dropResources(state, level, pos);
+                level.removeBlock(pos, false);
+            } else if (state.is(Blocks.SNOW_BLOCK) || state.is(Blocks.POWDER_SNOW)) {
+                level.removeBlock(pos, false);
+            } else if (state.is(Blocks.ICE) || state.is(Blocks.FROSTED_ICE)) {
+                if (level.environmentAttributes().getValue(EnvironmentAttributes.WATER_EVAPORATES, pos)) {
+                    level.removeBlock(pos, false);
+                } else {
+                    level.setBlockAndUpdate(pos, IceBlock.meltsInto());
+                    level.neighborChanged(pos, Blocks.WATER, null);
+                }
+            }
+        }
     }
 
     private static boolean isAttractableTo(ItemStack stack, PathfinderMob mob) {

@@ -13,6 +13,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
+import net.noahsarch.deeperdark.duck.CollarHolder;
 import net.noahsarch.deeperdark.payload.PlayerLeashPacket;
 
 public class PlayerLeashHandler {
@@ -25,6 +26,9 @@ public class PlayerLeashHandler {
             if (!(entity instanceof Player target)) return InteractionResult.PASS;
             if (!player.getItemInHand(hand).is(Items.LEAD)) return InteractionResult.PASS;
             if (level.isClientSide()) return InteractionResult.SUCCESS;
+            if (!(target instanceof CollarHolder ch) || ch.deeperdark$getCollarItem().isEmpty()) {
+                return InteractionResult.PASS;
+            }
 
             Leashable leashable = (Leashable) target;
 

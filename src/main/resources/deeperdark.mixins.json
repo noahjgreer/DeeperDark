@@ -88,12 +88,16 @@
     "InventoryMenuMixin",
     "ServerboundChatPacketMixin",
     "ShulkerBoxSlotMixin",
-    "EntityRidingMixin"
+    "EntityRidingMixin",
+    "RedStoneWireBlockMixin",
+    "SlotPositionAccessor",
+    "SlotMutableMixin"
   ],
   "client": [
     "MinecraftMusicMixin",
     "HumanoidArmorLayerMixin",
-    "PassengerPickableMixin"
+    "PassengerPickableMixin",
+    "CreativeCollarSlotMixin"
   ],
   "injectors": {
     "defaultRequire": 1

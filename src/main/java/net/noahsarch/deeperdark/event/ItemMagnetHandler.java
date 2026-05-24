@@ -5,6 +5,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
@@ -14,7 +15,6 @@ import net.noahsarch.deeperdark.DeeperDarkConfig;
 import net.noahsarch.deeperdark.item.ItemMagnetItem;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -94,38 +94,43 @@ public class ItemMagnetHandler {
         DeeperDarkConfig.ItemMagnetVariantConfig cfg = getVariantConfig(DeeperDarkConfig.get(), type);
         double radius = cfg.radius;
         double passiveStrength = cfg.passiveStrength;
+        double xpRadius = radius * 1.5;
 
         AABB searchBox = new AABB(
-                center.x - radius, center.y - radius, center.z - radius,
-                center.x + radius, center.y + radius, center.z + radius
+                center.x - xpRadius, center.y - xpRadius, center.z - xpRadius,
+                center.x + xpRadius, center.y + xpRadius, center.z + xpRadius
         );
 
-        List<ItemEntity> nearby = level.getEntitiesOfClass(ItemEntity.class, searchBox);
-
-        for (ItemEntity item : nearby) {
+        for (ItemEntity item : level.getEntitiesOfClass(ItemEntity.class, searchBox)) {
             if (excludeEntityId != null && item.getUUID().equals(excludeEntityId)) continue;
 
-            Vec3 itemPos = item.position();
-            Vec3 diff = center.subtract(itemPos);
+            Vec3 diff = center.subtract(item.position());
             double dist = diff.length();
-
             if (dist < 0.5 || dist > radius) continue;
 
             Vec3 dir = diff.normalize();
-
-            Vec3 newVel;
-            if (activating) {
-                // Same strong pull for all materials — items fly toward the player
-                newVel = dir.scale(3.0);
-            } else {
-                // Directly set velocity toward magnet, scaled by proximity (squared falloff)
-                double t = 1.0 - (dist / radius);
-                newVel = dir.scale(passiveStrength * t * t * 0.5);
-            }
-
+            Vec3 newVel = activating ? dir.scale(3.0)
+                    : dir.scale(passiveStrength * sqFalloff(dist, radius) * 0.5);
             item.setDeltaMovement(newVel);
             item.hurtMarked = true;
         }
+
+        for (ExperienceOrb orb : level.getEntitiesOfClass(ExperienceOrb.class, searchBox)) {
+            Vec3 diff = center.subtract(orb.position());
+            double dist = diff.length();
+            if (dist < 0.5 || dist > xpRadius) continue;
+
+            Vec3 dir = diff.normalize();
+            Vec3 newVel = activating ? dir.scale(4.5)
+                    : dir.scale(passiveStrength * sqFalloff(dist, xpRadius) * 0.75);
+            orb.setDeltaMovement(newVel);
+            orb.hurtMarked = true;
+        }
+    }
+
+    private static double sqFalloff(double dist, double radius) {
+        double t = 1.0 - (dist / radius);
+        return t * t;
     }
 
     private static DeeperDarkConfig.ItemMagnetVariantConfig getVariantConfig(DeeperDarkConfig.ConfigInstance cfg, ItemMagnetItem.MagnetType type) {

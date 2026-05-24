@@ -118,6 +118,9 @@ public abstract class PlayerEntityMixin extends LivingEntity implements Leashabl
     public InteractionResult interact(Player player, InteractionHand hand, Vec3 pos) {
         ItemStack itemStack = player.getItemInHand(hand);
         if (itemStack.is(Items.LEAD) && this.canBeLeashed() && !this.isLeashed()) {
+            if (!(this instanceof CollarHolder ch) || ch.deeperdark$getCollarItem().isEmpty()) {
+                return InteractionResult.PASS;
+            }
             this.setLeashedTo(player, true);
             if (!player.hasInfiniteMaterials()) {
                 itemStack.shrink(1);

@@ -14,13 +14,20 @@ public class DeeperDarkDynamicLightsInit implements DynamicLightsInitializer {
 
     @Override
     public void onInitializeDynamicLights(DynamicLightsContext context) {
-        // Ensure our custom luminance type is registered (triggers static initializer)
+        // Ensure our custom luminance types are registered (triggers static initializers)
         @SuppressWarnings("unused")
-        var type = CollarGlowBerriesLuminance.TYPE;
+        var type1 = CollarGlowBerriesLuminance.TYPE;
+        @SuppressWarnings("unused")
+        var type2 = CollarLavaBucketLuminance.TYPE;
 
         context.entityLightSourceManager().onRegisterEvent().register(
             Identifier.fromNamespaceAndPath("deeperdark", "collar_glow_berries"),
             ctx -> ctx.register(EntityType.PLAYER, CollarGlowBerriesLuminance.INSTANCE)
+        );
+
+        context.entityLightSourceManager().onRegisterEvent().register(
+            Identifier.fromNamespaceAndPath("deeperdark", "collar_lava_bucket"),
+            ctx -> ctx.register(EntityType.PLAYER, CollarLavaBucketLuminance.INSTANCE)
         );
     }
 }
