@@ -204,6 +204,7 @@ public class DeeperDarkConfig {
         // Baby mob spawning configuration
         public boolean babySkeletonsEnabled = true; // If true, baby skeletons can spawn
         public boolean babyCreepersEnabled = true; // If true, baby creepers can spawn
+        public boolean babySpidersEnabled = true; // If true, baby spiders can spawn
 
         // Fishing configuration
         public int fishingChargedCreeperChance = 5000; // 1 in X chance to fish up a charged creeper

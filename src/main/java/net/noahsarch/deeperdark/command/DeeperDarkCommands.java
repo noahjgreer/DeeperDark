@@ -132,6 +132,10 @@ public class DeeperDarkCommands {
                     .executes(ctx -> executeConfigQuery(ctx, "baby_creepers_enabled"))
                     .then(Commands.argument("value", BoolArgumentType.bool())
                         .executes(ctx -> executeConfigBoolean(ctx, "baby_creepers_enabled"))))
+                .then(Commands.literal("baby_spiders_enabled")
+                    .executes(ctx -> executeConfigQuery(ctx, "baby_spiders_enabled"))
+                    .then(Commands.argument("value", BoolArgumentType.bool())
+                        .executes(ctx -> executeConfigBoolean(ctx, "baby_spiders_enabled"))))
 
                 // Creeper effects
                 .then(Commands.literal("creeper_effect_min_seconds")
@@ -362,6 +366,7 @@ public class DeeperDarkCommands {
             .append(Component.literal("\n\n--- Baby Mobs ---").withStyle(ChatFormatting.YELLOW))
             .append(formatConfigLine("baby_skeletons_enabled", config.babySkeletonsEnabled))
             .append(formatConfigLine("baby_creepers_enabled", config.babyCreepersEnabled))
+            .append(formatConfigLine("baby_spiders_enabled", config.babySpidersEnabled))
             .append(Component.literal("\n\n--- Fishing ---").withStyle(ChatFormatting.YELLOW))
             .append(formatConfigLine("fishing_charged_creeper_chance", config.fishingChargedCreeperChance))
             .append(Component.literal("\n\n--- Moss Growth ---").withStyle(ChatFormatting.YELLOW))
@@ -406,6 +411,7 @@ public class DeeperDarkCommands {
             case "enderman_pick_up_all_blocks"        -> config.endermanPickUpAllBlocks;
             case "baby_skeletons_enabled"             -> config.babySkeletonsEnabled;
             case "baby_creepers_enabled"              -> config.babyCreepersEnabled;
+            case "baby_spiders_enabled"               -> config.babySpidersEnabled;
             case "fishing_charged_creeper_chance"     -> config.fishingChargedCreeperChance;
             case "moss_growth_enabled"                -> config.mossGrowthEnabled;
             case "moss_tick_check_frequency"          -> config.mossTickCheckFrequency;
@@ -440,6 +446,7 @@ public class DeeperDarkCommands {
             case "enderman_pick_up_all_blocks"      -> config.endermanPickUpAllBlocks = value;
             case "baby_skeletons_enabled"           -> config.babySkeletonsEnabled = value;
             case "baby_creepers_enabled"            -> config.babyCreepersEnabled = value;
+            case "baby_spiders_enabled"             -> config.babySpidersEnabled = value;
             case "moss_growth_enabled"              -> config.mossGrowthEnabled = value;
             default -> {
                 source.sendFailure(Component.literal("Unknown config key: " + key).withStyle(ChatFormatting.RED));

@@ -7,6 +7,8 @@ import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.skeleton.Skeleton;
 import net.noahsarch.deeperdark.util.BabyCreeperAccessor;
 import net.noahsarch.deeperdark.util.BabySkeletonAccessor;
+import net.noahsarch.deeperdark.util.BabySpiderAccessor;
+import net.minecraft.world.entity.monster.spider.Spider;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -49,6 +51,12 @@ public class LivingEntityMixin {
 
         if (self instanceof Creeper && self instanceof BabyCreeperAccessor accessor) {
             if (accessor.deeperdark$isBabyCreeper()) {
+                cir.setReturnValue((self.getRandom().nextFloat() - self.getRandom().nextFloat()) * 0.2F + 1.5F);
+            }
+        }
+
+        if (self instanceof Spider && self instanceof BabySpiderAccessor accessor) {
+            if (accessor.deeperdark$isBabySpider()) {
                 cir.setReturnValue((self.getRandom().nextFloat() - self.getRandom().nextFloat()) * 0.2F + 1.5F);
             }
         }
