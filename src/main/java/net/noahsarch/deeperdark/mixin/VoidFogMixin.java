@@ -8,9 +8,11 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.fog.FogData;
 import net.minecraft.client.renderer.fog.FogRenderer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.material.FogType;
+import net.noahsarch.deeperdark.DeeperDarkConfig;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -28,10 +30,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  *   d = skyLight / 16.0  +  (relativeY + 4) / 32.0
  * If d < 1.0:  fogEnd = max(5, 100 * d²)  blocks
  *
- * In 1.3.1 this condition fired whenever the player was not in creative mode
- * and the world had void particles (overworld).  We keep the creative-mode
- * guard and rely on the Y threshold to naturally silence the effect when the
- * player is not near the world floor.
+ * Smooth onset: instead of snapping at d=1.0, a blend factor linearly
+ * transitions from 0 (at d=1.0, just entering) to 1 (at d=0.75, deep in the
+ * void zone) so the fog eases in rather than popping into existence.
  */
 @Environment(EnvType.CLIENT)
 @Mixin(FogRenderer.class)
@@ -42,6 +43,8 @@ public class VoidFogMixin {
             Camera camera, int renderDistanceInChunks, DeltaTracker deltaTracker,
             float darkenWorldAmount, ClientLevel level,
             CallbackInfoReturnable<FogData> cir) {
+
+        if (!DeeperDarkConfig.get().voidFogEnabled) return;
 
         // Only atmospheric fog — water / lava / powder-snow have their own handling
         if (camera.getFluidInCamera() != FogType.NONE) return;
@@ -62,6 +65,10 @@ public class VoidFogMixin {
         if (d >= 1.0) return; // not near the void — nothing to do
 
         if (d < 0.0) d = 0.0;
+
+        // Smooth onset: blend factor 0 at d=1.0 (no effect) → 1 at d≤0.75 (full effect)
+        float blendFactor = (float) Mth.clamp((1.0 - d) / 0.25, 0.0, 1.0);
+
         d *= d; // square for the same non-linear curve as the original
         float voidFogEnd = Math.max(5.0f, 100.0f * (float) d);
 
@@ -69,18 +76,24 @@ public class VoidFogMixin {
 
         // Pull environmental fog (spherical — affects blocks in all directions)
         if (fog.environmentalEnd > voidFogEnd) {
-            fog.environmentalStart = Math.min(fog.environmentalStart, voidFogEnd * 0.25f);
-            fog.environmentalEnd = voidFogEnd;
+            fog.environmentalStart = Math.min(fog.environmentalStart,
+                    Mth.lerp(blendFactor, fog.environmentalStart, voidFogEnd * 0.25f));
+            fog.environmentalEnd = Mth.lerp(blendFactor, fog.environmentalEnd, voidFogEnd);
         }
 
         // Pull render-distance fog (cylindrical — affects chunk boundary)
         if (fog.renderDistanceEnd > voidFogEnd) {
-            fog.renderDistanceStart = Math.min(fog.renderDistanceStart, voidFogEnd * 0.25f);
-            fog.renderDistanceEnd = voidFogEnd;
+            fog.renderDistanceStart = Math.min(fog.renderDistanceStart,
+                    Mth.lerp(blendFactor, fog.renderDistanceStart, voidFogEnd * 0.25f));
+            fog.renderDistanceEnd = Mth.lerp(blendFactor, fog.renderDistanceEnd, voidFogEnd);
         }
 
         // Pull sky and cloud fog so the void darkens the upper atmosphere too
-        fog.skyEnd = Math.min(fog.skyEnd, voidFogEnd);
-        fog.cloudEnd = Math.min(fog.cloudEnd, voidFogEnd);
+        if (fog.skyEnd > voidFogEnd) {
+            fog.skyEnd = Mth.lerp(blendFactor, fog.skyEnd, voidFogEnd);
+        }
+        if (fog.cloudEnd > voidFogEnd) {
+            fog.cloudEnd = Mth.lerp(blendFactor, fog.cloudEnd, voidFogEnd);
+        }
     }
 }

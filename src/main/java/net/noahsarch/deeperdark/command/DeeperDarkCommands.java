@@ -16,6 +16,8 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.ChatFormatting;
 import net.noahsarch.deeperdark.DeeperDarkConfig;
+import net.noahsarch.deeperdark.payload.VoidFogSyncPacket;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.server.permissions.Permission;
 import net.minecraft.server.permissions.PermissionLevel;
 
@@ -215,7 +217,13 @@ public class DeeperDarkCommands {
                 .then(Commands.literal("zombie_follow_range")
                     .executes(ctx -> executeConfigQuery(ctx, "zombie_follow_range"))
                     .then(Commands.argument("value", DoubleArgumentType.doubleArg(1.0, 128.0))
-                        .executes(ctx -> executeConfigDouble(ctx, "zombie_follow_range")))))
+                        .executes(ctx -> executeConfigDouble(ctx, "zombie_follow_range"))))
+
+                // Void fog (client rendering; synced to all players via packet)
+                .then(Commands.literal("void_fog_enabled")
+                    .executes(ctx -> executeConfigQuery(ctx, "void_fog_enabled"))
+                    .then(Commands.argument("value", BoolArgumentType.bool())
+                        .executes(ctx -> executeVoidFogEnabled(ctx)))))
 
             // dd reload
             .then(Commands.literal("reload")
@@ -378,6 +386,8 @@ public class DeeperDarkCommands {
             .append(formatConfigLine("stone_brick_moss_multiplier", config.stoneBrickMossMultiplier))
             .append(Component.literal("\n\n--- Zombie ---").withStyle(ChatFormatting.YELLOW))
             .append(formatConfigLine("zombie_follow_range", config.zombieFollowRange))
+            .append(Component.literal("\n\n--- Void Fog ---").withStyle(ChatFormatting.YELLOW))
+            .append(formatConfigLine("void_fog_enabled", config.voidFogEnabled))
             .append(Component.literal("\n\nUse /dd config <setting> [value] to change or query").withStyle(ChatFormatting.GRAY)), false);
         return 1;
     }
@@ -420,6 +430,7 @@ public class DeeperDarkCommands {
             case "moss_underwater_multiplier"         -> config.mossUnderwaterMultiplier;
             case "stone_brick_moss_multiplier"        -> config.stoneBrickMossMultiplier;
             case "zombie_follow_range"                -> config.zombieFollowRange;
+            case "void_fog_enabled"                   -> config.voidFogEnabled;
             default -> {
                 source.sendFailure(Component.literal("Unknown config key: " + key).withStyle(ChatFormatting.RED));
                 yield null;
@@ -515,6 +526,28 @@ public class DeeperDarkCommands {
             .append(Component.literal(key).withStyle(ChatFormatting.AQUA))
             .append(Component.literal(" to "))
             .append(Component.literal(String.valueOf(value)).withStyle(ChatFormatting.GOLD)), true);
+        return 1;
+    }
+
+    // ===== Void fog toggle (broadcasts packet so all clients update immediately) =====
+
+    private static int executeVoidFogEnabled(CommandContext<CommandSourceStack> context) {
+        CommandSourceStack source = context.getSource();
+        boolean value = BoolArgumentType.getBool(context, "value");
+        DeeperDarkConfig.ConfigInstance config = DeeperDarkConfig.get();
+        config.voidFogEnabled = value;
+        DeeperDarkConfig.save();
+
+        net.minecraft.server.MinecraftServer server = source.getServer();
+        if (server != null) {
+            VoidFogSyncPacket packet = new VoidFogSyncPacket(value);
+            server.getPlayerList().getPlayers().forEach(p -> ServerPlayNetworking.send(p, packet));
+        }
+
+        source.sendSuccess(() -> Component.literal("Set ")
+            .append(Component.literal("void_fog_enabled").withStyle(ChatFormatting.AQUA))
+            .append(Component.literal(" to "))
+            .append(Component.literal(String.valueOf(value)).withStyle(value ? ChatFormatting.GREEN : ChatFormatting.RED)), true);
         return 1;
     }
 

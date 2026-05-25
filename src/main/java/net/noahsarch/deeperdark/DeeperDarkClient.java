@@ -24,7 +24,9 @@ import net.noahsarch.deeperdark.client.screen.VaultScreen;
 import net.noahsarch.deeperdark.entity.ModEntities;
 import net.noahsarch.deeperdark.intro.DeeperDarkLogoScreen;
 import net.noahsarch.deeperdark.menu.ModMenus;
+import net.noahsarch.deeperdark.event.VoidParticleHandler;
 import net.noahsarch.deeperdark.payload.PlayerLeashPacket;
+import net.noahsarch.deeperdark.payload.VoidFogSyncPacket;
 
 @Environment(EnvType.CLIENT)
 public class DeeperDarkClient implements ClientModInitializer {
@@ -88,6 +90,11 @@ public class DeeperDarkClient implements ClientModInitializer {
                 }
             });
         });
+
+        VoidParticleHandler.register();
+
+        ClientPlayNetworking.registerGlobalReceiver(VoidFogSyncPacket.ID, (payload, context) ->
+                DeeperDarkConfig.get().voidFogEnabled = payload.enabled());
 
         ClientTickEvents.START_CLIENT_TICK.register(client -> {
             if (!updateCheckShown && client.screen instanceof TitleScreen) {

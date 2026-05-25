@@ -8,6 +8,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.Identifier;
 import net.noahsarch.deeperdark.event.*;
 import net.noahsarch.deeperdark.payload.PlayerLeashPacket;
+import net.noahsarch.deeperdark.payload.VoidFogSyncPacket;
 import net.noahsarch.deeperdark.item.ModItems;
 import net.noahsarch.deeperdark.portal.SlipPortalHandler;
 import net.noahsarch.deeperdark.potion.CustomBrewingRecipeHandler;
@@ -65,6 +66,12 @@ public class Deeperdark implements ModInitializer {
 		PALE_MANSION_PROCESSOR = Registry.register(net.minecraft.core.registries.BuiltInRegistries.STRUCTURE_PROCESSOR, Identifier.fromNamespaceAndPath(MOD_ID, "pale_mansion_processor"), () -> PaleMansionProcessor.CODEC);
 
 		PayloadTypeRegistry.clientboundPlay().register(PlayerLeashPacket.ID, PlayerLeashPacket.CODEC);
+		PayloadTypeRegistry.clientboundPlay().register(VoidFogSyncPacket.ID, VoidFogSyncPacket.CODEC);
+
+		// Sync void fog toggle to each client when they join
+		net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents.JOIN.register((handler, sender, server) ->
+				net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.send(
+						handler.player, new VoidFogSyncPacket(DeeperDarkConfig.get().voidFogEnabled)));
 
 		SiphonEvents.register();
 

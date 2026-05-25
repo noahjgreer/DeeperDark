@@ -242,6 +242,9 @@ public class DeeperDarkConfig {
         public int unloadedActivityMaxOccurrencesPerBlock = 100;
         public int unloadedActivityMaxNegativeBinomialAttempts = 10;
 
+        // Void fog configuration (client rendering; synced server→client on join and command change)
+        public boolean voidFogEnabled = true;
+
         // Creature configuration
         public net.noahsarch.deeperdark.creature.CreatureConfig creature = new net.noahsarch.deeperdark.creature.CreatureConfig();
 
@@ -391,6 +394,10 @@ public class DeeperDarkConfig {
                     # unloadedActivityUpdateAllChunksWhenSleep: bypass per-tick limits when players sleep (default: true).
                     # unloadedActivityMaxOccurrencesPerBlock: max random ticks simulated per block per catch-up (default: 100).
                     # unloadedActivityMaxNegativeBinomialAttempts: attempts for negative-binomial duration sampling (default: 10).
+                    #
+                    # Void Fog Configuration:
+                    # voidFogEnabled: if true, void fog distance shortening and void particles are active (default: true)
+                    #   This is an operator-only setting (/dd config void_fog_enabled) synced to all clients.
                     #
                     # Auto-Updater Configuration (client-side only):
                     # autoUpdater.repoURL: GitHub releases page URL used to check for and download updates.
