@@ -22,26 +22,32 @@ public class ItemMagnetHandler {
 
     private static final int ACTIVATION_DURATION = 30;
 
+    // Ticks to block magnet after eating ends. Resets to this value on each suppressed
+    // call (RMB still held), so it only counts down after the player releases RMB.
+    // Must be > 4 (the client's right-click repeat rate) so holding never drains it to 0.
+    private static final int POST_EAT_HOLD_TICKS = 8;
+
     private static final Map<UUID, Integer> activationTicks = new HashMap<>();
     private static final Map<UUID, InteractionHand> activationHand = new HashMap<>();
-
-    // Tracks whether each player was using an item last tick (for eat-detection).
     private static final Map<UUID, Boolean> prevUsingItem = new HashMap<>();
-    // Players who just finished using an item (ate food, etc.) and must fully
-    // release right-click before the next offhand magnet activation is allowed.
-    private static final java.util.Set<UUID> requiresMagnetRelease = new java.util.HashSet<>();
-    // Tracks which players attempted a (suppressed) magnet activation this tick.
-    // Used to detect when RMB is finally released (no attempt → released).
-    private static final java.util.Set<UUID> holdingMagnetWhileSuppressed = new java.util.HashSet<>();
+    // Per-player countdown: positive = suppressed; reset to POST_EAT_HOLD_TICKS on each
+    // suppressed activateMagnet call; counts down to 0 only after RMB is released.
+    private static final Map<UUID, Integer> postEatCooldown = new HashMap<>();
 
-    public static void activateMagnet(UUID playerUUID, InteractionHand hand) {
-        if (requiresMagnetRelease.contains(playerUUID)) {
-            // RMB still held after eating — mark it, but keep the suppression active
-            holdingMagnetWhileSuppressed.add(playerUUID);
-            return;
+    /**
+     * Called from ItemMagnetItem.use() when the player right-clicks with a magnet.
+     * Returns true if activation was allowed (caller should apply damage/cooldown/sound),
+     * or false if suppressed because the player just finished eating while holding RMB.
+     */
+    public static boolean activateMagnet(UUID playerUUID, InteractionHand hand) {
+        if (postEatCooldown.containsKey(playerUUID)) {
+            // RMB still held after eating — reset the timer to prevent it draining to 0
+            postEatCooldown.put(playerUUID, POST_EAT_HOLD_TICKS);
+            return false;
         }
         activationTicks.put(playerUUID, ACTIVATION_DURATION);
         activationHand.put(playerUUID, hand);
+        return true;
     }
 
     public static void register() {
@@ -53,12 +59,10 @@ public class ItemMagnetHandler {
     }
 
     private static void tickLevel(ServerLevel level) {
-        // Player-held magnets
         for (ServerPlayer player : level.players()) {
             handlePlayer(level, player);
         }
 
-        // Dropped magnet items and item frames containing magnets
         for (Entity entity : level.getAllEntities()) {
             if (entity instanceof ItemEntity itemEntity) {
                 ItemStack stack = itemEntity.getItem();
@@ -77,23 +81,22 @@ public class ItemMagnetHandler {
     private static void handlePlayer(ServerLevel level, ServerPlayer player) {
         UUID uuid = player.getUUID();
 
-        // Detect when a player stops using an item (e.g. finishes eating).
-        // The transition from true → false means the right-click may still be
-        // physically held, so suppress the very next magnet activation.
+        // Detect eating completion: isUsingItem true → false
         boolean isUsingNow = player.isUsingItem();
         Boolean wasUsing = prevUsingItem.put(uuid, isUsingNow);
         if (Boolean.TRUE.equals(wasUsing) && !isUsingNow) {
-            // Player just finished eating — suppress magnet until RMB is fully released
-            requiresMagnetRelease.add(uuid);
+            postEatCooldown.put(uuid, POST_EAT_HOLD_TICKS);
             activationTicks.remove(uuid);
             activationHand.remove(uuid);
         }
 
-        // If suppression is active: clear it only when no activation was attempted this tick
-        // (i.e. the player finally released RMB)
-        if (requiresMagnetRelease.contains(uuid)) {
-            if (!holdingMagnetWhileSuppressed.remove(uuid)) {
-                requiresMagnetRelease.remove(uuid);
+        // Decrement post-eat suppression timer each tick
+        Integer remaining = postEatCooldown.get(uuid);
+        if (remaining != null) {
+            if (remaining <= 0) {
+                postEatCooldown.remove(uuid);
+            } else {
+                postEatCooldown.put(uuid, remaining - 1);
             }
         }
 
@@ -139,7 +142,7 @@ public class ItemMagnetHandler {
             if (excludeEntityId != null && item.getUUID().equals(excludeEntityId)) continue;
             // When not actively activating, don't pull items thrown by the holder (lets them give items to others)
             if (!activating && magnetHolderUUID != null) {
-                net.minecraft.world.entity.Entity owner = item.getOwner();
+                Entity owner = item.getOwner();
                 if (owner != null && magnetHolderUUID.equals(owner.getUUID())) continue;
             }
 

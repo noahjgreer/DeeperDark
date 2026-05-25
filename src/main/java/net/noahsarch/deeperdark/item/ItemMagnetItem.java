@@ -48,13 +48,14 @@ public class ItemMagnetItem extends Item {
         ItemStack stack = player.getItemInHand(hand);
 
         if (!level.isClientSide() && !player.getCooldowns().isOnCooldown(stack)) {
-            stack.hurtAndBreak(1, player, hand);
-            ItemMagnetHandler.activateMagnet(player.getUUID(), hand);
-            player.getCooldowns().addCooldown(stack, 30);
+            if (ItemMagnetHandler.activateMagnet(player.getUUID(), hand)) {
+                stack.hurtAndBreak(1, player, hand);
+                player.getCooldowns().addCooldown(stack, 30);
 
-            float pitch = 0.8f + level.getRandom().nextFloat() * 0.4f;
-            level.playSound(null, player.getX(), player.getY(), player.getZ(),
-                    ModSounds.ITEM_MAGNET_ACTIVATE, SoundSource.PLAYERS, 1.0f, pitch);
+                float pitch = 0.8f + level.getRandom().nextFloat() * 0.4f;
+                level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                        ModSounds.ITEM_MAGNET_ACTIVATE, SoundSource.PLAYERS, 1.0f, pitch);
+            }
         }
 
         return InteractionResult.SUCCESS;

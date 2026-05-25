@@ -1,6 +1,8 @@
 package net.noahsarch.deeperdark.mixin;
 
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -73,6 +75,11 @@ public class AllIngredientsConsumableMixin {
         if (!IngredientItemRegistry.ingredientItems.contains(stack.getItem())) return;
 
         stack.consume(1, entity);
+        if (!level.isClientSide() && entity instanceof Player player) {
+            float pitch = 0.9f + entity.getRandom().nextFloat() * 0.1f;
+            level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                    SoundEvents.PLAYER_BURP, SoundSource.PLAYERS, 0.5f, pitch);
+        }
         cir.setReturnValue(stack);
     }
 }
