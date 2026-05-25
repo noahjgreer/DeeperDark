@@ -7,6 +7,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.Identifier;
 import net.noahsarch.deeperdark.event.*;
+import net.noahsarch.deeperdark.payload.AllIngredientsConsumableSyncPacket;
 import net.noahsarch.deeperdark.payload.PlayerLeashPacket;
 import net.noahsarch.deeperdark.payload.VoidFogSyncPacket;
 import net.noahsarch.deeperdark.item.ModItems;
@@ -67,11 +68,15 @@ public class Deeperdark implements ModInitializer {
 
 		PayloadTypeRegistry.clientboundPlay().register(PlayerLeashPacket.ID, PlayerLeashPacket.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(VoidFogSyncPacket.ID, VoidFogSyncPacket.CODEC);
+		PayloadTypeRegistry.clientboundPlay().register(AllIngredientsConsumableSyncPacket.ID, AllIngredientsConsumableSyncPacket.CODEC);
 
-		// Sync void fog toggle to each client when they join
-		net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents.JOIN.register((handler, sender, server) ->
-				net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.send(
-						handler.player, new VoidFogSyncPacket(DeeperDarkConfig.get().voidFogEnabled)));
+		// Sync config toggles to each client when they join
+		net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+			net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.send(
+					handler.player, new VoidFogSyncPacket(DeeperDarkConfig.get().voidFogEnabled));
+			net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.send(
+					handler.player, new AllIngredientsConsumableSyncPacket(DeeperDarkConfig.get().allIngredientsConsumable));
+		});
 
 		SiphonEvents.register();
 
@@ -116,6 +121,8 @@ public class Deeperdark implements ModInitializer {
 			for (net.minecraft.server.level.ServerLevel world : server.getAllLevels()) {
 				net.noahsarch.deeperdark.util.CustomBlockTracker.get(world);
 			}
+			// Populate the ingredient item set used by AllIngredientsConsumableMixin
+			net.noahsarch.deeperdark.util.IngredientItemRegistry.buildIngredientSet(server);
 		});
 
 		// Save custom block data when server stops

@@ -16,6 +16,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.ChatFormatting;
 import net.noahsarch.deeperdark.DeeperDarkConfig;
+import net.noahsarch.deeperdark.payload.AllIngredientsConsumableSyncPacket;
 import net.noahsarch.deeperdark.payload.VoidFogSyncPacket;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.server.permissions.Permission;
@@ -223,7 +224,13 @@ public class DeeperDarkCommands {
                 .then(Commands.literal("void_fog_enabled")
                     .executes(ctx -> executeConfigQuery(ctx, "void_fog_enabled"))
                     .then(Commands.argument("value", BoolArgumentType.bool())
-                        .executes(ctx -> executeVoidFogEnabled(ctx)))))
+                        .executes(ctx -> executeVoidFogEnabled(ctx))))
+
+                // All ingredients consumable (synced to all players via packet)
+                .then(Commands.literal("all_ingredients_consumable")
+                    .executes(ctx -> executeConfigQuery(ctx, "all_ingredients_consumable"))
+                    .then(Commands.argument("value", BoolArgumentType.bool())
+                        .executes(ctx -> executeAllIngredientsConsumable(ctx)))))
 
             // dd reload
             .then(Commands.literal("reload")
@@ -388,6 +395,8 @@ public class DeeperDarkCommands {
             .append(formatConfigLine("zombie_follow_range", config.zombieFollowRange))
             .append(Component.literal("\n\n--- Void Fog ---").withStyle(ChatFormatting.YELLOW))
             .append(formatConfigLine("void_fog_enabled", config.voidFogEnabled))
+            .append(Component.literal("\n\n--- Ingredients ---").withStyle(ChatFormatting.YELLOW))
+            .append(formatConfigLine("all_ingredients_consumable", config.allIngredientsConsumable))
             .append(Component.literal("\n\nUse /dd config <setting> [value] to change or query").withStyle(ChatFormatting.GRAY)), false);
         return 1;
     }
@@ -431,6 +440,7 @@ public class DeeperDarkCommands {
             case "stone_brick_moss_multiplier"        -> config.stoneBrickMossMultiplier;
             case "zombie_follow_range"                -> config.zombieFollowRange;
             case "void_fog_enabled"                   -> config.voidFogEnabled;
+            case "all_ingredients_consumable"         -> config.allIngredientsConsumable;
             default -> {
                 source.sendFailure(Component.literal("Unknown config key: " + key).withStyle(ChatFormatting.RED));
                 yield null;
@@ -546,6 +556,28 @@ public class DeeperDarkCommands {
 
         source.sendSuccess(() -> Component.literal("Set ")
             .append(Component.literal("void_fog_enabled").withStyle(ChatFormatting.AQUA))
+            .append(Component.literal(" to "))
+            .append(Component.literal(String.valueOf(value)).withStyle(value ? ChatFormatting.GREEN : ChatFormatting.RED)), true);
+        return 1;
+    }
+
+    // ===== All ingredients consumable toggle (broadcasts packet so all clients update immediately) =====
+
+    private static int executeAllIngredientsConsumable(CommandContext<CommandSourceStack> context) {
+        CommandSourceStack source = context.getSource();
+        boolean value = BoolArgumentType.getBool(context, "value");
+        DeeperDarkConfig.ConfigInstance config = DeeperDarkConfig.get();
+        config.allIngredientsConsumable = value;
+        DeeperDarkConfig.save();
+
+        net.minecraft.server.MinecraftServer server = source.getServer();
+        if (server != null) {
+            AllIngredientsConsumableSyncPacket packet = new AllIngredientsConsumableSyncPacket(value);
+            server.getPlayerList().getPlayers().forEach(p -> ServerPlayNetworking.send(p, packet));
+        }
+
+        source.sendSuccess(() -> Component.literal("Set ")
+            .append(Component.literal("all_ingredients_consumable").withStyle(ChatFormatting.AQUA))
             .append(Component.literal(" to "))
             .append(Component.literal(String.valueOf(value)).withStyle(value ? ChatFormatting.GREEN : ChatFormatting.RED)), true);
         return 1;

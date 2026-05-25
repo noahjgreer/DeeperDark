@@ -25,6 +25,7 @@ import net.noahsarch.deeperdark.entity.ModEntities;
 import net.noahsarch.deeperdark.intro.DeeperDarkLogoScreen;
 import net.noahsarch.deeperdark.menu.ModMenus;
 import net.noahsarch.deeperdark.event.VoidParticleHandler;
+import net.noahsarch.deeperdark.payload.AllIngredientsConsumableSyncPacket;
 import net.noahsarch.deeperdark.payload.PlayerLeashPacket;
 import net.noahsarch.deeperdark.payload.VoidFogSyncPacket;
 
@@ -95,6 +96,9 @@ public class DeeperDarkClient implements ClientModInitializer {
 
         ClientPlayNetworking.registerGlobalReceiver(VoidFogSyncPacket.ID, (payload, context) ->
                 DeeperDarkConfig.get().voidFogEnabled = payload.enabled());
+
+        ClientPlayNetworking.registerGlobalReceiver(AllIngredientsConsumableSyncPacket.ID, (payload, context) ->
+                DeeperDarkConfig.get().allIngredientsConsumable = payload.enabled());
 
         ClientTickEvents.START_CLIENT_TICK.register(client -> {
             if (!updateCheckShown && client.screen instanceof TitleScreen) {

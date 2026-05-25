@@ -40,6 +40,15 @@ public class ModBlocks {
         return Registry.register(BuiltInRegistries.BLOCK, blockKey, block);
     }
 
+    private static Block registerBoxBlock(String name, BlockBehaviour.Properties settings) {
+        ResourceKey<Block> blockKey = keyOfBlock(name);
+        Block block = new BoxBlock(settings.setId(blockKey));
+        ResourceKey<Item> itemKey = keyOfItem(name);
+        BoxItem boxItem = new BoxItem(block, new Item.Properties().setId(itemKey).useBlockDescriptionPrefix());
+        Registry.register(BuiltInRegistries.ITEM, itemKey, boxItem);
+        return Registry.register(BuiltInRegistries.BLOCK, blockKey, block);
+    }
+
     private static Block register(String name, Function<BlockBehaviour.Properties, Block> blockFactory,
             BlockBehaviour.Properties settings, boolean shouldRegisterItem) {
         // Create a registry key for the block
@@ -199,27 +208,21 @@ public class ModBlocks {
                     .sound(SoundType.STONE)
                     .lightLevel(state -> 7),
             true);
-    public static final Block REINFORCED_BOX = register(
+    public static final Block REINFORCED_BOX = registerBoxBlock(
             "reinforced_box",
-            BoxBlock::new,
             BlockBehaviour.Properties.of()
                     .strength(1.0F)
-                    .sound(ModSoundType.BOX),
-            true);
-    public static final Block FLIMSY_BOX = register(
+                    .sound(ModSoundType.BOX));
+    public static final Block FLIMSY_BOX = registerBoxBlock(
             "flimsy_box",
-            BoxBlock::new,
             BlockBehaviour.Properties.of()
                     .strength(1.0F)
-                    .sound(ModSoundType.BOX),
-            true);
-    public static final Block STURDY_BOX = register(
+                    .sound(ModSoundType.BOX));
+    public static final Block STURDY_BOX = registerBoxBlock(
             "sturdy_box",
-            BoxBlock::new,
             BlockBehaviour.Properties.of()
                     .strength(1.0F)
-                    .sound(ModSoundType.BOX),
-            true);
+                    .sound(ModSoundType.BOX));
     public static final Block ENDER_PEARL_BLOCK = register(
             "ender_pearl_block",
             Block::new,

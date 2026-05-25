@@ -79,6 +79,7 @@
     "LeavesBeGoneServerLevelMixin",
     "LeavesBeGoneLevelChunkMixin",
     "LeavesBeGoneLeavesBlockMixin",
+    "AllIngredientsConsumableMixin",
     "ArmorSlotMixin",
     "BowItemMixin",
     "CollarPlayerMixin",

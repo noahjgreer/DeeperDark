@@ -25,7 +25,18 @@ public class ItemMagnetHandler {
     private static final Map<UUID, Integer> activationTicks = new HashMap<>();
     private static final Map<UUID, InteractionHand> activationHand = new HashMap<>();
 
+    // Tracks whether each player was using an item last tick (for eat-detection).
+    private static final Map<UUID, Boolean> prevUsingItem = new HashMap<>();
+    // Players who just finished using an item (ate food, etc.) and must fully
+    // release right-click before the next offhand magnet activation is allowed.
+    private static final java.util.Set<UUID> requiresMagnetRelease = new java.util.HashSet<>();
+
     public static void activateMagnet(UUID playerUUID, InteractionHand hand) {
+        // Consume the "needs release" flag: if the player just finished eating
+        // this activation came from the same held right-click, so suppress it.
+        if (requiresMagnetRelease.remove(playerUUID)) {
+            return;
+        }
         activationTicks.put(playerUUID, ACTIVATION_DURATION);
         activationHand.put(playerUUID, hand);
     }
@@ -49,12 +60,12 @@ public class ItemMagnetHandler {
             if (entity instanceof ItemEntity itemEntity) {
                 ItemStack stack = itemEntity.getItem();
                 if (stack.getItem() instanceof ItemMagnetItem magnet) {
-                    pullItemsToward(level, itemEntity.position(), magnet.getMagnetType(), false, itemEntity.getUUID());
+                    pullItemsToward(level, itemEntity.position(), magnet.getMagnetType(), false, itemEntity.getUUID(), null);
                 }
             } else if (entity instanceof ItemFrame frame) {
                 ItemStack stack = frame.getItem();
                 if (stack.getItem() instanceof ItemMagnetItem magnet) {
-                    pullItemsToward(level, frame.position(), magnet.getMagnetType(), false, null);
+                    pullItemsToward(level, frame.position(), magnet.getMagnetType(), false, null, null);
                 }
             }
         }
@@ -62,6 +73,18 @@ public class ItemMagnetHandler {
 
     private static void handlePlayer(ServerLevel level, ServerPlayer player) {
         UUID uuid = player.getUUID();
+
+        // Detect when a player stops using an item (e.g. finishes eating).
+        // The transition from true → false means the right-click may still be
+        // physically held, so suppress the very next magnet activation.
+        boolean isUsingNow = player.isUsingItem();
+        Boolean wasUsing = prevUsingItem.put(uuid, isUsingNow);
+        if (Boolean.TRUE.equals(wasUsing) && !isUsingNow) {
+            requiresMagnetRelease.add(uuid);
+            // Also cancel any activation that may have already fired this tick
+            activationTicks.remove(uuid);
+            activationHand.remove(uuid);
+        }
 
         boolean activating = false;
         InteractionHand activeHand = null;
@@ -80,17 +103,17 @@ public class ItemMagnetHandler {
         ItemStack mainhand = player.getMainHandItem();
         if (mainhand.getItem() instanceof ItemMagnetItem magnet) {
             boolean isActivating = activating && activeHand == InteractionHand.MAIN_HAND;
-            pullItemsToward(level, player.position(), magnet.getMagnetType(), isActivating, null);
+            pullItemsToward(level, player.position(), magnet.getMagnetType(), isActivating, null, uuid);
         }
 
         ItemStack offhand = player.getOffhandItem();
         if (offhand.getItem() instanceof ItemMagnetItem magnet) {
             boolean isActivating = activating && activeHand == InteractionHand.OFF_HAND;
-            pullItemsToward(level, player.position(), magnet.getMagnetType(), isActivating, null);
+            pullItemsToward(level, player.position(), magnet.getMagnetType(), isActivating, null, uuid);
         }
     }
 
-    private static void pullItemsToward(ServerLevel level, Vec3 center, ItemMagnetItem.MagnetType type, boolean activating, UUID excludeEntityId) {
+    private static void pullItemsToward(ServerLevel level, Vec3 center, ItemMagnetItem.MagnetType type, boolean activating, UUID excludeEntityId, UUID magnetHolderUUID) {
         DeeperDarkConfig.ItemMagnetVariantConfig cfg = getVariantConfig(DeeperDarkConfig.get(), type);
         double radius = cfg.radius;
         double passiveStrength = cfg.passiveStrength;
@@ -103,6 +126,11 @@ public class ItemMagnetHandler {
 
         for (ItemEntity item : level.getEntitiesOfClass(ItemEntity.class, searchBox)) {
             if (excludeEntityId != null && item.getUUID().equals(excludeEntityId)) continue;
+            // When not actively activating, don't pull items thrown by the holder (lets them give items to others)
+            if (!activating && magnetHolderUUID != null) {
+                net.minecraft.world.entity.Entity owner = item.getOwner();
+                if (owner != null && magnetHolderUUID.equals(owner.getUUID())) continue;
+            }
 
             Vec3 diff = center.subtract(item.position());
             double dist = diff.length();

@@ -245,6 +245,11 @@ public class DeeperDarkConfig {
         // Void fog configuration (client rendering; synced server→client on join and command change)
         public boolean voidFogEnabled = true;
 
+        // Ingredients consumable configuration (synced server→client on join and command change)
+        // When true, all items in the "ingredients" creative tab that are not already edible
+        // can be consumed (eaten) by players. They provide no food value or effects.
+        public boolean allIngredientsConsumable = false;
+
         // Creature configuration
         public net.noahsarch.deeperdark.creature.CreatureConfig creature = new net.noahsarch.deeperdark.creature.CreatureConfig();
 
@@ -398,6 +403,11 @@ public class DeeperDarkConfig {
                     # Void Fog Configuration:
                     # voidFogEnabled: if true, void fog distance shortening and void particles are active (default: true)
                     #   This is an operator-only setting (/dd config void_fog_enabled) synced to all clients.
+                    #
+                    # Ingredients Consumable Configuration:
+                    # allIngredientsConsumable: if true, items in the "ingredients" creative tab that are not
+                    #   already edible can be consumed (eaten) by players with no food value or effects (default: false)
+                    #   This is an operator-only setting (/dd config all_ingredients_consumable) synced to all clients.
                     #
                     # Auto-Updater Configuration (client-side only):
                     # autoUpdater.repoURL: GitHub releases page URL used to check for and download updates.
