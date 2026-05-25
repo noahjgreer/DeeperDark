@@ -97,7 +97,8 @@
     "MinecraftMusicMixin",
     "HumanoidArmorLayerMixin",
     "PassengerPickableMixin",
-    "CreativeCollarSlotMixin"
+    "CreativeCollarSlotMixin",
+    "VoidFogMixin"
   ],
   "injectors": {
     "defaultRequire": 1
