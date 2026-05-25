@@ -32,12 +32,12 @@ public class SkeletonMobMixin implements BabySkeletonAccessor, BabyCreeperAccess
     @Unique private static final Identifier BABY_SPEED_MODIFIER_ID =
         Identifier.fromNamespaceAndPath("deeperdark", "baby_skeleton_speed");
     @Unique private static final AttributeModifier BABY_SPEED_MODIFIER =
-        new AttributeModifier(BABY_SPEED_MODIFIER_ID, 0.75, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
+        new AttributeModifier(BABY_SPEED_MODIFIER_ID, 0.5, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
 
     @Unique private static final Identifier BABY_CREEPER_SPEED_MODIFIER_ID =
         Identifier.fromNamespaceAndPath("deeperdark", "baby_creeper_speed");
     @Unique private static final AttributeModifier BABY_CREEPER_SPEED_MODIFIER =
-        new AttributeModifier(BABY_CREEPER_SPEED_MODIFIER_ID, 0.75, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
+        new AttributeModifier(BABY_CREEPER_SPEED_MODIFIER_ID, 0.5, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
 
     @Unique private static final Identifier BABY_SPIDER_SPEED_MODIFIER_ID =
         Identifier.fromNamespaceAndPath("deeperdark", "baby_spider_speed");

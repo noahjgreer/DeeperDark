@@ -30,11 +30,14 @@ public class ItemMagnetHandler {
     // Players who just finished using an item (ate food, etc.) and must fully
     // release right-click before the next offhand magnet activation is allowed.
     private static final java.util.Set<UUID> requiresMagnetRelease = new java.util.HashSet<>();
+    // Tracks which players attempted a (suppressed) magnet activation this tick.
+    // Used to detect when RMB is finally released (no attempt → released).
+    private static final java.util.Set<UUID> holdingMagnetWhileSuppressed = new java.util.HashSet<>();
 
     public static void activateMagnet(UUID playerUUID, InteractionHand hand) {
-        // Consume the "needs release" flag: if the player just finished eating
-        // this activation came from the same held right-click, so suppress it.
-        if (requiresMagnetRelease.remove(playerUUID)) {
+        if (requiresMagnetRelease.contains(playerUUID)) {
+            // RMB still held after eating — mark it, but keep the suppression active
+            holdingMagnetWhileSuppressed.add(playerUUID);
             return;
         }
         activationTicks.put(playerUUID, ACTIVATION_DURATION);
@@ -80,10 +83,18 @@ public class ItemMagnetHandler {
         boolean isUsingNow = player.isUsingItem();
         Boolean wasUsing = prevUsingItem.put(uuid, isUsingNow);
         if (Boolean.TRUE.equals(wasUsing) && !isUsingNow) {
+            // Player just finished eating — suppress magnet until RMB is fully released
             requiresMagnetRelease.add(uuid);
-            // Also cancel any activation that may have already fired this tick
             activationTicks.remove(uuid);
             activationHand.remove(uuid);
+        }
+
+        // If suppression is active: clear it only when no activation was attempted this tick
+        // (i.e. the player finally released RMB)
+        if (requiresMagnetRelease.contains(uuid)) {
+            if (!holdingMagnetWhileSuppressed.remove(uuid)) {
+                requiresMagnetRelease.remove(uuid);
+            }
         }
 
         boolean activating = false;

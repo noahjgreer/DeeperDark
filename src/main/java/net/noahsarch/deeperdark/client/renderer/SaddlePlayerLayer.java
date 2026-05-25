@@ -36,6 +36,8 @@ public class SaddlePlayerLayer<S extends HumanoidRenderState, M extends Humanoid
     public void submit(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int lightCoords, S state, float yRot, float xRot) {
         if (!state.headEquipment.is(Items.SADDLE)) return;
 
+        poseStack.pushPose();
+        poseStack.scale(1.05f, 1.05f, 1.05f);
         this.equipmentRenderer.renderLayers(
                 EquipmentClientInfo.LayerType.HUMANOID,
                 PLAYER_SADDLE_ASSET,
@@ -47,5 +49,6 @@ public class SaddlePlayerLayer<S extends HumanoidRenderState, M extends Humanoid
                 lightCoords,
                 state.outlineColor
         );
+        poseStack.popPose();
     }
 }
