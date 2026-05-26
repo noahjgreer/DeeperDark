@@ -29,6 +29,22 @@ public class ModEntities {
                     .build(CREATURE_KEY)
     );
 
+    public static final ResourceKey<EntityType<?>> PRIMED_DYNAMITE_KEY = ResourceKey.create(
+            Registries.ENTITY_TYPE,
+            Identifier.fromNamespaceAndPath(Deeperdark.MOD_ID, "primed_dynamite")
+    );
+
+    public static final EntityType<PrimedDynamite> PRIMED_DYNAMITE = Registry.register(
+            BuiltInRegistries.ENTITY_TYPE,
+            PRIMED_DYNAMITE_KEY,
+            EntityType.Builder.<PrimedDynamite>of(PrimedDynamite::new, MobCategory.MISC)
+                    .fireImmune()
+                    .sized(0.98F, 0.98F)
+                    .clientTrackingRange(10)
+                    .updateInterval(10)
+                    .build(PRIMED_DYNAMITE_KEY)
+    );
+
     public static void initialize() {
         // Reference this class to trigger the static field initializers above,
         // which register the entity type. Called from Deeperdark.onInitialize().

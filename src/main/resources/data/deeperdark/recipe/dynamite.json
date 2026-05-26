@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SQS",
+    "QGQ",
+    "SQS"
+  ],
+  "key": {
+    "S": "minecraft:sand",
+    "Q": "minecraft:quartz",
+    "G": "deeperdark:gunpowder_block"
+  },
+  "result": {
+    "count": 1,
+    "id": "deeperdark:dynamite"
+  }
+}

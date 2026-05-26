@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "bottom": "deeperdark:block/dynamite_bottom",
+    "side":   "deeperdark:block/dynamite_side",
+    "top":    "deeperdark:block/dynamite_top"
+  }
+}

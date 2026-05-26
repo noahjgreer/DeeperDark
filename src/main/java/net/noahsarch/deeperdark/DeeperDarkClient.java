@@ -17,6 +17,7 @@ import net.noahsarch.deeperdark.autoupdate.AutoUpdater;
 import net.noahsarch.deeperdark.autoupdate.AutoUpdaterScreen;
 import net.noahsarch.deeperdark.block.ModBlockEntities;
 import net.noahsarch.deeperdark.client.renderer.CreatureEntityRenderer;
+import net.noahsarch.deeperdark.client.renderer.PrimedDynamiteRenderer;
 import net.noahsarch.deeperdark.client.renderer.SaddlePlayerLayer;
 import net.noahsarch.deeperdark.client.renderer.VaultBlockEntityRenderer;
 import net.noahsarch.deeperdark.client.screen.BoxScreen;
@@ -46,6 +47,7 @@ public class DeeperDarkClient implements ClientModInitializer {
 
         BlockEntityRenderers.register(ModBlockEntities.VAULT, VaultBlockEntityRenderer::new);
         EntityRenderers.register(ModEntities.CREATURE, CreatureEntityRenderer::new);
+        EntityRenderers.register(ModEntities.PRIMED_DYNAMITE, PrimedDynamiteRenderer::new);
         LivingEntityRenderLayerRegistrationCallback.EVENT
                 .register((entityType, entityRenderer, registrationHelper, context) -> {
                     if (entityRenderer instanceof AvatarRenderer<?> avatarRenderer) {

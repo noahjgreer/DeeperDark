@@ -371,6 +371,15 @@
     ],
     "subtitle": "subtitles.deeperdark.item.collar.jingle"
   },
+  "block.dynamite.explode": {
+    "sounds": [
+      "deeperdark:block/dynamite/explode1",
+      "deeperdark:block/dynamite/explode2",
+      "deeperdark:block/dynamite/explode3",
+      "deeperdark:block/dynamite/explode4"
+    ],
+    "subtitle": "subtitles.deeperdark.block.dynamite.explode"
+  },
   "block.box.close": {
     "sounds": [
       {

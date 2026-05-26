@@ -19,6 +19,15 @@ public class ModSoundType extends SoundType {
         net.minecraft.sounds.SoundEvents.AMETHYST_BLOCK_BREAK
     );
 
+    // TNT's grass sounds pitched all the way down to 0
+    public static final SoundType DYNAMITE = new ModSoundType(1.0F, 0.0F,
+        net.minecraft.sounds.SoundEvents.GRASS_BREAK,
+        net.minecraft.sounds.SoundEvents.GRASS_STEP,
+        net.minecraft.sounds.SoundEvents.GRASS_PLACE,
+        net.minecraft.sounds.SoundEvents.GRASS_HIT,
+        net.minecraft.sounds.SoundEvents.GRASS_FALL
+    );
+
     public ModSoundType(float volume, float pitch,
             SoundEvent breakSound, SoundEvent stepSound,
             SoundEvent placeSound, SoundEvent hitSound, SoundEvent fallSound) {

@@ -104,6 +104,7 @@ public class ModBlocks {
         });
 
         CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register(content -> {
+            content.accept(DYNAMITE);
             content.accept(GOLDEN_CAULDRON);
             content.accept(SIPHON);
             content.accept(FLIMSY_BOX);
@@ -123,6 +124,16 @@ public class ModBlocks {
     private static ResourceKey<Item> keyOfItem(String name) {
         return ResourceKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Deeperdark.MOD_ID, name));
     }
+
+    public static final Block DYNAMITE = register(
+            "dynamite",
+            DynamiteBlock::new,
+            BlockBehaviour.Properties.of()
+                    .strength(0.0F)
+                    .instabreak()
+                    .sound(ModSoundType.DYNAMITE)
+                    .ignitedByLava(),
+            true);
 
     public static final Block GUNPOWDER_BLOCK = register(
             "gunpowder_block",

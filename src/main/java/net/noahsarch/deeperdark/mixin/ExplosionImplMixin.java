@@ -31,6 +31,10 @@ public class ExplosionImplMixin {
         )
     )
     private void deeperdark$forceAllBlockDrops(BlockState state, ServerLevel world, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> stackMerger) {
+        if (!state.getBlock().dropFromExplosion(explosion)) {
+            state.onExplosionHit(world, pos, explosion, stackMerger);
+            return;
+        }
         if (!state.isAir() && explosion.getBlockInteraction() != Explosion.BlockInteraction.TRIGGER_BLOCK) {
             BlockEntity blockEntity = state.hasBlockEntity() ? world.getBlockEntity(pos) : null;
 

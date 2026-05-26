@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "unstable=false": { "model": "deeperdark:block/dynamite" },
+    "unstable=true":  { "model": "deeperdark:block/dynamite" }
+  }
+}
