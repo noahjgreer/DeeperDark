@@ -81,19 +81,13 @@ public class VoidFogMixin {
             fog.environmentalEnd = Mth.lerp(blendFactor, fog.environmentalEnd, voidFogEnd);
         }
 
-        // Pull render-distance fog (cylindrical — affects chunk boundary)
-        if (fog.renderDistanceEnd > voidFogEnd) {
-            fog.renderDistanceStart = Math.min(fog.renderDistanceStart,
-                    Mth.lerp(blendFactor, fog.renderDistanceStart, voidFogEnd * 0.25f));
-            fog.renderDistanceEnd = Mth.lerp(blendFactor, fog.renderDistanceEnd, voidFogEnd);
-        }
-
-        // Pull sky and cloud fog so the void darkens the upper atmosphere too
-        if (fog.skyEnd > voidFogEnd) {
-            fog.skyEnd = Mth.lerp(blendFactor, fog.skyEnd, voidFogEnd);
-        }
-        if (fog.cloudEnd > voidFogEnd) {
-            fog.cloudEnd = Mth.lerp(blendFactor, fog.cloudEnd, voidFogEnd);
-        }
+        // renderDistanceEnd, skyEnd, and cloudEnd are intentionally left alone.
+        // renderDistanceEnd is read by Distant Horizons to position its LOD transition; capping
+        // it to voidFogEnd causes DH to move the LOD boundary inside the vanilla render range,
+        // making DH's sky-coloured atmosphere bleed through vanilla geometry.
+        // The environmental fog (spherical) already fully covers the effect: fog.glsl takes
+        // max(environmental, renderDistance), so environmentalEnd=47 makes everything beyond
+        // 47 blocks fully opaque regardless of renderDistanceEnd.
+        // skyEnd/cloudEnd have no 1.3.1 equivalent and similarly break DH if modified.
     }
 }

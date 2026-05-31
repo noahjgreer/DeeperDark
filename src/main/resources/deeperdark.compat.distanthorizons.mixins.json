@@ -1,0 +1,11 @@
+{
+  "required": false,
+  "package": "net.noahsarch.deeperdark.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "client": [
+    "VoidFogDHCompatMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 0
+  }
+}

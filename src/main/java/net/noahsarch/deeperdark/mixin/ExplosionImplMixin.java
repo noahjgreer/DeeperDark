@@ -5,7 +5,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.noahsarch.deeperdark.entity.PrimedDynamite;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.core.BlockPos;
@@ -18,7 +20,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 import java.util.function.BiConsumer;
-import net.minecraft.world.level.gamerules.GameRules;
 
 @Mixin(ServerExplosion.class)
 public class ExplosionImplMixin {
@@ -37,10 +38,12 @@ public class ExplosionImplMixin {
         }
         if (!state.isAir() && explosion.getBlockInteraction() != Explosion.BlockInteraction.TRIGGER_BLOCK) {
             BlockEntity blockEntity = state.hasBlockEntity() ? world.getBlockEntity(pos) : null;
+            ItemStack tool = explosion.getDirectSourceEntity() instanceof PrimedDynamite
+                    ? new ItemStack(Items.GOLDEN_PICKAXE) : ItemStack.EMPTY;
 
             LootParams.Builder builder = new LootParams.Builder(world)
                 .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos))
-                .withParameter(LootContextParams.TOOL, (net.minecraft.world.item.ItemInstance) ItemStack.EMPTY)
+                .withParameter(LootContextParams.TOOL, (net.minecraft.world.item.ItemInstance) tool)
                 .withOptionalParameter(LootContextParams.BLOCK_ENTITY, blockEntity)
                 .withOptionalParameter(LootContextParams.THIS_ENTITY, explosion.getDirectSourceEntity());
 
