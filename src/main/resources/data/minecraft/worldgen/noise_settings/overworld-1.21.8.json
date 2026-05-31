@@ -753,7 +753,7 @@
               "if_true": {
                 "type": "minecraft:biome",
                 "biome_is": [
-                  "minecraft:black_mesa"
+                  "deeperdark:black_mesa"
                 ]
               },
               "then_run": {

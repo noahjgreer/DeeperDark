@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class VanillaBiomeParametersMixin {
 
     @Unique
-    private static final ResourceKey<Biome> BLACK_MESA = ResourceKey.create(Registries.BIOME, Identifier.fromNamespaceAndPath("minecraft", "black_mesa"));
+    private static final ResourceKey<Biome> BLACK_MESA = ResourceKey.create(Registries.BIOME, Identifier.fromNamespaceAndPath("deeperdark", "black_mesa"));
 
     @Inject(method = "pickBadlandsBiome", at = @At("HEAD"), cancellable = true)
     private void deeperdark$replaceBadlandsWithBlackMesa(int humidity, Climate.Parameter weirdness, CallbackInfoReturnable<ResourceKey<Biome>> cir) {
