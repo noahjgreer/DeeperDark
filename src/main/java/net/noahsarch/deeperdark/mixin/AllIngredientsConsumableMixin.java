@@ -78,6 +78,8 @@ public class AllIngredientsConsumableMixin {
         if (!level.isClientSide() && entity instanceof Player player) {
             float pitch = 0.9f + entity.getRandom().nextFloat() * 0.1f;
             level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                    SoundEvents.GENERIC_EAT.value(), SoundSource.PLAYERS, 3.0f, pitch);
+            level.playSound(null, player.getX(), player.getY(), player.getZ(),
                     SoundEvents.PLAYER_BURP, SoundSource.PLAYERS, 0.5f, pitch);
         }
         cir.setReturnValue(stack);

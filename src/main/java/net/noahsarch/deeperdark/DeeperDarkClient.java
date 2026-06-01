@@ -15,6 +15,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Leashable;
 import net.noahsarch.deeperdark.autoupdate.AutoUpdater;
 import net.noahsarch.deeperdark.autoupdate.AutoUpdaterScreen;
+import net.noahsarch.deeperdark.util.IngredientItemRegistry;
 import net.noahsarch.deeperdark.block.ModBlockEntities;
 import net.noahsarch.deeperdark.client.renderer.CreatureEntityRenderer;
 import net.noahsarch.deeperdark.client.renderer.PrimedDynamiteRenderer;
@@ -99,8 +100,15 @@ public class DeeperDarkClient implements ClientModInitializer {
         ClientPlayNetworking.registerGlobalReceiver(VoidFogSyncPacket.ID, (payload, context) ->
                 DeeperDarkConfig.get().voidFogEnabled = payload.enabled());
 
-        ClientPlayNetworking.registerGlobalReceiver(AllIngredientsConsumableSyncPacket.ID, (payload, context) ->
-                DeeperDarkConfig.get().allIngredientsConsumable = payload.enabled());
+        ClientPlayNetworking.registerGlobalReceiver(AllIngredientsConsumableSyncPacket.ID, (payload, context) -> {
+            DeeperDarkConfig.get().allIngredientsConsumable = payload.enabled();
+            context.client().execute(() -> {
+                var connection = context.client().getConnection();
+                if (connection != null) {
+                    IngredientItemRegistry.buildIngredientSet(connection.registryAccess());
+                }
+            });
+        });
 
         ClientTickEvents.START_CLIENT_TICK.register(client -> {
             if (!updateCheckShown && client.screen instanceof TitleScreen) {

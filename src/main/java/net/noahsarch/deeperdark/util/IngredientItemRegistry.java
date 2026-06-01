@@ -1,5 +1,6 @@
 package net.noahsarch.deeperdark.util;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.item.CreativeModeTab;
@@ -15,12 +16,12 @@ public class IngredientItemRegistry {
 
     public static Set<Item> ingredientItems = Collections.emptySet();
 
-    public static void buildIngredientSet(net.minecraft.server.MinecraftServer server) {
+    public static void buildIngredientSet(HolderLookup.Provider registryAccess) {
         CreativeModeTab tab = BuiltInRegistries.CREATIVE_MODE_TAB.getValue(CreativeModeTabs.INGREDIENTS);
         if (tab == null) return;
         try {
             CreativeModeTab.ItemDisplayParameters params = new CreativeModeTab.ItemDisplayParameters(
-                    FeatureFlags.REGISTRY.allFlags(), true, server.registryAccess());
+                    FeatureFlags.REGISTRY.allFlags(), true, registryAccess);
             tab.buildContents(params);
             Set<Item> items = new HashSet<>();
             for (ItemStack stack : tab.getDisplayItems()) {

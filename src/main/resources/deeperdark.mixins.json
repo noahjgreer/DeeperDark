@@ -80,6 +80,7 @@
     "LeavesBeGoneLevelChunkMixin",
     "LeavesBeGoneLeavesBlockMixin",
     "AllIngredientsConsumableMixin",
+    "TridentItemMixin",
     "ArmorSlotMixin",
     "BowItemMixin",
     "CollarPlayerMixin",

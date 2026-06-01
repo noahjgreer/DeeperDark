@@ -24,36 +24,40 @@ public class PlayerLeashHandler {
     public static void register() {
         UseEntityCallback.EVENT.register((player, level, hand, entity, hitResult) -> {
             if (!(entity instanceof Player target)) return InteractionResult.PASS;
-            if (!player.getItemInHand(hand).is(Items.LEAD)) return InteractionResult.PASS;
-            if (level.isClientSide()) return InteractionResult.SUCCESS;
             if (!(target instanceof CollarHolder ch) || ch.deeperdark$getCollarItem().isEmpty()) {
                 return InteractionResult.PASS;
             }
 
             Leashable leashable = (Leashable) target;
 
+            // Un-leash: right-click the leashed player regardless of what is in hand.
             if (leashable.isLeashed() && player == leashable.getLeashHolder()) {
-                leashable.removeLeash();
-                ServerPlayNetworking.send((ServerPlayer) target, new PlayerLeashPacket(target.getId(), -1));
-                if (!player.hasInfiniteMaterials()) {
-                    ItemStack lead = new ItemStack(Items.LEAD);
-                    if (!player.getInventory().add(lead)) {
-                        player.drop(lead, false);
+                if (!level.isClientSide()) {
+                    leashable.removeLeash();
+                    ServerPlayNetworking.send((ServerPlayer) target, new PlayerLeashPacket(target.getId(), -1));
+                    if (!player.hasInfiniteMaterials()) {
+                        ItemStack lead = new ItemStack(Items.LEAD);
+                        if (!player.getInventory().add(lead)) {
+                            player.drop(lead, false);
+                        }
                     }
+                    level.playSound(null, player.blockPosition(), SoundEvents.LEAD_UNTIED, SoundSource.PLAYERS, 1.0F, 1.0F);
                 }
-                level.playSound(null, player.blockPosition(), SoundEvents.LEAD_UNTIED, SoundSource.PLAYERS, 1.0F, 1.0F);
-            } else if (!target.getUUID().equals(player.getUUID())) {
-                leashable.setLeashedTo(player, true);
-                // setLeashedTo broadcasts to trackers; custom packet tells the leashed player's own client
-                ServerPlayNetworking.send((ServerPlayer) target, new PlayerLeashPacket(target.getId(), player.getId()));
-                if (!player.hasInfiniteMaterials()) {
-                    player.getItemInHand(hand).shrink(1);
-                }
-                level.playSound(null, player.blockPosition(), SoundEvents.LEAD_TIED, SoundSource.PLAYERS, 1.0F, 1.0F);
-            } else {
-                return InteractionResult.PASS;
+                return InteractionResult.SUCCESS;
             }
 
+            // Leash: requires a lead in hand and a different target.
+            if (!player.getItemInHand(hand).is(Items.LEAD)) return InteractionResult.PASS;
+            if (target.getUUID().equals(player.getUUID())) return InteractionResult.PASS;
+            if (level.isClientSide()) return InteractionResult.SUCCESS;
+
+            leashable.setLeashedTo(player, true);
+            // setLeashedTo broadcasts to trackers; custom packet tells the leashed player's own client
+            ServerPlayNetworking.send((ServerPlayer) target, new PlayerLeashPacket(target.getId(), player.getId()));
+            if (!player.hasInfiniteMaterials()) {
+                player.getItemInHand(hand).shrink(1);
+            }
+            level.playSound(null, player.blockPosition(), SoundEvents.LEAD_TIED, SoundSource.PLAYERS, 1.0F, 1.0F);
             return InteractionResult.SUCCESS;
         });
 

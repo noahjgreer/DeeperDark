@@ -122,7 +122,7 @@ public class Deeperdark implements ModInitializer {
 				net.noahsarch.deeperdark.util.CustomBlockTracker.get(world);
 			}
 			// Populate the ingredient item set used by AllIngredientsConsumableMixin
-			net.noahsarch.deeperdark.util.IngredientItemRegistry.buildIngredientSet(server);
+			net.noahsarch.deeperdark.util.IngredientItemRegistry.buildIngredientSet(server.registryAccess());
 		});
 
 		// Save custom block data when server stops
