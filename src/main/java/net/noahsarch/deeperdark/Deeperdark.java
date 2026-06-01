@@ -79,6 +79,7 @@ public class Deeperdark implements ModInitializer {
 		});
 
 		SiphonEvents.register();
+		GunpowderTrailEvents.register();
 
 		// Register glass door dye recipe
 		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER,

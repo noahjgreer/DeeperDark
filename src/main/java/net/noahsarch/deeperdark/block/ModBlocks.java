@@ -135,6 +135,17 @@ public class ModBlocks {
                     .ignitedByLava(),
             true);
 
+    public static final Block GUNPOWDER_TRAIL = register(
+            "gunpowder_trail",
+            GunpowderTrailBlock::new,
+            BlockBehaviour.Properties.of()
+                    .strength(0.0F)
+                    .instabreak()
+                    .noCollision()
+                    .ignitedByLava()
+                    .sound(SoundType.GRAVEL),
+            false);
+
     public static final Block GUNPOWDER_BLOCK = register(
             "gunpowder_block",
             Block::new,

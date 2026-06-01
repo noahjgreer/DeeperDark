@@ -1,0 +1,9 @@
+{
+    "parent": "deeperdark:block/gunpowder_trail_side",
+    "textures": {
+        "line": {
+            "sprite": "deeperdark:block/gunpowder_trail_line0",
+            "force_translucent": true
+        }
+    }
+}

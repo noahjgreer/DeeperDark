@@ -1,5 +1,9 @@
 package net.noahsarch.deeperdark.mixin;
 
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -38,8 +42,16 @@ public class ExplosionImplMixin {
         }
         if (!state.isAir() && explosion.getBlockInteraction() != Explosion.BlockInteraction.TRIGGER_BLOCK) {
             BlockEntity blockEntity = state.hasBlockEntity() ? world.getBlockEntity(pos) : null;
-            ItemStack tool = explosion.getDirectSourceEntity() instanceof PrimedDynamite
-                    ? new ItemStack(Items.GOLDEN_PICKAXE) : ItemStack.EMPTY;
+            ItemStack tool;
+            if (explosion.getDirectSourceEntity() instanceof PrimedDynamite) {
+                tool = new ItemStack(Items.GOLDEN_PICKAXE);
+                Holder<Enchantment> silkTouch = world.registryAccess()
+                        .lookupOrThrow(Registries.ENCHANTMENT)
+                        .getOrThrow(Enchantments.SILK_TOUCH);
+                tool.enchant(silkTouch, 1);
+            } else {
+                tool = ItemStack.EMPTY;
+            }
 
             LootParams.Builder builder = new LootParams.Builder(world)
                 .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos))

@@ -93,7 +93,8 @@
     "EntityRidingMixin",
     "RedStoneWireBlockMixin",
     "SlotPositionAccessor",
-    "SlotMutableMixin"
+    "SlotMutableMixin",
+    "PodzolBlockMixin"
   ],
   "client": [
     "MinecraftMusicMixin",

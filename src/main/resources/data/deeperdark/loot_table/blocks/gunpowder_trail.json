@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:gunpowder"
+        }
+      ],
+      "rolls": 1
+    }
+  ],
+  "random_sequence": "deeperdark:blocks/gunpowder_trail"
+}

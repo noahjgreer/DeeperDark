@@ -41,7 +41,7 @@ public class PrimedDynamite extends Entity implements TraceableEntity {
             .defineId(PrimedDynamite.class, EntityDataSerializers.BLOCK_STATE);
 
     private static final short DEFAULT_FUSE_TIME = 80; // 2x vanilla TNT (80)
-    private static final float DEFAULT_EXPLOSION_POWER = 24.0F; // 3x vanilla TNT (4.0F)
+    public static final float DEFAULT_EXPLOSION_POWER = 24.0F; // 3x vanilla TNT (4.0F)
 
     // Initialized after ModBlocks is loaded (ModEntities.initialize() runs after
     // ModBlocks.initialize())
@@ -138,6 +138,22 @@ public class PrimedDynamite extends Entity implements TraceableEntity {
     private void explode() {
         if (!(this.level() instanceof ServerLevel level))
             return;
+        explodeAt(level, this.getX(), this.getY(0.0625), this.getZ(), this.explosionPower, this);
+    }
+
+    /**
+     * Perform the full dynamite explosion at an arbitrary world position.
+     * Pass {@code null} for {@code source} when there is no primed entity (e.g. trail-triggered);
+     * a detached {@link PrimedDynamite} will be created so the silk-touch mixin check still passes.
+     */
+    public static void explodeAt(ServerLevel level, double x, double y, double z, float power,
+                                 @Nullable Entity source) {
+        if (source == null) {
+            // Detached entity (never added to the world) used only as the explosion source
+            // so that ExplosionImplMixin's instanceof PrimedDynamite check passes.
+            source = new PrimedDynamite(ModEntities.PRIMED_DYNAMITE, level);
+            ((PrimedDynamite) source).setPos(x, y, z);
+        }
         if (!level.getGameRules().get(GameRules.TNT_EXPLODES))
             return;
 
@@ -149,13 +165,11 @@ public class PrimedDynamite extends Entity implements TraceableEntity {
                 BuiltInRegistries.SOUND_EVENT.wrapAsHolder(ModSounds.DYNAMITE_EXPLODE);
 
         level.explode(
-                this,
-                Explosion.getDefaultDamageSource(level, this),
+                source,
+                Explosion.getDefaultDamageSource(level, source),
                 DYNAMITE_DAMAGE_CALCULATOR,
-                this.getX(),
-                this.getY(0.0625),
-                this.getZ(),
-                this.explosionPower,
+                x, y, z,
+                power,
                 false,
                 Level.ExplosionInteraction.TNT,
                 ParticleTypes.EXPLOSION,
@@ -164,14 +178,11 @@ public class PrimedDynamite extends Entity implements TraceableEntity {
                 explosionSound);
 
         level.sendParticles(ParticleTypes.CAMPFIRE_SIGNAL_SMOKE,
-                this.getX(), this.getY() + 0.5, this.getZ(),
-                240, 5.0, 1.0, 5.0, 0.08);
+                x, y + 0.5, z, 240, 5.0, 1.0, 5.0, 0.08);
         level.sendParticles(ParticleTypes.CAMPFIRE_SIGNAL_SMOKE,
-                this.getX(), this.getY() + 3.0, this.getZ(),
-                180, 3.5, 1.5, 3.5, 0.12);
+                x, y + 3.0, z, 180, 3.5, 1.5, 3.5, 0.12);
         level.sendParticles(ParticleTypes.CAMPFIRE_SIGNAL_SMOKE,
-                this.getX(), this.getY() + 6.0, this.getZ(),
-                120, 2.0, 2.0, 2.0, 0.15);
+                x, y + 6.0, z, 120, 2.0, 2.0, 2.0, 0.15);
     }
 
     @Override
