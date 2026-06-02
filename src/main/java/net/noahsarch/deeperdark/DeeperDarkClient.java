@@ -24,6 +24,7 @@ import net.noahsarch.deeperdark.client.renderer.VaultBlockEntityRenderer;
 import net.noahsarch.deeperdark.client.screen.BoxScreen;
 import net.noahsarch.deeperdark.client.screen.VaultScreen;
 import net.noahsarch.deeperdark.entity.ModEntities;
+import net.noahsarch.deeperdark.client.ContainerItemKeyHandler;
 import net.noahsarch.deeperdark.intro.DeeperDarkLogoScreen;
 import net.noahsarch.deeperdark.menu.ModMenus;
 import net.noahsarch.deeperdark.event.VoidParticleHandler;
@@ -38,6 +39,7 @@ public class DeeperDarkClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        ContainerItemKeyHandler.register();
         MenuScreens.register(ModMenus.COLLAR, net.noahsarch.deeperdark.client.screen.CollarScreen::new);
         MenuScreens.register(ModMenus.COLLAR_BENCH, net.noahsarch.deeperdark.client.screen.CollarBenchScreen::new);
         MenuScreens.register(ModMenus.FLIMSY_BOX, BoxScreen::new);

@@ -1,0 +1,151 @@
+package net.noahsarch.deeperdark.mixin;
+
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.protocol.game.ClientboundSetHeldSlotPacket;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
+import net.minecraft.world.item.component.BundleContents;
+import net.minecraft.world.item.component.ItemContainerContents;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Extends pick-block (middle-click) in survival to search inside shulker boxes,
+ * boxes, and bundles held in the player's inventory when the item isn't found
+ * directly in the inventory.
+ */
+@Mixin(ServerGamePacketListenerImpl.class)
+public abstract class PickBlockContainerMixin {
+
+    @Shadow
+    private ServerPlayer player;
+
+    @Inject(method = "tryPickItem", at = @At("TAIL"))
+    private void deeperdark$pickFromContainers(ItemStack itemStack, CallbackInfo ci) {
+        if (!itemStack.isItemEnabled(this.player.level().enabledFeatures()))
+            return;
+        // Creative already handled it
+        if (this.player.hasInfiniteMaterials())
+            return;
+
+        Inventory inventory = this.player.getInventory();
+        // If vanilla already selected the right item, nothing to do
+        if (ItemStack.isSameItemSameComponents(inventory.getSelectedItem(), itemStack))
+            return;
+
+        if (deeperdark$searchAndExtract(inventory, itemStack)) {
+            this.player.connection.send(new ClientboundSetHeldSlotPacket(inventory.getSelectedSlot()));
+            this.player.inventoryMenu.broadcastChanges();
+        }
+    }
+
+    private boolean deeperdark$searchAndExtract(Inventory inventory, ItemStack target) {
+        for (int i = 0; i < inventory.getContainerSize(); i++) {
+            ItemStack slot = inventory.getItem(i);
+            if (slot.isEmpty())
+                continue;
+
+            BundleContents bundle = slot.get(DataComponents.BUNDLE_CONTENTS);
+            if (bundle != null && !bundle.isEmpty()) {
+                if (deeperdark$extractFromBundle(slot, bundle, target, inventory))
+                    return true;
+            }
+
+            ItemContainerContents container = slot.get(DataComponents.CONTAINER);
+            if (container != null) {
+                if (deeperdark$extractFromContainer(slot, container, target, inventory))
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean deeperdark$extractFromBundle(
+            ItemStack bundleItem, BundleContents contents, ItemStack target, Inventory inventory) {
+        List<ItemStackTemplate> items = contents.items();
+        for (int i = 0; i < items.size(); i++) {
+            ItemStack candidate = items.get(i).create();
+            if (!ItemStack.isSameItemSameComponents(candidate, target))
+                continue;
+            if (!deeperdark$hasRoomForStack(inventory, candidate))
+                return false;
+
+            BundleContents.Mutable mutable = new BundleContents.Mutable(contents);
+            mutable.toggleSelectedItem(i);
+            ItemStack removed = mutable.removeOne();
+            if (removed == null || removed.isEmpty())
+                return false;
+
+            ItemStack extracted = removed.copy();
+            bundleItem.set(DataComponents.BUNDLE_CONTENTS, mutable.toImmutable());
+            deeperdark$addAndSelectItem(inventory, extracted, target);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean deeperdark$extractFromContainer(
+            ItemStack containerItem, ItemContainerContents contents, ItemStack target, Inventory inventory) {
+        List<ItemStack> allItems = new ArrayList<>();
+        contents.allItemsCopyStream().forEach(allItems::add);
+
+        for (int i = 0; i < allItems.size(); i++) {
+            ItemStack slot = allItems.get(i);
+            if (slot.isEmpty() || !ItemStack.isSameItemSameComponents(slot, target))
+                continue;
+            if (!deeperdark$hasRoomForStack(inventory, slot))
+                return false;
+
+            ItemStack extracted = slot.copy();
+            allItems.set(i, ItemStack.EMPTY);
+            containerItem.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(allItems));
+            deeperdark$addAndSelectItem(inventory, extracted, target);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Returns true if the full stack can fit in the main inventory.
+     */
+    private static boolean deeperdark$hasRoomForStack(Inventory inventory, ItemStack stack) {
+        int remaining = stack.getCount();
+        int maxStack = stack.getMaxStackSize();
+        for (int i = 0; i < 36; i++) {
+            ItemStack s = inventory.getItem(i);
+            if (s.isEmpty()) {
+                remaining -= maxStack;
+            } else if (ItemStack.isSameItemSameComponents(s, stack)) {
+                remaining -= Math.max(0, s.getMaxStackSize() - s.getCount());
+            }
+            if (remaining <= 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Adds the extracted stack, then selects a matching hotbar slot if present.
+     */
+    private static void deeperdark$addAndSelectItem(Inventory inventory, ItemStack extracted, ItemStack target) {
+        inventory.add(extracted);
+        int slotWithItem = inventory.findSlotMatchingItem(target);
+        if (slotWithItem != -1) {
+            if (Inventory.isHotbarSlot(slotWithItem)) {
+                inventory.setSelectedSlot(slotWithItem);
+            } else {
+                inventory.pickSlot(slotWithItem);
+            }
+        }
+    }
+}

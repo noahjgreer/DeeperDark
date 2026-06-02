@@ -94,9 +94,11 @@
     "RedStoneWireBlockMixin",
     "SlotPositionAccessor",
     "SlotMutableMixin",
-    "PodzolBlockMixin"
+    "PodzolBlockMixin",
+    "PickBlockContainerMixin"
   ],
   "client": [
+    "ContainerScreenOpenMixin",
     "MinecraftMusicMixin",
     "HumanoidArmorLayerMixin",
     "PassengerPickableMixin",
