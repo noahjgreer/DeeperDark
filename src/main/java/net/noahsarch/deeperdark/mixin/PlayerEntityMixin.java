@@ -94,13 +94,39 @@ public abstract class PlayerEntityMixin extends LivingEntity implements Leashabl
 
     @Override
     public void dropLeash() {
-        // removeLeash() broadcasts an unlink packet to trackers (for third-party observers).
-        // The custom PlayerLeashPacket tells the leashed player's own client (snap/auto-break case).
         Entity self = (Entity)(Object)this;
-        if (!self.level().isClientSide() && self instanceof ServerPlayer sp) {
-            ServerPlayNetworking.send(sp, new net.noahsarch.deeperdark.payload.PlayerLeashPacket(self.getId(), -1));
+        if (!self.level().isClientSide()) {
+            if (self instanceof ServerPlayer sp) {
+                ServerPlayNetworking.send(sp, new net.noahsarch.deeperdark.payload.PlayerLeashPacket(self.getId(), -1));
+            }
+            // Drop the lead item at the leashed player's feet, matching vanilla mob behaviour.
+            if (self.level() instanceof ServerLevel serverLevel) {
+                self.spawnAtLocation(serverLevel, Items.LEAD);
+            }
         }
         this.removeLeash();
+    }
+
+    @Override
+    public Vec3 getLeashOffset() {
+        Player self = (Player)(Object)this;
+        return new Vec3(0.0, self.getEyeHeight() - 0.25, self.getBbWidth() * 0.4F);
+    }
+
+    @Unique
+    private void deeperdark$snapLeashForRiding(Player rider) {
+        Leashable self = (Leashable)(Object)this;
+        // Vehicle is leashed to the rider
+        if (self.isLeashed() && self.getLeashHolder() == rider) {
+            self.dropLeash();
+            return;
+        }
+        // Rider is leashed to the vehicle
+        if (rider instanceof Leashable riderLeashable
+                && riderLeashable.isLeashed()
+                && riderLeashable.getLeashHolder() == (Entity)(Object)this) {
+            riderLeashable.dropLeash();
+        }
     }
 
     @Unique
@@ -134,6 +160,9 @@ public abstract class PlayerEntityMixin extends LivingEntity implements Leashabl
                 && !this.isVehicle()
                 && deeperdark$hasSaddleEquipped()
                 && player.startRiding(this, true, true)) {
+            // Snap any leash between the rider and the vehicle — riding and leashing the same
+            // player creates an irrecoverable desync, so drop the lead on the ground.
+            deeperdark$snapLeashForRiding(player);
             // The tracker sends SetPassengers to observers but NOT to the vehicle player's own client
             if ((Object)this instanceof ServerPlayer vehiclePlayer) {
                 vehiclePlayer.connection.send(new ClientboundSetPassengersPacket((Entity)(Object)this));

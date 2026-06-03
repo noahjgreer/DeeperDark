@@ -8,6 +8,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Leashable;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -30,9 +31,12 @@ public class PlayerLeashHandler {
 
             Leashable leashable = (Leashable) target;
 
-            // Un-leash: right-click the leashed player regardless of what is in hand.
+            // If this player is holding target's leash, intercept ALL hands so vanilla
+            // Entity.interact (which has its own leash management in MC 26.1.2) never runs.
+            // Only actually un-leash on MAIN_HAND server-side; off-hand just gets SUCCESS to
+            // suppress the vanilla un-leash that would otherwise fire when we return PASS.
             if (leashable.isLeashed() && player == leashable.getLeashHolder()) {
-                if (!level.isClientSide()) {
+                if (hand == InteractionHand.MAIN_HAND && !level.isClientSide()) {
                     leashable.removeLeash();
                     ServerPlayNetworking.send((ServerPlayer) target, new PlayerLeashPacket(target.getId(), -1));
                     if (!player.hasInfiniteMaterials()) {

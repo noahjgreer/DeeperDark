@@ -24,6 +24,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.gamerules.GameRules;
 import net.noahsarch.deeperdark.entity.PrimedDynamite;
@@ -136,6 +137,40 @@ public class GunpowderTrailBlock extends Block {
                 .setValue(SOUTH, getConnectingSide(level, pos, Direction.SOUTH))
                 .setValue(EAST,  getConnectingSide(level, pos, Direction.EAST))
                 .setValue(WEST,  getConnectingSide(level, pos, Direction.WEST));
+    }
+
+    // ─── Indirect Neighbour Shape Updates ────────────────────────────────────
+    // Vanilla RedStoneWireBlock overrides this so that diagonally-adjacent wires
+    // (one step ahead + one step up/down) are notified when this block changes.
+    // Without it, a higher trail placed first never learns about a lower trail
+    // placed one-step-below-ahead, so its SIDE connection stays NONE and the
+    // burn cannot propagate downward.
+    @Override
+    protected void updateIndirectNeighbourShapes(BlockState state, LevelAccessor level, BlockPos pos,
+                                                 int updateFlags, int updateLimit) {
+        BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
+
+        for (Direction dir : Direction.Plane.HORIZONTAL) {
+            RedstoneSide side = state.getValue(PROPERTY_BY_DIRECTION.get(dir));
+            if (side == RedstoneSide.NONE) continue;
+            if (level.getBlockState(mutablePos.setWithOffset(pos, dir)).is(this)) continue;
+
+            // Trail one step below-and-ahead
+            mutablePos.move(Direction.DOWN);
+            if (level.getBlockState(mutablePos).is(this)) {
+                BlockPos neighborPos = mutablePos.relative(dir.getOpposite());
+                level.neighborShapeChanged(dir.getOpposite(), mutablePos, neighborPos,
+                        level.getBlockState(neighborPos), updateFlags, updateLimit);
+            }
+
+            // Trail one step above-and-ahead
+            mutablePos.setWithOffset(pos, dir).move(Direction.UP);
+            if (level.getBlockState(mutablePos).is(this)) {
+                BlockPos neighborPos = mutablePos.relative(dir.getOpposite());
+                level.neighborShapeChanged(dir.getOpposite(), mutablePos, neighborPos,
+                        level.getBlockState(neighborPos), updateFlags, updateLimit);
+            }
+        }
     }
 
     // ─── Placement & Shape Updates ────────────────────────────────────────────

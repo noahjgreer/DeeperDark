@@ -1,4 +1,6 @@
 {
+  "key.deeperdark.open_container_item": "Open Container",
+  "tooltip.deeperdark.open_container_hint": "Press %s to open from inventory",
   "autoUpdater.error": "An error occurred:",
   "autoUpdater.install.fail": "Installation failed. Sorry about that!\n\nPlease try and install the latest update manually, or send me a DM.",
   "autoUpdater.install.option.fail.continue": "Continue to Title Screen",

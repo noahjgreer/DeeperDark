@@ -42,6 +42,7 @@ import net.minecraft.world.phys.Vec3;
 import net.noahsarch.deeperdark.DeeperDarkConfig;
 import net.noahsarch.deeperdark.component.CollarFuelData;
 import net.noahsarch.deeperdark.component.ModComponents;
+import net.noahsarch.deeperdark.block.ModBlocks;
 import net.noahsarch.deeperdark.duck.CollarHolder;
 import net.noahsarch.deeperdark.item.CollarItem;
 import net.noahsarch.deeperdark.item.CollarTier;
@@ -447,7 +448,14 @@ public class CollarEvents {
         }
 
         BlockPos feetPos = player.blockPosition();
-        BlockPos onWire = level.getBlockState(feetPos).is(Blocks.REDSTONE_WIRE) ? feetPos : null;
+        BlockState feetState = level.getBlockState(feetPos);
+
+        // Ignite any gunpowder trail the player is standing on
+        if (feetState.is(ModBlocks.GUNPOWDER_TRAIL)) {
+            level.scheduleTick(feetPos, feetState.getBlock(), 2);
+        }
+
+        BlockPos onWire = feetState.is(Blocks.REDSTONE_WIRE) ? feetPos : null;
 
         if (onWire != null) {
             if (!onWire.equals(prev)) {

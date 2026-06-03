@@ -4,11 +4,13 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.protocol.game.ClientboundSetHeldSlotPacket;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.component.BundleContents;
 import net.minecraft.world.item.component.ItemContainerContents;
+import net.noahsarch.deeperdark.block.ModBlocks;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -62,7 +64,10 @@ public abstract class PickBlockContainerMixin {
 
             ItemContainerContents container = slot.get(DataComponents.CONTAINER);
             if (container != null) {
-                if (deeperdark$extractFromContainer(slot, container, target, inventory))
+                if (deeperdark$isVaultItem(slot)) {
+                    if (deeperdark$extractFromVault(slot, container, target, inventory))
+                        return true;
+                } else if (deeperdark$extractFromContainer(slot, container, target, inventory))
                     return true;
             }
         }
@@ -112,6 +117,36 @@ public abstract class PickBlockContainerMixin {
             return true;
         }
         return false;
+    }
+
+    private boolean deeperdark$extractFromVault(
+            ItemStack vaultItem, ItemContainerContents contents, ItemStack target, Inventory inventory) {
+        List<ItemStack> allItems = new ArrayList<>();
+        contents.allItemsCopyStream().forEach(allItems::add);
+
+        for (int i = 0; i < allItems.size(); i++) {
+            ItemStack slot = allItems.get(i);
+            if (slot.isEmpty() || !ItemStack.isSameItemSameComponents(slot, target))
+                continue;
+            if (!deeperdark$hasRoomForStack(inventory, slot))
+                return false;
+
+            ItemStack extracted = slot.copy();
+            allItems.set(i, ItemStack.EMPTY);
+            vaultItem.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(allItems));
+            deeperdark$addAndSelectItem(inventory, extracted, target);
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean deeperdark$isVaultItem(ItemStack stack) {
+        if (!(stack.getItem() instanceof BlockItem blockItem)) {
+            return false;
+        }
+        return blockItem.getBlock() == ModBlocks.SMALL_ITEM_VAULT
+                || blockItem.getBlock() == ModBlocks.MEDIUM_ITEM_VAULT
+                || blockItem.getBlock() == ModBlocks.LARGE_ITEM_VAULT;
     }
 
     /**

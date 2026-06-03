@@ -42,6 +42,18 @@ public class ItemBackedContainer extends SimpleContainer {
         return new ItemBackedContainer(player, stack, size);
     }
 
+    public ItemStack getSourceStack() {
+        return sourceStack;
+    }
+
+    @Override
+    public boolean canPlaceItem(int slot, ItemStack stack) {
+        if (stack == sourceStack) return false;
+        // Block all container items (shulker boxes, our boxes) from being nested.
+        if (ContainerItemUtil.getContainerSize(stack) >= 0) return false;
+        return super.canPlaceItem(slot, stack);
+    }
+
     @Override
     public boolean stillValid(Player p) {
         return p == this.player && findSourceStackInInventory() != -1;

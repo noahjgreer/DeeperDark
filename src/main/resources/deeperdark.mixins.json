@@ -45,7 +45,6 @@
     "SaplingBlockMixin",
     "ServerPlayerEntityMixin",
     "ShearsItemMixin",
-    "ShulkerBoxBlockEntityMixin",
     "SpawnHelperMixin",
     "SkeletonMobMixin",
     "SquidMobMixin",
@@ -81,6 +80,7 @@
     "LeavesBeGoneLeavesBlockMixin",
     "AllIngredientsConsumableMixin",
     "TridentItemMixin",
+    "SpinAttackRidingMixin",
     "ArmorSlotMixin",
     "BowItemMixin",
     "CollarPlayerMixin",
@@ -95,7 +95,8 @@
     "SlotPositionAccessor",
     "SlotMutableMixin",
     "PodzolBlockMixin",
-    "PickBlockContainerMixin"
+    "PickBlockContainerMixin",
+    "ShulkerBoxItemInsertMixin"
   ],
   "client": [
     "ContainerScreenOpenMixin",

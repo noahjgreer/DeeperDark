@@ -1,7 +1,9 @@
 {
   "block.collarbench.use": {
     "sounds": [
-      "deeperdark:block/collarbench/use"
+      "deeperdark:block/collarbench/use1",
+      "deeperdark:block/collarbench/use2",
+      "deeperdark:block/collarbench/use3"
     ],
     "subtitle": "subtitles.deeperdark.block.collarbench.use"
   },
