@@ -22,14 +22,6 @@ public class ContainerItemKeyHandler {
         KeyMapping.Category.INVENTORY
     );
 
-    /**
-     * Inventory slot index of the container currently open from inventory (-1 = none).
-     * Set when the player presses the key; cleared when the player returns to the
-     * plain inventory screen. Used by ContainerScreenOpenMixin to suppress the "+"
-     * indicator on the slot that is already open (preventing duplication).
-     */
-    public static int openedFromInventorySlot = -1;
-
     public static void register() {
         // Constructing KEY above is sufficient — KeyMapping adds itself to the static ALL map.
     }

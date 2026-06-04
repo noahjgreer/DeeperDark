@@ -31,9 +31,11 @@ public class BoxItem extends BlockItem {
             ItemStack self, ItemStack other, Slot slot,
             ClickAction clickAction, Player player, SlotAccess carriedAccess) {
         if (clickAction != ClickAction.PRIMARY || other.isEmpty()) return false;
+        // Block nesting containers inside containers.
+        if (ContainerItemUtil.getContainerSize(other) >= 0) return false;
         // Block insertion when this exact container item is currently open from inventory.
         for (Slot s : player.containerMenu.slots) {
-            if (s.container instanceof ItemBackedContainer ibc && ibc.getSourceStack() == self) return false;
+            if (s.container instanceof ItemBackedContainer ibc && ibc.isTrackingItem(self)) return false;
         }
         int size = ContainerItemUtil.getContainerSize(self);
         return ContainerItemUtil.tryInsert(self, other, carriedAccess, size);

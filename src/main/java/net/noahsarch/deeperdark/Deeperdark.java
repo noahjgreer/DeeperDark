@@ -223,6 +223,11 @@ public class Deeperdark implements ModInitializer {
 		ItemStack stack = player.getInventory().getItem(slot);
 		if (stack.isEmpty()) return;
 
+		// Refuse to open if this exact item is already open from inventory.
+		for (net.minecraft.world.inventory.Slot s : player.containerMenu.slots) {
+			if (s.container instanceof ItemBackedContainer ibc && ibc.isTrackingItem(stack)) return;
+		}
+
 		if (stack.is(ItemTags.SHULKER_BOXES)) {
 			ItemBackedContainer container = ItemBackedContainer.of(player, slot, 27);
 			player.openMenu(new SimpleMenuProvider(

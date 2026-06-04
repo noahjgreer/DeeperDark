@@ -2,90 +2,131 @@ package net.noahsarch.deeperdark.inventory;
 
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.ContainerUser;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.component.ItemContainerContents;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * A SimpleContainer backed by the CONTAINER data component on a player's inventory item.
- * Changes are written back to the source item when the menu is closed via stopOpen().
+ *
+ * The source item is tracked by a UUID written into its CUSTOM_DATA component rather than
+ * by object identity. This survives the ItemStack.split() copy that MC performs when the
+ * player drags the item between inventory slots — the copy inherits all data components,
+ * including the UUID marker, so the container stays valid.
+ *
+ * Changes are written back in real time via setChanged(), keeping the item's NBT current
+ * even before the menu closes.
  */
 public class ItemBackedContainer extends SimpleContainer {
+
+    /** Key used inside CUSTOM_DATA to hold the open-session UUID. */
+    public static final String OPEN_MARKER_KEY = "deeperdark_open";
+
     private final ServerPlayer player;
-    private final ItemStack sourceStack;
+    private final String openId;
 
     private ItemBackedContainer(ServerPlayer player, ItemStack sourceStack, int size) {
         super(size);
         this.player = player;
-        this.sourceStack = sourceStack;
-        NonNullList<ItemStack> items = NonNullList.withSize(size, ItemStack.EMPTY);
-        sourceStack.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY).copyInto(items);
+        this.openId = UUID.randomUUID().toString();
+
+        // Stamp the item with our UUID so we can find it even after it is split/copied
+        // when the player drags it to a different inventory slot.
+        CustomData.update(DataComponents.CUSTOM_DATA, sourceStack, tag -> tag.putString(OPEN_MARKER_KEY, openId));
+
+        // Load directly into the backing list to bypass setChanged during initial load.
+        NonNullList<ItemStack> loaded = NonNullList.withSize(size, ItemStack.EMPTY);
+        sourceStack.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY).copyInto(loaded);
         for (int i = 0; i < size; i++) {
-            this.setItem(i, items.get(i));
+            this.items.set(i, loaded.get(i));
         }
     }
 
-    /**
-     * Creates a container backed by the item at the given inventory slot.
-     * The source item reference is held; the container is valid as long as
-     * that exact ItemStack object remains in the player's inventory.
-     */
     public static ItemBackedContainer of(ServerPlayer player, int inventorySlot, int size) {
         ItemStack stack = player.getInventory().getItem(inventorySlot);
         return new ItemBackedContainer(player, stack, size);
     }
 
-    public ItemStack getSourceStack() {
-        return sourceStack;
+    /** Returns true if {@code stack} is the item this container is currently tracking. */
+    public boolean isTrackingItem(ItemStack stack) {
+        return !stack.isEmpty() && openId.equals(markerOf(stack));
     }
 
     @Override
     public boolean canPlaceItem(int slot, ItemStack stack) {
-        if (stack == sourceStack) return false;
-        // Block all container items (shulker boxes, our boxes) from being nested.
+        if (isTrackingItem(stack)) return false;
         if (ContainerItemUtil.getContainerSize(stack) >= 0) return false;
         return super.canPlaceItem(slot, stack);
     }
 
     @Override
     public boolean stillValid(Player p) {
-        return p == this.player && findSourceStackInInventory() != -1;
+        return p == this.player && findMarkedItem() != null;
+    }
+
+    /** Write contents back to the source item on every change so NBT is always current. */
+    @Override
+    public void setChanged() {
+        super.setChanged();
+        saveBack();
     }
 
     @Override
     public void stopOpen(ContainerUser user) {
         super.stopOpen(user);
         saveBack();
+        // Remove the open marker so the item no longer looks "in use".
+        ItemStack current = findMarkedItem();
+        if (current != null) {
+            CustomData.update(DataComponents.CUSTOM_DATA, current, tag -> tag.remove(OPEN_MARKER_KEY));
+            player.inventoryMenu.broadcastChanges();
+        }
     }
 
     private void saveBack() {
-        if (findSourceStackInInventory() == -1) return;
-        List<ItemStack> items = new ArrayList<>(getContainerSize());
-        for (int i = 0; i < getContainerSize(); i++) {
-            items.add(getItem(i).copy());
-        }
-        sourceStack.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(items));
+        ItemStack target = findMarkedItem();
+        if (target == null) return;
+        List<ItemStack> list = new ArrayList<>(getContainerSize());
+        for (int i = 0; i < getContainerSize(); i++) list.add(getItem(i).copy());
+        target.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(list));
         player.inventoryMenu.broadcastChanges();
     }
 
     /**
-     * Finds the slot where sourceStack (by object reference) currently lives.
-     * Returns -1 if the item is no longer in the player's inventory.
+     * Locates the item bearing our open-marker UUID.
+     * Checks both the player's inventory slots and the carried (cursor) item, since
+     * the player may be mid-drag with the item on the cursor.
      */
-    private int findSourceStackInInventory() {
+    private @Nullable ItemStack findMarkedItem() {
         Inventory inv = player.getInventory();
         for (int i = 0; i < inv.getContainerSize(); i++) {
-            if (inv.getItem(i) == sourceStack) {
-                return i;
-            }
+            ItemStack s = inv.getItem(i);
+            if (isMarkedWith(s)) return s;
         }
-        return -1;
+        ItemStack carried = player.containerMenu.getCarried();
+        if (isMarkedWith(carried)) return carried;
+        return null;
+    }
+
+    private boolean isMarkedWith(ItemStack stack) {
+        return !stack.isEmpty() && openId.equals(markerOf(stack));
+    }
+
+    private static @Nullable String markerOf(ItemStack stack) {
+        CustomData data = stack.get(DataComponents.CUSTOM_DATA);
+        if (data == null) return null;
+        CompoundTag tag = data.copyTag();
+        return tag.contains(OPEN_MARKER_KEY) ? tag.getStringOr(OPEN_MARKER_KEY, "") : null;
     }
 }

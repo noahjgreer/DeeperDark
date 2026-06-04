@@ -29,9 +29,11 @@ public class ShulkerBoxItemInsertMixin {
             CallbackInfoReturnable<Boolean> cir) {
         if (!self.is(ItemTags.SHULKER_BOXES)) return;
         if (clickAction != ClickAction.PRIMARY || other.isEmpty()) return;
+        // Block nesting containers inside containers.
+        if (ContainerItemUtil.getContainerSize(other) >= 0) return;
         // Block insertion when this exact container item is currently open from inventory.
         for (Slot s : player.containerMenu.slots) {
-            if (s.container instanceof ItemBackedContainer ibc && ibc.getSourceStack() == self) return;
+            if (s.container instanceof ItemBackedContainer ibc && ibc.isTrackingItem(self)) return;
         }
         if (ContainerItemUtil.tryInsert(self, other, carriedAccess, 27)) {
             cir.setReturnValue(true);
