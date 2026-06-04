@@ -6,8 +6,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.noahsarch.deeperdark.item.ModItems;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.noahsarch.deeperdark.block.ModBlocks;
@@ -17,7 +17,7 @@ public class GunpowderTrailEvents {
     public static void register() {
         UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
             ItemStack stack = player.getItemInHand(hand);
-            if (!stack.is(Items.GUNPOWDER)) return InteractionResult.PASS;
+            if (!stack.is(ModItems.GUNPOWDER_DUST)) return InteractionResult.PASS;
 
             // Only allow placement by clicking the top face of a block
             if (hitResult.getDirection() != Direction.UP) return InteractionResult.PASS;

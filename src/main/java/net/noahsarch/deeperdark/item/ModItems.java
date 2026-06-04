@@ -57,7 +57,10 @@ public class ModItems {
         Deeperdark.LOGGER.info("Registering ModItems for deeperdark");
 
         CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.INGREDIENTS)
-            .register(creativeTab -> creativeTab.accept(ModItems.LEATHER_SCRAP));
+            .register(creativeTab -> {
+                creativeTab.accept(ModItems.LEATHER_SCRAP);
+                creativeTab.accept(ModItems.GUNPOWDER_DUST);
+            });
 
         CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.TOOLS_AND_UTILITIES)
             .register(creativeTab -> {
@@ -80,6 +83,11 @@ public class ModItems {
 
     public static final Item LEATHER_SCRAP = register(
         "leather_scrap",
+        Item::new,
+        new Item.Properties());
+
+    public static final Item GUNPOWDER_DUST = register(
+        "gunpowder_dust",
         Item::new,
         new Item.Properties());
 

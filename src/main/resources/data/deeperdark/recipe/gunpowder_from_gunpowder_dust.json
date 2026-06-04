@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "deeperdark:gunpowder_dust",
+    "deeperdark:gunpowder_dust",
+    "deeperdark:gunpowder_dust",
+    "deeperdark:gunpowder_dust",
+    "deeperdark:gunpowder_dust",
+    "deeperdark:gunpowder_dust",
+    "deeperdark:gunpowder_dust",
+    "deeperdark:gunpowder_dust",
+    "deeperdark:gunpowder_dust"
+  ],
+  "result": {
+    "count": 1,
+    "id": "minecraft:gunpowder"
+  }
+}
