@@ -9,6 +9,8 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.component.ItemContainerContents;
 import org.jspecify.annotations.Nullable;
@@ -35,11 +37,13 @@ public class ItemBackedContainer extends SimpleContainer {
 
     private final ServerPlayer player;
     private final String openId;
+    private final @Nullable SoundEvent closeSound;
 
-    private ItemBackedContainer(ServerPlayer player, ItemStack sourceStack, int size) {
+    private ItemBackedContainer(ServerPlayer player, ItemStack sourceStack, int size, @Nullable SoundEvent closeSound) {
         super(size);
         this.player = player;
         this.openId = UUID.randomUUID().toString();
+        this.closeSound = closeSound;
 
         // Stamp the item with our UUID so we can find it even after it is split/copied
         // when the player drags it to a different inventory slot.
@@ -53,9 +57,9 @@ public class ItemBackedContainer extends SimpleContainer {
         }
     }
 
-    public static ItemBackedContainer of(ServerPlayer player, int inventorySlot, int size) {
+    public static ItemBackedContainer of(ServerPlayer player, int inventorySlot, int size, @Nullable SoundEvent closeSound) {
         ItemStack stack = player.getInventory().getItem(inventorySlot);
-        return new ItemBackedContainer(player, stack, size);
+        return new ItemBackedContainer(player, stack, size, closeSound);
     }
 
     /** Returns true if {@code stack} is the item this container is currently tracking. */
@@ -85,6 +89,10 @@ public class ItemBackedContainer extends SimpleContainer {
     @Override
     public void stopOpen(ContainerUser user) {
         super.stopOpen(user);
+        if (closeSound != null) {
+            player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
+                    closeSound, SoundSource.BLOCKS, 1.0f, 1.0f);
+        }
         saveBack();
         // Remove the open marker so the item no longer looks "in use".
         ItemStack current = findMarkedItem();

@@ -16,7 +16,11 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.Identifier;
 import net.noahsarch.deeperdark.event.*;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.inventory.ChestMenu;
 import net.noahsarch.deeperdark.inventory.ItemBackedContainer;
+import net.noahsarch.deeperdark.inventory.OpenMarkedContainer;
 import net.noahsarch.deeperdark.payload.AllIngredientsConsumableSyncPacket;
 import net.noahsarch.deeperdark.payload.OpenContainerItemPayload;
 import net.noahsarch.deeperdark.payload.PlayerLeashPacket;
@@ -214,11 +218,11 @@ public class Deeperdark implements ModInitializer {
 	}
 
 	/**
-	 * Opens the appropriate container menu for a shulker box or box held in the
-	 * player's inventory at the given slot. Called server-side from the
-	 * OpenContainerItemPayload handler.
+	 * Opens the appropriate container menu for a container item held in the player's
+	 * inventory at the given slot. Public so it can also be called from the right-click
+	 * mixin (ContainerItemUseInHandMixin).
 	 */
-	private static void openContainerFromInventory(ServerPlayer player, int slot) {
+	public static void openContainerFromInventory(ServerPlayer player, int slot) {
 		if (slot < 0 || slot >= player.getInventory().getContainerSize()) return;
 		ItemStack stack = player.getInventory().getItem(slot);
 		if (stack.isEmpty()) return;
@@ -226,32 +230,56 @@ public class Deeperdark implements ModInitializer {
 		// Refuse to open if this exact item is already open from inventory.
 		for (net.minecraft.world.inventory.Slot s : player.containerMenu.slots) {
 			if (s.container instanceof ItemBackedContainer ibc && ibc.isTrackingItem(stack)) return;
+			if (s.container instanceof OpenMarkedContainer omc && omc.isTrackingItem(stack)) return;
 		}
 
+		playSound(player, stack, true);
+
 		if (stack.is(ItemTags.SHULKER_BOXES)) {
-			ItemBackedContainer container = ItemBackedContainer.of(player, slot, 27);
+			ItemBackedContainer container = ItemBackedContainer.of(player, slot, 27, SoundEvents.SHULKER_BOX_CLOSE);
 			player.openMenu(new SimpleMenuProvider(
 				(id, inv, p) -> new ShulkerBoxMenu(id, inv, container),
 				stack.getHoverName()
 			));
 		} else if (stack.is(ModBlocks.FLIMSY_BOX.asItem())) {
-			ItemBackedContainer container = ItemBackedContainer.of(player, slot, 3);
+			ItemBackedContainer container = ItemBackedContainer.of(player, slot, 3, SoundEvents.CHEST_CLOSE);
 			player.openMenu(new SimpleMenuProvider(
 				(id, inv, p) -> new BoxMenu(ModMenus.FLIMSY_BOX, id, inv, container, 1),
 				stack.getHoverName()
 			));
 		} else if (stack.is(ModBlocks.STURDY_BOX.asItem())) {
-			ItemBackedContainer container = ItemBackedContainer.of(player, slot, 6);
+			ItemBackedContainer container = ItemBackedContainer.of(player, slot, 6, SoundEvents.CHEST_CLOSE);
 			player.openMenu(new SimpleMenuProvider(
 				(id, inv, p) -> new BoxMenu(ModMenus.STURDY_BOX, id, inv, container, 2),
 				stack.getHoverName()
 			));
 		} else if (stack.is(ModBlocks.REINFORCED_BOX.asItem())) {
-			ItemBackedContainer container = ItemBackedContainer.of(player, slot, 9);
+			ItemBackedContainer container = ItemBackedContainer.of(player, slot, 9, SoundEvents.CHEST_CLOSE);
 			player.openMenu(new SimpleMenuProvider(
 				(id, inv, p) -> new DispenserMenu(id, inv, container),
 				stack.getHoverName()
 			));
+		} else if (stack.is(Items.ENDER_CHEST)) {
+			OpenMarkedContainer container = new OpenMarkedContainer(
+				player.getEnderChestInventory(), player, stack, SoundEvents.ENDER_CHEST_CLOSE
+			);
+			player.openMenu(new SimpleMenuProvider(
+				(id, inv, p) -> ChestMenu.threeRows(id, inv, container),
+				Component.translatable("container.enderchest")
+			));
 		}
+	}
+
+	private static void playSound(ServerPlayer player, ItemStack stack, boolean open) {
+		net.minecraft.sounds.SoundEvent sound;
+		if (stack.is(ItemTags.SHULKER_BOXES)) {
+			sound = open ? SoundEvents.SHULKER_BOX_OPEN : SoundEvents.SHULKER_BOX_CLOSE;
+		} else if (stack.is(Items.ENDER_CHEST)) {
+			sound = open ? SoundEvents.ENDER_CHEST_OPEN : SoundEvents.ENDER_CHEST_CLOSE;
+		} else {
+			sound = open ? SoundEvents.CHEST_OPEN : SoundEvents.CHEST_CLOSE;
+		}
+		player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
+			sound, SoundSource.BLOCKS, 1.0f, 1.0f);
 	}
 }

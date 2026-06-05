@@ -96,7 +96,8 @@
     "SlotMutableMixin",
     "PodzolBlockMixin",
     "PickBlockContainerMixin",
-    "ShulkerBoxItemInsertMixin"
+    "ShulkerBoxItemInsertMixin",
+    "ContainerItemUseInHandMixin"
   ],
   "client": [
     "ContainerScreenOpenMixin",

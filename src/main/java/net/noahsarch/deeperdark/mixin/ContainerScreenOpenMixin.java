@@ -4,15 +4,19 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomData;
 import net.noahsarch.deeperdark.block.ModBlocks;
 import net.noahsarch.deeperdark.client.ContainerItemKeyHandler;
@@ -39,6 +43,29 @@ public abstract class ContainerScreenOpenMixin<T extends AbstractContainerMenu> 
 
     @Shadow
     protected T menu;
+
+    @Shadow
+    public abstract void onClose();
+
+    /**
+     * When Escape or the inventory key is pressed while inside a container that was
+     * opened from the player's inventory, close the container and go back to the
+     * inventory screen instead of returning to the game world.
+     */
+    @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
+    private void deeperdark$backToInventory(KeyEvent event, CallbackInfoReturnable<Boolean> cir) {
+        if (this.menu instanceof InventoryMenu) return;
+        if (!deeperdark$isOpenedFromInventory()) return;
+
+        Minecraft mc = Minecraft.getInstance();
+        boolean isEscape = event.key() == 256; // GLFW_KEY_ESCAPE
+        boolean isInventoryKey = mc.options.keyInventory.matches(event);
+        if (!isEscape && !isInventoryKey) return;
+
+        this.onClose();
+        mc.setScreen(new InventoryScreen(mc.player));
+        cir.setReturnValue(true);
+    }
 
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
     private void deeperdark$openContainerOnKey(KeyEvent event, CallbackInfoReturnable<Boolean> cir) {
@@ -103,6 +130,15 @@ public abstract class ContainerScreenOpenMixin<T extends AbstractContainerMenu> 
         cir.setReturnValue(tooltip);
     }
 
+    /** True if any player-inventory slot in the current menu holds a marker-tagged item. */
+    private boolean deeperdark$isOpenedFromInventory() {
+        for (Slot slot : this.menu.slots) {
+            if (!(slot.container instanceof Inventory)) continue;
+            if (deeperdark$isContainerOpen(slot.getItem())) return true;
+        }
+        return false;
+    }
+
     /** Returns true if this item has an open-container marker written by ItemBackedContainer. */
     private static boolean deeperdark$isContainerOpen(ItemStack stack) {
         CustomData data = stack.get(net.minecraft.core.component.DataComponents.CUSTOM_DATA);
@@ -111,6 +147,7 @@ public abstract class ContainerScreenOpenMixin<T extends AbstractContainerMenu> 
 
     private static boolean deeperdark$isOpenableContainer(ItemStack stack) {
         return stack.is(ItemTags.SHULKER_BOXES)
+            || stack.is(Items.ENDER_CHEST)
             || stack.is(ModBlocks.FLIMSY_BOX.asItem())
             || stack.is(ModBlocks.STURDY_BOX.asItem())
             || stack.is(ModBlocks.REINFORCED_BOX.asItem());

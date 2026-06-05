@@ -3,6 +3,7 @@ package net.noahsarch.deeperdark.client;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.minecraft.client.KeyMapping;
 
 @Environment(EnvType.CLIENT)
@@ -23,6 +24,7 @@ public class ContainerItemKeyHandler {
     );
 
     public static void register() {
-        // Constructing KEY above is sufficient — KeyMapping adds itself to the static ALL map.
+        // Registers KEY with Fabric's key-mapping API so it appears in Options → Controls.
+        KeyMappingHelper.registerKeyMapping(KEY);
     }
 }
