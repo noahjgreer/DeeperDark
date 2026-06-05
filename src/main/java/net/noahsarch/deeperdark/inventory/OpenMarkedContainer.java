@@ -64,8 +64,10 @@ public class OpenMarkedContainer implements Container {
         }
         ItemStack current = findMarkedItem();
         if (current != null) {
-            CustomData.update(DataComponents.CUSTOM_DATA, current,
-                    tag -> tag.remove(ItemBackedContainer.OPEN_MARKER_KEY));
+            CustomData.update(DataComponents.CUSTOM_DATA, current, tag -> {
+                tag.remove(ItemBackedContainer.OPEN_MARKER_KEY);
+                tag.remove(ItemBackedContainer.FROM_SCREEN_MARKER_KEY);
+            });
             player.inventoryMenu.broadcastChanges();
         }
     }

@@ -14,8 +14,8 @@ public class ShulkerBoxSlotMixin {
     // ShulkerBoxSlot itself — cannot @Shadow them. Upcast to Slot instead.
     @Overwrite
     public boolean mayPlace(ItemStack stack) {
-        // Block all container items (shulker boxes, our boxes) from nesting.
-        if (ContainerItemUtil.getContainerSize(stack) >= 0) return false;
+        // Per spec: shulker boxes only block other shulker boxes (vanilla behaviour).
+        if (stack.is(net.minecraft.tags.ItemTags.SHULKER_BOXES)) return false;
         Slot self = (Slot) (Object) this;
         return self.container.canPlaceItem(self.getContainerSlot(), stack);
     }

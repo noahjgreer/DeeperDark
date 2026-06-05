@@ -49,13 +49,15 @@ public abstract class ContainerScreenOpenMixin<T extends AbstractContainerMenu> 
 
     /**
      * When Escape or the inventory key is pressed while inside a container that was
-     * opened from the player's inventory, close the container and go back to the
-     * inventory screen instead of returning to the game world.
+     * opened from the player's inventory screen, close the container and go back to
+     * the inventory screen instead of returning to the game world.
+     * This only triggers when FROM_SCREEN_MARKER_KEY is present on the item —
+     * containers opened via right-click in hand skip back to game normally.
      */
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
     private void deeperdark$backToInventory(KeyEvent event, CallbackInfoReturnable<Boolean> cir) {
         if (this.menu instanceof InventoryMenu) return;
-        if (!deeperdark$isOpenedFromInventory()) return;
+        if (!deeperdark$isOpenedFromScreen()) return;
 
         Minecraft mc = Minecraft.getInstance();
         boolean isEscape = event.key() == 256; // GLFW_KEY_ESCAPE
@@ -76,9 +78,6 @@ public abstract class ContainerScreenOpenMixin<T extends AbstractContainerMenu> 
         if (stack.isEmpty()) return;
         if (!(this.hoveredSlot.container instanceof Inventory)) return;
         if (!deeperdark$isOpenableContainer(stack)) return;
-        // No client-side "already open" guard here — the server guard handles that correctly,
-        // and a client-side check using the CUSTOM_DATA marker would block re-opening after
-        // the item was dropped (the stale marker can't be cleaned up server-side in that case).
 
         ClientPlayNetworking.send(new OpenContainerItemPayload(this.hoveredSlot.getContainerSlot()));
         cir.setReturnValue(true);
@@ -89,8 +88,7 @@ public abstract class ContainerScreenOpenMixin<T extends AbstractContainerMenu> 
         ItemStack cursor = this.menu.getCarried();
         if (cursor.isEmpty()) return;
 
-        // Advance to the next render stratum so the "+" fills are drawn above the 3D item
-        // icons (which live in a separate addItem() queue on the current stratum).
+        // Advance stratum so "+" fills render above 3D item icons in the current stratum.
         graphics.nextStratum();
 
         for (Slot slot : this.menu.slots) {
@@ -98,21 +96,49 @@ public abstract class ContainerScreenOpenMixin<T extends AbstractContainerMenu> 
             if (!(slot.container instanceof Inventory)) continue;
             ItemStack slotItem = slot.getItem();
             if (slotItem.isEmpty()) continue;
-            // Skip containers that are currently open — inserting into them would duplicate items.
             if (deeperdark$isContainerOpen(slotItem)) continue;
 
-            int size = ContainerItemUtil.getContainerSize(slotItem);
-            if (size < 0) continue;
-            if (!ContainerItemUtil.canInsert(slotItem, cursor, size)) continue;
-            // Also skip if the cursor item itself is a container (shulker/box) — nesting is blocked.
-            if (ContainerItemUtil.getContainerSize(cursor) >= 0) continue;
+            boolean shouldShow;
+            if (slotItem.is(ItemTags.SHULKER_BOXES)) {
+                // Shulker boxes block only other shulker boxes per spec.
+                if (cursor.is(ItemTags.SHULKER_BOXES)) continue;
+                shouldShow = ContainerItemUtil.canInsert(slotItem, cursor, 27);
+
+            } else if (slotItem.is(ModBlocks.FLIMSY_BOX.asItem())
+                    || slotItem.is(ModBlocks.STURDY_BOX.asItem())
+                    || slotItem.is(ModBlocks.REINFORCED_BOX.asItem())) {
+                // Custom boxes block shulker boxes and all custom boxes.
+                if (cursor.is(ItemTags.SHULKER_BOXES)) continue;
+                if (ContainerItemUtil.getContainerSize(cursor) >= 0) continue;
+                int size = ContainerItemUtil.getContainerSize(slotItem);
+                shouldShow = ContainerItemUtil.canInsert(slotItem, cursor, size);
+
+            } else if (slotItem.is(Items.ENDER_CHEST)) {
+                // Ender chests: actual capacity can't be read client-side reliably.
+                // Show "+" for any non-shulker, non-vault, non-ender-chest cursor.
+                if (cursor.is(ItemTags.SHULKER_BOXES)) continue;
+                if (ContainerItemUtil.isVaultItem(cursor)) continue;
+                if (cursor.is(Items.ENDER_CHEST)) continue;
+                shouldShow = true;
+
+            } else if (ContainerItemUtil.isVaultItem(slotItem)) {
+                // Vaults block shulker boxes and other vaults.
+                if (cursor.is(ItemTags.SHULKER_BOXES)) continue;
+                if (ContainerItemUtil.isVaultItem(cursor)) continue;
+                shouldShow = ContainerItemUtil.canVaultInsert(slotItem, cursor);
+
+            } else {
+                continue; // Not a container item we recognise
+            }
+
+            if (!shouldShow) continue;
 
             // Draw a thin green "+" at the top-right corner of the slot.
             int px = slot.x + 9;
             int py = slot.y;
             int color = 0xFF_55FF55;
-            graphics.fill(px,     py + 3, px + 7, py + 4, color); // horizontal bar (1px)
-            graphics.fill(px + 3, py,     px + 4, py + 7, color); // vertical bar (1px)
+            graphics.fill(px,     py + 3, px + 7, py + 4, color); // horizontal bar
+            graphics.fill(px + 3, py,     px + 4, py + 7, color); // vertical bar
         }
     }
 
@@ -120,7 +146,6 @@ public abstract class ContainerScreenOpenMixin<T extends AbstractContainerMenu> 
     private void deeperdark$appendOpenHint(ItemStack itemStack, CallbackInfoReturnable<List<Component>> cir) {
         if (this.hoveredSlot == null || !(this.hoveredSlot.container instanceof Inventory)) return;
         if (!deeperdark$isOpenableContainer(itemStack)) return;
-        // Suppress the hint while this container is already open from inventory.
         if (deeperdark$isContainerOpen(itemStack)) return;
 
         List<Component> tooltip = new ArrayList<>(cir.getReturnValue());
@@ -130,16 +155,21 @@ public abstract class ContainerScreenOpenMixin<T extends AbstractContainerMenu> 
         cir.setReturnValue(tooltip);
     }
 
-    /** True if any player-inventory slot in the current menu holds a marker-tagged item. */
-    private boolean deeperdark$isOpenedFromInventory() {
+    /**
+     * True if any player-inventory slot in the current menu holds an item stamped
+     * with FROM_SCREEN_MARKER_KEY, meaning this container was opened from inside the
+     * inventory screen (not via right-click in hand).
+     */
+    private boolean deeperdark$isOpenedFromScreen() {
         for (Slot slot : this.menu.slots) {
             if (!(slot.container instanceof Inventory)) continue;
-            if (deeperdark$isContainerOpen(slot.getItem())) return true;
+            CustomData data = slot.getItem().get(net.minecraft.core.component.DataComponents.CUSTOM_DATA);
+            if (data != null && data.copyTag().contains(ItemBackedContainer.FROM_SCREEN_MARKER_KEY)) return true;
         }
         return false;
     }
 
-    /** Returns true if this item has an open-container marker written by ItemBackedContainer. */
+    /** True if this item has an open-container UUID marker (any open method). */
     private static boolean deeperdark$isContainerOpen(ItemStack stack) {
         CustomData data = stack.get(net.minecraft.core.component.DataComponents.CUSTOM_DATA);
         return data != null && data.copyTag().contains(ItemBackedContainer.OPEN_MARKER_KEY);
@@ -150,6 +180,7 @@ public abstract class ContainerScreenOpenMixin<T extends AbstractContainerMenu> 
             || stack.is(Items.ENDER_CHEST)
             || stack.is(ModBlocks.FLIMSY_BOX.asItem())
             || stack.is(ModBlocks.STURDY_BOX.asItem())
-            || stack.is(ModBlocks.REINFORCED_BOX.asItem());
+            || stack.is(ModBlocks.REINFORCED_BOX.asItem())
+            || ContainerItemUtil.isVaultItem(stack);
     }
 }

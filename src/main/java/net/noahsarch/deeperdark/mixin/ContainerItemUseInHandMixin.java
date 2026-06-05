@@ -33,13 +33,16 @@ public class ContainerItemUseInHandMixin {
         if (!(player instanceof ServerPlayer serverPlayer)) return;
 
         ItemStack stack = player.getItemInHand(hand);
-        if (ContainerItemUtil.getContainerSize(stack) < 0 && !stack.is(Items.ENDER_CHEST)) return;
+        boolean isContainer = ContainerItemUtil.getContainerSize(stack) >= 0
+                || stack.is(Items.ENDER_CHEST)
+                || ContainerItemUtil.isVaultItem(stack);
+        if (!isContainer) return;
 
         int slot = hand == InteractionHand.MAIN_HAND
                 ? serverPlayer.getInventory().getSelectedSlot()
                 : Inventory.SLOT_OFFHAND;
 
-        Deeperdark.openContainerFromInventory(serverPlayer, slot);
+        Deeperdark.openContainerFromInventory(serverPlayer, slot, false);
         cir.setReturnValue(InteractionResult.CONSUME);
     }
 }

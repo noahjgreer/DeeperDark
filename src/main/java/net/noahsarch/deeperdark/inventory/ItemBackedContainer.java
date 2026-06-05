@@ -35,6 +35,9 @@ public class ItemBackedContainer extends SimpleContainer {
     /** Key used inside CUSTOM_DATA to hold the open-session UUID. */
     public static final String OPEN_MARKER_KEY = "deeperdark_open";
 
+    /** Stamped only when the container is opened from the inventory screen (not from right-click in hand). */
+    public static final String FROM_SCREEN_MARKER_KEY = "deeperdark_from_screen";
+
     private final ServerPlayer player;
     private final String openId;
     private final @Nullable SoundEvent closeSound;
@@ -97,7 +100,10 @@ public class ItemBackedContainer extends SimpleContainer {
         // Remove the open marker so the item no longer looks "in use".
         ItemStack current = findMarkedItem();
         if (current != null) {
-            CustomData.update(DataComponents.CUSTOM_DATA, current, tag -> tag.remove(OPEN_MARKER_KEY));
+            CustomData.update(DataComponents.CUSTOM_DATA, current, tag -> {
+                tag.remove(OPEN_MARKER_KEY);
+                tag.remove(FROM_SCREEN_MARKER_KEY);
+            });
             player.inventoryMenu.broadcastChanges();
         }
     }

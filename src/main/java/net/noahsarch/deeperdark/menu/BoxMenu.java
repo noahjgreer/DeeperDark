@@ -1,5 +1,6 @@
 package net.noahsarch.deeperdark.menu;
 
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -7,6 +8,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.noahsarch.deeperdark.inventory.ContainerItemUtil;
 
 public class BoxMenu extends AbstractContainerMenu {
     private static final int COLUMNS = 3;
@@ -38,8 +40,16 @@ public class BoxMenu extends AbstractContainerMenu {
     private void addBoxSlots(Container container, int left, int top) {
         for (int row = 0; row < this.rows; row++) {
             for (int col = 0; col < COLUMNS; col++) {
-                int slot = col + row * COLUMNS;
-                this.addSlot(new Slot(container, slot, left + col * 18, top + row * 18));
+                int slotIndex = col + row * COLUMNS;
+                this.addSlot(new Slot(container, slotIndex, left + col * 18, top + row * 18) {
+                    @Override
+                    public boolean mayPlace(ItemStack stack) {
+                        // Per spec: custom boxes block all shulker boxes and all custom boxes.
+                        if (stack.is(ItemTags.SHULKER_BOXES)) return false;
+                        if (ContainerItemUtil.getContainerSize(stack) >= 0) return false;
+                        return this.container.canPlaceItem(this.getContainerSlot(), stack);
+                    }
+                });
             }
         }
     }

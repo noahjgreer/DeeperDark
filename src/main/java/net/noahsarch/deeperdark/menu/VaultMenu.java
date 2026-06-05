@@ -226,6 +226,12 @@ public class VaultMenu extends AbstractContainerMenu {
         return maxTypes == 9 ? 230 : 176;
     }
 
+    /** True if the vault backing this menu is an ItemBackedVaultEntity tracking the given item. */
+    public boolean isTrackingItem(net.minecraft.world.item.ItemStack stack) {
+        return vault instanceof net.noahsarch.deeperdark.inventory.ItemBackedVaultEntity ive
+                && ive.isTrackingItem(stack);
+    }
+
     public static int getImageHeight(int maxTypes) {
         return switch (maxTypes) {
             case 1  -> 166;

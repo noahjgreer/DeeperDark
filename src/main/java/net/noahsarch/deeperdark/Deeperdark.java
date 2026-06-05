@@ -16,11 +16,16 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.Identifier;
 import net.noahsarch.deeperdark.event.*;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.inventory.ChestMenu;
+import net.noahsarch.deeperdark.inventory.ContainerItemUtil;
 import net.noahsarch.deeperdark.inventory.ItemBackedContainer;
+import net.noahsarch.deeperdark.inventory.ItemBackedVaultEntity;
 import net.noahsarch.deeperdark.inventory.OpenMarkedContainer;
+import net.noahsarch.deeperdark.menu.VaultMenu;
+import net.noahsarch.deeperdark.sound.ModSounds;
 import net.noahsarch.deeperdark.payload.AllIngredientsConsumableSyncPacket;
 import net.noahsarch.deeperdark.payload.OpenContainerItemPayload;
 import net.noahsarch.deeperdark.payload.PlayerLeashPacket;
@@ -88,7 +93,7 @@ public class Deeperdark implements ModInitializer {
 		// Container-from-inventory: client → server
 		PayloadTypeRegistry.serverboundPlay().register(OpenContainerItemPayload.ID, OpenContainerItemPayload.CODEC);
 		ServerPlayNetworking.registerGlobalReceiver(OpenContainerItemPayload.ID, (payload, context) ->
-			context.server().execute(() -> openContainerFromInventory(context.player(), payload.slot()))
+			context.server().execute(() -> openContainerFromInventory(context.player(), payload.slot(), true))
 		);
 
 		// Sync config toggles to each client when they join
@@ -221,40 +226,59 @@ public class Deeperdark implements ModInitializer {
 	 * Opens the appropriate container menu for a container item held in the player's
 	 * inventory at the given slot. Public so it can also be called from the right-click
 	 * mixin (ContainerItemUseInHandMixin).
+	 *
+	 * @param fromScreen true when invoked via the Alt key from inside an open inventory
+	 *                   screen; causes the FROM_SCREEN_MARKER_KEY to be stamped so that
+	 *                   Escape backs out to inventory rather than exiting to the game.
 	 */
-	public static void openContainerFromInventory(ServerPlayer player, int slot) {
+	public static void openContainerFromInventory(ServerPlayer player, int slot, boolean fromScreen) {
 		if (slot < 0 || slot >= player.getInventory().getContainerSize()) return;
 		ItemStack stack = player.getInventory().getItem(slot);
 		if (stack.isEmpty()) return;
 
-		// Refuse to open if this exact item is already open from inventory.
+		// Refuse to open if this exact item is already being tracked by an open container.
 		for (net.minecraft.world.inventory.Slot s : player.containerMenu.slots) {
 			if (s.container instanceof ItemBackedContainer ibc && ibc.isTrackingItem(stack)) return;
 			if (s.container instanceof OpenMarkedContainer omc && omc.isTrackingItem(stack)) return;
+		}
+		if (player.containerMenu instanceof VaultMenu vm && vm.isTrackingItem(stack)) return;
+
+		// When opening from hand, clear any stale FROM_SCREEN_MARKER_KEY left by a
+		// prior session where the item was dropped before the menu could clean it up.
+		if (!fromScreen) {
+			net.minecraft.world.item.component.CustomData existing = stack.get(DataComponents.CUSTOM_DATA);
+			if (existing != null && existing.copyTag().contains(ItemBackedContainer.FROM_SCREEN_MARKER_KEY)) {
+				net.minecraft.world.item.component.CustomData.update(DataComponents.CUSTOM_DATA, stack,
+						tag -> tag.remove(ItemBackedContainer.FROM_SCREEN_MARKER_KEY));
+			}
 		}
 
 		playSound(player, stack, true);
 
 		if (stack.is(ItemTags.SHULKER_BOXES)) {
 			ItemBackedContainer container = ItemBackedContainer.of(player, slot, 27, SoundEvents.SHULKER_BOX_CLOSE);
+			if (fromScreen) stampFromScreen(player, slot);
 			player.openMenu(new SimpleMenuProvider(
 				(id, inv, p) -> new ShulkerBoxMenu(id, inv, container),
 				stack.getHoverName()
 			));
 		} else if (stack.is(ModBlocks.FLIMSY_BOX.asItem())) {
-			ItemBackedContainer container = ItemBackedContainer.of(player, slot, 3, SoundEvents.CHEST_CLOSE);
+			ItemBackedContainer container = ItemBackedContainer.of(player, slot, 3, ModSounds.BOX_CLOSE);
+			if (fromScreen) stampFromScreen(player, slot);
 			player.openMenu(new SimpleMenuProvider(
 				(id, inv, p) -> new BoxMenu(ModMenus.FLIMSY_BOX, id, inv, container, 1),
 				stack.getHoverName()
 			));
 		} else if (stack.is(ModBlocks.STURDY_BOX.asItem())) {
-			ItemBackedContainer container = ItemBackedContainer.of(player, slot, 6, SoundEvents.CHEST_CLOSE);
+			ItemBackedContainer container = ItemBackedContainer.of(player, slot, 6, ModSounds.BOX_CLOSE);
+			if (fromScreen) stampFromScreen(player, slot);
 			player.openMenu(new SimpleMenuProvider(
 				(id, inv, p) -> new BoxMenu(ModMenus.STURDY_BOX, id, inv, container, 2),
 				stack.getHoverName()
 			));
 		} else if (stack.is(ModBlocks.REINFORCED_BOX.asItem())) {
-			ItemBackedContainer container = ItemBackedContainer.of(player, slot, 9, SoundEvents.CHEST_CLOSE);
+			ItemBackedContainer container = ItemBackedContainer.of(player, slot, 9, ModSounds.BOX_CLOSE);
+			if (fromScreen) stampFromScreen(player, slot);
 			player.openMenu(new SimpleMenuProvider(
 				(id, inv, p) -> new DispenserMenu(id, inv, container),
 				stack.getHoverName()
@@ -263,10 +287,27 @@ public class Deeperdark implements ModInitializer {
 			OpenMarkedContainer container = new OpenMarkedContainer(
 				player.getEnderChestInventory(), player, stack, SoundEvents.ENDER_CHEST_CLOSE
 			);
+			if (fromScreen) stampFromScreen(player, slot);
 			player.openMenu(new SimpleMenuProvider(
 				(id, inv, p) -> ChestMenu.threeRows(id, inv, container),
 				Component.translatable("container.enderchest")
 			));
+		} else if (ContainerItemUtil.isVaultItem(stack)) {
+			ItemBackedVaultEntity entity = new ItemBackedVaultEntity(player, stack);
+			if (fromScreen) stampFromScreen(player, slot);
+			player.openMenu(new SimpleMenuProvider(
+				(id, inv, p) -> new VaultMenu(entity.getVaultMenuType(), id, inv, entity),
+				stack.getHoverName()
+			));
+		}
+	}
+
+	/** Stamps the FROM_SCREEN_MARKER_KEY into the item at the given inventory slot. */
+	private static void stampFromScreen(ServerPlayer player, int slot) {
+		ItemStack s = player.getInventory().getItem(slot);
+		if (!s.isEmpty()) {
+			net.minecraft.world.item.component.CustomData.update(DataComponents.CUSTOM_DATA, s,
+					tag -> tag.putBoolean(ItemBackedContainer.FROM_SCREEN_MARKER_KEY, true));
 		}
 	}
 
@@ -276,8 +317,10 @@ public class Deeperdark implements ModInitializer {
 			sound = open ? SoundEvents.SHULKER_BOX_OPEN : SoundEvents.SHULKER_BOX_CLOSE;
 		} else if (stack.is(Items.ENDER_CHEST)) {
 			sound = open ? SoundEvents.ENDER_CHEST_OPEN : SoundEvents.ENDER_CHEST_CLOSE;
+		} else if (ContainerItemUtil.isVaultItem(stack)) {
+			sound = open ? SoundEvents.ENDER_CHEST_OPEN : SoundEvents.ENDER_CHEST_CLOSE;
 		} else {
-			sound = open ? SoundEvents.CHEST_OPEN : SoundEvents.CHEST_CLOSE;
+			sound = open ? ModSounds.BOX_OPEN : ModSounds.BOX_CLOSE;
 		}
 		player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
 			sound, SoundSource.BLOCKS, 1.0f, 1.0f);

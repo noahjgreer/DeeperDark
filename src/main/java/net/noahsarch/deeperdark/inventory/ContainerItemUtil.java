@@ -5,6 +5,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.SlotAccess;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.noahsarch.deeperdark.block.ModBlocks;
 
@@ -15,12 +16,111 @@ public final class ContainerItemUtil {
 
     private ContainerItemUtil() {}
 
+    /** Returns slot count for shulker/custom boxes, or -1 for non-container items (vaults use getVaultMaxTypes). */
     public static int getContainerSize(ItemStack stack) {
         if (stack.is(ItemTags.SHULKER_BOXES)) return 27;
         if (stack.is(ModBlocks.FLIMSY_BOX.asItem())) return 3;
         if (stack.is(ModBlocks.STURDY_BOX.asItem())) return 6;
         if (stack.is(ModBlocks.REINFORCED_BOX.asItem())) return 9;
         return -1;
+    }
+
+    /** Returns the max item-type count for vault items, or -1 if not a vault. */
+    public static int getVaultMaxTypes(ItemStack stack) {
+        if (stack.is(ModBlocks.SMALL_ITEM_VAULT.asItem())) return 1;
+        if (stack.is(ModBlocks.MEDIUM_ITEM_VAULT.asItem())) return 3;
+        if (stack.is(ModBlocks.LARGE_ITEM_VAULT.asItem())) return 9;
+        return -1;
+    }
+
+    public static boolean isVaultItem(ItemStack stack) {
+        return getVaultMaxTypes(stack) >= 0;
+    }
+
+    /**
+     * Returns true if the cursor can be quick-inserted into the vault item.
+     * Reads the CONTAINER component to check existing entry types and capacity.
+     */
+    public static boolean canVaultInsert(ItemStack vaultItem, ItemStack cursor) {
+        if (cursor.isEmpty()) return false;
+        int maxTypes = getVaultMaxTypes(vaultItem);
+        if (maxTypes < 0) return false;
+
+        ItemContainerContents contents = vaultItem.get(DataComponents.CONTAINER);
+        if (contents == null) return true; // Empty vault, any item can start a new entry
+
+        // Reconstruct unique entry types from the batched CONTAINER data
+        List<ItemStack> entries = new ArrayList<>();
+        for (ItemStackTemplate template : contents.nonEmptyItems()) {
+            ItemStack s = template.create();
+            if (s.isEmpty()) continue;
+            boolean seen = false;
+            for (ItemStack e : entries) {
+                if (ItemStack.isSameItemSameComponents(e, s)) { seen = true; break; }
+            }
+            if (!seen && entries.size() < maxTypes) entries.add(s.copyWithCount(1));
+        }
+
+        // Cursor matches an existing type → vault always has room (unbounded per type)
+        for (ItemStack e : entries) {
+            if (ItemStack.isSameItemSameComponents(e, cursor)) return true;
+        }
+        // New type → needs an empty slot
+        return entries.size() < maxTypes;
+    }
+
+    /**
+     * Inserts all cursor items into the vault's CONTAINER component (merging by type).
+     * Vaults have unlimited per-type capacity, so the cursor is always fully consumed.
+     */
+    public static boolean tryVaultInsert(ItemStack vaultItem, ItemStack cursor, SlotAccess carriedAccess) {
+        if (!canVaultInsert(vaultItem, cursor)) return false;
+        int maxTypes = getVaultMaxTypes(vaultItem);
+
+        // Decode current entries
+        ItemContainerContents contents = vaultItem.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY);
+        List<ItemStack> entries = new ArrayList<>();
+        for (ItemStackTemplate template : contents.nonEmptyItems()) {
+            ItemStack s = template.create();
+            if (s.isEmpty()) continue;
+            boolean merged = false;
+            for (ItemStack e : entries) {
+                if (ItemStack.isSameItemSameComponents(e, s)) {
+                    long sum = (long) e.getCount() + s.getCount();
+                    e.setCount((int) Math.min(sum, Integer.MAX_VALUE));
+                    merged = true;
+                    break;
+                }
+            }
+            if (!merged && entries.size() < maxTypes) entries.add(s.copy());
+        }
+
+        // Add cursor items into matching entry or create a new entry
+        boolean inserted = false;
+        for (ItemStack e : entries) {
+            if (ItemStack.isSameItemSameComponents(e, cursor)) {
+                long sum = (long) e.getCount() + cursor.getCount();
+                e.setCount((int) Math.min(sum, Integer.MAX_VALUE));
+                inserted = true;
+                break;
+            }
+        }
+        if (!inserted) entries.add(cursor.copy());
+
+        // Re-encode entries back to the CONTAINER component (batch by maxStackSize)
+        List<ItemStack> stacks = new ArrayList<>();
+        for (ItemStack e : entries) {
+            int batchSize = e.getMaxStackSize();
+            int remaining = e.getCount();
+            while (remaining > 0) {
+                int batch = Math.min(remaining, batchSize);
+                stacks.add(e.copyWithCount(batch));
+                remaining -= batch;
+            }
+        }
+        vaultItem.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(stacks));
+        carriedAccess.set(ItemStack.EMPTY); // Vault always accepts all inserted items
+        return true;
     }
 
     /** Returns true if at least 1 of cursor can be placed into the container. */

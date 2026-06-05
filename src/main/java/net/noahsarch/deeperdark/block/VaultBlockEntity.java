@@ -98,9 +98,10 @@ public class VaultBlockEntity extends BlockEntity implements MenuProvider, Conta
 
     public boolean canAccept(ItemStack stack) {
         if (stack.isEmpty()) return false;
-        // Prevent vault items from being stored inside vaults.
+        // Prevent vault items and shulker boxes from being stored inside vaults.
         if (stack.getItem() instanceof net.minecraft.world.item.BlockItem bi
                 && bi.getBlock() instanceof VaultBlock) return false;
+        if (stack.is(net.minecraft.tags.ItemTags.SHULKER_BOXES)) return false;
         for (VaultEntry entry : entries) {
             if (ItemStack.isSameItemSameComponents(entry.representative, stack)) return true;
         }

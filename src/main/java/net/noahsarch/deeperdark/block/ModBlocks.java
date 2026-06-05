@@ -40,6 +40,16 @@ public class ModBlocks {
         return Registry.register(BuiltInRegistries.BLOCK, blockKey, block);
     }
 
+    private static Block registerVaultBlock(String name, BlockBehaviour.Properties settings) {
+        ResourceKey<Block> blockKey = keyOfBlock(name);
+        Block block = new VaultBlock(settings.setId(blockKey));
+        ResourceKey<Item> itemKey = keyOfItem(name);
+        VaultItem vaultItem = new VaultItem(block,
+                new Item.Properties().setId(itemKey).useBlockDescriptionPrefix().stacksTo(1));
+        Registry.register(BuiltInRegistries.ITEM, itemKey, vaultItem);
+        return Registry.register(BuiltInRegistries.BLOCK, blockKey, block);
+    }
+
     private static Block registerBoxBlock(String name, BlockBehaviour.Properties settings) {
         ResourceKey<Block> blockKey = keyOfBlock(name);
         Block block = new BoxBlock(settings.setId(blockKey));
@@ -255,23 +265,20 @@ public class ModBlocks {
                     .noOcclusion(),
             true);
 
-    public static final Block SMALL_ITEM_VAULT = registerStacksTo1(
+    public static final Block SMALL_ITEM_VAULT = registerVaultBlock(
             "small_item_vault",
-            VaultBlock::new,
             BlockBehaviour.Properties.of()
                     .strength(150F, 1200F)
                     .sound(VaultBlock.VAULT_SOUND_TYPE)
                     .noOcclusion());
-    public static final Block MEDIUM_ITEM_VAULT = registerStacksTo1(
+    public static final Block MEDIUM_ITEM_VAULT = registerVaultBlock(
             "medium_item_vault",
-            VaultBlock::new,
             BlockBehaviour.Properties.of()
                     .strength(150F, 1200F)
                     .sound(VaultBlock.VAULT_SOUND_TYPE)
                     .noOcclusion());
-    public static final Block LARGE_ITEM_VAULT = registerStacksTo1(
+    public static final Block LARGE_ITEM_VAULT = registerVaultBlock(
             "large_item_vault",
-            VaultBlock::new,
             BlockBehaviour.Properties.of()
                     .strength(150F, 1200F)
                     .sound(VaultBlock.VAULT_SOUND_TYPE)
