@@ -1,0 +1,19 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "category": "misc",
+    "key": {
+        "G": [
+            "minecraft:obsidian",
+            "minecraft:crying_obsidian"
+        ],
+        "T": "minecraft:diamond"
+    },
+    "pattern": [
+        "GGG",
+        "GTG",
+        "GGG"
+    ],
+    "result": {
+        "id": "deeperdark:siphon"
+    }
+}

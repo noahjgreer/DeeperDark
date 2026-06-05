@@ -5,7 +5,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "minecraft:gunpowder"
+          "name": "deeperdark:gunpowder_dust"
         }
       ],
       "rolls": 1

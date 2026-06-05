@@ -1,4 +1,13 @@
 {
+  "block.siphon.suck": {
+    "sounds": [
+      { "name": "deeperdark:block/siphon/suck1", "attenuation_distance": 16 },
+      { "name": "deeperdark:block/siphon/suck2", "attenuation_distance": 16 },
+      { "name": "deeperdark:block/siphon/suck3", "attenuation_distance": 16 },
+      { "name": "deeperdark:block/siphon/suck4", "attenuation_distance": 16 }
+    ],
+    "subtitle": "subtitles.deeperdark.block.siphon.suck"
+  },
   "block.collarbench.use": {
     "sounds": [
       "deeperdark:block/collarbench/use1",

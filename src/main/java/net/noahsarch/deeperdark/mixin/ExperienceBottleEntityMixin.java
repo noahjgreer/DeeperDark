@@ -30,7 +30,7 @@ public abstract class ExperienceBottleEntityMixin extends ThrowableItemProjectil
             // Color for water is 3694022
             world.levelEvent(2002, this.blockPosition(), 3694022);
 
-            int amount = 10;
+            int amount = 8;
             ExperienceOrb.award((ServerLevel)world, new net.minecraft.world.phys.Vec3(this.getX(), this.getY(), this.getZ()), amount);
 
             this.discard();

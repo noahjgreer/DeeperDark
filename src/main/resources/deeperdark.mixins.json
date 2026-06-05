@@ -3,6 +3,7 @@
   "package": "net.noahsarch.deeperdark.mixin",
   "compatibilityLevel": "JAVA_25",
   "mixins": [
+    "AbstractCraftingMenuMixin",
     "AnvilScreenHandlerMixin",
     "AbstractBoatEntityMixin",
     "BeaconBlockEntityMixin",
@@ -100,7 +101,10 @@
     "ContainerItemUseInHandMixin"
   ],
   "client": [
+    "AbstractRecipeBookScreenMixin",
     "ContainerScreenOpenMixin",
+    "CraftingRecipeBookMixin",
+    "InventoryScreenMixin",
     "MinecraftMusicMixin",
     "HumanoidArmorLayerMixin",
     "PassengerPickableMixin",

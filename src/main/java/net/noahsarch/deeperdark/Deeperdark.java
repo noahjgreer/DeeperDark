@@ -26,8 +26,10 @@ import net.noahsarch.deeperdark.inventory.ItemBackedVaultEntity;
 import net.noahsarch.deeperdark.inventory.OpenMarkedContainer;
 import net.noahsarch.deeperdark.menu.VaultMenu;
 import net.noahsarch.deeperdark.sound.ModSounds;
+import net.noahsarch.deeperdark.duck.CraftingPanelHolder;
 import net.noahsarch.deeperdark.payload.AllIngredientsConsumableSyncPacket;
 import net.noahsarch.deeperdark.payload.OpenContainerItemPayload;
+import net.noahsarch.deeperdark.payload.SyncCraftingPanelPayload;
 import net.noahsarch.deeperdark.payload.PlayerLeashPacket;
 import net.noahsarch.deeperdark.payload.VoidFogSyncPacket;
 import net.noahsarch.deeperdark.item.ModItems;
@@ -96,6 +98,17 @@ public class Deeperdark implements ModInitializer {
 			context.server().execute(() -> openContainerFromInventory(context.player(), payload.slot(), true))
 		);
 
+		// Collar crafting panel state sync: client → server
+		PayloadTypeRegistry.serverboundPlay().register(SyncCraftingPanelPayload.ID, SyncCraftingPanelPayload.CODEC);
+		ServerPlayNetworking.registerGlobalReceiver(SyncCraftingPanelPayload.ID, (payload, context) ->
+			context.server().execute(() -> {
+				ServerPlayer player = context.player();
+				if (player.inventoryMenu instanceof CraftingPanelHolder holder) {
+					holder.deeperdark$setPanelOpen(payload.open());
+				}
+			})
+		);
+
 		// Sync config toggles to each client when they join
 		net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
 			net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.send(
@@ -104,7 +117,6 @@ public class Deeperdark implements ModInitializer {
 					handler.player, new AllIngredientsConsumableSyncPacket(DeeperDarkConfig.get().allIngredientsConsumable));
 		});
 
-		SiphonEvents.register();
 		GunpowderTrailEvents.register();
 
 		// Register glass door dye recipe

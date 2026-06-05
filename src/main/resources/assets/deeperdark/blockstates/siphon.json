@@ -1,7 +1,19 @@
 {
   "variants": {
-    "": {
+    "facing=east": {
+      "model": "deeperdark:block/siphon",
+      "y": 90
+    },
+    "facing=north": {
       "model": "deeperdark:block/siphon"
+    },
+    "facing=south": {
+      "model": "deeperdark:block/siphon",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "deeperdark:block/siphon",
+      "y": 270
     }
   }
 }
