@@ -3,6 +3,13 @@
     "type": "minecraft:composite",
     "models": [
       {
+        "type": "minecraft:condition",
+        "property": "minecraft:custom_model_data",
+        "index": 8,
+        "on_true": { "type": "minecraft:model", "model": "deeperdark:item/collar_trinket_arrow" },
+        "on_false": { "type": "minecraft:empty" }
+      },
+      {
         "type": "minecraft:model",
         "model": "deeperdark:item/collar",
         "tints": [

@@ -23,6 +23,7 @@ import net.noahsarch.deeperdark.client.ContainerItemKeyHandler;
 import net.noahsarch.deeperdark.inventory.ContainerItemUtil;
 import net.noahsarch.deeperdark.inventory.ItemBackedContainer;
 import net.noahsarch.deeperdark.payload.OpenContainerItemPayload;
+import net.noahsarch.deeperdark.payload.OpenNestedContainerPayload;
 import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -76,10 +77,15 @@ public abstract class ContainerScreenOpenMixin<T extends AbstractContainerMenu> 
 
         ItemStack stack = this.hoveredSlot.getItem();
         if (stack.isEmpty()) return;
-        if (!(this.hoveredSlot.container instanceof Inventory)) return;
         if (!deeperdark$isOpenableContainer(stack)) return;
 
-        ClientPlayNetworking.send(new OpenContainerItemPayload(this.hoveredSlot.getContainerSlot()));
+        if (this.hoveredSlot.container instanceof Inventory) {
+            // Normal path: container item in the player's own inventory.
+            ClientPlayNetworking.send(new OpenContainerItemPayload(this.hoveredSlot.getContainerSlot()));
+        } else {
+            // Nested path: container item inside an already-open container (e.g. shulker in ender chest).
+            ClientPlayNetworking.send(new OpenNestedContainerPayload(this.hoveredSlot.index));
+        }
         cir.setReturnValue(true);
     }
 
@@ -144,7 +150,7 @@ public abstract class ContainerScreenOpenMixin<T extends AbstractContainerMenu> 
 
     @Inject(method = "getTooltipFromContainerItem", at = @At("RETURN"), cancellable = true)
     private void deeperdark$appendOpenHint(ItemStack itemStack, CallbackInfoReturnable<List<Component>> cir) {
-        if (this.hoveredSlot == null || !(this.hoveredSlot.container instanceof Inventory)) return;
+        if (this.hoveredSlot == null) return;
         if (!deeperdark$isOpenableContainer(itemStack)) return;
         if (deeperdark$isContainerOpen(itemStack)) return;
 
@@ -157,14 +163,17 @@ public abstract class ContainerScreenOpenMixin<T extends AbstractContainerMenu> 
 
     /**
      * True if any player-inventory slot in the current menu holds an item stamped
-     * with FROM_SCREEN_MARKER_KEY, meaning this container was opened from inside the
-     * inventory screen (not via right-click in hand).
+     * with FROM_SCREEN_MARKER_KEY (opened from inventory) or NESTED_FROM_KEY (opened
+     * as a nested container inside another container).
      */
     private boolean deeperdark$isOpenedFromScreen() {
         for (Slot slot : this.menu.slots) {
             if (!(slot.container instanceof Inventory)) continue;
             CustomData data = slot.getItem().get(net.minecraft.core.component.DataComponents.CUSTOM_DATA);
-            if (data != null && data.copyTag().contains(ItemBackedContainer.FROM_SCREEN_MARKER_KEY)) return true;
+            if (data == null) continue;
+            net.minecraft.nbt.CompoundTag tag = data.copyTag();
+            if (tag.contains(ItemBackedContainer.FROM_SCREEN_MARKER_KEY)) return true;
+            if (tag.contains(ItemBackedContainer.NESTED_FROM_KEY)) return true;
         }
         return false;
     }

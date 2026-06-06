@@ -29,6 +29,7 @@ import net.noahsarch.deeperdark.sound.ModSounds;
 import net.noahsarch.deeperdark.duck.CraftingPanelHolder;
 import net.noahsarch.deeperdark.payload.AllIngredientsConsumableSyncPacket;
 import net.noahsarch.deeperdark.payload.OpenContainerItemPayload;
+import net.noahsarch.deeperdark.payload.OpenNestedContainerPayload;
 import net.noahsarch.deeperdark.payload.SyncCraftingPanelPayload;
 import net.noahsarch.deeperdark.payload.PlayerLeashPacket;
 import net.noahsarch.deeperdark.payload.VoidFogSyncPacket;
@@ -96,6 +97,12 @@ public class Deeperdark implements ModInitializer {
 		PayloadTypeRegistry.serverboundPlay().register(OpenContainerItemPayload.ID, OpenContainerItemPayload.CODEC);
 		ServerPlayNetworking.registerGlobalReceiver(OpenContainerItemPayload.ID, (payload, context) ->
 			context.server().execute(() -> openContainerFromInventory(context.player(), payload.slot(), true))
+		);
+
+		// Container-within-container: client → server
+		PayloadTypeRegistry.serverboundPlay().register(OpenNestedContainerPayload.ID, OpenNestedContainerPayload.CODEC);
+		ServerPlayNetworking.registerGlobalReceiver(OpenNestedContainerPayload.ID, (payload, context) ->
+			context.server().execute(() -> openContainerFromCurrentMenu(context.player(), payload.menuSlotIndex()))
 		);
 
 		// Collar crafting panel state sync: client → server
@@ -312,6 +319,83 @@ public class Deeperdark implements ModInitializer {
 				stack.getHoverName()
 			));
 		}
+	}
+
+	/**
+	 * Opens a container item found at {@code menuSlotIndex} inside the player's currently
+	 * active container menu (e.g. a shulker box inside an open ender chest).
+	 *
+	 * The parent container item (in the player's own inventory) is stamped with
+	 * {@link ItemBackedContainer#NESTED_FROM_KEY} so that closing the nested container
+	 * automatically reopens the parent.
+	 */
+	public static void openContainerFromCurrentMenu(ServerPlayer player, int menuSlotIndex) {
+		net.minecraft.world.inventory.AbstractContainerMenu currentMenu = player.containerMenu;
+		if (menuSlotIndex < 0 || menuSlotIndex >= currentMenu.slots.size()) return;
+
+		net.minecraft.world.inventory.Slot slot = currentMenu.slots.get(menuSlotIndex);
+		// Only operate on non-inventory container slots.
+		if (slot.container instanceof net.minecraft.world.entity.player.Inventory) return;
+
+		ItemStack stack = slot.getItem();
+		if (stack.isEmpty()) return;
+
+		// Refuse if already open.
+		net.minecraft.world.item.component.CustomData existing = stack.get(DataComponents.CUSTOM_DATA);
+		if (existing != null && existing.copyTag().contains(ItemBackedContainer.OPEN_MARKER_KEY)) return;
+
+		// Find which player-inventory slot holds the parent container (has OPEN_MARKER_KEY).
+		int parentInventorySlot = findParentInventorySlot(player);
+		if (parentInventorySlot < 0) return;
+
+		net.minecraft.world.Container parentStorage = slot.container;
+		int slotInParent = slot.getContainerSlot();
+
+		// Stamp NESTED_FROM_KEY on the parent item BEFORE player.openMenu() closes the
+		// current menu and removes its own OPEN_MARKER_KEY.
+		ItemStack parentItem = player.getInventory().getItem(parentInventorySlot);
+		net.minecraft.world.item.component.CustomData.update(DataComponents.CUSTOM_DATA, parentItem,
+				tag -> tag.putInt(ItemBackedContainer.NESTED_FROM_KEY, parentInventorySlot));
+
+		playSound(player, stack, true);
+
+		if (stack.is(ItemTags.SHULKER_BOXES)) {
+			ItemBackedContainer container = ItemBackedContainer.ofNested(player, parentStorage, slotInParent, 27, net.minecraft.sounds.SoundEvents.SHULKER_BOX_CLOSE);
+			player.openMenu(new SimpleMenuProvider(
+				(id, inv, p) -> new net.minecraft.world.inventory.ShulkerBoxMenu(id, inv, container),
+				stack.getHoverName()
+			));
+		} else if (stack.is(ModBlocks.FLIMSY_BOX.asItem())) {
+			ItemBackedContainer container = ItemBackedContainer.ofNested(player, parentStorage, slotInParent, 3, net.noahsarch.deeperdark.sound.ModSounds.BOX_CLOSE);
+			player.openMenu(new SimpleMenuProvider(
+				(id, inv, p) -> new net.noahsarch.deeperdark.menu.BoxMenu(ModMenus.FLIMSY_BOX, id, inv, container, 1),
+				stack.getHoverName()
+			));
+		} else if (stack.is(ModBlocks.STURDY_BOX.asItem())) {
+			ItemBackedContainer container = ItemBackedContainer.ofNested(player, parentStorage, slotInParent, 6, net.noahsarch.deeperdark.sound.ModSounds.BOX_CLOSE);
+			player.openMenu(new SimpleMenuProvider(
+				(id, inv, p) -> new net.noahsarch.deeperdark.menu.BoxMenu(ModMenus.STURDY_BOX, id, inv, container, 2),
+				stack.getHoverName()
+			));
+		} else if (stack.is(ModBlocks.REINFORCED_BOX.asItem())) {
+			ItemBackedContainer container = ItemBackedContainer.ofNested(player, parentStorage, slotInParent, 9, net.noahsarch.deeperdark.sound.ModSounds.BOX_CLOSE);
+			player.openMenu(new SimpleMenuProvider(
+				(id, inv, p) -> new net.minecraft.world.inventory.DispenserMenu(id, inv, container),
+				stack.getHoverName()
+			));
+		}
+		// Ender chests and vaults nested inside other containers are not supported.
+	}
+
+	/** Returns the player-inventory slot index of the item currently stamped with OPEN_MARKER_KEY, or -1. */
+	private static int findParentInventorySlot(ServerPlayer player) {
+		net.minecraft.world.entity.player.Inventory inv = player.getInventory();
+		for (int i = 0; i < inv.getContainerSize(); i++) {
+			ItemStack s = inv.getItem(i);
+			net.minecraft.world.item.component.CustomData data = s.get(DataComponents.CUSTOM_DATA);
+			if (data != null && data.copyTag().contains(ItemBackedContainer.OPEN_MARKER_KEY)) return i;
+		}
+		return -1;
 	}
 
 	/** Stamps the FROM_SCREEN_MARKER_KEY into the item at the given inventory slot. */
