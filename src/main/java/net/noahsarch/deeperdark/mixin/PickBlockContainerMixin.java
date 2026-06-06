@@ -7,14 +7,12 @@ import net.minecraft.network.protocol.game.ServerboundPickItemFromBlockPacket;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.component.BundleContents;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.block.state.BlockState;
-import net.noahsarch.deeperdark.block.ModBlocks;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -89,106 +87,96 @@ public abstract class PickBlockContainerMixin {
         }
     }
 
+    /**
+     * Scans every container item in the player's inventory for the target item.
+     * Prefers the smallest available stack to minimise depletion of large stacks
+     * and to maximise the chance of fitting into a nearly-full inventory.
+     * Bundles always contribute one item at a time regardless of template count.
+     */
     private boolean deeperdark$searchAndExtract(Inventory inventory, ItemStack target) {
+        // Pass 1 — find the candidate with the smallest count that actually fits.
+        int bestInvSlot = -1;
+        int bestInnerSlot = -1;
+        int bestCount = Integer.MAX_VALUE;
+        boolean bestIsBundle = false;
+
         for (int i = 0; i < inventory.getContainerSize(); i++) {
-            ItemStack slot = inventory.getItem(i);
-            if (slot.isEmpty())
-                continue;
+            ItemStack holder = inventory.getItem(i);
+            if (holder.isEmpty()) continue;
 
-            BundleContents bundle = slot.get(DataComponents.BUNDLE_CONTENTS);
-            if (bundle != null && !bundle.isEmpty()) {
-                if (deeperdark$extractFromBundle(slot, bundle, target, inventory))
-                    return true;
+            // Bundles always yield count=1; treat them as a 1-item candidate.
+            if (bestCount > 1) {
+                BundleContents bundle = holder.get(DataComponents.BUNDLE_CONTENTS);
+                if (bundle != null && !bundle.isEmpty()) {
+                    List<ItemStackTemplate> templates = bundle.items();
+                    for (int j = 0; j < templates.size(); j++) {
+                        if (ItemStack.isSameItemSameComponents(templates.get(j).create(), target)) {
+                            if (deeperdark$hasRoomForStack(inventory, target.copyWithCount(1))) {
+                                bestInvSlot = i;
+                                bestInnerSlot = j;
+                                bestCount = 1;
+                                bestIsBundle = true;
+                            }
+                            break;
+                        }
+                    }
+                }
             }
 
-            ItemContainerContents container = slot.get(DataComponents.CONTAINER);
-            if (container != null) {
-                if (deeperdark$isVaultItem(slot)) {
-                    if (deeperdark$extractFromVault(slot, container, target, inventory))
-                        return true;
-                } else if (deeperdark$extractFromContainer(slot, container, target, inventory))
-                    return true;
+            ItemContainerContents contents = holder.get(DataComponents.CONTAINER);
+            if (contents != null) {
+                List<ItemStack> items = new ArrayList<>();
+                contents.allItemsCopyStream().forEach(items::add);
+                for (int j = 0; j < items.size(); j++) {
+                    ItemStack slot = items.get(j);
+                    if (slot.isEmpty() || !ItemStack.isSameItemSameComponents(slot, target)) continue;
+                    int count = slot.getCount();
+                    if (count < bestCount && deeperdark$hasRoomForStack(inventory, slot)) {
+                        bestInvSlot = i;
+                        bestInnerSlot = j;
+                        bestCount = count;
+                        bestIsBundle = false;
+                        if (count == 1) break;
+                    }
+                }
             }
+
+            if (bestCount == 1) break;
         }
-        return false;
-    }
 
-    private boolean deeperdark$extractFromBundle(
-            ItemStack bundleItem, BundleContents contents, ItemStack target, Inventory inventory) {
-        List<ItemStackTemplate> templates = contents.items();
-        for (int i = 0; i < templates.size(); i++) {
-            ItemStackTemplate tmpl = templates.get(i);
-            ItemStack candidate = tmpl.create();
-            if (!ItemStack.isSameItemSameComponents(candidate, target))
-                continue;
-            if (!deeperdark$hasRoomForStack(inventory, target))
-                return false;
+        if (bestInvSlot == -1) return false;
 
-            // Rebuild the bundle's item list with one fewer of the matched item.
-            // Avoids BundleContents.Mutable.toggleSelectedItem, which deselects when
-            // selectedItem already equals i (default=0), causing removeOne to return null.
+        // Pass 2 — extract from the identified slot.
+        ItemStack holder = inventory.getItem(bestInvSlot);
+
+        if (bestIsBundle) {
+            BundleContents bundle = holder.get(DataComponents.BUNDLE_CONTENTS);
+            if (bundle == null) return false;
+            List<ItemStackTemplate> templates = bundle.items();
+            if (bestInnerSlot >= templates.size()) return false;
+            ItemStackTemplate tmpl = templates.get(bestInnerSlot);
             List<ItemStackTemplate> newTemplates = new ArrayList<>(templates);
             if (tmpl.count() > 1) {
-                newTemplates.set(i, tmpl.withCount(tmpl.count() - 1));
+                newTemplates.set(bestInnerSlot, tmpl.withCount(tmpl.count() - 1));
             } else {
-                newTemplates.remove(i);
+                newTemplates.remove(bestInnerSlot);
             }
-            bundleItem.set(DataComponents.BUNDLE_CONTENTS, new BundleContents(newTemplates));
-            deeperdark$addAndSelectItem(inventory, candidate.copyWithCount(1), target);
+            holder.set(DataComponents.BUNDLE_CONTENTS, new BundleContents(newTemplates));
+            deeperdark$addAndSelectItem(inventory, tmpl.create().copyWithCount(1), target);
             return true;
         }
-        return false;
-    }
 
-    private boolean deeperdark$extractFromContainer(
-            ItemStack containerItem, ItemContainerContents contents, ItemStack target, Inventory inventory) {
+        // Regular container (shulker, custom box, vault — all use CONTAINER component).
+        ItemContainerContents contents = holder.get(DataComponents.CONTAINER);
+        if (contents == null) return false;
         List<ItemStack> allItems = new ArrayList<>();
         contents.allItemsCopyStream().forEach(allItems::add);
-
-        for (int i = 0; i < allItems.size(); i++) {
-            ItemStack slot = allItems.get(i);
-            if (slot.isEmpty() || !ItemStack.isSameItemSameComponents(slot, target))
-                continue;
-            if (!deeperdark$hasRoomForStack(inventory, slot))
-                return false;
-
-            ItemStack extracted = slot.copy();
-            allItems.set(i, ItemStack.EMPTY);
-            containerItem.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(allItems));
-            deeperdark$addAndSelectItem(inventory, extracted, target);
-            return true;
-        }
-        return false;
-    }
-
-    private boolean deeperdark$extractFromVault(
-            ItemStack vaultItem, ItemContainerContents contents, ItemStack target, Inventory inventory) {
-        List<ItemStack> allItems = new ArrayList<>();
-        contents.allItemsCopyStream().forEach(allItems::add);
-
-        for (int i = 0; i < allItems.size(); i++) {
-            ItemStack slot = allItems.get(i);
-            if (slot.isEmpty() || !ItemStack.isSameItemSameComponents(slot, target))
-                continue;
-            if (!deeperdark$hasRoomForStack(inventory, slot))
-                return false;
-
-            ItemStack extracted = slot.copy();
-            allItems.set(i, ItemStack.EMPTY);
-            vaultItem.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(allItems));
-            deeperdark$addAndSelectItem(inventory, extracted, target);
-            return true;
-        }
-        return false;
-    }
-
-    private static boolean deeperdark$isVaultItem(ItemStack stack) {
-        if (!(stack.getItem() instanceof BlockItem blockItem)) {
-            return false;
-        }
-        return blockItem.getBlock() == ModBlocks.SMALL_ITEM_VAULT
-                || blockItem.getBlock() == ModBlocks.MEDIUM_ITEM_VAULT
-                || blockItem.getBlock() == ModBlocks.LARGE_ITEM_VAULT;
+        if (bestInnerSlot >= allItems.size()) return false;
+        ItemStack extracted = allItems.get(bestInnerSlot).copy();
+        allItems.set(bestInnerSlot, ItemStack.EMPTY);
+        holder.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(allItems));
+        deeperdark$addAndSelectItem(inventory, extracted, target);
+        return true;
     }
 
     /**
