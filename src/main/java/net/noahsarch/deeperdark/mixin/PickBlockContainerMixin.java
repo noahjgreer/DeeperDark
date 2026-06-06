@@ -1,8 +1,11 @@
 package net.noahsarch.deeperdark.mixin;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.protocol.game.ClientboundSetHeldSlotPacket;
+import net.minecraft.network.protocol.game.ServerboundPickItemFromBlockPacket;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.entity.player.Inventory;
@@ -10,6 +13,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.component.BundleContents;
 import net.minecraft.world.item.component.ItemContainerContents;
+import net.minecraft.world.level.block.state.BlockState;
 import net.noahsarch.deeperdark.block.ModBlocks;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -31,17 +35,46 @@ public abstract class PickBlockContainerMixin {
     @Shadow
     private ServerPlayer player;
 
-    @Inject(method = "tryPickItem", at = @At("TAIL"))
+    /**
+     * Primary interception point: runs before other mods (e.g. Litematica) can
+     * cancel handlePickItemFromBlock and prevent tryPickItem from being reached.
+     * Independently resolves the target item from the packet so container search
+     * works regardless of what happens in tryPickItem.
+     */
+    @Inject(method = "handlePickItemFromBlock", at = @At("HEAD"))
+    private void deeperdark$pickFromContainersOnBlock(
+            ServerboundPickItemFromBlockPacket packet, CallbackInfo ci) {
+        if (this.player.hasInfiniteMaterials()) return;
+
+        ServerLevel level = this.player.level();
+        BlockPos pos = packet.pos();
+        if (!this.player.isWithinBlockInteractionRange(pos, 1.0)) return;
+        if (!level.isLoaded(pos)) return;
+
+        BlockState blockState = level.getBlockState(pos);
+        ItemStack target = blockState.getCloneItemStack(level, pos, false);
+        if (target.isEmpty()) return;
+        if (!target.isItemEnabled(level.enabledFeatures())) return;
+
+        Inventory inventory = this.player.getInventory();
+        if (inventory.findSlotMatchingItem(target) != -1) return;
+
+        if (deeperdark$searchAndExtract(inventory, target)) {
+            this.player.connection.send(new ClientboundSetHeldSlotPacket(inventory.getSelectedSlot()));
+            this.player.inventoryMenu.broadcastChanges();
+        }
+    }
+
+    @Inject(method = "tryPickItem", at = @At("HEAD"))
     private void deeperdark$pickFromContainers(ItemStack itemStack, CallbackInfo ci) {
         if (!itemStack.isItemEnabled(this.player.level().enabledFeatures()))
             return;
-        // Creative already handled it
         if (this.player.hasInfiniteMaterials())
             return;
 
         Inventory inventory = this.player.getInventory();
-        // If vanilla already selected the right item, nothing to do
-        if (ItemStack.isSameItemSameComponents(inventory.getSelectedItem(), itemStack))
+        // Item is directly in inventory — vanilla will find it; nothing to do.
+        if (inventory.findSlotMatchingItem(itemStack) != -1)
             return;
 
         if (deeperdark$searchAndExtract(inventory, itemStack)) {
