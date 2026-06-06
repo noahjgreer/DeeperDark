@@ -1,0 +1,1947 @@
+Prism Launcher version: 11.0.2 (official)
+
+Launched instance in online mode
+
+login.microsoftonline.com resolves to:
+  2603:1036:3000:148::1, 2603:1037:1:148::13, 2603:1037:1:148::f, 2603:1037:1:148::e, 2603:1036:3000:148::6, 2603:1036:3000:148::8, 2603:1036:3000:148::2, 2603:1037:1:148::12, 40.126.29.15, 20.190.157.2, 40.126.29.13, 40.126.29.9, 40.126.29.7, 40.126.29.14, 20.190.157.12, 20.190.157.1
+
+session.minecraft.net resolves to:
+  2603:1061:14:1c2::1, 150.171.110.195
+
+textures.minecraft.net resolves to:
+  2603:1061:14:1c2::1, 150.171.110.195
+
+api.mojang.com resolves to:
+  2603:1061:14:1c2::1, 150.171.109.183
+
+Minecraft folder is:
+  C:/Users/********/AppData/Roaming/PrismLauncher/instances/FO - Cluster - 26.1.2/minecraft
+
+Java path is:
+  C:/Users/********/AppData/Roaming/PrismLauncher/java/java-runtime-epsilon/bin/javaw.exe
+Java is version 25.0.1, using 64 (amd64) architecture, from Microsoft
+
+OS: Windows 11 Version 25H2 | winnt | 10.0.26200
+CPU: AMD Ryzen 9 9950X 16-Core Processor            
+RAM: 62852 MiB (available: 39711 MiB)
+Found Vulkan device: NVIDIA GeForce RTX 5070 Ti (API version 1.4.329)
+Found Vulkan device: AMD Radeon(TM) Graphics (API version 1.4.315)
+OpenGL driver vendor: NVIDIA Corporation
+OpenGL renderer: NVIDIA GeForce RTX 5070 Ti/PCIe/SSE2
+OpenGL driver version: 4.6.0 NVIDIA 596.49
+
+Launcher: standard
+Main class: net.fabricmc.loader.impl.launch.knot.KnotClient
+
+Mods:
+  [✔] appleskin-fabric-mc26.1-3.0.9
+  [✔] architectury-fabric-20.0.5
+  [✔] ArmorStatues-v26.1.0-mc26.1.x-Fabric
+  [✘] authme-fabric-9.1.0+1.21.11.jar (disabled)
+  [✘] autolec-mc26.1.2-1.1.0.jar (disabled)
+  [✔] autotools-fabric-3.4.3
+  [✘] Axiom-5.4.2-for-MC26.1.jar (disabled)
+  [✔] BadOptimizations-2.4.1-26.1-fabric
+  [✔] balm-fabric-26.1.2-26.1.2.6
+  [✘] bedrockify-1.11.6+mc26.1.1.jar (disabled)
+  [✔] BetterF3-18.0.2-Fabric-26.1
+  [✔] BetterGrassify-1.8.6+fabric.26.1.2
+  [✔] bettermounthud-1.3.0
+  [✘] better-ping-display-fabric-1.21.11-1.2.0.jar (disabled)
+  [✘] better-selection-1.8.jar (disabled)
+  [✔] betterstats-5.2.1+fn-26.1
+  [✔] blur-fabric-6.2.0+26.1
+  [✔] boatiview-fabric-0.0.9-26.1
+  [✔] c2me-fabric-mc26.1.2-0.4.0-alpha.0.4
+  [✔] calcmod-1.5.1+fabric.26.1
+  [✔] capes-1.5.10+26.1
+  [✔] chat_heads-1.2.2-fabric-26.1
+  [✔] chatpatches-8.0-alpha.9+26.1.2-fabric
+  [✔] chesttracker-2.8.2+26.1.2
+  [✔] Chunky-Fabric-1.5.3
+  [✔] clickthrough-plus-3.6.4+26.1.1-fabric
+  [✔] clienttweaks-fabric-26.1.2-26.1.2.3
+  [✔] cloth-config-26.1.154
+  [✔] Clumps-fabric-26.1.2-26.1.2.1
+  [✔] collective-26.1.2-8.22
+  [✔] continuity-3.0.1-beta.2+26.1
+  [✘] controlify-3.0.0+26.1-fabric.jar (disabled)
+  [✔] Controlling-fabric-26.1.2-26.1.2.4
+  [✔] cpm-svc-compat-1.3.1
+  [✔] craftingtweaks-fabric-26.1.2-26.1.2.1
+  [✔] CrashAssistant-fabric-26.1-1.11.9
+  [✔] cullleaves-fabric-4.1.2+26.1
+  [✔] CustomPlayerModels-Fabric-26.1-0.6.26a
+  [✔] CutThrough-v26.1.0-mc26.1.x-Fabric
+  [✔] cwb-4.0.6+26.1
+  [✘] DBTools-2.2.0_AX5.4.2_MC26.1-26.1.2.jar (disabled)
+  [✔] debugify-26.1.2.2
+  [✔] deeperdark-2.1.0-7g
+  [✔] DistantHorizons-3.0.3-b-26.1.2-fabric-neoforge
+  [✔] doubledoors-26.1.2-7.2
+  [✘] Drip Sounds-0.5.2+1.21.10-Fabric.jar (disabled)
+  [✘] drop_confirm-6.1.1.jar (disabled)
+  [✘] durabilitytooltip-1.1.6-fabric-mc1.21.11.jar (disabled)
+  [✔] dynamic-fps-3.11.7+minecraft-26.1.0-fabric
+  [✘] e4mc-fabric-6.1.0.jar (disabled)
+  [✘] Easyplace Container Supply 26.1.2.jar (disabled)
+  [✔] entity_model_features-3.2.4-26.1-fabric
+  [✔] entity_texture_features_26.1-fabric-7.1
+  [✔] entityculling-fabric-1.10.2-mc26.1
+  [✔] explosive-enhancement-1.4.2-26.1.1
+  [✔] fabric-api-0.150.0+26.1.2
+  [✔] fabric-language-kotlin-1.13.12+kotlin.2.4.0
+  [✔] fabrishot-1.17.0
+  [✔] fallingleaves-2.0.7+26.1
+  [✔] fancymenu_fabric_3.9.1_MC_26.1.1-26.1.2
+  [✔] fast-ip-ping-v1.0.11-mc26.1.2
+  [✔] ferritecore-9.0.0-fabric
+  [✔] finnitweaks-1.0.5
+  [✔] firstperson-fabric-2.7.1-mc26.1
+  [✔] foodeffecttooltips-2.1.2+26.1.1
+  [✔] ForgeConfigAPIPort-v26.1.4-mc26.1.x-Fabric
+  [✔] freecam-fabric-1.4.0-rc.1+mc26.1.2
+  [✔] fzzy_config-0.7.6+26.1
+  [✔] Gamma-Utils-3.0.0+mc26.1
+  [✔] held-item-info-1.9.1
+  [✘] ijmtweaks-1.6.1+1.21.11.jar (disabled)
+  [✔] ImmediatelyFast-Fabric-1.15.2+26.1.2
+  [✔] inventoryessentials-fabric-26.1.2-26.1.2.2
+  [✔] inventoryhud.fabric.26.1.2-3.4.31
+  [✔] InventoryParticles-2.2.0+26.1+fabric
+  [✔] InventoryProfilesNext-fabric-26.1.2-2.3.3
+  [✔] InvMove-0.9.4+26.1-Fabric
+  [✘] InvMoveCompats-0.5.0+1.21.10-Fabric.jar (disabled)
+  [✘] iris-fabric-1.10.9+mc26.1.1.jar (disabled)
+  [✔] isxander-main-menu-credits-1.3.0
+  [✔] itemswapper-fabric-0.10.1-mc26.1
+  [✔] jamlib-fabric-2.2.0+26.1.x
+  [✘] jei-26.1.2-fabric-29.6.2.31.jar (disabled)
+  [✘] jjelytraswap-fabric-2.3.9+1.21.11.jar (disabled)
+  [✘] justenoughbreeding-fabric-1.21.11-1.6.6.jar (disabled)
+  [✔] konkrete_fabric_1.10.2_MC_26.1.1
+  [✔] krypton-0.3.0
+  [✔] lambdynamiclights-4.10.2+26.1.2
+  [✔] language-reload-1.7.6+26.1
+  [✔] LeaveMyBarsAlone-v26.1.0-mc26.1.x-Fabric
+  [✔] libIPN-fabric-26.1.2-6.8.0
+  [✘] litematica-enderchest-materials-1.1.0+1.21.5+.jar (disabled)
+  [✔] litematica-fabric-26.1.2-0.27.6
+  [✔] litematica-printer-26.1.1-3.2.2
+  [✔] litematic-downloader-1.1.8
+  [✔] lithium-fabric-0.24.5+mc26.1.2
+  [✔] LongerChatHistory-fabric-1.8
+  [✔] make_bubbles_pop-0.3.3-fabric-mc26.1.x
+  [✔] malilib-fabric-26.1.2-0.28.6
+  [✔] mcqoy-0.4.1+fabric-26.1
+  [✔] melody_fabric_1.0.16_MC_26.1.1
+  [✔] midnightlib-fabric-1.9.3+26.1
+  [✘] mixintrace-1.1.1+1.17.jar (disabled)
+  [✔] moderner-beta-fabric-4.1.8+26.1
+  [✔] modmenu-18.0.0-beta.1
+  [✔] morechathistory-2.0.0
+  [✔] moreculling-fabric-26.1.1-1.7.1
+  [✔] MossyLib-1.3.0+26.1+fabric
+  [✔] MouseTweaks-fabric-mc26.1-2.31
+  [✔] mru-1.0.28+lts+26.1-fabric
+  [✔] NBTac-FABRIC-26.1-1.3.15
+  [✔] NoChatReports-FABRIC-26.1-v2.19.0
+  [✔] no-report-button-1.7.1-fabric
+  [✔] no-resource-pack-warnings-1.5.0
+  [✔] notenoughanimations-fabric-1.12.3-mc26.1
+  [✔] notenoughcrashes-fabric-4.4.9+26.1.2
+  [✔] optigui-2.3.0-beta.10+26.1
+  [✔] OverflowingBars-v26.1.0-mc26.1.x-Fabric
+  [✔] packetfixer-fabric-3.3.5-26.1.2
+  [✔] paginatedadvancements-2.8.0+26.1
+  [✔] particlerain-4.0.0-beta.10+26.1-fabric
+  [✔] PickUpNotifier-v26.1.1-mc26.1.x-Fabric
+  [✔] placeholder-api-3.0.0+26.1
+  [✘] polytone-1.21.11-5.5.4-fabric.jar (disabled)
+  [✔] PresenceFootsteps-1.13.0+26.1
+  [✔] puzzle-fabric-2.3.1+26.1
+  [✔] PuzzlesLib-v26.1.9-mc26.1.x-Fabric
+  [✘] quickshare-1.0.2.jar (disabled)
+  [✘] reacharound+1.21.11-1.4.2.jar (disabled)
+  [✔] reeses-sodium-options-fabric-2.0.5+mc26.1.1
+  [✘] replanter-plus-2.3.3.jar (disabled)
+  [✔] replaymod-26.1-2.6.26
+  [✔] replayvoicechat-fabric-1.3.12+26.1.2
+  [✔] Resourcify (26.1-fabric)-1.8.3
+  [✔] rightclickharvest-fabric-4.6.2+26.1.x
+  [✔] rrls-5.2.5+mc.26.1
+  [✔] ScalableLux-0.2.0+fabric.2b63825-all
+  [✘] schematicpreview-0.0.16+1.21.11.jar (disabled)
+  [✔] screenshotcopy-fabric-1.4.1
+  [✔] Searchables-fabric-26.1.2-1.0.1
+  [✔] serverpingerfixer+26.1-1.1.0
+  [✔] shulkerboxtooltip-fabric-5.2.18+26.1
+  [✔] skyboxify-2.8+26.1.2-fabric
+  [✔] sodium-extra-fabric-0.8.7+mc26.1.1
+  [✔] sodium-fabric-0.8.12+mc26.1.2
+  [✔] sodium-shadowy-path-blocks-fabric-7.0.0
+  [✔] sound-physics-remastered-fabric-1.5.1+26.1.2
+  [✔] sounds-2.5.0+lts+26.1.2-fabric
+  [✔] spark-1.10.172-fabric
+  [✔] spawnanimations-v1.11.4+bump-mc1.17-26.1.x-mod
+  [✘] StackDeobfuscatorFabric-1.4.3+08e71cc.jar (disabled)
+  [✔] stack-to-nearby-chests-mc26.1.1-0.5.16
+  [✔] status-effect-bars-1.0.11
+  [✔] stendhal-1.4.6-26.1.2
+  [✔] SubtleEffects-fabric-26.1-1.14.3
+  [✘] supermartijn642configlib-1.1.8-fabric-mc1.21.11.jar (disabled)
+  [✘] syncac-1.3+1.21.11.jar (disabled)
+  [✔] tcdcommons-5.3.1+fn-26.1
+  [✘] techutils-0.7.0+26.1.jar (disabled)
+  [✔] tooltip-scroll-1.5.1+26.1.1
+  [✔] ukulib-fabric-2.0.0+26.1
+  [✔] ukus-armor-hud-fabric-0.11.0+mc26.1
+  [✘] ViaFabric-0.4.21+160-26.x.jar (disabled)
+  [✘] ViaFabricPlus-4.5.2.jar (disabled)
+  [✘] ViaVersion-5.9.1-SNAPSHOT.jar (disabled)
+  [✔] visuality-0.7.13+26.1
+  [✔] vivecraft-26.1.2-1.3.10-fabric
+  [✔] voicechat-fabric-2.6.18+26.1.2
+  [✔] worldedit-mod-7.4.3
+  [✔] xaerominimap-fabric-26.1.2-25.3.14
+  [✔] XaeroPlus-2.31.5+fabric-26.1.2-WM1.40.18-MM25.3.14
+  [✔] xaeroworldmap-fabric-26.1.2-1.40.18
+  [✔] xaerozoomout-fabric-2.0.0+26.1.2
+  [✔] xplus-autofish-1.5.0-fabric-mc26.1
+  [✘] yeetusexperimentus-fabric-87.0.0.jar (disabled)
+  [✔] yet_another_config_lib_v3-3.9.4+26.1-fabric
+  [✘] yosbr-0.1.2.jar (disabled)
+  [✔] zoomify-2.16.0+26.1
+
+Traits:
+  feature:is_quick_play_singleplayer
+  FirstThreadOnMacOS
+  XR:Initial
+  feature:is_quick_play_multiplayer
+
+Libraries:
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl-freetype-natives-windows-arm64/3.4.1/lwjgl-freetype-natives-windows-arm64-3.4.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl-freetype-natives-windows-x86/3.4.1/lwjgl-freetype-natives-windows-x86-3.4.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl-freetype-natives-windows/3.4.1/lwjgl-freetype-natives-windows-3.4.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl-freetype/3.4.1/lwjgl-freetype-3.4.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl-glfw-natives-windows-arm64/3.4.1/lwjgl-glfw-natives-windows-arm64-3.4.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl-glfw-natives-windows-x86/3.4.1/lwjgl-glfw-natives-windows-x86-3.4.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl-glfw-natives-windows/3.4.1/lwjgl-glfw-natives-windows-3.4.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl-glfw/3.4.1/lwjgl-glfw-3.4.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl-jemalloc-natives-windows-arm64/3.4.1/lwjgl-jemalloc-natives-windows-arm64-3.4.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl-jemalloc-natives-windows-x86/3.4.1/lwjgl-jemalloc-natives-windows-x86-3.4.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl-jemalloc-natives-windows/3.4.1/lwjgl-jemalloc-natives-windows-3.4.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl-jemalloc/3.4.1/lwjgl-jemalloc-3.4.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl-natives-windows-arm64/3.4.1/lwjgl-natives-windows-arm64-3.4.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl-natives-windows-x86/3.4.1/lwjgl-natives-windows-x86-3.4.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl-natives-windows/3.4.1/lwjgl-natives-windows-3.4.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl-openal-natives-windows-arm64/3.4.1/lwjgl-openal-natives-windows-arm64-3.4.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl-openal-natives-windows-x86/3.4.1/lwjgl-openal-natives-windows-x86-3.4.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl-openal-natives-windows/3.4.1/lwjgl-openal-natives-windows-3.4.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl-openal/3.4.1/lwjgl-openal-3.4.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl-opengl-natives-windows-arm64/3.4.1/lwjgl-opengl-natives-windows-arm64-3.4.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl-opengl-natives-windows-x86/3.4.1/lwjgl-opengl-natives-windows-x86-3.4.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl-opengl-natives-windows/3.4.1/lwjgl-opengl-natives-windows-3.4.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl-opengl/3.4.1/lwjgl-opengl-3.4.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl-shaderc-natives-windows-arm64/3.4.1/lwjgl-shaderc-natives-windows-arm64-3.4.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl-shaderc-natives-windows-x86/3.4.1/lwjgl-shaderc-natives-windows-x86-3.4.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl-shaderc-natives-windows/3.4.1/lwjgl-shaderc-natives-windows-3.4.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl-shaderc/3.4.1/lwjgl-shaderc-3.4.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl-spvc-natives-windows-arm64/3.4.1/lwjgl-spvc-natives-windows-arm64-3.4.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl-spvc-natives-windows-x86/3.4.1/lwjgl-spvc-natives-windows-x86-3.4.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl-spvc-natives-windows/3.4.1/lwjgl-spvc-natives-windows-3.4.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl-spvc/3.4.1/lwjgl-spvc-3.4.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl-stb-natives-windows-arm64/3.4.1/lwjgl-stb-natives-windows-arm64-3.4.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl-stb-natives-windows-x86/3.4.1/lwjgl-stb-natives-windows-x86-3.4.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl-stb-natives-windows/3.4.1/lwjgl-stb-natives-windows-3.4.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl-stb/3.4.1/lwjgl-stb-3.4.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl-tinyfd-natives-windows-arm64/3.4.1/lwjgl-tinyfd-natives-windows-arm64-3.4.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl-tinyfd-natives-windows-x86/3.4.1/lwjgl-tinyfd-natives-windows-x86-3.4.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl-tinyfd-natives-windows/3.4.1/lwjgl-tinyfd-natives-windows-3.4.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl-tinyfd/3.4.1/lwjgl-tinyfd-3.4.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl-vma-natives-windows-arm64/3.4.1/lwjgl-vma-natives-windows-arm64-3.4.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl-vma-natives-windows-x86/3.4.1/lwjgl-vma-natives-windows-x86-3.4.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl-vma-natives-windows/3.4.1/lwjgl-vma-natives-windows-3.4.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl-vma/3.4.1/lwjgl-vma-3.4.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl-vulkan/3.4.1/lwjgl-vulkan-3.4.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl/3.4.1/lwjgl-3.4.1-unsafe.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/at/yawk/lz4/lz4-java/1.10.1/lz4-java-1.10.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/com/azure/azure-json/1.4.0/azure-json-1.4.0.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/com/github/oshi/oshi-core/6.9.0/oshi-core-6.9.0.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/com/google/code/gson/gson/2.13.2/gson-2.13.2.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/com/google/guava/failureaccess/1.0.3/failureaccess-1.0.3.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/com/google/guava/guava/33.5.0-jre/guava-33.5.0-jre.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/com/ibm/icu/icu4j/77.1/icu4j-77.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/com/microsoft/azure/msal4j/1.23.1/msal4j-1.23.1.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/com/mojang/authlib/7.0.63/authlib-7.0.63.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/com/mojang/blocklist/1.0.10/blocklist-1.0.10.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/com/mojang/brigadier/1.3.10/brigadier-1.3.10.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/com/mojang/datafixerupper/9.0.19/datafixerupper-9.0.19.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/com/mojang/jtracy/1.0.37/jtracy-1.0.37.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/com/mojang/jtracy-natives-windows/1.0.37/jtracy-natives-windows-1.0.37.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/com/mojang/logging/1.6.11/logging-1.6.11.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/com/mojang/patchy/2.2.10/patchy-2.2.10.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/com/mojang/text2speech/1.18.11/text2speech-1.18.11.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/commons-codec/commons-codec/1.19.0/commons-codec-1.19.0.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/commons-io/commons-io/2.20.0/commons-io-2.20.0.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/io/netty/netty-buffer/4.2.7.Final/netty-buffer-4.2.7.Final.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/io/netty/netty-codec-base/4.2.7.Final/netty-codec-base-4.2.7.Final.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/io/netty/netty-codec-compression/4.2.7.Final/netty-codec-compression-4.2.7.Final.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/io/netty/netty-codec-http/4.2.7.Final/netty-codec-http-4.2.7.Final.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/io/netty/netty-common/4.2.7.Final/netty-common-4.2.7.Final.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/io/netty/netty-handler/4.2.7.Final/netty-handler-4.2.7.Final.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/io/netty/netty-resolver/4.2.7.Final/netty-resolver-4.2.7.Final.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/io/netty/netty-transport-classes-epoll/4.2.7.Final/netty-transport-classes-epoll-4.2.7.Final.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/io/netty/netty-transport-classes-kqueue/4.2.7.Final/netty-transport-classes-kqueue-4.2.7.Final.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/io/netty/netty-transport-native-unix-common/4.2.7.Final/netty-transport-native-unix-common-4.2.7.Final.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/io/netty/netty-transport/4.2.7.Final/netty-transport-4.2.7.Final.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/it/unimi/dsi/fastutil/8.5.18/fastutil-8.5.18.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/net/java/dev/jna/jna-platform/5.17.0/jna-platform-5.17.0.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/net/java/dev/jna/jna/5.17.0/jna-5.17.0.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/net/sf/jopt-simple/jopt-simple/5.0.4/jopt-simple-5.0.4.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/apache/commons/commons-compress/1.28.0/commons-compress-1.28.0.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/apache/commons/commons-lang3/3.19.0/commons-lang3-3.19.0.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/apache/logging/log4j/log4j-api/2.25.2/log4j-api-2.25.2.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/apache/logging/log4j/log4j-core/2.25.2/log4j-core-2.25.2.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/apache/logging/log4j/log4j-slf4j2-impl/2.25.2/log4j-slf4j2-impl-2.25.2.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/jcraft/jorbis/0.0.17/jorbis-0.0.17.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/joml/joml/1.10.8/joml-1.10.8.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/jspecify/jspecify/1.0.0/jspecify-1.0.0.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/slf4j/slf4j-api/2.0.17/slf4j-api-2.0.17.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/net/fabricmc/intermediary/26.1.2/intermediary-26.1.2.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/ow2/asm/asm/9.9/asm-9.9.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/ow2/asm/asm-analysis/9.9/asm-analysis-9.9.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/ow2/asm/asm-commons/9.9/asm-commons-9.9.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/ow2/asm/asm-tree/9.9/asm-tree-9.9.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/ow2/asm/asm-util/9.9/asm-util-9.9.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/net/fabricmc/sponge-mixin/0.17.2+mixin.0.8.7/sponge-mixin-0.17.2+mixin.0.8.7.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/net/fabricmc/fabric-loader/0.19.2/fabric-loader-0.19.2.jar
+  C:/Users/********/AppData/Roaming/PrismLauncher/libraries/com/mojang/minecraft/26.1.2/minecraft-26.1.2-client.jar
+
+Native libraries:
+
+Natives path:
+  C:/Users/********/AppData/Roaming/PrismLauncher/instances/FO - Cluster - 26.1.2/natives
+
+Minecraft arguments:
+  --username  --version 26.1.2 --gameDir C:/Users/********/AppData/Roaming/PrismLauncher/instances/FO - Cluster - 26.1.2/minecraft --assetsDir C:/Users/********/AppData/Roaming/PrismLauncher/assets --assetIndex 30 --uuid  --accessToken  --versionType release
+
+Window size: 854 x 480
+
+Java arguments:
+  -Duser.language=en -XX:+UseZGC -XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump -Xms512m -Xmx8096m
+
+Minecraft process ID: 43232
+
+
+[13:55:17] [main/INFO]: Loading Minecraft 26.1.2 with Fabric Loader 0.19.2
+[13:55:17] [ForkJoinPool-1-worker-32/WARN]: Mod cpm uses the version 0.6.26a which isn't compatible with Loader's extended semantic version format (Could not parse version number component '26a'!), SemVer is recommended for reliably evaluating dependencies and prioritizing newer version
+[13:55:17] [ForkJoinPool-1-worker-20/WARN]: Mod com_github_rtyley_animated-gif-lib-for-java uses the version animated-gif-lib-1.7 which isn't compatible with Loader's extended semantic version format (Could not parse version number component 'animated'!), SemVer is recommended for reliably evaluating dependencies and prioritizing newer version
+[13:55:17] [ForkJoinPool-1-worker-24/WARN]: Mod freecam_cloth-config_26_1 uses the version cloth-config-1.4.0-rc.1+mc26.1.2 which isn't compatible with Loader's extended semantic version format (Could not parse version number component 'cloth'!), SemVer is recommended for reliably evaluating dependencies and prioritizing newer version
+[13:55:17] [main/INFO]: Dependencies overridden for minecraft, fabricloader
+[13:55:17] [main/WARN]: Warnings were found!
+ - Mod 'BetterF3' (betterf3) 18.0.2 recommends version 18.0.0 or later of mod 'Mod Menu' (modmenu), but only the wrong version is present: 18.0.0-beta.1!
+	 - You should install version 18.0.0 or later of mod 'Mod Menu' (modmenu) for the optimal experience.
+ - Mod 'Chat Patches' (chatpatches) 8.0-alpha.9 conflicts with any version of mod 'More Chat History' (morechathistory), which is present with the following versions: 2.0.0!
+	 - While this won't prevent you from starting the game, the developer(s) of mod 'Chat Patches' (chatpatches) have found that this combination may cause issues. You should remove one of the mods or check for updates that resolve the issue.
+ - 'Minecraft' (minecraft) 26.1.2 recommends any version after 10.3.1 of Fabulously Optimized, which is missing!
+	 - You should install any version after 10.3.1 of Fabulously Optimized for the optimal experience.
+ - Mod 'OptiGUI' (optigui) 2.3.0-beta.10+26.1 recommends any version of animatica, which is missing!
+	 - You should install any version of animatica for the optimal experience.
+ - Mod 'Sounds' (sounds) 2.5.0+lts recommends any version of rsls, which is missing!
+	 - You should install any version of rsls for the optimal experience.
+ - Mod 'Spawn Animations' (spawnanimations) 1.11.4+bump+mod recommends any version of mr_spawn_animationscompats, which is missing!
+	 - You should install any version of mr_spawn_animationscompats for the optimal experience.
+[13:55:17] [main/INFO]: Loading 302 mods:
+	- appleskin 3.0.9+mc26.1
+	- architectury 20.0.5
+	- armorstatues 26.1.0
+	   \-- statuemenus 26.1.0
+	- autofish 1.5.0-fabric-mc26.1
+	- autotools 3.4.3
+	- badoptimizations 2.4.1
+	- balm 26.1.2.6
+	   \-- kuma_api 26.1.2.2
+	- betterf3 18.0.2
+	- bettergrass 1.8.6+fabric.26.1.2
+	- bettermounthud 1.3.0
+	- betterstats 5.2.1+fabric-26.1
+	- blur 6.2.0
+	- boatiview 0.0.9
+	- c2me 0.4.0-alpha.0.4+26.1.2
+	   |-- c2me-base 0.4.0-alpha.0.4+26.1.2
+	   |-- c2me-client-uncapvd 0.4.0-alpha.0.4+26.1.2
+	   |-- c2me-fixes-chunkio-threading-issues 0.4.0-alpha.0.4+26.1.2
+	   |-- c2me-fixes-general-threading-issues 0.4.0-alpha.0.4+26.1.2
+	   |-- c2me-fixes-worldgen-threading-issues 0.4.0-alpha.0.4+26.1.2
+	   |-- c2me-fixes-worldgen-vanilla-bugs 0.4.0-alpha.0.4+26.1.2
+	   |-- c2me-notickvd 0.4.0-alpha.0.4+26.1.2
+	   |-- c2me-opts-allocs 0.4.0-alpha.0.4+26.1.2
+	   |-- c2me-opts-chunkio 0.4.0-alpha.0.4+26.1.2
+	   |-- c2me-opts-dfc 0.4.0-alpha.0.4+26.1.2
+	   |-- c2me-opts-math 0.4.0-alpha.0.4+26.1.2
+	   |-- c2me-opts-natives-math 0.4.0-alpha.0.4+26.1.2
+	   |-- c2me-opts-scheduling 0.4.0-alpha.0.4+26.1.2
+	   |-- c2me-opts-worldgen-general 0.4.0-alpha.0.4+26.1.2
+	   |-- c2me-opts-worldgen-vanilla 0.4.0-alpha.0.4+26.1.2
+	   |-- c2me-rewrites-chunk-serializer 0.4.0-alpha.0.4+26.1.2
+	   |-- c2me-rewrites-chunk-system 0.4.0-alpha.0.4+26.1.2
+	   |-- c2me-rewrites-chunkio 0.4.0-alpha.0.4+26.1.2
+	   |-- c2me-server-utils 0.4.0-alpha.0.4+26.1.2
+	   |-- c2me-threading-lighting 0.4.0-alpha.0.4+26.1.2
+	   |-- com_github_ben-manes_caffeine_caffeine 3.2.1
+	   |-- com_ibm_async_asyncutil 0.1.0
+	   |-- io_reactivex_rxjava3_rxjava 3.1.12
+	   |-- mixinsquared 0.3.7-beta.1
+	   |-- net_objecthunter_exp4j 0.4.8
+	   |-- org_jctools_jctools-core 4.0.5
+	   \-- org_reactivestreams_reactive-streams 1.0.4
+	- calcmod 1.5.1+fabric.26.1
+	   |-- clientarguments 1.12.0
+	   \-- org_mariuszgromada_math_mathparser_org-mxparser 5.0.6
+	- capes 1.5.10+26.1
+	- chat_heads 1.2.2
+	- chatpatches 8.0-alpha.9
+	- chesttracker 2.8.2+26.1.2
+	   \-- whereisit 2.7.4+26.1
+	        \-- jackfredlib 0.10.6+26.1
+	             |-- jackfredlib-base 1.4.1+26.1
+	             |    \-- org_apache_httpcomponents_httpcore 4.4.16
+	             |-- jackfredlib-colour 1.1.1+26.1
+	             |    \-- org_apache_httpcomponents_httpcore 4.4.16
+	             |-- jackfredlib-extracommandsourcedata 1.1.1+26.1
+	             |    \-- org_apache_httpcomponents_httpcore 4.4.16
+	             |-- jackfredlib-gps 1.0.7+26.1
+	             |    \-- org_apache_httpcomponents_httpcore 4.4.16
+	             |-- jackfredlib-lying 0.5.9+26.1
+	             |    \-- org_apache_httpcomponents_httpcore 4.4.16
+	             |-- jackfredlib-toasts 1.1.1+26.1
+	             |    \-- org_apache_httpcomponents_httpcore 4.4.16
+	             \-- org_apache_httpcomponents_httpcore 4.4.16
+	- chunky 1.5.3
+	- clickthrough 3.6.4+26.1.1
+	   \-- folk_sisby_kaleido-config 0.3.3+1.3.2
+	- clienttweaks 26.1.2.3
+	   \-- shogi_api 26.1.2.2-SNAPSHOT
+	- cloth-config 26.1.154
+	   \-- cloth-basic-math 0.6.1
+	- clumps 26.1.2.1
+	- collective 8.22
+	- continuity 3.0.1-beta.2+26.1
+	- controlling 26.1.2.4
+	- cpm 0.6.26a
+	- cpmsvcc 1.3.1
+	- craftingtweaks 26.1.2.1
+	- crash_assistant 1.11.9
+	- cullleaves 4.1.2
+	- cutthrough 26.1.0
+	- cwb 4.0.6+26.1
+	- debugify 26.1.2.2
+	- deeperdark 2.1.0-7g
+	   \-- org_yaml_snakeyaml 2.1
+	- distanthorizons 3.0.3-b
+	   |-- fabric-api-base 2.0.3+ece0632339
+	   |-- fabric-biome-api-v1 18.0.4+35c80edc39
+	   |-- fabric-block-api-v1 3.0.2+ec56b60139
+	   |-- fabric-block-getter-api-v2 2.0.6+ec56b60139
+	   |-- fabric-client-gametest-api-v1 5.0.14+9c21967139
+	   |-- fabric-command-api-v2 3.0.5+e2bdee7839
+	   |-- fabric-crash-report-info-v1 1.0.3+9f78a5a839
+	   |-- fabric-debug-api-v1 1.0.1+c792624d39
+	   |-- fabric-entity-events-v1 5.0.2+e2bdee7839
+	   |-- fabric-game-rule-api-v1 4.0.5+d871b99e39
+	   |-- fabric-gametest-api-v1 4.0.13+00a1fba639
+	   |-- fabric-key-mapping-api-v1 2.0.4+e2bdee7839
+	   |-- fabric-message-api-v1 7.0.5+dae8ce3e39
+	   |-- fabric-rendering-fluids-v1 6.0.1+d871b99e39
+	   |-- fabric-resource-conditions-api-v1 6.0.5+00a1fba639
+	   |-- fabric-screen-api-v1 5.0.1+d871b99e39
+	   |-- fabric-serialization-api-v1 2.0.3+11a26f3139
+	   \-- fabric-sound-api-v1 2.0.4+11a26f3139
+	- doubledoors 7.2
+	- dynamic_fps 3.11.7
+	   |-- dynamic_fps_common 3.11.7
+	   \-- net_lostluma_battery 2.1.0
+	- entity_model_features 3.2.4
+	- entity_texture_features 7.1
+	- entityculling 1.10.2
+	   |-- transition 1.0.19
+	   \-- trender 1.0.13
+	- explosiveenhancement 1.4.2-26.1.1
+	- fabric-api 0.150.0+26.1.2
+	   |-- fabric-api-lookup-api-v1 2.0.11+d5a053b64c
+	   |-- fabric-content-registries-v0 11.2.0+76b0b6bb4c
+	   |-- fabric-convention-tags-v2 4.6.1+4f11f7994c
+	   |-- fabric-creative-tab-api-v1 5.0.11+d871b99e4c
+	   |-- fabric-data-attachment-api-v1 2.2.7+44a0bd1d4c
+	   |-- fabric-data-generation-api-v1 24.2.1+73b1f9054c
+	   |-- fabric-dimensions-v1 5.1.5+9cbf5da54c
+	   |-- fabric-events-interaction-v0 5.2.2+07b380be4c
+	   |-- fabric-item-api-v1 14.1.2+73d134684c
+	   |-- fabric-lifecycle-events-v1 4.1.0+6d50a0854c
+	   |-- fabric-loot-api-v3 3.0.12+00a1fba64c
+	   |-- fabric-menu-api-v1 2.0.13+d871b99e4c
+	   |-- fabric-model-loading-api-v1 8.0.7+c80601bb4c
+	   |-- fabric-networking-api-v1 6.3.1+554860db4c
+	   |-- fabric-object-builder-api-v1 23.0.16+b95dd56e4c
+	   |-- fabric-particles-v1 5.0.15+b61fef434c
+	   |-- fabric-permission-api-v1 1.0.1+c3369b134c
+	   |-- fabric-recipe-api-v1 9.0.15+be4b75ae4c
+	   |-- fabric-registry-sync-v0 7.0.13+b61fef434c
+	   |-- fabric-renderer-api-v1 13.0.4+c80601bb4c
+	   |-- fabric-renderer-indigo 8.1.1+1403e82c4c
+	   |-- fabric-rendering-v1 23.1.1+1403e82c4c
+	   |-- fabric-resource-loader-v0 3.3.17+4fc5413f4c
+	   |-- fabric-resource-loader-v1 2.0.10+7c44c7324c
+	   |-- fabric-tag-api-v1 2.1.1+371cf5db4c
+	   |-- fabric-transfer-api-v1 8.0.5+357ea7334c
+	   \-- fabric-transitive-access-wideners-v1 8.1.1+7f80f93d4c
+	- fabric-language-kotlin 1.13.12+kotlin.2.4.0
+	   |-- org_jetbrains_kotlin_kotlin-reflect 2.4.0
+	   |-- org_jetbrains_kotlin_kotlin-stdlib 2.4.0
+	   |-- org_jetbrains_kotlin_kotlin-stdlib-jdk7 2.4.0
+	   |-- org_jetbrains_kotlin_kotlin-stdlib-jdk8 2.4.0
+	   |-- org_jetbrains_kotlinx_atomicfu-jvm 0.33.0
+	   |-- org_jetbrains_kotlinx_kotlinx-coroutines-core-jvm 1.11.0
+	   |-- org_jetbrains_kotlinx_kotlinx-coroutines-jdk8 1.11.0
+	   |-- org_jetbrains_kotlinx_kotlinx-datetime-jvm 0.8.0
+	   |-- org_jetbrains_kotlinx_kotlinx-io-bytestring-jvm 0.9.0
+	   |-- org_jetbrains_kotlinx_kotlinx-io-core-jvm 0.9.0
+	   |-- org_jetbrains_kotlinx_kotlinx-serialization-cbor-jvm 1.11.0
+	   |-- org_jetbrains_kotlinx_kotlinx-serialization-core-jvm 1.11.0
+	   \-- org_jetbrains_kotlinx_kotlinx-serialization-json-jvm 1.11.0
+	- fabricloader 0.19.2
+	   \-- mixinextras 0.5.4
+	- fabrishot 1.17.0
+	- fallingleaves 2.0.7
+	- fancymenu 3.9.1
+	   |-- com_github_keksuccino_japng 0.5.3
+	   \-- com_github_rtyley_animated-gif-lib-for-java animated-gif-lib-1.7
+	- fastipping 1.0.11
+	- ferritecore 9.0.0
+	- finnitweaks 1.0.5
+	- firstperson 2.7.1
+	- foodeffecttooltips 2.1.2+26.1.1
+	- forgeconfigapiport 26.1.4
+	   |-- com_electronwill_night-config_core 3.8.3
+	   \-- com_electronwill_night-config_toml 3.8.3
+	- freecam 1.4.0-rc.1
+	   \-- freecam_cloth-config_26_1 cloth-config-1.4.0-rc.1+mc26.1.2
+	- fzzy_config 0.7.6+26.1
+	   |-- blue_endless_jankson 1.2.3
+	   \-- net_peanuuutz_tomlkt_tomlkt-jvm 0.3.7
+	- gammautils 3.0.0
+	- held-item-info 1.9.1
+	- immediatelyfast 1.15.2+26.1.2
+	   \-- net_lenni0451_reflect 1.6.2
+	- inventory_particles 2.2.0+26.1+fabric
+	- inventoryessentials 26.1.2.2
+	- inventoryhud 3.4.31
+	- inventoryprofilesnext 2.3.3
+	- invmove 0.9.4
+	- isxander-main-menu-credits 1.3.0
+	- itemswapper 0.10.1
+	- jamlib 2.2.0+26.1.x
+	- java 25
+	- konkrete 1.10.2
+	- krypton 0.3.0
+	   \-- com_velocitypowered_velocity-native 3.4.0-SNAPSHOT
+	- lambdynlights 4.10.2+26.1.2
+	   |-- lambdynlights_api 4.10.2+26.1.2
+	   |    |-- yumi_commons_collections 2.0.0
+	   |    |-- yumi_commons_core 2.0.0
+	   |    \-- yumi_commons_event 2.0.0
+	   |-- pride 1.6.0+26.1
+	   |-- spruceui 10.0.0+26.1
+	   \-- yumi_mc_core 1.0.0+26.1
+	        |-- yumi_commons_collections 2.0.0
+	        |-- yumi_commons_core 2.0.0
+	        \-- yumi_commons_event 2.0.0
+	- languagereload 1.7.6+26.1
+	- leavemybarsalone 26.1.0
+	- libipn 6.8.0
+	- litematic-downloader 1.1.8
+	   \-- org_sejda_imageio_webp-imageio 0.1.6
+	- litematica 0.27.6
+	   \-- conditional-mixin 0.6.4
+	- litematica_printer 3.2.2
+	- lithium 0.24.5+mc26.1.2
+	- longerchathistory 1.8
+	- make_bubbles_pop 0.3.3-fabric
+	- malilib 0.28.6
+	   \-- conditional-mixin 0.6.4
+	- mcqoy 0.4.1+fabric-26.1
+	   \-- folk_sisby_kaleido-config 0.3.3+1.3.2
+	- melody 1.0.16
+	- midnightlib 1.9.3
+	- minecraft 26.1.2
+	- moderner_beta 4.1.8+26.1
+	- modmenu 18.0.0-beta.1
+	- morechathistory 2.0.0
+	- moreculling 1.7.1
+	- mossylib 1.3.0+26.1+fabric
+	- mousetweaks 2.31
+	- mru 1.0.28+lts+26.1
+	- nbt_ac 1.3.15
+	- no-resource-pack-warnings 1.5.0
+	- nochatreports 26.1-v2.19.0
+	- noreportbutton 1.7.1
+	- notenoughanimations 1.12.3
+	   |-- transition 1.0.19
+	   \-- trender 1.0.13
+	- notenoughcrashes 4.4.9+26.1.2
+	- optigui 2.3.0-beta.10+26.1
+	   |-- org_apache_commons_commons-text 1.12.0
+	   \-- org_ini4j_ini4j 0.5.4
+	- overflowingbars 26.1.0
+	- packetfixer 3.3.5
+	- paginatedadvancements 2.8.0+26.1
+	- particlerain 4.0.0-beta.10
+	- pickupnotifier 26.1.1
+	- placeholder-api 3.0.0+26.1
+	- presencefootsteps 1.13.0+26.1
+	   \-- kirin 1.22.0-beta.1+26.1
+	- puzzle 2.3.1
+	- puzzleslib 26.1.9
+	- reeses-sodium-options 2.0.5+mc26.1.1
+	- replaymod 26.1-2.6.26
+	- replayvoicechat 1.3.12+26.1.2
+	- resourcify 1.8.3
+	- rightclickharvest 4.6.2+26.1.x
+	- rrls 5.2.5+mc.26.1
+	- scalablelux 0.2.0+fabric.2b63825
+	- screencopy 1.4.1-fabric
+	   |-- com_github_ramanrajarathinam_native-utils 1.0.0
+	   \-- io_github_imurx_arboard 1.1.3
+	- searchables 1.0.1
+	- serverpingerfixer 1.1.0
+	- shulkerboxtooltip 5.2.18+26.1
+	- skyboxify 2.8
+	   \-- com_moulberry_mixinconstraints 1.1.0
+	- sodium 0.8.12+mc26.1.2
+	- sodium-extra 0.8.7+mc26.1.1
+	- sound_physics_remastered 1.5.1+26.1.2
+	- sounds 2.5.0+lts
+	   \-- yumi_mc_core 1.0.0+26.1
+	        |-- yumi_commons_collections 2.0.0
+	        |-- yumi_commons_core 2.0.0
+	        \-- yumi_commons_event 2.0.0
+	- spark 1.10.172
+	   \-- fabric-permissions-api-v0 0.7.0
+	- spawnanimations 1.11.4+bump+mod
+	- sspb 7.0.0
+	- stack-to-nearby-chests 0.5.16
+	   \-- libgui 16.0.1+26.1
+	        |-- jankson 12.0.0+j1.2.3
+	        |    \-- blue_endless_jankson 1.2.3
+	        \-- libninepatch 1.2.0
+	- status-effect-bars 1.0.11
+	- stendhal 1.4.6-26.1.2
+	   \-- libgui 16.0.1+26.1
+	        |-- jankson 12.0.0+j1.2.3
+	        |    \-- blue_endless_jankson 1.2.3
+	        \-- libninepatch 1.2.0
+	- subtle_effects 1.14.3
+	   \-- com_moulberry_mixinconstraints 1.1.0
+	- tcdcommons 5.3.1+fabric-26.1
+	- tooltipscroll 1.5.1+26.1.1
+	   \-- lilylib 4.1.0+26.1
+	- ukulib 2.0.0+26.1
+	   \-- com_moandjiezana_toml_toml4j 0.7.2
+	- ukus-armor-hud 0.11.0+mc26.1
+	- visuality 0.7.13+26.1
+	- vivecraft 26.1.2-1.3.10
+	   |-- com_github_bhaptics_tact-java 0.1.4
+	   |-- com_illposed_osc_javaosc-core 0.9
+	   |-- fabric-api-base 2.0.3+ece0632339
+	   |-- fabric-command-api-v2 3.0.5+e2bdee7839
+	   |-- org_java-websocket_java-websocket 1.5.1
+	   |-- org_lwjgl_lwjgl-openvr 3.3.6
+	   |-- org_lwjgl_lwjgl-openvr_natives-linux 3.3.6
+	   |-- org_lwjgl_lwjgl-openvr_natives-linux-arm64 3.3.6
+	   |-- org_lwjgl_lwjgl-openvr_natives-macos 3.3.6
+	   \-- org_lwjgl_lwjgl-openvr_natives-windows 3.3.6
+	- voicechat 2.6.18+26.1.2
+	   \-- voicechat_api 2.6.13
+	- worldedit 7.4.3+7515-78babeb
+	   \-- worldeditcui_protocol 4.0.3
+	- xaerominimap 25.3.14
+	   \-- xaerolib 1.1.15
+	- xaeroplus 2.31.5
+	- xaeroworldmap 1.40.18
+	   \-- xaerolib 1.1.15
+	- xaerozoomout 2.0.0+26.1.2
+	- yet_another_config_lib_v3 3.9.4+26.1-fabric
+	   |-- com_twelvemonkeys_common_common-image 3.12.0
+	   |-- com_twelvemonkeys_common_common-io 3.12.0
+	   |-- com_twelvemonkeys_common_common-lang 3.12.0
+	   |-- com_twelvemonkeys_imageio_imageio-core 3.12.0
+	   |-- com_twelvemonkeys_imageio_imageio-metadata 3.12.0
+	   |-- com_twelvemonkeys_imageio_imageio-webp 3.12.0
+	   |-- org_quiltmc_parsers_gson 0.2.1
+	   \-- org_quiltmc_parsers_json 0.2.1
+	- zoomify 2.16.0+26.1
+[13:55:17] [main/WARN]: Stream injection failed; legacy loggers may retain blocking behavior.
+[13:55:17] [main/INFO]: Launching CrashAssistantApp (CrashAssistant-fabric-26.1-1.11.9.jar)
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by com.sun.jna.Native in an unnamed module (file:/C:/Users/********/AppData/Roaming/PrismLauncher/libraries/net/java/dev/jna/jna/5.17.0/jna-5.17.0.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+[13:55:18] [main/INFO]: SpongePowered MIXIN Subsystem Version=0.8.7 Source=file:/C:/Users/********/AppData/Roaming/PrismLauncher/libraries/net/fabricmc/sponge-mixin/0.17.2+mixin.0.8.7/sponge-mixin-0.17.2+mixin.0.8.7.jar Service=Knot/Fabric Env=CLIENT
+[13:55:18] [main/INFO]: Compatibility level set to JAVA_21
+[13:55:18] [main/INFO]: Compatibility level set to JAVA_25
+[13:55:18] [main/INFO]: Config version: 6
+[13:55:18] [main/INFO]: BadOptimizations config dump:
+[13:55:18] [main/INFO]: enable_toast_optimizations: true
+[13:55:18] [main/INFO]: ignore_mod_incompatibilities: false
+[13:55:18] [main/INFO]: lightmap_time_change_needed_for_update: 80
+[13:55:18] [main/INFO]: enable_lightmap_caching: true
+[13:55:18] [main/INFO]: enable_particle_manager_optimization: true
+[13:55:18] [main/INFO]: enable_entity_renderer_caching: true
+[13:55:18] [main/INFO]: log_config: true
+[13:55:18] [main/INFO]: enable_remove_redundant_fov_calculations: true
+[13:55:18] [main/INFO]: config_version: 6
+[13:55:18] [main/INFO]: enable_sky_angle_caching_in_worldrenderer: true
+[13:55:18] [main/INFO]: enable_block_entity_renderer_caching: true
+[13:55:18] [main/INFO]: skycolor_time_change_needed_for_update: 3
+[13:55:18] [main/INFO]: enable_entity_flag_caching: true
+[13:55:18] [main/INFO]: ignore_mod_cache_hooks: false
+[13:55:18] [main/INFO]: enable_debug_renderer_disable_if_not_needed: true
+[13:55:18] [main/INFO]: enable_sky_color_caching: true
+[13:55:18] [main/INFO]: enable_remove_tutorial_if_not_demo: true
+[13:55:18] [main/INFO]: show_f3_text: true
+[13:55:18] [main/INFO]: Mod gammautils added a lightmap caching hook: io.github.sjouwer.gammautils.compat.BadOptimizationsHook
+[13:55:18] [main/WARN]: Reference map 'balm.refmap.json' for balm.mixins.json could not be read. If this is a development environment you can ignore this message
+[13:55:18] [main/WARN]: Reference map 'balm.refmap.json' for balm.api.mixins.json could not be read. If this is a development environment you can ignore this message
+[13:55:18] [main/WARN]: Reference map 'balm.refmap.json' for balm.fabric.mixins.json could not be read. If this is a development environment you can ignore this message
+[13:55:18] [main/INFO]: Initializing com.ishland.c2me.base.mixin
+[13:55:18] [main/INFO]: Global Executor Parallelism: 11 configured, 11 evaluated, 11 default evaluated
+[13:55:18] [main/INFO]: Initializing com.ishland.c2me.client.uncapvd.mixin
+[13:55:18] [main/INFO]: Initializing com.ishland.c2me.fixes.chunkio.threading_issues.mixin
+[13:55:18] [main/INFO]: Initializing com.ishland.c2me.fixes.general.threading_issues.mixin
+[13:55:18] [main/INFO]: Initializing com.ishland.c2me.fixes.worldgen.threading_issues.mixin
+[13:55:18] [main/INFO]: Initializing com.ishland.c2me.fixes.worldgen.vanilla_bugs.mixin
+[13:55:18] [main/INFO]: Initializing com.ishland.c2me.notickvd.mixin
+[13:55:18] [main/INFO]: Initializing com.ishland.c2me.opts.allocs.mixin
+[13:55:18] [main/INFO]: Initializing com.ishland.c2me.opts.chunkio.mixin
+[13:55:18] [main/INFO]: Initializing com.ishland.c2me.opts.dfc.mixin
+[13:55:18] [main/INFO]: Initializing com.ishland.c2me.opts.math.mixin
+[13:55:18] [main/INFO]: Initializing com.ishland.c2me.opts.natives_math.mixin
+[13:55:18] [main/INFO]: Attempting to call native library. If your game crashes right after this point, native acceleration may not be available for your system.
+[13:55:18] [main/INFO]: Detected maximum supported ISA target: AVX2
+[13:55:18] [main/INFO]: Initializing com.ishland.c2me.opts.scheduling.mixin
+[13:55:18] [main/INFO]: Initializing com.ishland.c2me.opts.worldgen.general.mixin
+[13:55:18] [main/INFO]: Initializing com.ishland.c2me.opts.worldgen.vanilla.mixin
+[13:55:18] [main/INFO]: Initializing com.ishland.c2me.rewrites.chunk_serializer.mixin
+[13:55:18] [main/INFO]: Disabling config ioSystem.gcFreeChunkSerializer: Incompatible with architectury@20.0.5 (*) (defined in c2me)
+[13:55:18] [main/INFO]: Disabling com.ishland.c2me.rewrites.chunk_serializer.mixin
+[13:55:18] [main/INFO]: Initializing com.ishland.c2me.rewrites.chunksystem.mixin
+[13:55:18] [main/INFO]: Initializing com.ishland.c2me.rewrites.chunkio.mixin
+[13:55:18] [main/INFO]: Initializing com.ishland.c2me.server.utils.mixin
+[13:55:18] [main/INFO]: Initializing com.ishland.c2me.threading.lighting.mixin
+[13:55:18] [main/WARN]: Reference map 'clienttweaks.refmap.json' for clienttweaks.mixins.json could not be read. If this is a development environment you can ignore this message
+[13:55:18] [main/WARN]: Reference map 'clienttweaks.refmap.json' for clienttweaks.fabric.mixins.json could not be read. If this is a development environment you can ignore this message
+[13:55:18] [main/WARN]: Reference map 'clumps.refmap.json' for clumps.mixins.json could not be read. If this is a development environment you can ignore this message
+[13:55:18] [main/WARN]: Reference map 'controlling.refmap.json' for controlling.mixins.json could not be read. If this is a development environment you can ignore this message
+[13:55:18] [main/WARN]: Reference map 'craftingtweaks.refmap.json' for craftingtweaks.mixins.json could not be read. If this is a development environment you can ignore this message
+[13:55:18] [main/WARN]: Reference map 'craftingtweaks.refmap.json' for craftingtweaks.fabric.mixins.json could not be read. If this is a development environment you can ignore this message
+[13:55:18] [main/INFO]: Preloading Debugify
+[13:55:18] [main/WARN]: Reference map 'entityculling.refmap.mixins.json' for entityculling.mixins.json could not be read. If this is a development environment you can ignore this message
+[13:55:18] [main/WARN]: Reference map 'fancymenu.refmap.json' for fancymenu.mixins.json could not be read. If this is a development environment you can ignore this message
+[13:55:18] [CrashAssistantApp process logger/INFO]: CrashAssistantApp process successfully started.
+[13:55:18] [main/WARN]: Reference map 'inventory_particles.refmap.json' for inventory_particles.mixins.json could not be read. If this is a development environment you can ignore this message
+[13:55:18] [main/WARN]: Reference map 'inventoryessentials.refmap.json' for inventoryessentials.mixins.json could not be read. If this is a development environment you can ignore this message
+[13:55:18] [main/WARN]: Reference map 'kuma_api.refmap.json' for kuma_api.mixins.json could not be read. If this is a development environment you can ignore this message
+[13:55:18] [main/WARN]: Reference map 'kuma_api.refmap.json' for kuma_api.fabric.mixins.json could not be read. If this is a development environment you can ignore this message
+[13:55:18] [main/INFO]: Loaded configuration file for Lithium: 171 options available, 2 override(s) found.
+[13:55:18] [main/WARN]: Reference map 'moderner_beta.refmap.json' for moderner_beta-common.mixins.json could not be read. If this is a development environment you can ignore this message
+[13:55:18] [main/WARN]: Reference map 'mossylib.refmap.json' for mossylib.mixins.json could not be read. If this is a development environment you can ignore this message
+[13:55:18] [main/WARN]: Reference map 'mossylib.refmap.json' for mossylib-yacl.mixins.json could not be read. If this is a development environment you can ignore this message
+[13:55:18] [main/WARN]: Reference map 'nochatreports.refmap.json' for mixins/common/nochatreports.mixins.json could not be read. If this is a development environment you can ignore this message
+[13:55:18] [main/WARN]: Reference map 'particlerain.refmap.json' for particlerain.mixins.json could not be read. If this is a development environment you can ignore this message
+[13:55:18] [main/WARN]: Reference map 'reeses-sodium-options.refmap.json' for reeses-sodium-options.mixins.json could not be read. If this is a development environment you can ignore this message
+[13:55:18] [main/WARN]: Reference map 'mixins.jgui.refmap.json' for mixins.jgui.json could not be read. If this is a development environment you can ignore this message
+[13:55:18] [main/WARN]: Reference map 'mixins.nonmmlauncher.replaymod.refmap.json' for mixins.nonmmlauncher.replaymod.json could not be read. If this is a development environment you can ignore this message
+[13:55:18] [main/WARN]: Reference map 'searchables.refmap.json' for searchables.mixins.json could not be read. If this is a development environment you can ignore this message
+[13:55:18] [main/WARN]: Reference map 'searchables.refmap.json' for searchables.fabric.mixins.json could not be read. If this is a development environment you can ignore this message
+[13:55:18] [main/INFO]: Loaded configuration file for Sodium: 36 options available, 0 override(s) found
+[13:55:18] [main/INFO]: Loaded configuration file for Sodium Extra: 26 options available, 0 override(s) found
+[13:55:18] [main/WARN]: Reference map 'sspb.refmap.json' for sspb.mixins.json could not be read. If this is a development environment you can ignore this message
+[13:55:18] [main/WARN]: Reference map 'subtle_effects.refmap.json' for subtle_effects.mixins.json could not be read. If this is a development environment you can ignore this message
+[13:55:18] [main/WARN]: Reference map 'subtle_effects.refmap.json' for subtle_effects.fabric.mixins.json could not be read. If this is a development environment you can ignore this message
+[13:55:18] [main/WARN]: Reference map 'xaerolib.refmap.json' for xaerolib.mixins.json could not be read. If this is a development environment you can ignore this message
+[13:55:18] [main/WARN]: Reference map 'xaeroworldmap.refmap.json' for xaeroworldmap.mixins.json could not be read. If this is a development environment you can ignore this message
+[13:55:18] [main/WARN]: Reference map 'xaerozoomout.refmap.json' for xaerozoomout.mixins.json could not be read. If this is a development environment you can ignore this message
+[13:55:18] [main/WARN]: Reference map 'xaerozoomout.refmap.json' for xaerozoomout.fabric.mixins.json could not be read. If this is a development environment you can ignore this message
+[13:55:18] [main/WARN]: Reference map 'yet_another_config_lib_v3.refmap.json' for yacl.mixins.json could not be read. If this is a development environment you can ignore this message
+[13:55:18] [main/WARN]: Reference map 'yet_another_config_lib_v3.refmap.json' for yacl-fabric.mixins.json could not be read. If this is a development environment you can ignore this message
+[13:55:18] [main/WARN]: Error loading class: mezz/jei/fabric/platform/RenderHelper (java.lang.ClassNotFoundException: mezz/jei/fabric/platform/RenderHelper)
+[13:55:18] [main/WARN]: @Mixin target mezz.jei.fabric.platform.RenderHelper was not found appleskin.jei.mixins.json:JEIRenderHelperMixin from mod appleskin
+[13:55:19] [main/WARN]: Error loading class: net/vulkanmod/config/option/Options (java.lang.ClassNotFoundException: net/vulkanmod/config/option/Options)
+[13:55:19] [main/WARN]: Force disabled MC-122477 because it only applies to OS: LINUX
+[13:55:19] [main/WARN]: Force disabled MC-59810 because it only applies to OS: MAC
+[13:55:19] [main/WARN]: Error loading class: net/irisshaders/iris/layer/OuterWrappedRenderType (java.lang.ClassNotFoundException: net/irisshaders/iris/layer/OuterWrappedRenderType)
+[13:55:19] [main/WARN]: Error loading class: dev/zelo/renderscale/RenderScale (java.lang.ClassNotFoundException: dev/zelo/renderscale/RenderScale)
+[13:55:19] [main/WARN]: Error loading class: dev/isxander/controlify/virtualmouse/VirtualMouseHandler (java.lang.ClassNotFoundException: dev/isxander/controlify/virtualmouse/VirtualMouseHandler)
+[13:55:19] [main/WARN]: @Mixin target dev.isxander.controlify.virtualmouse.VirtualMouseHandler was not found mixins.ipnext.json:MixinVirtualMouseHandler from mod inventoryprofilesnext
+[13:55:19] [main/INFO]: Force-disabling mixin 'chunk.palette.StrategyMixin' as rule 'mixin.chunk.palette' (added by mods [xaeroplus]) disables it and children
+[13:55:19] [main/INFO]: Force-disabling mixin 'chunk.palette.StrategyMixin$Strategy1Mixin' as rule 'mixin.chunk.palette' (added by mods [xaeroplus]) disables it and children
+[13:55:19] [main/INFO]: Force-disabling mixin 'chunk.palette.StrategyMixin$Strategy2Mixin' as rule 'mixin.chunk.palette' (added by mods [xaeroplus]) disables it and children
+[13:55:19] [main/INFO]: Force-enabling mixin 'compat.worldedit.LevelChunkMixin' as rule 'mixin.compat.worldedit' (added by mods [lithium]) enables it
+[13:55:19] [main/WARN]: Error loading class: net/strobel/inventive_inventory/features/sorting/SortingHandler (java.lang.ClassNotFoundException: net/strobel/inventive_inventory/features/sorting/SortingHandler)
+[13:55:19] [main/WARN]: Error loading class: de/rubixdev/inventorio/player/InventorioScreenHandler (java.lang.ClassNotFoundException: de/rubixdev/inventorio/player/InventorioScreenHandler)
+[13:55:19] [main/WARN]: Error loading class: net/blay09/mods/trashslot/client/deletion/DefaultDeletionProvider (java.lang.ClassNotFoundException: net/blay09/mods/trashslot/client/deletion/DefaultDeletionProvider)
+[13:55:19] [main/INFO]: Vivecraft: applying 'dynamicfps' fixes
+[13:55:19] [main/INFO]: Vivecraft: applying 'elementa' fixes
+[13:55:19] [main/INFO]: Vivecraft: applying 'emf' fixes
+[13:55:19] [main/INFO]: Vivecraft: skipping mixin 'org.vivecraft.mod_compat_vr.emf.mixin.EMFModelPartWithStateAnimatorVRMixin'
+[13:55:19] [main/INFO]: Vivecraft: applying 'epicfight' fixes
+[13:55:19] [main/INFO]: Vivecraft: skipping mixin 'org.vivecraft.mod_compat_vr.epicfight.mixin.EpicFightLocalPlayerVRMixin'
+[13:55:19] [main/INFO]: Vivecraft: applying 'modmenu' fixes
+[13:55:19] [main/INFO]: Vivecraft: applying 'optifine' fixes
+[13:55:19] [main/INFO]: Vivecraft: skipping mixin 'org.vivecraft.mod_compat_vr.optifine.mixin.OptifineDefaultVertexFormatMixin'
+[13:55:19] [main/INFO]: Vivecraft: skipping mixin 'org.vivecraft.mod_compat_vr.optifine.mixin.OptifineFluidRendererMixin'
+[13:55:19] [main/INFO]: Vivecraft: skipping mixin 'org.vivecraft.mod_compat_vr.optifine.mixin.OptifineModelBlockRendererMixin'
+[13:55:19] [main/INFO]: Vivecraft: applying 'sodium' fixes
+[13:55:19] [main/INFO]: Vivecraft: applying 'xaerosminimap' fixes
+[13:55:19] [main/INFO]: Vivecraft: applying 'xaerosworldmap' fixes
+[13:55:19] [main/WARN]: Reference map 'mixins.replaymod.refmap.json' for mixins.compat.mapwriter.replaymod.json could not be read. If this is a development environment you can ignore this message
+[13:55:19] [main/WARN]: Reference map 'mixins.replaymod.refmap.json' for mixins.compat.shaders.replaymod.json could not be read. If this is a development environment you can ignore this message
+[13:55:19] [main/WARN]: Reference map 'mixins.replaymod.refmap.json' for mixins.core.replaymod.json could not be read. If this is a development environment you can ignore this message
+[13:55:19] [main/WARN]: Reference map 'mixins.replaymod.refmap.json' for mixins.extras.playeroverview.replaymod.json could not be read. If this is a development environment you can ignore this message
+[13:55:19] [main/WARN]: Reference map 'mixins.replaymod.refmap.json' for mixins.recording.replaymod.json could not be read. If this is a development environment you can ignore this message
+[13:55:19] [main/WARN]: Reference map 'mixins.replaymod.refmap.json' for mixins.render.blend.replaymod.json could not be read. If this is a development environment you can ignore this message
+[13:55:19] [main/WARN]: Reference map 'mixins.replaymod.refmap.json' for mixins.render.replaymod.json could not be read. If this is a development environment you can ignore this message
+[13:55:19] [main/WARN]: Reference map 'mixins.replaymod.refmap.json' for mixins.replay.replaymod.json could not be read. If this is a development environment you can ignore this message
+[13:55:19] [main/WARN]: Error loading class: net/optifine/render/ChunkVisibility (java.lang.ClassNotFoundException: net/optifine/render/ChunkVisibility)
+[13:55:19] [main/WARN]: Error loading class: shadersmod/client/ShadersRender (java.lang.ClassNotFoundException: shadersmod/client/ShadersRender)
+[13:55:19] [main/WARN]: Error loading class: net/optifine/shaders/ShadersRender (java.lang.ClassNotFoundException: net/optifine/shaders/ShadersRender)
+[13:55:19] [main/WARN]: Error loading class: net/irisshaders/iris/uniforms/SystemTimeUniforms$Timer (java.lang.ClassNotFoundException: net/irisshaders/iris/uniforms/SystemTimeUniforms$Timer)
+[13:55:19] [main/WARN]: Error loading class: net/irisshaders/iris/uniforms/CommonUniforms (java.lang.ClassNotFoundException: net/irisshaders/iris/uniforms/CommonUniforms)
+[13:55:19] [main/WARN]: Error loading class: net/irisshaders/iris/Iris (java.lang.ClassNotFoundException: net/irisshaders/iris/Iris)
+[13:55:19] [main/INFO]: Searching for graphics cards...
+WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::objectFieldOffset has been called by org.lwjgl.system.MemoryUtil (file:/C:/Users/********/AppData/Roaming/PrismLauncher/libraries/org/lwjgl/lwjgl/3.4.1/lwjgl-3.4.1-unsafe.jar)
+WARNING: Please consider reporting this to the maintainers of class org.lwjgl.system.MemoryUtil
+WARNING: sun.misc.Unsafe::objectFieldOffset will be removed in a future release
+[13:55:19] [main/INFO]: Found graphics adapter: AdapterInfo{vendor=AMD, description='AMD Radeon(TM) Graphics', adapterType=0x00002323, openglIcdFilePath='C:\WINDOWS\System32\DriverStore\FileRepository\u0420529.inf_amd64_94ad5a6c4d1a04e2\B419765\atig6pxx.dll', openglIcdVersion=32.0.21030.2001}
+[13:55:19] [main/INFO]: Found graphics adapter: AdapterInfo{vendor=NVIDIA, description='NVIDIA GeForce RTX 5070 Ti', adapterType=0x0000031B, openglIcdFilePath='C:\WINDOWS\System32\DriverStore\FileRepository\nvmdi.inf_amd64_97fbf7e42e9512b0\nvoglv64.dll', openglIcdVersion=32.0.15.9649}
+[13:55:19] [main/WARN]: Sodium has applied one or more workarounds to prevent crashes or other issues on your system: [NVIDIA_THREADED_OPTIMIZATIONS_BROKEN, AMD_GAME_OPTIMIZATION_BROKEN]
+[13:55:19] [main/WARN]: This is not necessarily an issue, but it may result in certain features or optimizations being disabled. You can sometimes fix these issues by upgrading your graphics driver.
+[13:55:19] [main/INFO]: Initializing MixinExtras via com.llamalad7.mixinextras.service.MixinExtrasServiceImpl(version=0.5.4).
+[13:55:20] [main/INFO]: Setting Minecraft's SharedConstants.IS_RUNNING_IN_IDE to [false]
+[13:55:20] [Datafixer Bootstrap/INFO]: 291 Datafixer optimizations took 238 milliseconds
+[13:55:22] [main/INFO]: mixins.core.replaymod.json:BlockableEventLoopAccessor from mod (unknown)->@Accessor[FIELD_GETTER]::getDelayedCrash()Ljava/util/function/Supplier; should be static as its target is
+[13:55:22] [main/WARN]: Mixin stendhal.mixins.json:ChatScreenMixin from mod stendhal has multiple constructors, <init>(Lnet/minecraft/network/chat/Component;)V was selected
+[13:55:24] [Render thread/INFO]: Environment: Environment[sessionHost=https://sessionserver.mojang.com, servicesHost=https://api.minecraftservices.com, profilesHost=https://api.mojang.com, name=PROD]
+[13:55:24] [Render thread/INFO]: Setting user: FinniTheFox
+[13:55:24] [Render thread/INFO]: Constructing components for armorstatues:common
+[13:55:24] [Render thread/INFO]: Dispatching loading event for config armorstatues-client.toml
+[13:55:24] [Render thread/INFO]: Loading Collective version 8.22.
+[13:55:24] [Render thread/INFO]: Customizable Player Models Initialized
+[13:55:24] [Render thread/INFO]: Customizable Player Models API initialized: Loaded plugins: (1)
+	cpmsvcc
+[13:55:24] [Render thread/INFO]: Constructing components for cutthrough:common
+[13:55:24] [Render thread/INFO]: Dispatching loading event for config cutthrough-client.toml
+[13:55:24] [Render thread/INFO]: Enabled 6 bug fixes: [MC-577, MC-59810, MC-89146, MC-90683, MC-122477, MC-237493]
+[13:55:24] [Render thread/INFO]: Successfully Debugify'd your game!
+[13:55:24] [Render thread/INFO]: [Deeper Dark] Custom sounds initialized
+[13:55:24] [Render thread/INFO]: [Deeper Dark] Registering custom data components
+[13:55:24] [Render thread/INFO]: Registering ModBlocks for deeperdark
+[13:55:24] [Render thread/INFO]: Registering ModBlockEntities for deeperdark
+[13:55:24] [Render thread/INFO]: Registering ModMenus for deeperdark
+[13:55:24] [Render thread/INFO]: Registering ModItems for deeperdark
+[13:55:24] [Render thread/INFO]: Registering Villagers for deeperdark
+[13:55:24] [Render thread/INFO]: [Deeper Dark] Mod initialized!
+[13:55:24] [Render thread/INFO]: [Deeper Dark] Creature system registered
+[13:55:24] [Render thread/INFO]: [FANCYMENU] Loading v3.9.1 in client-side mode on FABRIC!
+[13:55:24] [Render thread/INFO]: ping & connect fast!
+[13:55:24] [Render thread/INFO]: Hello Fabric world!
+[13:55:24] [Render thread/INFO]: [Inventory Particles]: Inventory Particles Initialized
+[13:55:24] [Render thread/INFO]: Initializing JamLib on Fabric
+[13:55:24] [Render thread/INFO]: Registered network payload type jamlib:capabilities
+[13:55:24] [Render thread/INFO]: [KONKRETE] Loading v1.10.2 in client-side mode on FABRIC!
+[13:55:24] [Render thread/INFO]: [KONKRETE] Server-side modules initialized and ready to use!
+[13:55:24] [Render thread/INFO]: Compression will use Java, encryption will use Java
+[13:55:24] [Render thread/INFO]: Constructing components for leavemybarsalone:common
+[13:55:24] [Render thread/INFO]: Dispatching loading event for config leavemybarsalone-client.toml
+[13:55:24] [Render thread/INFO]: Litematic Downloader mod initialized
+[13:55:24] [Render thread/INFO]: i18nLang#load: File: '/assets/malilib/lang/en_us.json' has been loaded successfully
+[13:55:24] [Render thread/WARN]: i18nOptionManager#buildLanguageOptions(malilib): Detected [12] available options.
+[13:55:24] [Render thread/INFO]: litematica_printer-26.1.2-3.2.2 initialized.
+[13:55:24] [Render thread/INFO]: MidnightLib detected!
+[13:55:24] [Render thread/INFO]: Make Bubbles Pop by Tschipcraft initialized!
+[13:55:24] [Render thread/INFO]: [McQoy] I’m beginning to think I can cure a rainy day!
+[13:55:24] [Render thread/INFO]: [MELODY] Loading v1.0.16 on FABRIC...
+[13:55:24] [Render thread/INFO]: [Moderner Beta] Initializing Moderner Beta...
+[13:55:25] [Render thread/INFO]: [MossyLib]: MossyLib Initialized
+[13:55:25] [Render thread/INFO]: Constructing components for overflowingbars:common
+[13:55:25] [Render thread/INFO]: Dispatching loading event for config overflowingbars-client.toml
+[13:55:25] [Render thread/INFO]: Packet Fixer 3.3.5 Fabric has been initialized!
+[13:55:25] [Render thread/INFO]: Constructing components for pickupnotifier:common
+[13:55:25] [Render thread/INFO]: Dispatching loading event for config pickupnotifier-client.toml
+[13:55:25] [Render thread/INFO]: Constructing components for puzzleslib:common
+[13:55:25] [Render thread/INFO]: Initializing Right Click Harvest on FABRIC
+[13:55:25] [Render thread/INFO]: [ShulkerBoxTooltip] Could not find configuration file, creating default file
+[13:55:25] [Render thread/INFO]: [Spawn Animations] MidnightLib detected!
+[13:55:25] [Render thread/INFO]: [Spawn Animations] Registering server started event ...
+[13:55:25] [Render thread/INFO]: [Spawn Animations] Loaded Spawn Animations by Tschipcraft successfully!
+[13:55:25] [Render thread/INFO]: Constructing components for statuemenus:common
+[13:55:25] [Render thread/INFO]: [Stendhal] Initializing
+[13:55:25] [Render thread/INFO]: [voicechat] Compatibility version 20
+[13:55:25] [Render thread/INFO]: [voicechat] Loading plugins
+[13:55:25] [Render thread/INFO]: [voicechat] Loaded 3 plugin(s)
+[13:55:25] [Render thread/INFO]: [voicechat] Initializing plugins
+[13:55:25] [Render thread/INFO]: CPM voice chat plugin initialized!
+[13:55:25] [Render thread/INFO]: Initializing Simple Voice Chat integration
+[13:55:25] [Render thread/INFO]: [voicechat] Initialized 3 plugin(s)
+[13:55:25] [Render thread/INFO]: [voicechat] Registering events for 'cpmsvcc'
+[13:55:25] [Render thread/INFO]: [voicechat] Registering events for 'replayvoicechat'
+[13:55:25] [Render thread/INFO]: [voicechat] Registering events for 'sound_physics_remastered'
+[13:55:25] [Render thread/INFO]: Deserializing WhereIsItConfig from 'C:\Users\********\AppData\Roaming\PrismLauncher\instances\FO - Cluster - 26.1.2\minecraft\config\whereisit.json5'
+[13:55:25] [Render thread/INFO]: Serializing class red.jackf.whereisit.config.WhereIsItConfig to 'C:\Users\********\AppData\Roaming\PrismLauncher\instances\FO - Cluster - 26.1.2\minecraft\config\whereisit.json5'
+[13:55:25] [Render thread/INFO]: Got request to register class com.sk89q.worldedit.fabric.internal.FabricPlatform with WorldEdit [com.sk89q.worldedit.extension.platform.PlatformManager@16d79a7d]
+[13:55:25] [Render thread/INFO]: WorldEdit for Fabric (version 7.4.3+7515-78babeb) is loaded
+[13:55:25] [Render thread/INFO]: Registering S2C receiver with id architectury:spawn_entity_packet
+[13:55:25] [Render thread/INFO]: Constructing components for armorstatues:client
+[13:55:25] [Render thread/INFO]: Loaded custom block configs: []
+[13:55:25] [Render thread/INFO]: [BetterF3] Loading...
+[13:55:25] [Render thread/INFO]: [BetterF3] All done!
+[13:55:25] [Render thread/INFO]: [BetterGrassify] [FANCY] Gamers can finally touch grass!?
+[13:55:25] [Render thread/INFO]: Initializing 'betterstats' as 'BetterStatsFabricClient'.
+[13:55:25] [Render thread/INFO]: Trying to read config file...
+[13:55:25] [Render thread/INFO]: A config file was found, loading it..
+[13:55:25] [Render thread/INFO]: Successfully loaded config file.
+[13:55:25] [Render thread/INFO]: Reading...
+[13:55:25] [Render thread/INFO]: Read config data from 'C:\Users\********\AppData\Roaming\PrismLauncher\instances\FO - Cluster - 26.1.2\minecraft\config\chatpatches.json'!
+[13:55:25] [Render thread/INFO]: [Config.deserialize] Took 0.002 seconds
+[13:55:25] [Render thread/INFO]: Finished Chat Patches setup!
+[13:55:25] [Render thread/INFO]: Deserializing ChestTrackerConfig from 'C:\Users\********\AppData\Roaming\PrismLauncher\instances\FO - Cluster - 26.1.2\minecraft\config\chesttracker.json5'
+[13:55:25] [Render thread/INFO]: Serializing class red.jackf.chesttracker.impl.config.ChestTrackerConfig to 'C:\Users\********\AppData\Roaming\PrismLauncher\instances\FO - Cluster - 26.1.2\minecraft\config\chesttracker.json5'
+[13:55:25] [Render thread/INFO]: inventoryessentials.mixins.json:CreativeModeInventoryScreenAccessor from mod inventoryessentials->@Accessor[FIELD_GETTER]::getCONTAINER()Lnet/minecraft/world/SimpleContainer; should be static as its target is
+[13:55:25] [Render thread/INFO]: Customizable Player Models Client Init started
+[13:55:25] [CPM Background Loading Pool-1/INFO]: [VersionChecker] Starting CPM version checker...
+[13:55:25] [Render thread/INFO]: ViveCraft detected, enabling ViveCraft compatibility
+[13:55:25] [Render thread/INFO]: Customizable Player Models Client Initialized
+[13:55:25] [Render thread/INFO]: CPM Plugin initialized!
+[13:55:25] [Render thread/INFO]: Constructing components for cutthrough:client
+[13:55:25] [CPM Background Loading Pool-1/INFO]: [VersionChecker] Current: 0.6.26a Target: null Up-to-date
+[13:55:25] [Render thread/INFO]: Initializing Distant Horizons client, firing DhApiBeforeDhInitEvent...
+[13:55:25] [Render thread/INFO]: Running library validation...
+[13:55:26] [Render thread/INFO]: Distant Horizons, Version: 3.0.3-b
+[13:55:26] [Render thread/INFO]: Registering Fabric Client Events
+[13:55:26] [Render thread/INFO]: Registering Fabric Server Events
+[13:55:26] [Render thread/INFO]: Registered mod compatibility accessor for: [Sodium-Fabric].
+[13:55:26] [Render thread/INFO]: Registered mod compatibility accessor for: [Starlight-Fabric-1.18.X].
+[13:55:26] [Render thread/INFO]: Skipping mod compatibility accessor for: [optifine]
+[13:55:26] [Render thread/INFO]: Skipping mod compatibility accessor for: [bclib]
+[13:55:26] [Render thread/INFO]: Registered mod compatibility accessor for: [c2me].
+[13:55:26] [Render thread/INFO]: Skipping mod compatibility accessor for: [iris]
+[13:55:26] [Render thread/INFO]: Initialising config for [DistantHorizons]
+2026-06-06T18:55:26.214167300Z Render thread WARN found 2 argument placeholders, but provided 0 for pattern `Unable to convert config value [{}] from [class java.lang.String] to [class java.util.HashMap] for config [mapTest], the default config value will be used instead [{}]. Make sure a converter is defined in [ConfigTypeConverters].`
+[13:55:26] [Render thread/ERROR]: Unable to convert config value [{}] from [class java.lang.String] to [class java.util.HashMap] for config [mapTest], the default config value will be used instead [{}]. Make sure a converter is defined in [ConfigTypeConverters].
+[13:55:26] [Render thread/INFO]: [DistantHorizons] Config initialised
+[13:55:26] [Render thread/INFO]: Dimension ignoring disabled, DH will render all dimensions.
+[13:55:26] [Render thread/INFO]: Applying config to loggers
+[13:55:26] [Render thread/WARN]: Partially Incompatible Distant Horizons mod detected: [Chunky] Chunky can cause DH LODs to have holes since Chunky can generate chunks faster than DH can process them. 
+Using DH's distant generator instead of chunky or increasing DH's CPU thread count can resolve the issue.
+[13:55:26] [Render thread/INFO]: Garbage collectors: [ZGC Minor Cycles, ZGC Minor Pauses, ZGC Major Cycles, ZGC Major Pauses]
+[13:55:26] [Render thread/INFO]: Distant Horizons client Initialized.
+[13:55:26] [Render thread/INFO]: [ETF]: Modifying ETF Render State constructor because: for EMF
+[13:55:26] [Render thread/INFO]: Loading Entity Model Features, OptiFine's weirder younger half-brother that runs around making train models.
+[13:55:26] [Render thread/INFO]: [ETF]: 6 new ETF Random Properties registered by entity_model_features
+[13:55:26] [Render thread/INFO]: Loading Entity Texture Features, Lisa needs braces.
+[13:55:26] [Render thread/INFO]: [Indigo] Different rendering plugin detected; not applying Indigo.
+[13:55:26] [Render thread/INFO]: Registering leaf particles.
+[13:55:26] [Render thread/INFO]: Loading FirstPerson Mod
+[13:55:26] [Render thread/INFO]: Freecam support loaded.
+[13:55:26] [Render thread/INFO]: freecam.json not found, attempting to migrate legacy config freecam.json5
+[13:55:26] [Render thread/INFO]: Using Cloth Config Freecam GUI
+[13:55:26] [Render thread/INFO]: Loaded config fzzy_config:keybinds in 123ms
+[13:55:26] [Render thread/INFO]: [Inventory Particles/Client]: Inventory Particles Client Initialized
+[13:55:26] [Render thread/INFO]: [STDOUT]: Inventory HUD + has been initialized!
+[13:55:26] [Render thread/INFO]: Loading ItemSwapper!
+[13:55:26] [Render thread/INFO]: Loading ItemSwapper server support.
+[13:55:26] [Render thread/INFO]: Adding ViveCraft support...
+[13:55:26] [Render thread/INFO]: ViveCraft support is explicitly disabled!
+[13:55:26] [Render thread/INFO]: Krypton is now accelerating your Minecraft client's networking stack 🚀
+[13:55:26] [Render thread/INFO]: Note that Krypton is most effective on servers, not the client.
+[13:55:26] [Render thread/INFO]: Constructing components for leavemybarsalone:client
+[13:55:26] [Render thread/WARN]: Using Cloth Config GUI
+[13:55:26] [Render thread/INFO]: [MossyLib/Client]: MossyLib Client Initialized
+[13:55:26] [Render thread/INFO]: [STDOUT]: [Mouse Tweaks] Main.initialize()
+[13:55:26] [Render thread/INFO]: [STDOUT]: [Mouse Tweaks] Initialized.
+[13:55:26] [Render thread/INFO]: Constructing components for overflowingbars:client
+[13:55:27] [Render thread/INFO]: Constructing components for pickupnotifier:client
+[13:55:27] [Render thread/INFO]: Sodium: [0.8.12+mc26.1.2], Iris: [N/F]
+[13:55:27] [Render thread/INFO]: Constructing components for puzzleslib:client
+[13:55:27] [Render thread/INFO]: Config service: org.redlance.dima_dencep.mods.rrls.fabric.config.FabricConfigImpl
+[13:55:27] [Render thread/INFO]: Deserializing SkyboxifyConfig from 'C:\Users\********\AppData\Roaming\PrismLauncher\instances\FO - Cluster - 26.1.2\minecraft\config\skyboxify.json'
+[13:55:27] [Render thread/INFO]: Reloading reverb parameters
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: betterend:betterend.ambient.amber_land
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: betterend:betterend.ambient.blossoming_spires
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: betterend:betterend.ambient.caves
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: betterend:betterend.ambient.chorus_forest
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: betterend:betterend.ambient.dust_wastelands
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: betterend:betterend.ambient.foggy_mushroomland
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: betterend:betterend.ambient.glowing_grasslands
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: betterend:betterend.ambient.megalake
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: betterend:betterend.ambient.megalake_grove
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: betterend:betterend.ambient.sulphur_springs
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: betterend:betterend.ambient.umbra_valley
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: betterend:betterend.ambient.umbrella_jungle
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: betterend:betterend.entity.dragonfly
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: betterend:betterend.entity.shadow_walker
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: betterend:betterend.entity.shadow_walker_damage
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: betterend:betterend.entity.shadow_walker_death
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: betterend:betterend.music.caves
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: betterend:betterend.music.dark
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: betterend:betterend.music.forest
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: betterend:betterend.music.openspace
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: betterend:betterend.music.water
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: betterend:betterend.record.endseeker
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: betterend:betterend.record.eo_dracona
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: betterend:betterend.record.grasping_at_stars
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: betterend:betterend.record.strange_and_alien
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: nostalgic_tweaks:blank
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: farmersdelight:block.cabinet.close
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: farmersdelight:block.cabinet.open
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: farmersdelight:block.cooking_pot.boil
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: farmersdelight:block.cooking_pot.boil_soup
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: farmersdelight:block.cutting_board.knife
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: farmersdelight:block.skillet.add_food
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: farmersdelight:block.skillet.sizzle
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: farmersdelight:block.stove.crackle
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: farmersdelight:block.tomato_bush.pick_tomatoes
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: minecraft:entity.goat.screaming.horn_break
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: minecraft:entity.leash_knot.break
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: minecraft:entity.leash_knot.place
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: nostalgic_tweaks:entity.player.hurt
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: minecraft:entity.puffer_fish.ambient
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: farmersdelight:entity.rotten_tomato.hit
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: farmersdelight:entity.rotten_tomato.throw
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: minecraft:entity.wolf.howl
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: minecraft:item.goat_horn.play
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: farmersdelight:item.skillet.attack.strong
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: farmersdelight:item.skillet.attack.weak
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: nostalgic_tweaks:music.creative.beta
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: nostalgic_tweaks:music.creative.blended
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: nostalgic_tweaks:music.gameplay.alpha
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: nostalgic_tweaks:music.menu.beta
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: nostalgic_tweaks:music.menu.blended
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: biomeswevegone:music.overworld.crag_gardens
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: biomeswevegone:music.overworld.eroded_borealis
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: biomeswevegone:music.overworld.forgotten_forest
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: biomeswevegone:music.overworld.pale_bog
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: biomeswevegone:music_disc.better_days
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: biomeswevegone:music_disc.pixie_club
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: biomeswevegone:oddion.ambient
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: biomeswevegone:oddion.die
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: biomeswevegone:oddion.happy
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: biomeswevegone:oddion.hurt
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: biomeswevegone:soul_fruit.wail
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: leahs-immersive-thunder:thunder_close
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: leahs-immersive-thunder:thunder_far
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: leahs-immersive-thunder:thunder_medium
+[13:55:27] [Render thread/INFO]: Unknown sound in sound rate config: refinedstorage:wrench
+[13:55:27] [Render thread/INFO]: [SSPB] Broken dirt path lighting is best dirt path lighting lol
+[13:55:27] [Render thread/INFO]: Constructing components for statuemenus:client
+[13:55:27] [Render thread/INFO]: Loaded config subtle_effects:general in 71ms
+[13:55:27] [Render thread/INFO]: Loaded config subtle_effects:blocks in 69ms
+[13:55:27] [Render thread/INFO]: Loaded config subtle_effects:entities in 34ms
+[13:55:27] [Render thread/INFO]: Loaded config subtle_effects:environment in 21ms
+[13:55:27] [Render thread/INFO]: Loaded config subtle_effects:items in 12ms
+[13:55:27] [Render thread/INFO]: Initializing 'tcdcommons' as 'TCDCommonsFabricClient'.
+[13:55:27] [Render thread/INFO]: [STDOUT]: [LibGui] Initializing Client...
+[13:55:27] [Render thread/INFO]: [voicechat] Initializing Opus
+[13:55:27] [Render thread/INFO]: [voicechat] Successfully initialized Opus
+[13:55:27] [Render thread/INFO]: [voicechat] Initializing RNNoise
+[13:55:27] [Render thread/INFO]: [voicechat] Successfully initialized RNNoise
+[13:55:27] [Render thread/INFO]: [voicechat] Initializing Speex
+[13:55:27] [Render thread/INFO]: [voicechat] Successfully initialized Speex
+[13:55:27] [Render thread/INFO]: [voicechat] Initializing LAME
+[13:55:27] [Render thread/INFO]: [voicechat] Successfully initialized LAME
+[13:55:27] [Render thread/INFO]: [voicechat] Using Cloth Config GUI
+[13:55:27] [Render thread/INFO]: Registering common data for channel xaerolib:main!
+[13:55:27] [Render thread/INFO]: Registering client data for channel xaerolib:main!
+[13:55:27] [Render thread/INFO]: Loading primary common config for channel xaerolib:main!
+[13:55:27] [Render thread/INFO]: Loading server config profiles for channel xaerolib:main!
+[13:55:27] [Render thread/INFO]: Loading primary client config for channel xaerolib:main!
+[13:55:27] [Render thread/INFO]: Loading client config profiles for channel xaerolib:main!
+[13:55:27] [Render thread/INFO]: Loading XaeroLib common 1/2!
+[13:55:27] [Render thread/INFO]: Loading XaeroLib client 1/3!
+[13:55:29] [Render thread/INFO]: Registering common data for channel xaerominimap:main!
+[13:55:29] [Render thread/INFO]: Registering client data for channel xaerominimap:main!
+[13:55:29] [Render thread/INFO]: Loading primary common config for channel xaerominimap:main!
+[13:55:29] [Render thread/INFO]: Loading server config profiles for channel xaerominimap:main!
+[13:55:29] [Render thread/INFO]: Loading primary client config for channel xaerominimap:main!
+[13:55:29] [Render thread/INFO]: Loading client config profiles for channel xaerominimap:main!
+[13:55:29] [Render thread/INFO]: Initializing XaeroPlus
+[13:55:29] [Render thread/WARN]: Setting not found: [XP] Hide Invisible Entities
+[13:55:29] [Render thread/WARN]: Setting not found: [XP] Waypoint ETA Tick Buffer
+[13:55:29] [Render thread/INFO]: WorldTools not found. Disabling WorldTools support.
+[13:55:29] [Render thread/INFO]: Waystones not found. Disabling Waystones support.
+[13:55:29] [Render thread/INFO]: Baritone API not found. Disabling Baritone support.
+[13:55:29] [Render thread/INFO]: Loading Xaero's Minimap - Stage 1/3
+[13:55:29] [Render thread/INFO]: Registering common data for channel xaeroworldmap:main!
+[13:55:29] [Render thread/INFO]: Registering client data for channel xaeroworldmap:main!
+[13:55:29] [Render thread/INFO]: Loading primary common config for channel xaeroworldmap:main!
+[13:55:29] [Render thread/INFO]: Loading server config profiles for channel xaeroworldmap:main!
+[13:55:29] [Render thread/INFO]: Loading primary client config for channel xaeroworldmap:main!
+[13:55:29] [Render thread/INFO]: Loading client config profiles for channel xaeroworldmap:main!
+[13:55:29] [Render thread/INFO]: Loading Xaero's World Map - Stage 1/3
+[13:55:29] [Render thread/INFO]: Deserializing YACLConfig from 'C:\Users\********\AppData\Roaming\PrismLauncher\instances\FO - Cluster - 26.1.2\minecraft\config\yacl.json5'
+[13:55:30] [Render thread/INFO]: Initializing mods (entrypoint yumi:init)...
+[13:55:30] [Render thread/INFO]: [LambDynLights] Initializing LambDynamicLights...
+[13:55:30] [Render thread/INFO]: [LambDynLights] Configuration loaded.
+[13:55:30] [Render thread/INFO]: Deserializing WorldSoundsConfig from 'C:\Users\********\AppData\Roaming\PrismLauncher\instances\FO - Cluster - 26.1.2\minecraft\config\sounds\world.json'
+[13:55:30] [Render thread/INFO]: Deserializing ChatSoundsConfig from 'C:\Users\********\AppData\Roaming\PrismLauncher\instances\FO - Cluster - 26.1.2\minecraft\config\sounds\chat.json'
+[13:55:30] [Render thread/INFO]: Deserializing ModConfig from 'C:\Users\********\AppData\Roaming\PrismLauncher\instances\FO - Cluster - 26.1.2\minecraft\config\sounds\mod_utils.json'
+[13:55:30] [Render thread/INFO]: Deserializing EventSoundsConfig from 'C:\Users\********\AppData\Roaming\PrismLauncher\instances\FO - Cluster - 26.1.2\minecraft\config\sounds\event.json'
+[13:55:30] [Render thread/INFO]: Deserializing UISoundsConfig from 'C:\Users\********\AppData\Roaming\PrismLauncher\instances\FO - Cluster - 26.1.2\minecraft\config\sounds\ui.json'
+[13:55:30] [Render thread/INFO]: Backend library: LWJGL version 3.4.1-snapshot
+[13:55:30] [Render thread/INFO]: Modifying process environment to apply workarounds for the NVIDIA graphics driver...
+[13:55:30] [Render thread/INFO]: Initializing ImmediatelyFast 1.15.2+26.1.2 on NVIDIA GeForce RTX 5070 Ti/PCIe/SSE2 (NVIDIA Corporation) with OpenGL 3.3.0 NVIDIA 596.49
+[13:55:30] [Render thread/INFO]: Using optional rendering extensions: GL_ARB_buffer_storage, GL_KHR_debug, GL_ARB_vertex_attrib_binding, GL_ARB_direct_state_access, GL_EXT_texture_filter_anisotropic
+[13:55:30] [VivecraftUpdateThread/INFO]: Vivecraft: Checking for Updates
+[13:55:30] [Render thread/INFO]: Found non-pack entry 'C:\Users\********\AppData\Roaming\PrismLauncher\instances\FO - Cluster - 26.1.2\minecraft\resourcepacks\.index', ignoring
+[13:55:30] [Render thread/ERROR]: Failed to open pack C:\Users\********\AppData\Roaming\PrismLauncher\instances\FO - Cluster - 26.1.2\minecraft\resourcepacks\C4Music_v4.0.zip
+java.util.zip.ZipException: Invalid CEN header (invalid zip64 extra len size)
+	at java.base/java.util.zip.ZipFile$Source.zerror(ZipFile.java:1831)
+	at java.base/java.util.zip.ZipFile$Source.checkAndAddEntry(ZipFile.java:1229)
+	at java.base/java.util.zip.ZipFile$Source.initCEN(ZipFile.java:1767)
+	at java.base/java.util.zip.ZipFile$Source.initCEN(ZipFile.java:1759)
+	at java.base/java.util.zip.ZipFile$Source.<init>(ZipFile.java:1542)
+	at java.base/java.util.zip.ZipFile$Source.get(ZipFile.java:1506)
+	at java.base/java.util.zip.ZipFile$CleanableResource.<init>(ZipFile.java:704)
+	at java.base/java.util.zip.ZipFile.<init>(ZipFile.java:204)
+	at java.base/java.util.zip.ZipFile.<init>(ZipFile.java:150)
+	at java.base/java.util.zip.ZipFile.<init>(ZipFile.java:164)
+	at knot//net.minecraft.server.packs.FilePackResources$SharedZipFileAccess.getOrCreateZipFile(FilePackResources.java:168)
+	at knot//net.minecraft.server.packs.FilePackResources.getResource(FilePackResources.java:59)
+	at knot//net.minecraft.server.packs.FilePackResources.getRootResource(FilePackResources.java:42)
+	at knot//net.minecraft.server.packs.AbstractPackResources.loadMetadata(AbstractPackResources.java:30)
+	at knot//net.minecraft.server.packs.AbstractPackResources.getMetadataSection(AbstractPackResources.java:23)
+	at knot//net.minecraft.server.packs.repository.Pack.readPackMetadata(Pack.java:56)
+	at knot//net.minecraft.server.packs.repository.Pack.readMetaAndCreate(Pack.java:41)
+	at knot//net.minecraft.server.packs.repository.FolderRepositorySource.lambda$loadPacks$0(FolderRepositorySource.java:63)
+	at knot//net.minecraft.server.packs.repository.FolderRepositorySource.discoverPacks(FolderRepositorySource.java:94)
+	at knot//net.minecraft.server.packs.repository.FolderRepositorySource.loadPacks(FolderRepositorySource.java:59)
+	at knot//net.minecraft.server.packs.repository.PackRepository.discoverAvailable(PackRepository.java:43)
+	at knot//net.minecraft.server.packs.repository.PackRepository.reload(PackRepository.java:36)
+	at knot//net.minecraft.client.Minecraft.<init>(Minecraft.java:574)
+	at knot//net.minecraft.client.main.Main.main(Main.java:232)
+	at net.fabricmc.loader.impl.game.minecraft.MinecraftGameProvider.launch(MinecraftGameProvider.java:514)
+	at net.fabricmc.loader.impl.launch.knot.Knot.launch(Knot.java:72)
+	at net.fabricmc.loader.impl.launch.knot.KnotClient.main(KnotClient.java:23)
+	at org.prismlauncher.launcher.impl.StandardLauncher.launch(StandardLauncher.java:115)
+	at org.prismlauncher.EntryPoint.listen(EntryPoint.java:129)
+	at org.prismlauncher.EntryPoint.main(EntryPoint.java:70)
+[13:55:30] [Render thread/WARN]: Missing metadata in pack file/C4Music_v4.0.zip
+[13:55:30] [Render thread/WARN]: Error reading pack metadata, attempting fallback type
+com.google.gson.JsonParseException: Pack declares support for version newer than 64, but is missing mandatory fields min_format and max_format
+	at knot//com.mojang.serialization.DataResult$Error.getOrThrow(DataResult.java:287)
+	at knot//net.minecraft.server.packs.resources.ResourceMetadata$2.getSection(ResourceMetadata.java:40)
+	at knot//net.minecraft.server.packs.AbstractPackResources.getMetadataSection(AbstractPackResources.java:26)
+	at knot//net.minecraft.server.packs.repository.Pack.readPackMetadata(Pack.java:56)
+	at knot//net.minecraft.server.packs.repository.Pack.readMetaAndCreate(Pack.java:41)
+	at knot//net.minecraft.server.packs.repository.FolderRepositorySource.lambda$loadPacks$0(FolderRepositorySource.java:63)
+	at knot//net.minecraft.server.packs.repository.FolderRepositorySource.discoverPacks(FolderRepositorySource.java:94)
+	at knot//net.minecraft.server.packs.repository.FolderRepositorySource.loadPacks(FolderRepositorySource.java:59)
+	at knot//net.minecraft.server.packs.repository.PackRepository.discoverAvailable(PackRepository.java:43)
+	at knot//net.minecraft.server.packs.repository.PackRepository.reload(PackRepository.java:36)
+	at knot//net.minecraft.client.Minecraft.<init>(Minecraft.java:574)
+	at knot//net.minecraft.client.main.Main.main(Main.java:232)
+	at net.fabricmc.loader.impl.game.minecraft.MinecraftGameProvider.launch(MinecraftGameProvider.java:514)
+	at net.fabricmc.loader.impl.launch.knot.Knot.launch(Knot.java:72)
+	at net.fabricmc.loader.impl.launch.knot.KnotClient.main(KnotClient.java:23)
+	at org.prismlauncher.launcher.impl.StandardLauncher.launch(StandardLauncher.java:115)
+	at org.prismlauncher.EntryPoint.listen(EntryPoint.java:129)
+	at org.prismlauncher.EntryPoint.main(EntryPoint.java:70)
+[13:55:30] [Render thread/WARN]: Failed to read pack file/C4Music_v4.2.zip metadata
+com.google.gson.JsonParseException: Overlay "pf33plus" declares support for version newer than 64, but is missing mandatory fields min_format and max_format
+	at knot//com.mojang.serialization.DataResult$Error.getOrThrow(DataResult.java:287)
+	at knot//net.minecraft.server.packs.resources.ResourceMetadata$2.getSection(ResourceMetadata.java:40)
+	at knot//net.minecraft.server.packs.AbstractPackResources.getMetadataSection(AbstractPackResources.java:26)
+	at knot//net.minecraft.server.packs.repository.Pack.readPackMetadata(Pack.java:72)
+	at knot//net.minecraft.server.packs.repository.Pack.readMetaAndCreate(Pack.java:41)
+	at knot//net.minecraft.server.packs.repository.FolderRepositorySource.lambda$loadPacks$0(FolderRepositorySource.java:63)
+	at knot//net.minecraft.server.packs.repository.FolderRepositorySource.discoverPacks(FolderRepositorySource.java:94)
+	at knot//net.minecraft.server.packs.repository.FolderRepositorySource.loadPacks(FolderRepositorySource.java:59)
+	at knot//net.minecraft.server.packs.repository.PackRepository.discoverAvailable(PackRepository.java:43)
+	at knot//net.minecraft.server.packs.repository.PackRepository.reload(PackRepository.java:36)
+	at knot//net.minecraft.client.Minecraft.<init>(Minecraft.java:574)
+	at knot//net.minecraft.client.main.Main.main(Main.java:232)
+	at net.fabricmc.loader.impl.game.minecraft.MinecraftGameProvider.launch(MinecraftGameProvider.java:514)
+	at net.fabricmc.loader.impl.launch.knot.Knot.launch(Knot.java:72)
+	at net.fabricmc.loader.impl.launch.knot.KnotClient.main(KnotClient.java:23)
+	at org.prismlauncher.launcher.impl.StandardLauncher.launch(StandardLauncher.java:115)
+	at org.prismlauncher.EntryPoint.listen(EntryPoint.java:129)
+	at org.prismlauncher.EntryPoint.main(EntryPoint.java:70)
+[13:55:30] [Render thread/WARN]: Error reading pack metadata, attempting fallback type
+com.google.gson.JsonParseException: Pack declares support for version newer than 64, but is missing mandatory fields min_format and max_format
+	at knot//com.mojang.serialization.DataResult$Error.getOrThrow(DataResult.java:287)
+	at knot//net.minecraft.server.packs.resources.ResourceMetadata$2.getSection(ResourceMetadata.java:40)
+	at knot//net.minecraft.server.packs.AbstractPackResources.getMetadataSection(AbstractPackResources.java:26)
+	at knot//net.minecraft.server.packs.repository.Pack.readPackMetadata(Pack.java:56)
+	at knot//net.minecraft.server.packs.repository.Pack.readMetaAndCreate(Pack.java:41)
+	at knot//net.minecraft.server.packs.repository.FolderRepositorySource.lambda$loadPacks$0(FolderRepositorySource.java:63)
+	at knot//net.minecraft.server.packs.repository.FolderRepositorySource.discoverPacks(FolderRepositorySource.java:94)
+	at knot//net.minecraft.server.packs.repository.FolderRepositorySource.loadPacks(FolderRepositorySource.java:59)
+	at knot//net.minecraft.server.packs.repository.PackRepository.discoverAvailable(PackRepository.java:43)
+	at knot//net.minecraft.server.packs.repository.PackRepository.reload(PackRepository.java:36)
+	at knot//net.minecraft.client.Minecraft.<init>(Minecraft.java:574)
+	at knot//net.minecraft.client.main.Main.main(Main.java:232)
+	at net.fabricmc.loader.impl.game.minecraft.MinecraftGameProvider.launch(MinecraftGameProvider.java:514)
+	at net.fabricmc.loader.impl.launch.knot.Knot.launch(Knot.java:72)
+	at net.fabricmc.loader.impl.launch.knot.KnotClient.main(KnotClient.java:23)
+	at org.prismlauncher.launcher.impl.StandardLauncher.launch(StandardLauncher.java:115)
+	at org.prismlauncher.EntryPoint.listen(EntryPoint.java:129)
+	at org.prismlauncher.EntryPoint.main(EntryPoint.java:70)
+[13:55:30] [Render thread/WARN]: Error reading pack metadata, attempting fallback type
+com.google.gson.JsonParseException: Pack declares support for version newer than 64, but is missing mandatory fields min_format and max_format
+	at knot//com.mojang.serialization.DataResult$Error.getOrThrow(DataResult.java:287)
+	at knot//net.minecraft.server.packs.resources.ResourceMetadata$2.getSection(ResourceMetadata.java:40)
+	at knot//net.minecraft.server.packs.AbstractPackResources.getMetadataSection(AbstractPackResources.java:26)
+	at knot//net.minecraft.server.packs.repository.Pack.readPackMetadata(Pack.java:56)
+	at knot//net.minecraft.server.packs.repository.Pack.readMetaAndCreate(Pack.java:41)
+	at knot//net.minecraft.server.packs.repository.FolderRepositorySource.lambda$loadPacks$0(FolderRepositorySource.java:63)
+	at knot//net.minecraft.server.packs.repository.FolderRepositorySource.discoverPacks(FolderRepositorySource.java:94)
+	at knot//net.minecraft.server.packs.repository.FolderRepositorySource.loadPacks(FolderRepositorySource.java:59)
+	at knot//net.minecraft.server.packs.repository.PackRepository.discoverAvailable(PackRepository.java:43)
+	at knot//net.minecraft.server.packs.repository.PackRepository.reload(PackRepository.java:36)
+	at knot//net.minecraft.client.Minecraft.<init>(Minecraft.java:574)
+	at knot//net.minecraft.client.main.Main.main(Main.java:232)
+	at net.fabricmc.loader.impl.game.minecraft.MinecraftGameProvider.launch(MinecraftGameProvider.java:514)
+	at net.fabricmc.loader.impl.launch.knot.Knot.launch(Knot.java:72)
+	at net.fabricmc.loader.impl.launch.knot.KnotClient.main(KnotClient.java:23)
+	at org.prismlauncher.launcher.impl.StandardLauncher.launch(StandardLauncher.java:115)
+	at org.prismlauncher.EntryPoint.listen(EntryPoint.java:129)
+	at org.prismlauncher.EntryPoint.main(EntryPoint.java:70)
+[13:55:30] [Render thread/WARN]: Error reading pack metadata, attempting fallback type
+com.google.gson.JsonParseException: Pack declares support for version newer than 64, but is missing mandatory fields min_format and max_format
+	at knot//com.mojang.serialization.DataResult$Error.getOrThrow(DataResult.java:287)
+	at knot//net.minecraft.server.packs.resources.ResourceMetadata$2.getSection(ResourceMetadata.java:40)
+	at knot//net.minecraft.server.packs.AbstractPackResources.getMetadataSection(AbstractPackResources.java:26)
+	at knot//net.minecraft.server.packs.repository.Pack.readPackMetadata(Pack.java:56)
+	at knot//net.minecraft.server.packs.repository.Pack.readMetaAndCreate(Pack.java:41)
+	at knot//net.minecraft.server.packs.repository.FolderRepositorySource.lambda$loadPacks$0(FolderRepositorySource.java:63)
+	at knot//net.minecraft.server.packs.repository.FolderRepositorySource.discoverPacks(FolderRepositorySource.java:94)
+	at knot//net.minecraft.server.packs.repository.FolderRepositorySource.loadPacks(FolderRepositorySource.java:59)
+	at knot//net.minecraft.server.packs.repository.PackRepository.discoverAvailable(PackRepository.java:43)
+	at knot//net.minecraft.server.packs.repository.PackRepository.reload(PackRepository.java:36)
+	at knot//net.minecraft.client.Minecraft.<init>(Minecraft.java:574)
+	at knot//net.minecraft.client.main.Main.main(Main.java:232)
+	at net.fabricmc.loader.impl.game.minecraft.MinecraftGameProvider.launch(MinecraftGameProvider.java:514)
+	at net.fabricmc.loader.impl.launch.knot.Knot.launch(Knot.java:72)
+	at net.fabricmc.loader.impl.launch.knot.KnotClient.main(KnotClient.java:23)
+	at org.prismlauncher.launcher.impl.StandardLauncher.launch(StandardLauncher.java:115)
+	at org.prismlauncher.EntryPoint.listen(EntryPoint.java:129)
+	at org.prismlauncher.EntryPoint.main(EntryPoint.java:70)
+[13:55:30] [Render thread/WARN]: Error reading pack metadata, attempting fallback type
+com.google.gson.JsonParseException: com.google.gson.stream.MalformedJsonException: Unescaped control characters (\u0000-\u001F) are not allowed in strict mode at line 4 column 21 path $.pack.description
+See https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json
+	at knot//net.minecraft.util.GsonHelper.fromJson(GsonHelper.java:522)
+	at knot//net.minecraft.util.GsonHelper.parse(GsonHelper.java:557)
+	at knot//net.minecraft.server.packs.resources.ResourceMetadata.fromJsonStream(ResourceMetadata.java:32)
+	at knot//net.minecraft.server.packs.AbstractPackResources.loadMetadata(AbstractPackResources.java:35)
+	at knot//net.minecraft.server.packs.AbstractPackResources.getMetadataSection(AbstractPackResources.java:23)
+	at knot//net.minecraft.server.packs.repository.Pack.readPackMetadata(Pack.java:56)
+	at knot//net.minecraft.server.packs.repository.Pack.readMetaAndCreate(Pack.java:41)
+	at knot//net.minecraft.server.packs.repository.FolderRepositorySource.lambda$loadPacks$0(FolderRepositorySource.java:63)
+	at knot//net.minecraft.server.packs.repository.FolderRepositorySource.discoverPacks(FolderRepositorySource.java:94)
+	at knot//net.minecraft.server.packs.repository.FolderRepositorySource.loadPacks(FolderRepositorySource.java:59)
+	at knot//net.minecraft.server.packs.repository.PackRepository.discoverAvailable(PackRepository.java:43)
+	at knot//net.minecraft.server.packs.repository.PackRepository.reload(PackRepository.java:36)
+	at knot//net.minecraft.client.Minecraft.<init>(Minecraft.java:574)
+	at knot//net.minecraft.client.main.Main.main(Main.java:232)
+	at net.fabricmc.loader.impl.game.minecraft.MinecraftGameProvider.launch(MinecraftGameProvider.java:514)
+	at net.fabricmc.loader.impl.launch.knot.Knot.launch(Knot.java:72)
+	at net.fabricmc.loader.impl.launch.knot.KnotClient.main(KnotClient.java:23)
+	at org.prismlauncher.launcher.impl.StandardLauncher.launch(StandardLauncher.java:115)
+	at org.prismlauncher.EntryPoint.listen(EntryPoint.java:129)
+	at org.prismlauncher.EntryPoint.main(EntryPoint.java:70)
+Caused by: com.google.gson.stream.MalformedJsonException: Unescaped control characters (\u0000-\u001F) are not allowed in strict mode at line 4 column 21 path $.pack.description
+See https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json
+	at knot//com.google.gson.stream.JsonReader.syntaxError(JsonReader.java:1817)
+	at knot//com.google.gson.stream.JsonReader.nextQuotedValue(JsonReader.java:1141)
+	at knot//com.google.gson.stream.JsonReader.nextString(JsonReader.java:964)
+	at knot//com.google.gson.internal.bind.JsonElementTypeAdapter.readTerminal(JsonElementTypeAdapter.java:61)
+	at knot//com.google.gson.internal.bind.JsonElementTypeAdapter.read(JsonElementTypeAdapter.java:107)
+	at knot//com.google.gson.internal.bind.JsonElementTypeAdapter.read(JsonElementTypeAdapter.java:35)
+	at knot//com.google.gson.internal.bind.TypeAdapters$32$1.read(TypeAdapters.java:915)
+	at knot//net.minecraft.util.GsonHelper.fromJson(GsonHelper.java:516)
+	... 19 more
+[13:55:30] [Render thread/WARN]: Failed to read pack file/inks-portal-pack-0-3-1 metadata
+com.google.gson.JsonParseException: com.google.gson.stream.MalformedJsonException: Unescaped control characters (\u0000-\u001F) are not allowed in strict mode at line 4 column 21 path $.pack.description
+See https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json
+	at knot//net.minecraft.util.GsonHelper.fromJson(GsonHelper.java:522)
+	at knot//net.minecraft.util.GsonHelper.parse(GsonHelper.java:557)
+	at knot//net.minecraft.server.packs.resources.ResourceMetadata.fromJsonStream(ResourceMetadata.java:32)
+	at knot//net.minecraft.server.packs.AbstractPackResources.loadMetadata(AbstractPackResources.java:35)
+	at knot//net.minecraft.server.packs.AbstractPackResources.getMetadataSection(AbstractPackResources.java:23)
+	at knot//net.minecraft.server.packs.repository.Pack.readPackMetadata(Pack.java:60)
+	at knot//net.minecraft.server.packs.repository.Pack.readMetaAndCreate(Pack.java:41)
+	at knot//net.minecraft.server.packs.repository.FolderRepositorySource.lambda$loadPacks$0(FolderRepositorySource.java:63)
+	at knot//net.minecraft.server.packs.repository.FolderRepositorySource.discoverPacks(FolderRepositorySource.java:94)
+	at knot//net.minecraft.server.packs.repository.FolderRepositorySource.loadPacks(FolderRepositorySource.java:59)
+	at knot//net.minecraft.server.packs.repository.PackRepository.discoverAvailable(PackRepository.java:43)
+	at knot//net.minecraft.server.packs.repository.PackRepository.reload(PackRepository.java:36)
+	at knot//net.minecraft.client.Minecraft.<init>(Minecraft.java:574)
+	at knot//net.minecraft.client.main.Main.main(Main.java:232)
+	at net.fabricmc.loader.impl.game.minecraft.MinecraftGameProvider.launch(MinecraftGameProvider.java:514)
+	at net.fabricmc.loader.impl.launch.knot.Knot.launch(Knot.java:72)
+	at net.fabricmc.loader.impl.launch.knot.KnotClient.main(KnotClient.java:23)
+	at org.prismlauncher.launcher.impl.StandardLauncher.launch(StandardLauncher.java:115)
+	at org.prismlauncher.EntryPoint.listen(EntryPoint.java:129)
+	at org.prismlauncher.EntryPoint.main(EntryPoint.java:70)
+Caused by: com.google.gson.stream.MalformedJsonException: Unescaped control characters (\u0000-\u001F) are not allowed in strict mode at line 4 column 21 path $.pack.description
+See https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json
+	at knot//com.google.gson.stream.JsonReader.syntaxError(JsonReader.java:1817)
+	at knot//com.google.gson.stream.JsonReader.nextQuotedValue(JsonReader.java:1141)
+	at knot//com.google.gson.stream.JsonReader.nextString(JsonReader.java:964)
+	at knot//com.google.gson.internal.bind.JsonElementTypeAdapter.readTerminal(JsonElementTypeAdapter.java:61)
+	at knot//com.google.gson.internal.bind.JsonElementTypeAdapter.read(JsonElementTypeAdapter.java:107)
+	at knot//com.google.gson.internal.bind.JsonElementTypeAdapter.read(JsonElementTypeAdapter.java:35)
+	at knot//com.google.gson.internal.bind.TypeAdapters$32$1.read(TypeAdapters.java:915)
+	at knot//net.minecraft.util.GsonHelper.fromJson(GsonHelper.java:516)
+	... 19 more
+[13:55:30] [Render thread/WARN]: Error reading pack metadata, attempting fallback type
+com.google.gson.JsonParseException: com.google.gson.stream.MalformedJsonException: Unescaped control characters (\u0000-\u001F) are not allowed in strict mode at line 4 column 21 path $.pack.description
+See https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json
+	at knot//net.minecraft.util.GsonHelper.fromJson(GsonHelper.java:522)
+	at knot//net.minecraft.util.GsonHelper.parse(GsonHelper.java:557)
+	at knot//net.minecraft.server.packs.resources.ResourceMetadata.fromJsonStream(ResourceMetadata.java:32)
+	at knot//net.minecraft.server.packs.AbstractPackResources.loadMetadata(AbstractPackResources.java:35)
+	at knot//net.minecraft.server.packs.AbstractPackResources.getMetadataSection(AbstractPackResources.java:23)
+	at knot//net.minecraft.server.packs.repository.Pack.readPackMetadata(Pack.java:56)
+	at knot//net.minecraft.server.packs.repository.Pack.readMetaAndCreate(Pack.java:41)
+	at knot//net.minecraft.server.packs.repository.FolderRepositorySource.lambda$loadPacks$0(FolderRepositorySource.java:63)
+	at knot//net.minecraft.server.packs.repository.FolderRepositorySource.discoverPacks(FolderRepositorySource.java:94)
+	at knot//net.minecraft.server.packs.repository.FolderRepositorySource.loadPacks(FolderRepositorySource.java:59)
+	at knot//net.minecraft.server.packs.repository.PackRepository.discoverAvailable(PackRepository.java:43)
+	at knot//net.minecraft.server.packs.repository.PackRepository.reload(PackRepository.java:36)
+	at knot//net.minecraft.client.Minecraft.<init>(Minecraft.java:574)
+	at knot//net.minecraft.client.main.Main.main(Main.java:232)
+	at net.fabricmc.loader.impl.game.minecraft.MinecraftGameProvider.launch(MinecraftGameProvider.java:514)
+	at net.fabricmc.loader.impl.launch.knot.Knot.launch(Knot.java:72)
+	at net.fabricmc.loader.impl.launch.knot.KnotClient.main(KnotClient.java:23)
+	at org.prismlauncher.launcher.impl.StandardLauncher.launch(StandardLauncher.java:115)
+	at org.prismlauncher.EntryPoint.listen(EntryPoint.java:129)
+	at org.prismlauncher.EntryPoint.main(EntryPoint.java:70)
+Caused by: com.google.gson.stream.MalformedJsonException: Unescaped control characters (\u0000-\u001F) are not allowed in strict mode at line 4 column 21 path $.pack.description
+See https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json
+	at knot//com.google.gson.stream.JsonReader.syntaxError(JsonReader.java:1817)
+	at knot//com.google.gson.stream.JsonReader.nextQuotedValue(JsonReader.java:1141)
+	at knot//com.google.gson.stream.JsonReader.nextString(JsonReader.java:964)
+	at knot//com.google.gson.internal.bind.JsonElementTypeAdapter.readTerminal(JsonElementTypeAdapter.java:61)
+	at knot//com.google.gson.internal.bind.JsonElementTypeAdapter.read(JsonElementTypeAdapter.java:107)
+	at knot//com.google.gson.internal.bind.JsonElementTypeAdapter.read(JsonElementTypeAdapter.java:35)
+	at knot//com.google.gson.internal.bind.TypeAdapters$32$1.read(TypeAdapters.java:915)
+	at knot//net.minecraft.util.GsonHelper.fromJson(GsonHelper.java:516)
+	... 19 more
+[13:55:30] [Render thread/WARN]: Failed to read pack file/inks-portal-pack-0-3-1.zip metadata
+com.google.gson.JsonParseException: com.google.gson.stream.MalformedJsonException: Unescaped control characters (\u0000-\u001F) are not allowed in strict mode at line 4 column 21 path $.pack.description
+See https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json
+	at knot//net.minecraft.util.GsonHelper.fromJson(GsonHelper.java:522)
+	at knot//net.minecraft.util.GsonHelper.parse(GsonHelper.java:557)
+	at knot//net.minecraft.server.packs.resources.ResourceMetadata.fromJsonStream(ResourceMetadata.java:32)
+	at knot//net.minecraft.server.packs.AbstractPackResources.loadMetadata(AbstractPackResources.java:35)
+	at knot//net.minecraft.server.packs.AbstractPackResources.getMetadataSection(AbstractPackResources.java:23)
+	at knot//net.minecraft.server.packs.repository.Pack.readPackMetadata(Pack.java:60)
+	at knot//net.minecraft.server.packs.repository.Pack.readMetaAndCreate(Pack.java:41)
+	at knot//net.minecraft.server.packs.repository.FolderRepositorySource.lambda$loadPacks$0(FolderRepositorySource.java:63)
+	at knot//net.minecraft.server.packs.repository.FolderRepositorySource.discoverPacks(FolderRepositorySource.java:94)
+	at knot//net.minecraft.server.packs.repository.FolderRepositorySource.loadPacks(FolderRepositorySource.java:59)
+	at knot//net.minecraft.server.packs.repository.PackRepository.discoverAvailable(PackRepository.java:43)
+	at knot//net.minecraft.server.packs.repository.PackRepository.reload(PackRepository.java:36)
+	at knot//net.minecraft.client.Minecraft.<init>(Minecraft.java:574)
+	at knot//net.minecraft.client.main.Main.main(Main.java:232)
+	at net.fabricmc.loader.impl.game.minecraft.MinecraftGameProvider.launch(MinecraftGameProvider.java:514)
+	at net.fabricmc.loader.impl.launch.knot.Knot.launch(Knot.java:72)
+	at net.fabricmc.loader.impl.launch.knot.KnotClient.main(KnotClient.java:23)
+	at org.prismlauncher.launcher.impl.StandardLauncher.launch(StandardLauncher.java:115)
+	at org.prismlauncher.EntryPoint.listen(EntryPoint.java:129)
+	at org.prismlauncher.EntryPoint.main(EntryPoint.java:70)
+Caused by: com.google.gson.stream.MalformedJsonException: Unescaped control characters (\u0000-\u001F) are not allowed in strict mode at line 4 column 21 path $.pack.description
+See https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json
+	at knot//com.google.gson.stream.JsonReader.syntaxError(JsonReader.java:1817)
+	at knot//com.google.gson.stream.JsonReader.nextQuotedValue(JsonReader.java:1141)
+	at knot//com.google.gson.stream.JsonReader.nextString(JsonReader.java:964)
+	at knot//com.google.gson.internal.bind.JsonElementTypeAdapter.readTerminal(JsonElementTypeAdapter.java:61)
+	at knot//com.google.gson.internal.bind.JsonElementTypeAdapter.read(JsonElementTypeAdapter.java:107)
+	at knot//com.google.gson.internal.bind.JsonElementTypeAdapter.read(JsonElementTypeAdapter.java:35)
+	at knot//com.google.gson.internal.bind.TypeAdapters$32$1.read(TypeAdapters.java:915)
+	at knot//net.minecraft.util.GsonHelper.fromJson(GsonHelper.java:516)
+	... 19 more
+[13:55:30] [Render thread/WARN]: Error reading pack metadata, attempting fallback type
+com.google.gson.JsonParseException: Pack declares support for version newer than 64, but is missing mandatory fields min_format and max_format
+	at knot//com.mojang.serialization.DataResult$Error.getOrThrow(DataResult.java:287)
+	at knot//net.minecraft.server.packs.resources.ResourceMetadata$2.getSection(ResourceMetadata.java:40)
+	at knot//net.minecraft.server.packs.AbstractPackResources.getMetadataSection(AbstractPackResources.java:26)
+	at knot//net.minecraft.server.packs.repository.Pack.readPackMetadata(Pack.java:56)
+	at knot//net.minecraft.server.packs.repository.Pack.readMetaAndCreate(Pack.java:41)
+	at knot//net.minecraft.server.packs.repository.FolderRepositorySource.lambda$loadPacks$0(FolderRepositorySource.java:63)
+	at knot//net.minecraft.server.packs.repository.FolderRepositorySource.discoverPacks(FolderRepositorySource.java:94)
+	at knot//net.minecraft.server.packs.repository.FolderRepositorySource.loadPacks(FolderRepositorySource.java:59)
+	at knot//net.minecraft.server.packs.repository.PackRepository.discoverAvailable(PackRepository.java:43)
+	at knot//net.minecraft.server.packs.repository.PackRepository.reload(PackRepository.java:36)
+	at knot//net.minecraft.client.Minecraft.<init>(Minecraft.java:574)
+	at knot//net.minecraft.client.main.Main.main(Main.java:232)
+	at net.fabricmc.loader.impl.game.minecraft.MinecraftGameProvider.launch(MinecraftGameProvider.java:514)
+	at net.fabricmc.loader.impl.launch.knot.Knot.launch(Knot.java:72)
+	at net.fabricmc.loader.impl.launch.knot.KnotClient.main(KnotClient.java:23)
+	at org.prismlauncher.launcher.impl.StandardLauncher.launch(StandardLauncher.java:115)
+	at org.prismlauncher.EntryPoint.listen(EntryPoint.java:129)
+	at org.prismlauncher.EntryPoint.main(EntryPoint.java:70)
+[13:55:30] [Render thread/WARN]: Error reading pack metadata, attempting fallback type
+com.google.gson.JsonParseException: Input is not a list of 2 elements
+	at knot//com.mojang.serialization.DataResult$Error.getOrThrow(DataResult.java:287)
+	at knot//net.minecraft.server.packs.resources.ResourceMetadata$2.getSection(ResourceMetadata.java:40)
+	at knot//net.minecraft.server.packs.AbstractPackResources.getMetadataSection(AbstractPackResources.java:26)
+	at knot//net.minecraft.server.packs.repository.Pack.readPackMetadata(Pack.java:56)
+	at knot//net.minecraft.server.packs.repository.Pack.readMetaAndCreate(Pack.java:41)
+	at knot//net.minecraft.server.packs.repository.FolderRepositorySource.lambda$loadPacks$0(FolderRepositorySource.java:63)
+	at knot//net.minecraft.server.packs.repository.FolderRepositorySource.discoverPacks(FolderRepositorySource.java:94)
+	at knot//net.minecraft.server.packs.repository.FolderRepositorySource.loadPacks(FolderRepositorySource.java:59)
+	at knot//net.minecraft.server.packs.repository.PackRepository.discoverAvailable(PackRepository.java:43)
+	at knot//net.minecraft.server.packs.repository.PackRepository.reload(PackRepository.java:36)
+	at knot//net.minecraft.client.Minecraft.<init>(Minecraft.java:574)
+	at knot//net.minecraft.client.main.Main.main(Main.java:232)
+	at net.fabricmc.loader.impl.game.minecraft.MinecraftGameProvider.launch(MinecraftGameProvider.java:514)
+	at net.fabricmc.loader.impl.launch.knot.Knot.launch(Knot.java:72)
+	at net.fabricmc.loader.impl.launch.knot.KnotClient.main(KnotClient.java:23)
+	at org.prismlauncher.launcher.impl.StandardLauncher.launch(StandardLauncher.java:115)
+	at org.prismlauncher.EntryPoint.listen(EntryPoint.java:129)
+	at org.prismlauncher.EntryPoint.main(EntryPoint.java:70)
+[13:55:30] [Render thread/WARN]: Error reading pack metadata, attempting fallback type
+com.google.gson.JsonParseException: Pack declares support for version newer than 64, but is missing mandatory fields min_format and max_format
+	at knot//com.mojang.serialization.DataResult$Error.getOrThrow(DataResult.java:287)
+	at knot//net.minecraft.server.packs.resources.ResourceMetadata$2.getSection(ResourceMetadata.java:40)
+	at knot//net.minecraft.server.packs.AbstractPackResources.getMetadataSection(AbstractPackResources.java:26)
+	at knot//net.minecraft.server.packs.repository.Pack.readPackMetadata(Pack.java:56)
+	at knot//net.minecraft.server.packs.repository.Pack.readMetaAndCreate(Pack.java:41)
+	at knot//net.minecraft.server.packs.repository.FolderRepositorySource.lambda$loadPacks$0(FolderRepositorySource.java:63)
+	at knot//net.minecraft.server.packs.repository.FolderRepositorySource.discoverPacks(FolderRepositorySource.java:94)
+	at knot//net.minecraft.server.packs.repository.FolderRepositorySource.loadPacks(FolderRepositorySource.java:59)
+	at knot//net.minecraft.server.packs.repository.PackRepository.discoverAvailable(PackRepository.java:43)
+	at knot//net.minecraft.server.packs.repository.PackRepository.reload(PackRepository.java:36)
+	at knot//net.minecraft.client.Minecraft.<init>(Minecraft.java:574)
+	at knot//net.minecraft.client.main.Main.main(Main.java:232)
+	at net.fabricmc.loader.impl.game.minecraft.MinecraftGameProvider.launch(MinecraftGameProvider.java:514)
+	at net.fabricmc.loader.impl.launch.knot.Knot.launch(Knot.java:72)
+	at net.fabricmc.loader.impl.launch.knot.KnotClient.main(KnotClient.java:23)
+	at org.prismlauncher.launcher.impl.StandardLauncher.launch(StandardLauncher.java:115)
+	at org.prismlauncher.EntryPoint.listen(EntryPoint.java:129)
+	at org.prismlauncher.EntryPoint.main(EntryPoint.java:70)
+[13:55:30] [Render thread/INFO]: Block minecraft:pink_petals had its color provider replaced with [net.minecraft.client.color.block.BlockTintSources$$Lambda/0x000000003b7c5ce0@70fd37d3, mod.bluestaggo.modernerbeta.client.color.block.GrassTintSource@35192b4c] and will not use per-vertex coloring
+[13:55:30] [Render thread/INFO]: Block minecraft:grass_block had its color provider replaced with [mod.bluestaggo.modernerbeta.client.color.block.GrassBlockTintSource@37fb1ed5] and will not use per-vertex coloring
+[13:55:30] [Render thread/INFO]: Block minecraft:short_grass had its color provider replaced with [mod.bluestaggo.modernerbeta.client.color.block.GrassTintSource@72d312e3] and will not use per-vertex coloring
+[13:55:30] [Render thread/INFO]: Block minecraft:potted_fern had its color provider replaced with [mod.bluestaggo.modernerbeta.client.color.block.GrassTintSource@72d312e3] and will not use per-vertex coloring
+[13:55:30] [Render thread/INFO]: Block minecraft:mangrove_leaves had its color provider replaced with [mod.bluestaggo.modernerbeta.client.color.block.FoliageTintSource@6b89e0c5] and will not use per-vertex coloring
+[13:55:30] [Render thread/INFO]: Block minecraft:vine had its color provider replaced with [mod.bluestaggo.modernerbeta.client.color.block.FoliageTintSource@6b89e0c5] and will not use per-vertex coloring
+[13:55:30] [Render thread/INFO]: Block minecraft:fern had its color provider replaced with [mod.bluestaggo.modernerbeta.client.color.block.GrassTintSource@72d312e3] and will not use per-vertex coloring
+[13:55:30] [Render thread/INFO]: Block minecraft:bush had its color provider replaced with [mod.bluestaggo.modernerbeta.client.color.block.GrassTintSource@72d312e3] and will not use per-vertex coloring
+[13:55:30] [Render thread/INFO]: Block minecraft:oak_leaves had its color provider replaced with [mod.bluestaggo.modernerbeta.client.color.block.FoliageTintSource@6b89e0c5] and will not use per-vertex coloring
+[13:55:30] [Render thread/INFO]: Block minecraft:bubble_column had its color provider replaced with [mod.bluestaggo.modernerbeta.client.color.block.WaterTintSource@1736f5b3] and will not use per-vertex coloring
+[13:55:30] [Render thread/INFO]: Block minecraft:water_cauldron had its color provider replaced with [mod.bluestaggo.modernerbeta.client.color.block.WaterTintSource@1736f5b3] and will not use per-vertex coloring
+[13:55:30] [Render thread/INFO]: Block minecraft:large_fern had its color provider replaced with [mod.bluestaggo.modernerbeta.client.color.block.GrassTintSource@78d44c36] and will not use per-vertex coloring
+[13:55:30] [Render thread/INFO]: Block minecraft:tall_grass had its color provider replaced with [mod.bluestaggo.modernerbeta.client.color.block.GrassTintSource@78d44c36] and will not use per-vertex coloring
+[13:55:30] [Render thread/INFO]: Block minecraft:sugar_cane had its color provider replaced with [mod.bluestaggo.modernerbeta.client.color.block.ModernBetaConstantTintSource@12fa1dc5] and will not use per-vertex coloring
+[13:55:30] [Render thread/INFO]: Block minecraft:dark_oak_leaves had its color provider replaced with [mod.bluestaggo.modernerbeta.client.color.block.FoliageTintSource@6b89e0c5] and will not use per-vertex coloring
+[13:55:30] [Render thread/INFO]: Block minecraft:water had its color provider replaced with [mod.bluestaggo.modernerbeta.client.color.block.WaterTintSource@1736f5b3] and will not use per-vertex coloring
+[13:55:30] [Render thread/INFO]: Block minecraft:jungle_leaves had its color provider replaced with [mod.bluestaggo.modernerbeta.client.color.block.FoliageTintSource@6b89e0c5] and will not use per-vertex coloring
+[13:55:30] [Render thread/INFO]: Block minecraft:acacia_leaves had its color provider replaced with [mod.bluestaggo.modernerbeta.client.color.block.FoliageTintSource@6b89e0c5] and will not use per-vertex coloring
+[13:55:30] [Render thread/INFO]: Block minecraft:wildflowers had its color provider replaced with [net.minecraft.client.color.block.BlockTintSources$$Lambda/0x000000003b7c5ce0@70fd37d3, mod.bluestaggo.modernerbeta.client.color.block.GrassTintSource@35192b4c] and will not use per-vertex coloring
+[13:55:31] [Render thread/INFO]: [FANCYMENU] Registering resource reload listener..
+[13:55:31] [Render thread/INFO]: Reloading ResourceManager: vanilla, appleskin, armorstatues, autofish, autotools, badoptimizations, balm, betterf3, bettergrass, bettermounthud, betterstats, blur, boatiview, c2me, calcmod, capes, chat_heads, chatpatches, chesttracker, chunky, clickthrough, clienttweaks, cloth-config, conditional-mixin, continuity, controlling, cpm, cpmsvcc, craftingtweaks, cullleaves, cwb, debugify, deeperdark, distanthorizons, dynamic_fps, dynamic_fps_common, entity_model_features, entity_texture_features, entityculling, explosiveenhancement, fabric-api, fabric-api-base, fabric-api-lookup-api-v1, fabric-biome-api-v1, fabric-block-api-v1, fabric-block-getter-api-v2, fabric-client-gametest-api-v1, fabric-command-api-v2, fabric-content-registries-v0, fabric-convention-tags-v2, fabric-crash-report-info-v1, fabric-creative-tab-api-v1, fabric-data-attachment-api-v1, fabric-data-generation-api-v1, fabric-debug-api-v1, fabric-dimensions-v1, fabric-entity-events-v1, fabric-events-interaction-v0, fabric-game-rule-api-v1, fabric-gametest-api-v1, fabric-item-api-v1, fabric-key-mapping-api-v1, fabric-language-kotlin, fabric-lifecycle-events-v1, fabric-loot-api-v3, fabric-menu-api-v1, fabric-message-api-v1, fabric-model-loading-api-v1, fabric-networking-api-v1, fabric-object-builder-api-v1, fabric-particles-v1, fabric-permission-api-v1, fabric-recipe-api-v1, fabric-registry-sync-v0, fabric-renderer-api-v1, fabric-renderer-indigo, fabric-rendering-fluids-v1, fabric-rendering-v1, fabric-resource-conditions-api-v1, fabric-resource-loader-v0, fabric-resource-loader-v1, fabric-screen-api-v1, fabric-serialization-api-v1, fabric-sound-api-v1, fabric-tag-api-v1, fabric-transfer-api-v1, fabric-transitive-access-wideners-v1, fabricloader, fabrishot, fallingleaves, fancymenu, finnitweaks, firstperson, foodeffecttooltips, forgeconfigapiport, freecam, fzzy_config, gammautils, held-item-info, immediatelyfast, inventory_particles, inventoryessentials, inventoryhud, inventoryprofilesnext, invmove, itemswapper, jackfredlib, jackfredlib-base, jackfredlib-colour, jackfredlib-extracommandsourcedata, jackfredlib-gps, jackfredlib-lying, jackfredlib-toasts, jamlib, jankson, kirin, krypton, kuma_api, lambdynlights, lambdynlights_api, languagereload, libgui, libipn, lilylib, litematic-downloader, litematica, litematica_printer, lithium, longerchathistory, make_bubbles_pop, malilib, mcqoy, midnightlib, moderner_beta, modmenu, morechathistory, moreculling, mossylib, mru, nbt_ac, nochatreports, noreportbutton, notenoughanimations, notenoughcrashes, optigui, overflowingbars, paginatedadvancements, particlerain, placeholder-api, presencefootsteps, pride, puzzle, reeses-sodium-options, replaymod, resourcify, rightclickharvest, rrls, scalablelux, screencopy, searchables, serverpingerfixer, shulkerboxtooltip, skyboxify, sodium, sodium-extra, sound_physics_remastered, sounds, spark, spawnanimations, spruceui, sspb, stack-to-nearby-chests, statuemenus, status-effect-bars, stendhal, subtle_effects, tcdcommons, tooltipscroll, trender, ukulib, ukus-armor-hud, visuality, vivecraft, voicechat, whereisit, worldedit, xaerolib, xaerominimap, xaeroplus, xaeroworldmap, xaerozoomout, yet_another_config_lib_v3, zoomify, programmer_art, fabric-creative-tab-api-v1_programmer_art, modmenu_programmer_art, itemswapper:default, file/ProgrammerArtFix-26.1.zip, file/golden-days-base-1.21.x-1.15.5.zip, file/visual_armor_trims_4.2.zip, file/enchant icons 1.21.5 v1.3.zip, file/Rainbow Enchanted Glint 1.1.zip, file/Icon Xaero's 1.21.zip, file/EvenBetterEnchants_v3_1.21.5+.zip, file/§b§lSpectator Xray §7v1.2.1.zip, file/§eXaero's-Map-Frame-Frilled.zip, replaymod_lang
+[13:55:31] [Worker-Main-15/WARN]: Invalid path in datapack: minecraft:textures/item/Thumbs.db, ignoring
+[13:55:31] [Worker-Main-12/INFO]: Found unifont_all_no_pua-17.0.01.hex, loading
+[13:55:31] [Worker-Main-7/INFO]: Found unifont_jp_patch-17.0.01.hex, loading
+[13:55:31] [Worker-Main-24/INFO]: Found unifont_pua-17.0.01.hex, loading
+[13:55:31] [Worker-Main-3/WARN]: File deeperdark:sounds/item/collar/jingle/jingle10.ogg does not exist, cannot add it to event deeperdark:item.collar.jingle
+[13:55:31] [Worker-Main-3/WARN]: File deeperdark:sounds/item/collar/jingle/jingle16.ogg does not exist, cannot add it to event deeperdark:item.collar.jingle
+[13:55:31] [Worker-Main-3/WARN]: File minecraft:sounds/music/game/creative/creative1.ogg does not exist, cannot add it to event minecraft:music.creative
+[13:55:31] [Worker-Main-3/WARN]: File minecraft:sounds/music/game/creative/creative2.ogg does not exist, cannot add it to event minecraft:music.creative
+[13:55:31] [Worker-Main-3/WARN]: File minecraft:sounds/music/game/creative/creative3.ogg does not exist, cannot add it to event minecraft:music.creative
+[13:55:31] [Worker-Main-3/WARN]: File minecraft:sounds/music/game/creative/creative4.ogg does not exist, cannot add it to event minecraft:music.creative
+[13:55:31] [Worker-Main-3/WARN]: File minecraft:sounds/music/game/creative/creative5.ogg does not exist, cannot add it to event minecraft:music.creative
+[13:55:31] [Worker-Main-3/WARN]: File minecraft:sounds/music/game/creative/creative6.ogg does not exist, cannot add it to event minecraft:music.creative
+[13:55:31] [Worker-Main-3/WARN]: File minecraft:sounds/music/game/calm1.ogg does not exist, cannot add it to event minecraft:music.game
+[13:55:31] [Worker-Main-3/WARN]: File minecraft:sounds/music/game/calm2.ogg does not exist, cannot add it to event minecraft:music.game
+[13:55:31] [Worker-Main-3/WARN]: File minecraft:sounds/music/game/calm3.ogg does not exist, cannot add it to event minecraft:music.game
+[13:55:31] [Worker-Main-3/WARN]: File minecraft:sounds/music/game/hal1.ogg does not exist, cannot add it to event minecraft:music.game
+[13:55:31] [Worker-Main-3/WARN]: File minecraft:sounds/music/game/hal2.ogg does not exist, cannot add it to event minecraft:music.game
+[13:55:31] [Worker-Main-3/WARN]: File minecraft:sounds/music/game/hal3.ogg does not exist, cannot add it to event minecraft:music.game
+[13:55:31] [Worker-Main-3/WARN]: File minecraft:sounds/music/game/hal4.ogg does not exist, cannot add it to event minecraft:music.game
+[13:55:31] [Worker-Main-3/WARN]: File minecraft:sounds/music/game/nuance1.ogg does not exist, cannot add it to event minecraft:music.game
+[13:55:31] [Worker-Main-3/WARN]: File minecraft:sounds/music/game/nuance2.ogg does not exist, cannot add it to event minecraft:music.game
+[13:55:31] [Worker-Main-3/WARN]: File minecraft:sounds/music/game/piano1.ogg does not exist, cannot add it to event minecraft:music.game
+[13:55:31] [Worker-Main-3/WARN]: File minecraft:sounds/music/game/piano2.ogg does not exist, cannot add it to event minecraft:music.game
+[13:55:31] [Worker-Main-3/WARN]: File minecraft:sounds/music/game/piano3.ogg does not exist, cannot add it to event minecraft:music.game
+[13:55:31] [Worker-Main-3/WARN]: File minecraft:sounds/music/menu/menu1.ogg does not exist, cannot add it to event minecraft:music.menu
+[13:55:31] [Worker-Main-3/WARN]: File minecraft:sounds/music/menu/menu2.ogg does not exist, cannot add it to event minecraft:music.menu
+[13:55:31] [Worker-Main-3/WARN]: File minecraft:sounds/music/menu/menu3.ogg does not exist, cannot add it to event minecraft:music.menu
+[13:55:31] [Worker-Main-3/WARN]: File minecraft:sounds/music/menu/menu4.ogg does not exist, cannot add it to event minecraft:music.menu
+[13:55:31] [Worker-Main-3/WARN]: File minecraft:sounds/music/game/nether/nether1.ogg does not exist, cannot add it to event minecraft:music.nether
+[13:55:31] [Worker-Main-3/WARN]: File minecraft:sounds/music/game/nether/nether2.ogg does not exist, cannot add it to event minecraft:music.nether
+[13:55:31] [Worker-Main-3/WARN]: File minecraft:sounds/music/game/nether/nether3.ogg does not exist, cannot add it to event minecraft:music.nether
+[13:55:31] [Worker-Main-3/WARN]: File minecraft:sounds/music/game/nether/nether4.ogg does not exist, cannot add it to event minecraft:music.nether
+[13:55:31] [Render thread/INFO]: Placement Manager calculated thread limit: [02/08]
+[13:55:31] [Render thread/INFO]: i18nLang#load: File: '/assets/litematica/lang/en_us.json' has been loaded successfully
+[13:55:31] [Render thread/WARN]: i18nOptionManager#buildLanguageOptions(litematica): Detected [13] available options.
+[13:55:32] [Render thread/WARN]: Invalid path in datapack: minecraft:textures/block/Thumbs.db, ignoring
+[13:55:32] [Render thread/WARN]: Invalid path in datapack: minecraft:textures/item/Thumbs.db, ignoring
+[13:55:32] [Render thread/ERROR]: Invalid path in mod resource-pack distanthorizons: distanthorizons:textures/jar/themeDark.svg, ignoring
+[13:55:32] [Render thread/ERROR]: Invalid path in mod resource-pack distanthorizons: distanthorizons:textures/jar/themeLight.svg, ignoring
+[13:55:32] [Render thread/INFO]: [FANCYMENU] Initializing screen customization engine! Addons should NOT REGISTER TO REGISTRIES anymore now!
+[13:55:32] [Worker-Main-10/WARN]: Invalid path in datapack: minecraft:textures/block/Thumbs.db, ignoring
+[13:55:32] [Render thread/INFO]: [FANCYMENU] Starting late client initialization phase..
+[13:55:32] [Render thread/INFO]: Stopping [0] Placement Manager Daemon threads
+[13:55:32] [Render thread/INFO]: Resetting Placement Manager Thread count from config change [2 -> 4]
+[13:55:33] [Worker-Main-28/WARN]: Missing block model: minecraft:item/creature1
+[13:55:33] [Worker-Main-28/WARN]: Missing block model: minecraft:item/creature0
+[13:55:33] [Worker-Main-28/WARN]: Missing block model: minecraft:item/creature3
+[13:55:33] [Worker-Main-28/WARN]: Missing block model: minecraft:item/creature2
+[13:55:33] [Worker-Main-28/WARN]: Missing block model: minecraft:block/piston_top
+[13:55:33] [Worker-Main-28/WARN]: Missing block model: minecraft:builtin/entity
+[13:55:33] [Worker-Main-30/WARN]: Unresolved texture references in minecraft:block/lectern:
+	#south-> #side
+	#east-> #side
+	#north-> #front
+	#up-> #top
+	#west-> #side
+	#down-> #bottom
+	#bottom-> #top
+[13:55:33] [Worker-Main-19/WARN]: Unresolved texture references in minecraft:block/loom:
+	#bottom-> #top
+[13:55:33] [Worker-Main-27/WARN]: Unresolved texture references in minecraft:block/end_portal_frame_filled:
+	#south-> #all
+	#east-> #all
+	#north-> #all
+	#up-> #all
+	#west-> #all
+	#down-> #all
+[13:55:33] [Render thread/INFO]: Cached all modded block culling states
+[13:55:33] [Thread-37/ERROR]: Unable to get block entity class for "minecraft:banner"
+[13:55:33] [Thread-37/ERROR]: Unable to get block entity class for "minecraft:bed"
+[13:55:33] [Render thread/INFO]: Running Delayed setup...
+[13:55:33] [Render thread/INFO]: Delayed setup complete, firing DhApiAfterDhInitEvent event...
+[13:55:33] [DH-PostClientInit Thread/INFO]: Setting DH Rendering API to: [BLAZE_3D].
+[13:55:33] [Render thread/INFO]: Loading Xaero's World Map - Stage 2/3
+[13:55:34] [Render thread/INFO]: Registered player tracker system: map_synced
+[13:55:34] [Render thread/INFO]: Xaero's WorldMap Mod: Xaero's minimap found!
+[13:55:34] [Worker-Main-5/WARN]: Unresolved texture references in minecraft:item/template_pressure_plate:
+	#particle-> #texture
+[13:55:34] [Render thread/INFO]: Registered player tracker system: minimap_synced
+[13:55:34] [Render thread/INFO]: No Optifine!
+[13:55:34] [Render thread/INFO]: Xaero's World Map: No Vivecraft!
+[13:55:34] [Render thread/INFO]: Loading Xaero's World Map - Stage 3/3
+[13:55:34] [Render thread/INFO]: New world map region cache hash code: -1145060871
+[13:55:34] [Render thread/INFO]: PlayerAnimator not found!
+[13:55:34] [Render thread/INFO]: Loaded Vanilla Hands items: []
+[13:55:34] [Render thread/INFO]: Loaded Auto Disable items: []
+[13:55:34] [Render thread/INFO]: Loading Xaero's Minimap - Stage 2/3
+[13:55:34] [Worker-Main-23/WARN]: Missing textures in model minecraft:item/decorated_pot:
+    minecraft:entity/decorated_pot/decorated_pot_side
+[13:55:34] [Worker-Main-23/WARN]: Missing texture references in model vivecraft:item/spyglass_in_hand:
+    particle
+[13:55:34] [Worker-Main-23/WARN]: Missing texture references in model minecraft:item/template_pressure_plate:
+    #texture
+    particle
+[13:55:34] [Worker-Main-23/WARN]: Missing texture references in model vivecraft:item/climb_claws:
+    particle
+[13:55:35] [Render thread/WARN]: io exception while checking versions: Read timed out
+[13:55:35] [Render thread/INFO]: Registered player tracker system: minimap_synced
+[13:55:35] [Render thread/INFO]: Xaero's Minimap: World Map found!
+[13:55:35] [Render thread/INFO]: No Optifine!
+[13:55:35] [Render thread/INFO]: Xaero's Minimap: No Vivecraft!
+[13:55:35] [Render thread/INFO]: Loading Xaero's Minimap - Stage 3/3
+[13:55:35] [Render thread/INFO]: Loading XaeroLib common 2/2!
+[13:55:35] [Render thread/INFO]: Loading XaeroLib client 2/3!
+[13:55:35] [Render thread/INFO]: Loading XaeroLib client 3/3!
+[13:55:35] [Render thread/INFO]: [EMF]: EMF did not find the Iris API, disabling shadow pass detection
+[13:55:35] [Render thread/INFO]: Thread[#3,Render thread,10,main]
+[13:55:35] [Render thread/INFO]: OpenGL Vendor: NVIDIA Corporation
+[13:55:35] [Render thread/INFO]: OpenGL Renderer: NVIDIA GeForce RTX 5070 Ti/PCIe/SSE2
+[13:55:35] [Render thread/INFO]: OpenGL Version: 3.3.0 NVIDIA 596.49
+[13:55:35] [Render thread/INFO]: Modifying OpenGL context to apply workarounds for the NVIDIA graphics driver...
+[13:55:35] [Render thread/INFO]: Enabling GL_DEBUG_OUTPUT_SYNCHRONOUS to force the NVIDIA driver to disable threaded command submission
+[13:55:35] [Render thread/INFO]: OpenAL initialized on device OpenAL Soft on Headphones (Px7 S2)
+[13:55:35] [Render thread/INFO]: Initializing Sound Physics
+[13:55:35] [Render thread/INFO]: EFX Extension recognized
+[13:55:35] [Render thread/INFO]: Max auxiliary sends: 4
+[13:55:35] [Render thread/INFO]: Aux slot 1 created
+[13:55:35] [Render thread/INFO]: Aux slot 2 created
+[13:55:35] [Render thread/INFO]: Aux slot 3 created
+[13:55:35] [Render thread/INFO]: Aux slot 4 created
+[13:55:35] [Render thread/INFO]: EFX ready
+[13:55:35] [Render thread/INFO]: Sound engine started
+[13:55:35] [Render thread/INFO]: [FANCYMENU] Reloading AudioResourceHandler after Minecraft SoundEngine reload..
+[13:55:35] [Render thread/INFO]: Created: 1024x1024x0 minecraft:textures/atlas/particles.png-atlas
+[13:55:35] [Render thread/INFO]: Created: 128x128x0 minecraft:textures/atlas/decorated_pot.png-atlas
+[13:55:35] [Render thread/INFO]: Created: 2048x1024x0 minecraft:textures/atlas/armor_trims.png-atlas
+[13:55:35] [Render thread/INFO]: Created: 512x256x0 minecraft:textures/atlas/paintings.png-atlas
+[13:55:35] [Render thread/INFO]: Created: 1024x512x0 minecraft:textures/atlas/shield_patterns.png-atlas
+[13:55:35] [Render thread/INFO]: Created: 2048x2048x4 minecraft:textures/atlas/blocks.png-atlas
+[13:55:35] [Render thread/INFO]: Created: 512x512x0 minecraft:textures/atlas/chest.png-atlas
+[13:55:35] [Render thread/INFO]: Created: 256x128x0 minecraft:textures/atlas/celestials.png-atlas
+[13:55:35] [Render thread/INFO]: Created: 1024x512x0 minecraft:textures/atlas/banner_patterns.png-atlas
+[13:55:35] [Render thread/INFO]: Created: 512x512x0 minecraft:textures/atlas/beds.png-atlas
+[13:55:35] [Render thread/INFO]: Created: 2048x1024x0 minecraft:textures/atlas/items.png-atlas
+[13:55:35] [Render thread/INFO]: Created: 2048x1024x0 minecraft:textures/atlas/gui.png-atlas
+[13:55:35] [Render thread/INFO]: Created: 128x64x0 minecraft:textures/atlas/map_decorations.png-atlas
+[13:55:35] [Render thread/INFO]: Created: 512x256x0 minecraft:textures/atlas/signs.png-atlas
+[13:55:35] [Render thread/INFO]: Created: 512x512x0 minecraft:textures/atlas/shulker_boxes.png-atlas
+[13:55:35] [Render thread/INFO]: [FANCYMENU] Sound engine reload detected. Releasing cached audio resources.
+[13:55:35] [Render thread/INFO]: [FANCYMENU] Forced native video background reload after sound engine reload. backgroundsReset: 1, stoppedPlayers: 0, videoResourcesReleased: 0
+[13:55:36] [Render thread/INFO]: Vivecraft: Optifine not detected
+[13:55:36] [Render thread/WARN]: Vivecraft: Copying layer: class net.noahsarch.deeperdark.client.renderer.SaddlePlayerLayer with Object.copy, this could cause issues
+[13:55:36] [Render thread/WARN]: Vivecraft: Copying layer: class net.noahsarch.deeperdark.client.renderer.SaddlePlayerLayer with Object.copy, this could cause issues
+[13:55:36] [Render thread/WARN]: Vivecraft: Copying layer: class net.noahsarch.deeperdark.client.renderer.SaddlePlayerLayer with Object.copy, this could cause issues
+[13:55:36] [Render thread/WARN]: Vivecraft: Copying layer: class einstein.subtle_effects.client.renderer.entity.EinsteinSolarSystemLayer with Object.copy, this could cause issues
+[13:55:36] [Render thread/WARN]: Vivecraft: Copying layer: class einstein.subtle_effects.client.renderer.entity.EinsteinSolarSystemLayer with Object.copy, this could cause issues
+[13:55:36] [Render thread/WARN]: Vivecraft: Copying layer: class einstein.subtle_effects.client.renderer.entity.EinsteinSolarSystemLayer with Object.copy, this could cause issues
+[13:55:36] [Render thread/WARN]: Vivecraft: Copying layer: class net.noahsarch.deeperdark.client.renderer.SaddlePlayerLayer with Object.copy, this could cause issues
+[13:55:36] [Render thread/WARN]: Vivecraft: Copying layer: class net.noahsarch.deeperdark.client.renderer.SaddlePlayerLayer with Object.copy, this could cause issues
+[13:55:36] [Render thread/WARN]: Vivecraft: Copying layer: class net.noahsarch.deeperdark.client.renderer.SaddlePlayerLayer with Object.copy, this could cause issues
+[13:55:36] [Render thread/WARN]: Vivecraft: Copying layer: class einstein.subtle_effects.client.renderer.entity.EinsteinSolarSystemLayer with Object.copy, this could cause issues
+[13:55:36] [Render thread/WARN]: Vivecraft: Copying layer: class einstein.subtle_effects.client.renderer.entity.EinsteinSolarSystemLayer with Object.copy, this could cause issues
+[13:55:36] [Render thread/WARN]: Vivecraft: Copying layer: class einstein.subtle_effects.client.renderer.entity.EinsteinSolarSystemLayer with Object.copy, this could cause issues
+[13:55:36] [Render thread/INFO]: 31907 cache(s) were cleared!
+[13:55:36] [Render thread/INFO]: [FANCYMENU] Reloading resources..
+[13:55:36] [Render thread/INFO]: [FANCYMENU] Pre-loading resources..
+[13:55:36] [Render thread/INFO]: [Fabric Seasons] Successfully loaded 3 custom foliage colors.
+[13:55:36] [Render thread/INFO]: [Fabric Seasons] Successfully loaded 3 custom grass colors.
+[13:55:36] [Render thread/INFO]: [Inventory Particles/Client]: Started registration PARTICLE CONFIGS from resources...
+[13:55:36] [Render thread/INFO]: [Inventory Particles/Client]: Registration finished, found: 438, registered: 438
+[13:55:36] [Render thread/INFO]: [Inventory Particles/Client]: Started registration PARTICLES FAMILY from resources...
+[13:55:36] [Render thread/INFO]: [Inventory Particles/Client]: Registration finished, found: 17, registered: 17
+[13:55:36] [Render thread/INFO]: Created: 512x512x0 inventory_particles:textures/atlas/iparticles-atlas
+[13:55:36] [Render thread/INFO]: Skipping loading custom particles because no file exists at: config/particlerain/particles.json
+[13:55:36] [Render thread/INFO]: Loaded 14 particles
+[13:55:36] [Render thread/INFO]: Reloading ItemSwapper item groups and lists...
+[13:55:36] [Render thread/INFO]: Unable to find minecraft:scute, ignoring.
+[13:55:36] [Render thread/INFO]: Unable to find minecraft:chain, ignoring.
+[13:55:36] [Render thread/INFO]: Unable to find minecraft:grass, ignoring.
+[13:55:36] [Thread-37/INFO]: Finished in: 227 ms [3163 ms with interruption]
+[13:55:36] [Render thread/INFO]: [FANCYMENU] ScreenCustomizationLayer registered: generic_dirt_message_screen
+[13:55:36] [Render thread/WARN]: Invalid path in datapack: minecraft:textures/block/Thumbs.db, ignoring
+[13:55:36] [Render thread/WARN]: Invalid path in datapack: minecraft:textures/item/Thumbs.db, ignoring
+[13:55:36] [Render thread/ERROR]: Invalid path in mod resource-pack distanthorizons: distanthorizons:textures/jar/themeDark.svg, ignoring
+[13:55:36] [Render thread/ERROR]: Invalid path in mod resource-pack distanthorizons: distanthorizons:textures/jar/themeLight.svg, ignoring
+[13:55:36] [Render thread/INFO]: Loaded 0 built-in, 0 custom biome tags
+[13:55:36] [Render thread/INFO]: Loaded 0 built-in, 0 custom block tags
+[13:55:36] [Render thread/INFO]: Loaded 0 built-in, 0 custom entity tags
+[13:55:36] [Render thread/INFO]: Loaded 6 built-in, 0 custom item tags
+[13:55:36] [Render thread/INFO]: [FANCYMENU] Minecraft resource reload: FINISHED
+[13:55:36] [Render thread/INFO]: [ETF]: reloading ETF data.
+[13:55:36] [Render thread/INFO]: [ETF]: emissive suffixes loaded: [_e]
+[13:55:36] [Render thread/INFO]: [ETF]: emissive suffixes loaded: [_e]
+[13:55:36] [Render thread/WARN]: Resource pack 'golden-days-base-1.21.x-1.15.5.zip' indicates the following shaders should be ignored: fog.glsl, lightmap.fsh, rendertype_clouds.fsh, sky.fsh, terrain.fsh
+[13:55:36] [Render thread/INFO]: [FANCYMENU] ScreenCustomizationLayer registered: title_screen
+[13:55:36] [Render thread/INFO]: BlockModelCacheSchematic: refreshing model cache
+[13:55:36] [Render thread/INFO]: [FANCYMENU] ScreenCustomizationLayer registered: net.noahsarch.deeperdark.autoupdate.AutoUpdaterScreen
+[13:55:37] [Render thread/INFO]: [FANCYMENU] ScreenCustomizationLayer registered: net.noahsarch.deeperdark.intro.DeeperDarkLogoScreen
+[13:55:37] [Render thread/INFO]: Overlay is removed!
+[13:55:51] [Render thread/INFO]: Parsed 144 mod(s) metadata in 12 ms
+[13:55:51] [Render thread/INFO]: Modlist saved to config\crash_assistant\modlist.json
+[13:55:52] [Render thread/INFO]: [FANCYMENU] ScreenCustomizationLayer registered: select_world_screen
+[13:55:52] [Render thread/WARN]: Missing data pack axiom
+[13:55:53] [Worker-Main-5/INFO]: Registering commands with com.sk89q.worldedit.fabric.internal.FabricPlatform
+[13:55:53] [Render thread/INFO]: Loaded 1765 recipes
+[13:55:53] [Render thread/INFO]: Loaded 1618 advancements
+[13:55:53] [Render thread/INFO]: [Fabric Seasons] Successfully loaded 15 custom crop configs.
+[13:55:53] [Render thread/INFO]: Building tag cache.
+[13:55:53] [Render thread/INFO]: [FANCYMENU] ScreenCustomizationLayer registered: progress_screen
+[13:55:53] [Render thread/INFO]: [ETF]: emissive suffixes loaded: [_e]
+[13:55:53] [Render thread/INFO]: [FANCYMENU] ScreenCustomizationLayer registered: level_loading_screen
+[13:55:53] [Render thread/ERROR]: Failed to parse saved data for 'SavedDataType[minecraft:game_rules]': Unknown registry key in ResourceKey[minecraft:root / minecraft:game_rule]: axiom:do_block_drops; Unknown registry key in ResourceKey[minecraft:root / minecraft:game_rule]: axiom:do_block_drops; Unknown registry key in ResourceKey[minecraft:root / minecraft:game_rule]: axiom:player_invulnerability; Unknown registry key in ResourceKey[minecraft:root / minecraft:game_rule]: axiom:player_invulnerability; Unknown registry key in ResourceKey[minecraft:root / minecraft:game_rule]: axiom:do_block_gravity; Unknown registry key in ResourceKey[minecraft:root / minecraft:game_rule]: axiom:do_block_gravity; Unknown registry key in ResourceKey[minecraft:root / minecraft:game_rule]: axiom:do_trample_farmland; Unknown registry key in ResourceKey[minecraft:root / minecraft:game_rule]: axiom:do_trample_farmland missed input: {"axiom:do_block_drops":1b,"axiom:do_block_gravity":1b,"axiom:do_trample_farmland":1b,"axiom:player_invulnerability":0b}
+[13:55:53] [Render thread/INFO]: [STDOUT]: DEBUG - Registering brewing recipes
+[13:55:53] [Render thread/INFO]: Applied 0 biome modifications to 0 of 123 new biomes in 755.4 μs
+[13:55:53] [Server thread/INFO]: Dispatching loading event for config pickupnotifier-server.toml
+[13:55:53] [Server thread/INFO]: Starting background profiler...
+[13:55:53] [Server thread/INFO]: The async-profiler engine is not supported for your os/arch (windows11/amd64), so the built-in Java engine will be used instead.
+[13:55:53] [Server thread/INFO]: Started DhWorld of type CLIENT_SERVER
+[13:55:53] [Server thread/INFO]: Starting integrated minecraft server version 26.1.2
+[13:55:53] [Server thread/INFO]: Generating keypair
+[13:55:53] [Server thread/INFO]: Enforcing safe world random access
+[13:55:53] [Server thread/INFO]: [STDOUT]: Density function compilation finished in 36.36 ms
+[13:55:53] [Server thread/INFO]: [STDOUT]: [ScalableLux] Lighting scaling is enabled in externally managed mode
+[13:55:53] [Server thread/INFO]: Using TheSpeedyObjectFactory without Unsafe
+[13:55:53] [DH-Full Data Migration Thread[0]/INFO]: No migration necessary.
+[13:55:53] [Server thread/INFO]: Started DhClientServerLevel for [Wrapped{ServerLevel[test9]@minecraft:overworld}] at [[LocalSaveStructure@(C:\Users\********\AppData\Roaming\PrismLauncher\instances\FO - Cluster - 26.1.2\minecraft\saves\test9\dimensions\minecraft\overworld\data)]].
+[13:55:53] [Server thread/INFO]: [STDOUT]: Density function compilation finished in 17.40 ms
+[13:55:53] [DH-Full Data Migration Thread[0]/INFO]: No migration necessary.
+[13:55:53] [Server thread/INFO]: Started DhClientServerLevel for [Wrapped{ServerLevel[test9]@minecraft:the_nether}] at [[LocalSaveStructure@(C:\Users\********\AppData\Roaming\PrismLauncher\instances\FO - Cluster - 26.1.2\minecraft\saves\test9\dimensions\minecraft\the_nether\data;C:\Users\********\AppData\Roaming\PrismLauncher\instances\FO - Cluster - 26.1.2\minecraft\saves\test9\dimensions\minecraft\overworld\data)]].
+[13:55:53] [Server thread/INFO]: [STDOUT]: Density function compilation finished in 9.547 ms
+[13:55:53] [DH-Full Data Migration Thread[0]/INFO]: No migration necessary.
+[13:55:53] [Server thread/INFO]: Started DhClientServerLevel for [Wrapped{ServerLevel[test9]@minecraft:the_end}] at [[LocalSaveStructure@(C:\Users\********\AppData\Roaming\PrismLauncher\instances\FO - Cluster - 26.1.2\minecraft\saves\test9\dimensions\minecraft\the_end\data;C:\Users\********\AppData\Roaming\PrismLauncher\instances\FO - Cluster - 26.1.2\minecraft\saves\test9\dimensions\minecraft\the_nether\data;C:\Users\********\AppData\Roaming\PrismLauncher\instances\FO - Cluster - 26.1.2\minecraft\saves\test9\dimensions\minecraft\overworld\data)]].
+[13:55:53] [Server thread/INFO]: Loading 0 persistent chunks...
+[13:55:53] [Server thread/INFO]: Preparing spawn area: 16%
+[13:55:53] [Server thread/INFO]: Saving chunks for level 'ServerLevel[test9]'/minecraft:overworld
+[13:55:53] [Server thread/INFO]: Saving chunks for level 'ServerLevel[test9]'/minecraft:the_nether
+[13:55:53] [Server thread/INFO]: Saving chunks for level 'ServerLevel[test9]'/minecraft:the_end
+[13:55:54] [Server thread/INFO]: ThreadedAnvilChunkStorage (world): All chunks are saved
+[13:55:54] [Server thread/INFO]: ThreadedAnvilChunkStorage (DIM-1): All chunks are saved
+[13:55:54] [Server thread/INFO]: ThreadedAnvilChunkStorage (DIM1): All chunks are saved
+[13:55:54] [Server thread/INFO]: ThreadedAnvilChunkStorage: All dimensions are saved
+[13:55:54] [Server thread/INFO]: [Spawn Animations] Sending global config to world ...
+[13:55:54] [VoiceChatServerThread/INFO]: [voicechat] Voice chat server started at port 59100
+[13:55:54] [Render thread/INFO]: [CHAT] [13:55:54] [Replay Mod] Recording started
+Jun 06, 2026 1:55:54 PM com.replaymod.replaystudio.lib.viaversion.protocols.v1_12_2to1_13.blockconnections.ConnectionData init
+INFO: Loading block connection mappings ...
+Jun 06, 2026 1:55:54 PM com.replaymod.replaystudio.lib.viaversion.protocols.v1_12_2to1_13.storage.BlockConnectionStorage <clinit>
+INFO: Using FastUtil Long2ObjectOpenHashMap for block connections
+[13:55:54] [Server thread/INFO]: Loading 0 chunks for player spawn...
+[13:55:54] [Server thread/INFO]: Preparing spawn area: 16%
+[13:55:54] [Server thread/INFO]: Preparing spawn area: 16%
+[13:55:55] [Server thread/INFO]: Time elapsed: 1200 ms
+[13:55:55] [Render thread/INFO]: Building tag cache.
+[13:55:55] [Render thread/INFO]: [STDOUT]: DEBUG - Registering brewing recipes
+[13:55:55] [Render thread/INFO]: Joined server with c2me:ext_render_distance_v1 support
+[13:55:55] [Server thread/INFO]: FinniTheFox[local:E:f1d862e7] logged in with entity id 158 at (0.2872381983534231, 56.0, -0.25122039589768047)
+[13:55:55] [Server thread/INFO]: Player [FinniTheFox] joined.
+[13:55:55] [Server thread/INFO]: [voicechat] Using Fabric Permissions API
+[13:55:55] [Server thread/INFO]: FinniTheFox joined the game
+[13:55:55] [Render thread/INFO]: Minimap required item set to nothing.
+[13:55:55] [Render thread/INFO]: New Xaero hud session initialized!
+[13:55:55] [Server thread/INFO]: Sending 1 network capability to FinniTheFox
+[13:55:55] [Render thread/INFO]: Fullscreen map required item set to nothing.
+[13:55:55] [Render thread/INFO]: New world map session initialized!
+[13:55:55] [Render thread/INFO]: Loading client level [Wrapped{ClientLevel@lq4m4mblmc44q@minecraft:overworld}]-[lq4m4mblmc44q@minecraft:overworld].
+[13:55:55] [Render thread/INFO]: Loaded [0] waiting chunk wrappers.
+[13:55:55] [DH-Request Module Ticker [minecraft:overworld] Thread[0]/INFO]: C2ME detected: DH's pre-existing chunk accessing will use methods handled by C2ME.
+[13:55:55] [DH-Request Module Ticker [minecraft:overworld] Thread[0]/INFO]: Batch Chunk Generator initialized
+[13:55:55] [DH-Request Module Ticker [minecraft:overworld] Thread[0]/INFO]: Creating world gen queue
+[13:55:55] [DH-Request Module Ticker [minecraft:overworld] Thread[0]/INFO]: Created world gen queue
+[13:55:55] [DH-Request Module Ticker [minecraft:overworld] Thread[0]/INFO]: Set world gen queue for level [minecraft:overworld].
+[13:55:55] [Render thread/WARN]: @ModifyVariable(@At("HEAD")) Shift.BY=1 on sspb.mixins.json:sodium.SmoothLightPipelineMixin from mod sspb::localvar$gpl000$sspb$modifyApplyInsetPartialFaceVertexN2d exceeds the maximum allowed value: 0. Increase the value of maxShiftBy to suppress this warning.
+[13:55:55] [Server thread/INFO]: Changing simulation distance to 16, from 0
+[13:55:55] [Render thread/INFO]: Started 10 worker threads
+[13:55:55] [Render thread/INFO]: BlockModelCacheSchematic: refreshing model cache
+[13:55:55] [InventoryHUD+ version check/INFO]: Can't find update string
+[13:55:55] [Render thread/WARN]: Unable to read property: west with value: "false" for blockstate: {Name:"minecraft:cobblestone_wall",Properties:{east:"false",north:"false",south:"false",up:"false",west:"false"}}
+[13:55:55] [Render thread/WARN]: Unable to read property: east with value: "false" for blockstate: {Name:"minecraft:cobblestone_wall",Properties:{east:"false",north:"false",south:"false",up:"false",west:"false"}}
+[13:55:55] [Render thread/WARN]: Unable to read property: south with value: "false" for blockstate: {Name:"minecraft:cobblestone_wall",Properties:{east:"false",north:"false",south:"false",up:"false",west:"false"}}
+[13:55:55] [Render thread/WARN]: Unable to read property: north with value: "false" for blockstate: {Name:"minecraft:cobblestone_wall",Properties:{east:"false",north:"false",south:"false",up:"false",west:"false"}}
+[13:55:55] [Render thread/WARN]: Unable to read property: west with value: "false" for blockstate: {Name:"minecraft:mossy_cobblestone_wall",Properties:{east:"false",north:"false",south:"false",up:"false",west:"false"}}
+[13:55:55] [Render thread/WARN]: Unable to read property: east with value: "false" for blockstate: {Name:"minecraft:mossy_cobblestone_wall",Properties:{east:"false",north:"false",south:"false",up:"false",west:"false"}}
+[13:55:55] [Render thread/WARN]: Unable to read property: south with value: "false" for blockstate: {Name:"minecraft:mossy_cobblestone_wall",Properties:{east:"false",north:"false",south:"false",up:"false",west:"false"}}
+[13:55:55] [Render thread/WARN]: Unable to read property: north with value: "false" for blockstate: {Name:"minecraft:mossy_cobblestone_wall",Properties:{east:"false",north:"false",south:"false",up:"false",west:"false"}}
+[13:55:57] [Render thread/INFO]: Starting [4] Placement Manager Daemon threads
+[13:55:57] [Render thread/INFO]: [voicechat] Sending secret request to the server
+[13:55:57] [Server thread/INFO]: [voicechat] Received secret request of FinniTheFox (20)
+[13:55:57] [Server thread/INFO]: [voicechat] Sent secret to FinniTheFox
+[13:55:57] [Render thread/INFO]: Initializing sound physics for voice chat audio
+[13:55:57] [Render thread/INFO]: Initializing Sound Physics
+[13:55:57] [Render thread/INFO]: EFX Extension recognized
+[13:55:57] [Render thread/INFO]: Max auxiliary sends: 2
+[13:55:57] [Render thread/INFO]: Aux slot 1 created
+[13:55:57] [Render thread/INFO]: Aux slot 2 created
+[13:55:57] [Render thread/INFO]: Aux slot 3 created
+[13:55:57] [Render thread/INFO]: Aux slot 4 created
+[13:55:57] [Render thread/INFO]: EFX ready
+[13:55:57] [IO-Worker-4/INFO]: Reading...
+[13:55:57] [Render thread/INFO]: [CHAT] [13:55:57] §8[§rtest9§8]
+[13:55:57] [Server thread/INFO]: [FANCYMENU] A client with FancyMenu installed joined the server: FinniTheFox
+[13:55:57] [ForkJoinPool.commonPool-worker-1/INFO]: [Inventory Particles]: Started linking particle configs for VANILLA items...
+[13:55:57] [Render thread/INFO]: [ShulkerBoxTooltip Plugins] Loading 2 plugins: chesttracker, shulkerboxtooltip
+[13:55:57] [ForkJoinPool.commonPool-worker-1/INFO]: [Inventory Particles]: Finished linking particle configs for VANILLA items!
+[13:55:57] [ForkJoinPool.commonPool-worker-2/INFO]: [Inventory Particles]: Started linking particle configs for MODDED items...
+[13:55:57] [Render thread/INFO]: [ShulkerBoxTooltip Plugins] Registered 20 color keys for mod shulkerboxtooltip
+[13:55:57] [Render thread/INFO]: [ShulkerBoxTooltip Plugins] Registered 51 providers for mod shulkerboxtooltip
+[13:55:57] [Render thread/INFO]: [ShulkerBoxTooltip] overriding preview provider shulkerboxtooltip:ender_chest with chesttracker:client_ender_chest for item minecraft:ender_chest
+[13:55:57] [Render thread/INFO]: [ShulkerBoxTooltip Plugins] Registered 1 provider for mod chesttracker
+[13:55:57] [Render thread/INFO]: Reading locked slot indices from test9.json
+[13:55:57] [Render thread/INFO]: Loading client level [Wrapped{ClientLevel@lq4m4mblmc44q@minecraft:overworld}]-[lq4m4mblmc44q@minecraft:overworld].
+[13:55:57] [Render thread/INFO]: Loaded [0] waiting chunk wrappers.
+[13:55:57] [ForkJoinPool.commonPool-worker-2/INFO]: [Inventory Particles]: Finished linking particle configs for MODDED items!
+[13:55:57] [Render thread/WARN]: Ambiguity between arguments [calc, storage] and [calc, expression] with inputs: [storage]
+[13:55:57] [Render thread/WARN]: Ambiguity between arguments [calc, storage, timesHopperSpeed] and [calc, storage, itemsperhour] with inputs: [0, -123, 123]
+[13:55:57] [Render thread/WARN]: Ambiguity between arguments [calc, storage, help] and [calc, storage, itemsperhour] with inputs: [help]
+[13:55:57] [Render thread/WARN]: Ambiguity between arguments [calc, nether] and [calc, expression] with inputs: [nether]
+[13:55:57] [Render thread/WARN]: Ambiguity between arguments [calc, overworld] and [calc, expression] with inputs: [overworld]
+[13:55:57] [Render thread/WARN]: Ambiguity between arguments [calc, sbtoitem] and [calc, expression] with inputs: [sbtoitem]
+[13:55:57] [Render thread/WARN]: Ambiguity between arguments [calc, sbtoitem, 16s] and [calc, sbtoitem, numberofsbs] with inputs: [16s]
+[13:55:57] [Render thread/WARN]: Ambiguity between arguments [calc, sbtoitem, 1s] and [calc, sbtoitem, numberofsbs] with inputs: [1s]
+[13:55:57] [Render thread/WARN]: Ambiguity between arguments [calc, sbtoitem, help] and [calc, sbtoitem, numberofsbs] with inputs: [help]
+[13:55:57] [Render thread/WARN]: Ambiguity between arguments [calc, itemtosb] and [calc, expression] with inputs: [itemtosb]
+[13:55:57] [Render thread/WARN]: Ambiguity between arguments [calc, itemtosb, 16s] and [calc, itemtosb, numberofitems] with inputs: [16s]
+[13:55:57] [Render thread/WARN]: Ambiguity between arguments [calc, itemtosb, 1s] and [calc, itemtosb, numberofitems] with inputs: [1s]
+[13:55:57] [Render thread/WARN]: Ambiguity between arguments [calc, itemtosb, help] and [calc, itemtosb, numberofitems] with inputs: [help]
+[13:55:57] [Render thread/WARN]: Ambiguity between arguments [calc, secondstohopperclock] and [calc, expression] with inputs: [secondstohopperclock]
+[13:55:57] [Render thread/WARN]: Ambiguity between arguments [calc, secondstohopperclock, help] and [calc, secondstohopperclock, seconds] with inputs: [help]
+[13:55:57] [Render thread/WARN]: Ambiguity between arguments [calc, secondstorepeater] and [calc, expression] with inputs: [secondstorepeater]
+[13:55:57] [Render thread/WARN]: Ambiguity between arguments [calc, secondstorepeater, help] and [calc, secondstorepeater, seconds] with inputs: [help]
+[13:55:57] [Render thread/WARN]: Ambiguity between arguments [calc, itemtostack] and [calc, expression] with inputs: [itemtostack]
+[13:55:57] [Render thread/WARN]: Ambiguity between arguments [calc, itemtostack, 16s] and [calc, itemtostack, numberofitems] with inputs: [16s]
+[13:55:57] [Render thread/WARN]: Ambiguity between arguments [calc, itemtostack, 1s] and [calc, itemtostack, numberofitems] with inputs: [1s]
+[13:55:57] [Render thread/WARN]: Ambiguity between arguments [calc, itemtostack, help] and [calc, itemtostack, numberofitems] with inputs: [help]
+[13:55:57] [Render thread/WARN]: Ambiguity between arguments [calc, stacktoitem] and [calc, expression] with inputs: [stacktoitem]
+[13:55:57] [Render thread/WARN]: Ambiguity between arguments [calc, stacktoitem, 16s] and [calc, stacktoitem, numberofstacks] with inputs: [16s]
+[13:55:57] [Render thread/WARN]: Ambiguity between arguments [calc, stacktoitem, 1s] and [calc, stacktoitem, numberofstacks] with inputs: [1s]
+[13:55:57] [Render thread/WARN]: Ambiguity between arguments [calc, stacktoitem, help] and [calc, stacktoitem, numberofstacks] with inputs: [help]
+[13:55:57] [Render thread/WARN]: Ambiguity between arguments [calc, rates] and [calc, expression] with inputs: [rates]
+[13:55:57] [Render thread/WARN]: Ambiguity between arguments [calc, rates, help] and [calc, rates, numberofitems] with inputs: [help]
+[13:55:57] [Render thread/WARN]: Ambiguity between arguments [calc, allaystorage] and [calc, expression] with inputs: [allaystorage]
+[13:55:57] [Render thread/WARN]: Ambiguity between arguments [calc, allaystorage, help] and [calc, allaystorage, itemsperhour] with inputs: [help]
+[13:55:57] [Render thread/WARN]: Ambiguity between arguments [calc, random] and [calc, expression] with inputs: [random]
+[13:55:57] [Render thread/WARN]: Ambiguity between arguments [calc, random, minmax] and [calc, random, max] with inputs: [minmax]
+[13:55:57] [Render thread/WARN]: Ambiguity between arguments [calc, random, help] and [calc, random, max] with inputs: [help]
+[13:55:57] [Render thread/WARN]: Ambiguity between arguments [calc, craft] and [calc, expression] with inputs: [craft]
+[13:55:57] [Render thread/WARN]: Ambiguity between arguments [calc, craft, item, depth] and [calc, craft, item, amount] with inputs: [depth]
+[13:55:57] [Render thread/WARN]: Ambiguity between arguments [calc, craft, help] and [calc, craft, item] with inputs: [help]
+[13:55:57] [Render thread/WARN]: Ambiguity between arguments [calc, signaltoitems] and [calc, expression] with inputs: [signaltoitems]
+[13:55:57] [Render thread/WARN]: Ambiguity between arguments [calc, signaltoitems, help] and [calc, signaltoitems, container] with inputs: [help]
+[13:55:57] [Render thread/WARN]: Ambiguity between arguments [calc, barter] and [calc, expression] with inputs: [barter]
+[13:55:57] [Render thread/WARN]: Ambiguity between arguments [calc, dist] and [calc, expression] with inputs: [dist]
+[13:55:57] [Render thread/WARN]: Ambiguity between arguments [calc, craftinv] and [calc, expression] with inputs: [craftinv]
+[13:55:57] [Render thread/WARN]: Ambiguity between arguments [calc, craftinv, help] and [calc, craftinv, item] with inputs: [help]
+[13:55:57] [Render thread/WARN]: Ambiguity between arguments [calc, custom] and [calc, expression] with inputs: [custom]
+[13:55:57] [Render thread/WARN]: Ambiguity between arguments [calc, variables] and [calc, expression] with inputs: [variables]
+[13:55:57] [Render thread/WARN]: Ambiguity between arguments [calc, help] and [calc, expression] with inputs: [help]
+[13:55:57] [IO-Worker-4/INFO]: Parsed 3242 messages and 2148 sent messages!
+[13:55:57] [IO-Worker-4/INFO]: [ChatLog.deserialize] Took 0.119 seconds
+[13:55:57] [Render thread/INFO]: [Inventory Profiles Next] Loaded 1 external GUI hints
+[13:55:57] [Render thread/INFO]: [Inventory Profiles Next] Loaded 803 build-in GUI hints
+[13:55:57] [Render thread/INFO]: [Inventory Profiles Next] Effective GUI hints after merge: 804
+[13:55:57] [Render thread/INFO]: Minimap updated server level id: 178995712 for world ResourceKey[minecraft:dimension / minecraft:overworld]
+[13:55:57] [Render thread/INFO]: Received 1 network capability from server (responded with 1)
+[13:55:57] [Render thread/INFO]: Loaded 29 advancements
+[13:55:57] [Server thread/INFO]: Received 1 capability from FinniTheFox
+[13:55:57] [Render thread/INFO]: Joined server with c2me:ext_render_distance_v1 support
+[13:55:57] [Render thread/INFO]: [ShulkerBoxTooltip] Server integration enabled, attempting handshake...
+[13:55:57] [Server thread/INFO]: [ShulkerBoxTooltip] FinniTheFox: protocol version: 2.0
+[13:55:57] [Render thread/INFO]: Created: 256x128x0 inventory_particles:deeperdark-atlas
+[13:55:57] [Render thread/INFO]: [CHAT] [13:55:57] §8[§rtest9§8]
+[13:55:57] [Render thread/INFO]: Restored 3243 messages and 2148 history messages!
+[13:55:57] [Render thread/INFO]: [voicechat] Received secret
+[13:55:57] [Render thread/INFO]: [voicechat] Connecting to voice chat server: '127.0.0.1:59100'
+[13:55:57] [VoiceChatAuthenticationThread/INFO]: [voicechat] Trying to authenticate voice chat connection
+[13:55:57] [Render thread/INFO]: Changing view distance to 10 (play stage)
+[13:55:57] [VoiceChatPacketProcessingThread/INFO]: [voicechat] Successfully authenticated player 60dd4258-cd13-4e78-baa9-047f1f38d566
+[13:55:57] [VoiceChatConnectionThread/INFO]: [voicechat] Server acknowledged authentication
+[13:55:57] [Thread-33/INFO]: Firing world change event: ENTER_WORLD from null to ResourceKey[minecraft:dimension / minecraft:overworld]
+[13:55:57] [Render thread/INFO]: Resizing Dynamic Transforms UBO, capacity limit of 2 reached during a single frame. New capacity will be 4.
+[13:55:57] [Render thread/INFO]: Overriding vanilla MC settings to better fit Distant Horizons... This behavior can be disabled in the Distant Horizons config.
+[13:55:57] [Render thread/INFO]: Disabling vanilla clouds... This is done to prevent vanilla clouds from rendering on top of Distant Horizons LODs.
+[13:55:57] [Render thread/INFO]: Disabling vanilla chunk fade in... This is done to prevent vanilla chunks from flashing on the Distant Horizons boarder when moving (which is distracting).
+[13:55:57] [Render thread/INFO]: Disabling improved transparency... This is done to fix vanilla chunks (specifically water blocks) not fading into Distant Horizons LODs when DH's 'Vanilla Fade' option is enabled.
+[13:55:58] [Render thread/INFO]: Resizing Dynamic Transforms UBO, capacity limit of 4 reached during a single frame. New capacity will be 8.
+[13:55:58] [Render thread/INFO]: [ShulkerBoxTooltip] Handshake succeeded
+[13:55:58] [Render thread/INFO]: [ShulkerBoxTooltip] Server protocol version: 2.0
+[13:55:58] [Render thread/INFO]: [FANCYMENU] Connected to a server with FancyMenu installed: local_lan_world
+[13:55:58] [Render thread/INFO]: Resizing Dynamic Transforms UBO, capacity limit of 8 reached during a single frame. New capacity will be 16.
+[13:55:58] [Render thread/INFO]: Reloading radar icon resources...
+[13:55:58] [Render thread/INFO]: Skipping invalid icon form: true for minecraft:piglin_brute
+[13:55:58] [Render thread/INFO]: Skipping invalid icon form: true for minecraft:piglin
+[13:55:58] [Render thread/INFO]: Skipping invalid icon form: true for minecraft:creeper
+[13:55:58] [Render thread/INFO]: Skipping invalid icon form: true for minecraft:zombified_piglin
+[13:55:58] [Render thread/INFO]: Skipping invalid icon form: true for minecraft:enderman
+[13:55:58] [Render thread/INFO]: Reloaded radar icon resources!
+[13:55:58] [Render thread/INFO]: Resized a dynamic immediate buffer to 160!
+[13:55:58] [Render thread/INFO]: Resized a dynamic immediate buffer to 320!
+[13:55:58] [Render thread/INFO]: Resized a dynamic immediate buffer to 640!
+[13:55:58] [Render thread/INFO]: Resized a dynamic immediate buffer to 1280!
+[13:55:58] [Render thread/INFO]: Resizing Dynamic Transforms UBO, capacity limit of 16 reached during a single frame. New capacity will be 32.
+[13:55:58] [VoiceChatAuthenticationThread/INFO]: [voicechat] Trying to validate voice chat connection
+[13:55:58] [VoiceChatPacketProcessingThread/INFO]: [voicechat] Successfully validated connection of player 60dd4258-cd13-4e78-baa9-047f1f38d566
+[13:55:58] [VoiceChatPacketProcessingThread/INFO]: [voicechat] Player FinniTheFox (60dd4258-cd13-4e78-baa9-047f1f38d566) successfully connected to voice chat
+[13:55:58] [VoiceChatConnectionThread/INFO]: [voicechat] Server acknowledged connection check
+[13:55:58] [MicrophoneThread/INFO]: [voicechat] Using stereo workaround for OpenAL microphones
+[13:56:01] [Render thread/INFO]: [FANCYMENU] ScreenCustomizationLayer registered: inventory_screen
+[13:56:01] [Render thread/INFO]: [CHAT] [13:56:01] §6Distant Horizons: Chunky detected.§r\nChunky can cause DH LODs to have holes since Chunky can generate chunks faster than DH can process them. \nUsing DH's distant generator instead of chunky or increasing DH's CPU thread count can resolve the issue.
+[13:56:03] [Render thread/INFO]: Resized a dynamic immediate buffer to 160!
+[13:56:03] [Render thread/INFO]: Resized a dynamic immediate buffer to 320!
+[13:56:03] [Render thread/INFO]: Resized a dynamic immediate buffer to 640!
+[13:56:03] [Render thread/INFO]: Resized a dynamic immediate buffer to 1280!
+[13:56:09] [Render thread/INFO]: [FANCYMENU] ScreenCustomizationLayer registered: pause_screen
+[13:56:09] [IO-Worker-3/INFO]: Saving...
+[13:56:10] [Server thread/INFO]: Saving and pausing game...
+[13:56:10] [Server thread/INFO]: Saving chunks for level 'ServerLevel[test9]'/minecraft:overworld
+[13:56:10] [Server thread/INFO]: Saving chunks for level 'ServerLevel[test9]'/minecraft:the_nether
+[13:56:10] [Server thread/INFO]: Saving chunks for level 'ServerLevel[test9]'/minecraft:the_end
+[13:56:10] [IO-Worker-3/INFO]: Saved 3244 messages and 2148 sent messages to 'C:\Users\********\AppData\Roaming\PrismLauncher\instances\FO - Cluster - 26.1.2\minecraft\logs\chatlog.json'!
+[13:56:10] [IO-Worker-3/INFO]: [ChatLog.serialize(->0)] Took 0.14 seconds
+[13:56:10] [Netty Local IO #2/INFO]: Player [FinniTheFox] disconnected.
+[13:56:10] [Thread-33/INFO]: Firing world change event: EXIT_WORLD from ResourceKey[minecraft:dimension / minecraft:overworld] to null
+[13:56:10] [Render thread/INFO]: [voicechat] Clearing audio channels
+[13:56:10] [Server thread/INFO]: FinniTheFox lost connection: Disconnected
+[13:56:10] [Server thread/INFO]: FinniTheFox left the game
+[13:56:10] [Render thread/INFO]: [voicechat] Stopping microphone thread
+[13:56:10] [Server thread/INFO]: [voicechat] Disconnecting client FinniTheFox
+[13:56:10] [Render thread/INFO]: [voicechat] Disconnecting voicechat
+[13:56:10] [Render thread/INFO]: Client on ClientOnly mode disconnecting.
+[13:56:10] [Server thread/INFO]: Stopping singleplayer server as player logged out
+[13:56:10] [level shutdown/INFO]: Closing world gen queue
+[13:56:10] [level shutdown/INFO]: Closed DHLevel for [Wrapped{ServerLevel[test9]@minecraft:the_nether}].
+[13:56:10] [level shutdown/INFO]: Closed DhClientServerLevel for Wrapped{ServerLevel[test9]@minecraft:the_nether}
+[13:56:10] [level shutdown/INFO]: Closed DHLevel for [Wrapped{ServerLevel[test9]@minecraft:the_end}].
+[13:56:10] [level shutdown/INFO]: Closed DhClientServerLevel for Wrapped{ServerLevel[test9]@minecraft:the_end}
+[13:56:10] [level shutdown/INFO]: Closing WorldGenerationQueue...
+[13:56:10] [level shutdown/INFO]: Shutting down world generator thread pool...
+[13:56:10] [level shutdown/INFO]: World generator thread pool shutdown with [4] incomplete tasks.
+[13:56:10] [level shutdown/INFO]: [BatchGenerator] shutting down...
+[13:56:10] [level shutdown/INFO]: Closing [BatchGenerationEnvironment]
+[13:56:10] [level shutdown/INFO]: Finished closing WorldGenerationQueue
+[13:56:10] [level shutdown/INFO]: Closed DHLevel for [Wrapped{ServerLevel[test9]@minecraft:overworld}].
+[13:56:10] [level shutdown/INFO]: Closed DhClientServerLevel for Wrapped{ServerLevel[test9]@minecraft:overworld}
+[13:56:10] [Render thread/INFO]: Closed DhWorld of type [CLIENT_SERVER].
+[13:56:10] [level shutdown/INFO]: Closed DHLevel for [Wrapped{ServerLevel[test9]@minecraft:the_end}].
+[13:56:10] [level shutdown/INFO]: Closed DHLevel for [Wrapped{ServerLevel[test9]@minecraft:overworld}].
+[13:56:10] [level shutdown/INFO]: Closed DhClientServerLevel for Wrapped{ServerLevel[test9]@minecraft:the_end}
+[13:56:10] [level shutdown/INFO]: Closed DHLevel for [Wrapped{ServerLevel[test9]@minecraft:the_nether}].
+[13:56:10] [level shutdown/INFO]: Closed DhClientServerLevel for Wrapped{ServerLevel[test9]@minecraft:overworld}
+[13:56:10] [level shutdown/INFO]: Closed DhClientServerLevel for Wrapped{ServerLevel[test9]@minecraft:the_nether}
+[13:56:10] [Render thread/INFO]: Closed DhWorld of type [CLIENT_SERVER].
+[13:56:10] [Render thread/INFO]: Shutting down PriorityTaskPicker thread pool...
+[13:56:10] [Server thread/INFO]: Server stopping, waiting for ChestTracker saves...
+[13:56:10] [Server thread/INFO]: Stopping server
+[13:56:10] [Server thread/INFO]: Saving players
+[13:56:10] [Server thread/INFO]: Saving worlds
+[13:56:10] [Server thread/INFO]: ServerLevel[test9]/minecraft:overworld: waiting for 3363 chunks to unload
+[13:56:10] [Server thread/INFO]: Saving chunks for level 'ServerLevel[test9]'/minecraft:overworld
+[13:56:10] [Server thread/INFO]: Saving chunks for level 'ServerLevel[test9]'/minecraft:the_nether
+[13:56:10] [Server thread/INFO]: Saving chunks for level 'ServerLevel[test9]'/minecraft:the_end
+[13:56:10] [Server thread/INFO]: ThreadedAnvilChunkStorage (world): All chunks are saved
+[13:56:10] [Server thread/INFO]: ThreadedAnvilChunkStorage (DIM-1): All chunks are saved
+[13:56:10] [Server thread/INFO]: ThreadedAnvilChunkStorage (DIM1): All chunks are saved
+[13:56:10] [Server thread/INFO]: ThreadedAnvilChunkStorage: All dimensions are saved
+[13:56:11] [C2ME Storage #3/INFO]: Storage thread Thread[#307,C2ME Storage #3,8,main] stopped
+[13:56:11] [C2ME Storage #2/INFO]: Storage thread Thread[#296,C2ME Storage #2,8,main] stopped
+[13:56:11] [C2ME Storage #1/INFO]: Storage thread Thread[#295,C2ME Storage #1,8,main] stopped
+[13:56:11] [C2ME Storage #5/INFO]: Storage thread Thread[#315,C2ME Storage #5,8,main] stopped
+[13:56:11] [C2ME Storage #6/INFO]: Storage thread Thread[#316,C2ME Storage #6,8,main] stopped
+[13:56:11] [C2ME Storage #4/INFO]: Storage thread Thread[#314,C2ME Storage #4,8,main] stopped
+[13:56:11] [C2ME Storage #9/INFO]: Storage thread Thread[#322,C2ME Storage #9,8,main] stopped
+[13:56:11] [C2ME Storage #8/INFO]: Storage thread Thread[#321,C2ME Storage #8,8,main] stopped
+[13:56:11] [C2ME Storage #7/INFO]: Storage thread Thread[#320,C2ME Storage #7,8,main] stopped
+[13:56:11] [Server thread/INFO]: Dispatching unloading event for config pickupnotifier-server.toml
+[13:56:11] [Render thread/INFO]: Closing all [3] database connections...
+[13:56:11] [Render thread/INFO]: Closing database connection: [jdbc:dh_sqlite:C:\Users\********\AppData\Roaming\PrismLauncher\instances\FO - Cluster - 26.1.2\minecraft\saves\test9\dimensions\minecraft\the_end\data\DistantHorizons.sqlite]
+[13:56:11] [Render thread/INFO]: Closing database connection: [jdbc:dh_sqlite:C:\Users\********\AppData\Roaming\PrismLauncher\instances\FO - Cluster - 26.1.2\minecraft\saves\test9\dimensions\minecraft\the_nether\data\DistantHorizons.sqlite]
+[13:56:11] [Render thread/INFO]: Closing database connection: [jdbc:dh_sqlite:C:\Users\********\AppData\Roaming\PrismLauncher\instances\FO - Cluster - 26.1.2\minecraft\saves\test9\dimensions\minecraft\overworld\data\DistantHorizons.sqlite]
+[13:56:11] [Render thread/INFO]: Xaero hud session finalized.
+[13:56:11] [Render thread/INFO]: Finalizing world map session...
+[13:56:11] [Thread-33/INFO]: World map force-cleaned!
+[13:56:11] [Render thread/INFO]: World map session finalized.
+[13:56:11] [Render thread/INFO]: Writing locked slot indices to test9.json
+[13:56:11] [Render thread/INFO]: Stopping worker threads
+[13:56:11] [Render thread/INFO]: [ETF]: emissive suffixes loaded: [_e]
+[13:56:11] [Render thread/INFO]: [ETF]: emissive suffixes loaded: [_e]
+[13:56:13] [spark-monitoring-2-thread-1/INFO]: [STDERR]: Uncaught exception thrown in thread spark-monitoring-2-thread-1
+[13:56:13] [spark-monitoring-2-thread-1/INFO]: [STDERR]: java.util.concurrent.CancellationException
+[13:56:13] [spark-monitoring-2-thread-1/INFO]: [STDERR]: 	at java.base/java.util.concurrent.FutureTask.report(FutureTask.java:123)
+[13:56:13] [spark-monitoring-2-thread-1/INFO]: [STDERR]: 	at java.base/java.util.concurrent.FutureTask.get(FutureTask.java:193)
+[13:56:13] [spark-monitoring-2-thread-1/INFO]: [STDERR]: 	at knot//me.lucko.spark.common.util.SparkScheduledThreadPoolExecutor.afterExecute(SparkScheduledThreadPoolExecutor.java:48)
+[13:56:13] [spark-monitoring-2-thread-1/INFO]: [STDERR]: 	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1091)
+[13:56:13] [spark-monitoring-2-thread-1/INFO]: [STDERR]: 	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)
+[13:56:13] [spark-monitoring-2-thread-1/INFO]: [STDERR]: 	at java.base/java.lang.Thread.run(Thread.java:1474)
+[13:56:39] [Render thread/INFO]: Stopping [4] Placement Manager Daemon threads
+[13:56:39] [CullThread/INFO]: [STDOUT]: Shutting down culling task!
+[13:56:39] [Render thread/INFO]: Stopping [0] Placement Manager Daemon threads
+[13:56:40] [Render thread/INFO]: Stopping!
+[13:56:40] [Render thread/INFO]: [ETF]: emissive suffixes loaded: [_e]
+Process exited with code 0.
+Clipboard copy at: 06 Jun 2026 13:56:42 -0500

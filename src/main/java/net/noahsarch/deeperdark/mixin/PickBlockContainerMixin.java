@@ -44,6 +44,11 @@ public abstract class PickBlockContainerMixin {
     @Inject(method = "handlePickItemFromBlock", at = @At("HEAD"))
     private void deeperdark$pickFromContainersOnBlock(
             ServerboundPickItemFromBlockPacket packet, CallbackInfo ci) {
+        // handlePickItemFromBlock is invoked twice per packet: once on the Netty IO thread
+        // (before PacketUtils.ensureRunningOnSameThread reschedules it) and once on the server
+        // thread. Inventory/world access is only safe on the server thread.
+        if (!this.player.level().getServer().isSameThread()) return;
+
         if (this.player.hasInfiniteMaterials()) return;
 
         ServerLevel level = this.player.level();
@@ -59,7 +64,8 @@ public abstract class PickBlockContainerMixin {
         Inventory inventory = this.player.getInventory();
         if (inventory.findSlotMatchingItem(target) != -1) return;
 
-        if (deeperdark$searchAndExtract(inventory, target)) {
+        boolean found = deeperdark$searchAndExtract(inventory, target);
+        if (found) {
             this.player.connection.send(new ClientboundSetHeldSlotPacket(inventory.getSelectedSlot()));
             this.player.inventoryMenu.broadcastChanges();
         }
@@ -109,23 +115,26 @@ public abstract class PickBlockContainerMixin {
 
     private boolean deeperdark$extractFromBundle(
             ItemStack bundleItem, BundleContents contents, ItemStack target, Inventory inventory) {
-        List<ItemStackTemplate> items = contents.items();
-        for (int i = 0; i < items.size(); i++) {
-            ItemStack candidate = items.get(i).create();
+        List<ItemStackTemplate> templates = contents.items();
+        for (int i = 0; i < templates.size(); i++) {
+            ItemStackTemplate tmpl = templates.get(i);
+            ItemStack candidate = tmpl.create();
             if (!ItemStack.isSameItemSameComponents(candidate, target))
                 continue;
-            if (!deeperdark$hasRoomForStack(inventory, candidate))
+            if (!deeperdark$hasRoomForStack(inventory, target))
                 return false;
 
-            BundleContents.Mutable mutable = new BundleContents.Mutable(contents);
-            mutable.toggleSelectedItem(i);
-            ItemStack removed = mutable.removeOne();
-            if (removed == null || removed.isEmpty())
-                return false;
-
-            ItemStack extracted = removed.copy();
-            bundleItem.set(DataComponents.BUNDLE_CONTENTS, mutable.toImmutable());
-            deeperdark$addAndSelectItem(inventory, extracted, target);
+            // Rebuild the bundle's item list with one fewer of the matched item.
+            // Avoids BundleContents.Mutable.toggleSelectedItem, which deselects when
+            // selectedItem already equals i (default=0), causing removeOne to return null.
+            List<ItemStackTemplate> newTemplates = new ArrayList<>(templates);
+            if (tmpl.count() > 1) {
+                newTemplates.set(i, tmpl.withCount(tmpl.count() - 1));
+            } else {
+                newTemplates.remove(i);
+            }
+            bundleItem.set(DataComponents.BUNDLE_CONTENTS, new BundleContents(newTemplates));
+            deeperdark$addAndSelectItem(inventory, candidate.copyWithCount(1), target);
             return true;
         }
         return false;
