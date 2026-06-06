@@ -78,6 +78,8 @@ public class CreatureInstance {
     private Vec3 chaseTargetPos = null;
     private int chaseTicks = 0;
     private float pitchInfluenceAccumulated = 0;
+    /** UUIDs of mobs captured at chase start that should flee from the target player. */
+    private final java.util.Set<UUID> fleeingMobUuids = new java.util.HashSet<>();
 
     // ===== Echo Zone State =====
     private Vec3 echoPosition = null;
@@ -121,6 +123,7 @@ public class CreatureInstance {
     public Vec3 getChaseTargetPos() { return chaseTargetPos; }
     public int getChaseTicks() { return chaseTicks; }
     public float getPitchInfluenceAccumulated() { return pitchInfluenceAccumulated; }
+    public java.util.Set<UUID> getFleeingMobUuids() { return fleeingMobUuids; }
     public Vec3 getEchoPosition() { return echoPosition; }
     public int getEchoTicksRemaining() { return echoTicksRemaining; }
     public boolean isEchoTriggered() { return echoTriggered; }

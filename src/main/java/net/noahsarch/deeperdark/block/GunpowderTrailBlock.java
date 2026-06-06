@@ -6,7 +6,9 @@ import com.mojang.serialization.MapCodec;
 import java.util.Map;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.util.ARGB;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -57,7 +59,10 @@ public class GunpowderTrailBlock extends Block {
 
     // True only during the single tick when this block is actively burning —
     // used to briefly emit signal strength 15 so adjacent redstone devices trigger.
-    public static final BooleanProperty BURNING = BooleanProperty.create("burning");
+    public static final BooleanProperty BURNING          = BooleanProperty.create("burning");
+    // Set to true when ignition came from a redstone signal so tick() shows red
+    // dust particles instead of flame, and propagates the flag to neighbours.
+    public static final BooleanProperty REDSTONE_IGNITED = BooleanProperty.create("redstone_ignited");
 
     public static final Map<Direction, EnumProperty<RedstoneSide>> PROPERTY_BY_DIRECTION =
             ImmutableMap.copyOf(Maps.newEnumMap(Map.of(
@@ -82,7 +87,8 @@ public class GunpowderTrailBlock extends Block {
                 .setValue(SOUTH, RedstoneSide.NONE)
                 .setValue(EAST,  RedstoneSide.NONE)
                 .setValue(WEST,  RedstoneSide.NONE)
-                .setValue(BURNING, false));
+                .setValue(BURNING, false)
+                .setValue(REDSTONE_IGNITED, false));
     }
 
     // ─── Shape / Survival ─────────────────────────────────────────────────────
@@ -189,7 +195,9 @@ public class GunpowderTrailBlock extends Block {
         }
         // Any change to adjacent blocks (above or horizontal) may affect connection geometry
         if (dir != Direction.DOWN) {
-            return computeState(level, pos).setValue(BURNING, state.getValue(BURNING));
+            return computeState(level, pos)
+                    .setValue(BURNING, state.getValue(BURNING))
+                    .setValue(REDSTONE_IGNITED, state.getValue(REDSTONE_IGNITED));
         }
         return state;
     }
@@ -199,6 +207,7 @@ public class GunpowderTrailBlock extends Block {
     @Override
     protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
         if (!oldState.is(state.getBlock()) && !level.isClientSide() && level.hasNeighborSignal(pos)) {
+            level.setBlock(pos, state.setValue(REDSTONE_IGNITED, true), Block.UPDATE_CLIENTS);
             level.scheduleTick(pos, this, 2);
         }
     }
@@ -207,6 +216,11 @@ public class GunpowderTrailBlock extends Block {
     protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block,
                                    @Nullable Orientation orientation, boolean movedByPiston) {
         if (!level.isClientSide() && level.hasNeighborSignal(pos)) {
+            // A burning trail emits signal=15 via BURNING=true and calls updateNeighborsAt,
+            // which would reach the next trail block in the chain.  That is NOT real redstone —
+            // ignore it so the propagating trail keeps its original particle type.
+            if (block instanceof GunpowderTrailBlock) return;
+            level.setBlock(pos, state.setValue(REDSTONE_IGNITED, true), Block.UPDATE_CLIENTS);
             level.scheduleTick(pos, this, 2);
         }
     }
@@ -215,10 +229,27 @@ public class GunpowderTrailBlock extends Block {
 
     @Override
     protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
-        // Flame + smoke burst visible to all clients
-        level.sendParticles(ParticleTypes.FLAME,
-                pos.getX() + 0.5, pos.getY() + 0.1, pos.getZ() + 0.5,
-                6, 0.25, 0.05, 0.25, 0.04);
+        // Per-block rain check: if this specific block is exposed to open sky during rain,
+        // fizzle it here rather than propagate.  This lets a trail burn underground and
+        // only die when it reaches an unprotected surface segment.
+        if (isRainFizzle(level, pos)) {
+            fizzle(level, pos);
+            return;
+        }
+
+        boolean redstoneIgnited = state.getValue(REDSTONE_IGNITED);
+
+        // Particles: red dust for redstone-ignited, flame for fire-ignited
+        if (redstoneIgnited) {
+            int redColor = ARGB.colorFromFloat(1.0F, 1.0F, 0.2F, 0.0F);
+            level.sendParticles(new DustParticleOptions(redColor, 1.0F),
+                    pos.getX() + 0.5, pos.getY() + 0.1, pos.getZ() + 0.5,
+                    8, 0.3, 0.05, 0.3, 0.0);
+        } else {
+            level.sendParticles(ParticleTypes.FLAME,
+                    pos.getX() + 0.5, pos.getY() + 0.1, pos.getZ() + 0.5,
+                    6, 0.25, 0.05, 0.25, 0.04);
+        }
         level.sendParticles(ParticleTypes.SMOKE,
                 pos.getX() + 0.5, pos.getY() + 0.15, pos.getZ() + 0.5,
                 3, 0.2, 0.04, 0.2, 0.02);
@@ -232,16 +263,19 @@ public class GunpowderTrailBlock extends Block {
 
             BlockPos target;
             if (side == RedstoneSide.UP) {
-                // Trail climbs up: the connected block is on top of the solid block ahead
                 target = pos.relative(dir).above();
             } else {
-                // SIDE: same level, or descending one block
                 target = pos.relative(dir);
                 if (!level.getBlockState(target).is(this)) {
                     target = target.below();
                 }
             }
             if (level.getBlockState(target).is(this)) {
+                // Forward the redstone-ignited flag so the whole chain shows the same particle
+                if (redstoneIgnited) {
+                    BlockState targetState = level.getBlockState(target);
+                    level.setBlock(target, targetState.setValue(REDSTONE_IGNITED, true), Block.UPDATE_CLIENTS);
+                }
                 level.scheduleTick(target, this, 2);
             }
         }
@@ -290,6 +324,30 @@ public class GunpowderTrailBlock extends Block {
         return state.getValue(BURNING) && dir == Direction.UP ? 15 : 0;
     }
 
+    // ─── Rain Fizzle ──────────────────────────────────────────────────────────
+
+    // Returns true if this block is currently rained on and exposed to the open
+    // sky.  Uses the vanilla isRainingAt check, which internally verifies:
+    //   (1) server weather = rain, (2) no opaque blocks above (heightmap), and
+    //   (3) canSeeSky — so cave / sheltered trails are never affected.
+    private static boolean isRainFizzle(Level level, BlockPos pos) {
+        return level.isRainingAt(pos);
+    }
+
+    // Visual + audio feedback for a rain-fizzled trail block: brief spark then
+    // sizzle-out.  Does NOT propagate to neighbours.
+    private static void fizzle(ServerLevel level, BlockPos pos) {
+        level.sendParticles(ParticleTypes.FLAME,
+                pos.getX() + 0.5, pos.getY() + 0.1, pos.getZ() + 0.5,
+                3, 0.15, 0.04, 0.15, 0.02);
+        level.sendParticles(ParticleTypes.SMOKE,
+                pos.getX() + 0.5, pos.getY() + 0.15, pos.getZ() + 0.5,
+                8, 0.2, 0.05, 0.2, 0.02);
+        level.playSound(null, pos, SoundEvents.FIRE_EXTINGUISH,
+                SoundSource.BLOCKS, 0.8F, 1.4F);
+        level.removeBlock(pos, false);
+    }
+
     // ─── Fire-Starter Ignition ────────────────────────────────────────────────
 
     @Override
@@ -297,10 +355,14 @@ public class GunpowderTrailBlock extends Block {
                                           BlockPos pos, Player player, InteractionHand hand,
                                           BlockHitResult hit) {
         if (stack.is(Items.FLINT_AND_STEEL) || stack.is(Items.FIRE_CHARGE)) {
-            if (!level.isClientSide()) {
-                level.playSound(null, pos, SoundEvents.FLINTANDSTEEL_USE,
-                        SoundSource.BLOCKS, 1.0F, 1.0F);
-                level.scheduleTick(pos, this, 2);
+            if (level instanceof ServerLevel sl) {
+                if (isRainFizzle(sl, pos)) {
+                    fizzle(sl, pos);
+                } else {
+                    sl.playSound(null, pos, SoundEvents.FLINTANDSTEEL_USE,
+                            SoundSource.BLOCKS, 1.0F, 1.0F);
+                    sl.scheduleTick(pos, this, 2);
+                }
                 Item item = stack.getItem();
                 if (stack.is(Items.FLINT_AND_STEEL)) {
                     stack.hurtAndBreak(1, player, hand.asEquipmentSlot());
@@ -316,10 +378,14 @@ public class GunpowderTrailBlock extends Block {
 
     @Override
     protected void onProjectileHit(Level level, BlockState state, BlockHitResult hit, Projectile projectile) {
-        if (level instanceof ServerLevel serverLevel) {
+        if (level instanceof ServerLevel sl) {
             BlockPos pos = hit.getBlockPos();
-            if (projectile.isOnFire() && projectile.mayInteract(serverLevel, pos)) {
-                level.scheduleTick(pos, this, 2);
+            if (projectile.isOnFire() && projectile.mayInteract(sl, pos)) {
+                if (isRainFizzle(sl, pos)) {
+                    fizzle(sl, pos);
+                } else {
+                    sl.scheduleTick(pos, this, 2);
+                }
             }
         }
     }
@@ -327,8 +393,12 @@ public class GunpowderTrailBlock extends Block {
     @Override
     protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity,
                                 InsideBlockEffectApplier applier, boolean b) {
-        if (!level.isClientSide() && entity.isOnFire()) {
-            level.scheduleTick(pos, this, 2);
+        if (level instanceof ServerLevel sl && entity.isOnFire()) {
+            if (isRainFizzle(sl, pos)) {
+                fizzle(sl, pos);
+            } else {
+                sl.scheduleTick(pos, this, 2);
+            }
         }
     }
 
@@ -336,6 +406,6 @@ public class GunpowderTrailBlock extends Block {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(NORTH, SOUTH, EAST, WEST, BURNING);
+        builder.add(NORTH, SOUTH, EAST, WEST, BURNING, REDSTONE_IGNITED);
     }
 }

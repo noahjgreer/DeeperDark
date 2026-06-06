@@ -54,7 +54,7 @@ public class SiphonBlock extends Block {
             if (!player.isCreative()) {
                 player.giveExperiencePoints(-XP_COST);
             }
-            level.playSound(null, pos, ModSounds.SIPHON_SUCK, SoundSource.BLOCKS, 1.0F, 1.0F);
+            level.playSound(null, pos, ModSounds.SIPHON_SUCK, SoundSource.BLOCKS, 1.0F, 0.8F + level.getRandom().nextFloat() * 0.4F);
             player.setItemInHand(hand, ItemUtils.createFilledResult(stack, player, new ItemStack(Items.EXPERIENCE_BOTTLE)));
         }
         return InteractionResult.SUCCESS;

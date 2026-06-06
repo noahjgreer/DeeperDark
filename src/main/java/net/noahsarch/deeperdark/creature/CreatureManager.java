@@ -13,6 +13,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -672,6 +673,9 @@ public class CreatureManager {
         creature.setCurrentSequence(CreatureInstance.Sequence.CHASING);
         creature.setChaseTicks(0);
 
+        // Capture nearby mobs so they will flee from the player during the chase
+        startMobFlee(creature, player, world, debug);
+
         // Register chase for pitch influence tracking
         playerChaseMap.put(player.getUUID(), creature.getCreatureId());
 
@@ -690,6 +694,9 @@ public class CreatureManager {
             endChase(creature, null, server, config, debug, false);
             return;
         }
+
+        // Keep nearby mobs fleeing from the player
+        tickMobFlee(creature, player);
 
         // Check evasion timer (30 seconds = 600 ticks by default)
         if (creature.getChaseTicks() >= config.evasionTimer) {
@@ -802,6 +809,68 @@ public class CreatureManager {
         teleportToWorldSpawn(player, server);
     }
 
+    // ===== Mob Flee (chase side-effect) =====
+
+    private static final double MOB_FLEE_RADIUS = 30.0;
+    private static final double MOB_FLEE_SPEED  = 1.25;
+    /** How far ahead (in blocks) each mob is told to pathfind away from the player each tick. */
+    private static final double MOB_FLEE_PATH_DIST = 16.0;
+
+    /** Capture all non-player, non-creature mobs within range of the player at chase start. */
+    private static void startMobFlee(CreatureInstance creature, ServerPlayer player,
+                                     ServerLevel world, boolean debug) {
+        AABB box = AABB.ofSize(player.position(), MOB_FLEE_RADIUS * 2, MOB_FLEE_RADIUS * 2, MOB_FLEE_RADIUS * 2);
+        List<Mob> nearby = world.getEntitiesOfClass(Mob.class, box,
+            mob -> mob.getType() != ModEntities.CREATURE && mob.distanceTo(player) <= MOB_FLEE_RADIUS);
+
+        Set<UUID> uuids = creature.getFleeingMobUuids();
+        uuids.clear();
+        for (Mob mob : nearby) uuids.add(mob.getUUID());
+
+        if (debug) LOGGER.info("[Creature] Chase started — {} mob(s) will flee from {}",
+                uuids.size(), player.getName().getString());
+    }
+
+    /** Each chase tick: stop tracked mobs from attacking and push them away from the player. */
+    private static void tickMobFlee(CreatureInstance creature, ServerPlayer player) {
+        Set<UUID> uuids = creature.getFleeingMobUuids();
+        if (uuids.isEmpty()) return;
+
+        ServerLevel world = creature.getWorld();
+        Vec3 playerPos = player.position();
+        Set<UUID> dead = new HashSet<>();
+
+        for (UUID uuid : uuids) {
+            Entity entity = world.getEntity(uuid);
+            if (!(entity instanceof Mob mob) || !mob.isAlive()) {
+                dead.add(uuid);
+                continue;
+            }
+
+            // Stop any current or pending attack
+            mob.setTarget(null);
+
+            // Pathfind away: pick a point MOB_FLEE_PATH_DIST blocks behind the mob relative to the player
+            Vec3 mobPos = mob.position();
+            Vec3 awayDir = mobPos.subtract(playerPos);
+            if (awayDir.lengthSqr() < 0.001) {
+                // Mob coincides with player — pick a random horizontal direction
+                double angle = world.getRandom().nextDouble() * 2 * Math.PI;
+                awayDir = new Vec3(Math.cos(angle), 0, Math.sin(angle));
+            }
+            awayDir = awayDir.normalize();
+            Vec3 fleeTarget = mobPos.add(awayDir.scale(MOB_FLEE_PATH_DIST));
+            mob.getNavigation().moveTo(fleeTarget.x, fleeTarget.y, fleeTarget.z, MOB_FLEE_SPEED);
+        }
+
+        uuids.removeAll(dead);
+    }
+
+    /** Chase ended — clear the flee list so mobs naturally resume normal AI. */
+    private static void stopMobFlee(CreatureInstance creature) {
+        creature.getFleeingMobUuids().clear();
+    }
+
     private static void endChase(CreatureInstance creature, ServerPlayer player,
                                   MinecraftServer server, CreatureConfig config, boolean debug, boolean escaped) {
         if (debug) LOGGER.info("[Creature] Chase ended for creature {} (escaped: {})",
@@ -831,6 +900,9 @@ public class CreatureManager {
             playerChaseMap.remove(creature.getTargetPlayerUuid());
             soundSuppressedPlayers.remove(creature.getTargetPlayerUuid());
         }
+
+        // Release mob flee state so mobs resume normal AI
+        stopMobFlee(creature);
 
         // Remove creature from world
         Vec3 lastPos = creature.getPosition();

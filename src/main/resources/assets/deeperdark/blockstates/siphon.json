@@ -1,19 +1,8 @@
 {
   "variants": {
-    "facing=east": {
-      "model": "deeperdark:block/siphon",
-      "y": 90
-    },
-    "facing=north": {
-      "model": "deeperdark:block/siphon"
-    },
-    "facing=south": {
-      "model": "deeperdark:block/siphon",
-      "y": 180
-    },
-    "facing=west": {
-      "model": "deeperdark:block/siphon",
-      "y": 270
-    }
+    "facing=east":  { "model": "deeperdark:block/siphon", "x": 90, "y": 90 },
+    "facing=north": { "model": "deeperdark:block/siphon", "x": 90 },
+    "facing=south": { "model": "deeperdark:block/siphon", "x": 90, "y": 180 },
+    "facing=west":  { "model": "deeperdark:block/siphon", "x": 90, "y": 270 }
   }
 }

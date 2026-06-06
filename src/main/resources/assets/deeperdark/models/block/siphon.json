@@ -1,8 +1,7 @@
 {
-    "parent": "minecraft:block/orientable",
+    "parent": "minecraft:block/cube_column",
     "textures": {
-        "top": "deeperdark:block/siphon_side",
-        "front": "deeperdark:block/siphon_front",
+        "end": "deeperdark:block/siphon_front",
         "side": "deeperdark:block/siphon_side"
     }
 }
