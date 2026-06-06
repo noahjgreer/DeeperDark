@@ -370,6 +370,7 @@ public class CollarBenchMenu extends AbstractContainerMenu {
     private void updateModelFlags(ItemStack result, NonNullList<ItemStack> trinkets) {
         boolean hasSponge = false, hasGold = false, hasBell = false;
         boolean hasMagnet = false, hasBlazeRod = false, hasGlowBerries = false;
+        boolean hasCraftingTable = false, hasRedstone = false;
         for (ItemStack s : trinkets) {
             if (s.isEmpty()) continue;
             if (s.is(Items.SPONGE) || s.is(Items.WET_SPONGE)) hasSponge = true;
@@ -378,8 +379,11 @@ public class CollarBenchMenu extends AbstractContainerMenu {
             if (s.getItem() instanceof ItemMagnetItem) hasMagnet = true;
             if (s.is(Items.BLAZE_ROD)) hasBlazeRod = true;
             if (s.is(Items.GLOW_BERRIES)) hasGlowBerries = true;
+            if (s.is(Items.CRAFTING_TABLE)) hasCraftingTable = true;
+            if (s.is(Items.REDSTONE_BLOCK) || s.is(Items.REDSTONE_TORCH)) hasRedstone = true;
         }
-        List<Boolean> flags = List.of(hasSponge, hasGold, hasBell, hasMagnet, hasBlazeRod, hasGlowBerries);
+        // Flag indices: 0=sponge, 1=gold, 2=bell, 3=magnet, 4=blaze_rod, 5=glow_berries, 6=crafting_table, 7=redstone
+        List<Boolean> flags = List.of(hasSponge, hasGold, hasBell, hasMagnet, hasBlazeRod, hasGlowBerries, hasCraftingTable, hasRedstone);
         CustomModelData existing = result.getOrDefault(DataComponents.CUSTOM_MODEL_DATA, CustomModelData.EMPTY);
         result.set(DataComponents.CUSTOM_MODEL_DATA,
             new CustomModelData(existing.floats(), flags, existing.strings(), existing.colors()));

@@ -26,6 +26,13 @@
       {
         "type": "minecraft:condition",
         "property": "minecraft:custom_model_data",
+        "index": 7,
+        "on_true": { "type": "minecraft:model", "model": "deeperdark:item/collar_trinket_redstone" },
+        "on_false": { "type": "minecraft:empty" }
+      },
+      {
+        "type": "minecraft:condition",
+        "property": "minecraft:custom_model_data",
         "index": 1,
         "on_true": { "type": "minecraft:model", "model": "deeperdark:item/collar_trinket_gold" },
         "on_false": { "type": "minecraft:empty" }
@@ -42,6 +49,13 @@
         "property": "minecraft:custom_model_data",
         "index": 3,
         "on_true": { "type": "minecraft:model", "model": "deeperdark:item/collar_trinket_magnet" },
+        "on_false": { "type": "minecraft:empty" }
+      },
+      {
+        "type": "minecraft:condition",
+        "property": "minecraft:custom_model_data",
+        "index": 6,
+        "on_true": { "type": "minecraft:model", "model": "deeperdark:item/collar_trinket_crafting_table" },
         "on_false": { "type": "minecraft:empty" }
       },
       {
