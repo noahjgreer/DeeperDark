@@ -96,11 +96,12 @@
     "SlotPositionAccessor",
     "SlotMutableMixin",
     "PodzolBlockMixin",
-    "PickBlockContainerMixin",
     "ShulkerBoxItemInsertMixin",
-    "ContainerItemUseInHandMixin"
+    "ContainerItemUseInHandMixin",
+    "PickBlockContainerServerMixin"
   ],
   "client": [
+    "PickBlockContainerMixin",
     "AbstractRecipeBookScreenMixin",
     "ContainerScreenOpenMixin",
     "CraftingRecipeBookMixin",

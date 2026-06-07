@@ -30,9 +30,18 @@ import net.noahsarch.deeperdark.duck.CraftingPanelHolder;
 import net.noahsarch.deeperdark.payload.AllIngredientsConsumableSyncPacket;
 import net.noahsarch.deeperdark.payload.OpenContainerItemPayload;
 import net.noahsarch.deeperdark.payload.OpenNestedContainerPayload;
+import net.noahsarch.deeperdark.payload.PickFromContainerPayload;
 import net.noahsarch.deeperdark.payload.SyncCraftingPanelPayload;
 import net.noahsarch.deeperdark.payload.PlayerLeashPacket;
 import net.noahsarch.deeperdark.payload.VoidFogSyncPacket;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.protocol.game.ClientboundSetHeldSlotPacket;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStackTemplate;
+import net.minecraft.world.item.component.BundleContents;
+import net.minecraft.world.item.component.ItemContainerContents;
+import net.minecraft.world.level.block.state.BlockState;
 import net.noahsarch.deeperdark.item.ModItems;
 import net.noahsarch.deeperdark.portal.SlipPortalHandler;
 import net.noahsarch.deeperdark.potion.CustomBrewingRecipeHandler;
@@ -112,6 +121,43 @@ public class Deeperdark implements ModInitializer {
 				ServerPlayer player = context.player();
 				if (player.inventoryMenu instanceof CraftingPanelHolder holder) {
 					holder.deeperdark$setPanelOpen(payload.open());
+				}
+			})
+		);
+
+		// Pick-block from containers: client → server
+		PayloadTypeRegistry.serverboundPlay().register(PickFromContainerPayload.ID, PickFromContainerPayload.CODEC);
+		ServerPlayNetworking.registerGlobalReceiver(PickFromContainerPayload.ID, (payload, context) ->
+			context.server().execute(() -> {
+				ServerPlayer player = context.player();
+				ServerLevel level = (ServerLevel) player.level();
+				BlockPos pos = payload.blockPos();
+				LOGGER.info("[DD-pick] server received pos={} player={}", pos, player.getName().getString());
+				if (!player.isWithinBlockInteractionRange(pos, 1.0)) { LOGGER.info("[DD-pick] fail: range"); return; }
+				if (!level.isLoaded(pos)) { LOGGER.info("[DD-pick] fail: not loaded"); return; }
+				BlockState state = level.getBlockState(pos);
+				ItemStack target = state.getCloneItemStack(level, pos, false);
+				LOGGER.info("[DD-pick] target={} empty={}", target, target.isEmpty());
+				if (target.isEmpty()) return;
+				if (!target.isItemEnabled(level.enabledFeatures())) { LOGGER.info("[DD-pick] fail: not enabled"); return; }
+				if (player.hasInfiniteMaterials()) { LOGGER.info("[DD-pick] fail: creative"); return; }
+				Inventory inventory = player.getInventory();
+				int directSlot = inventory.findSlotMatchingItem(target);
+				LOGGER.info("[DD-pick] direct slot={}", directSlot);
+				if (directSlot != -1) return;
+				boolean extracted = searchAndExtractForPickBlock(inventory, target);
+				LOGGER.info("[DD-pick] extracted={}", extracted);
+				if (extracted) {
+					int slot = inventory.findSlotMatchingItem(target);
+					if (slot != -1) {
+						if (Inventory.isHotbarSlot(slot)) {
+							inventory.setSelectedSlot(slot);
+						} else {
+							inventory.pickSlot(slot);
+						}
+						player.connection.send(new ClientboundSetHeldSlotPacket(inventory.getSelectedSlot()));
+						player.inventoryMenu.broadcastChanges();
+					}
 				}
 			})
 		);
@@ -405,6 +451,110 @@ public class Deeperdark implements ModInitializer {
 			net.minecraft.world.item.component.CustomData.update(DataComponents.CUSTOM_DATA, s,
 					tag -> tag.putBoolean(ItemBackedContainer.FROM_SCREEN_MARKER_KEY, true));
 		}
+	}
+
+	/** Scans all 36 main inventory slots for container/bundle items, finds the smallest
+	 *  matching stack, extracts as many items as will fit, and adds them to the inventory.
+	 *  Returns true if anything was extracted. */
+	public static boolean searchAndExtractForPickBlock(Inventory inventory, ItemStack target) {
+		int bestContainerSlot = -1;
+		int bestBundleSlot = -1;
+		int bestCount = Integer.MAX_VALUE;
+
+		for (int i = 0; i < 36; i++) {
+			ItemStack carrier = inventory.getItem(i);
+			if (carrier.isEmpty()) continue;
+
+			ItemContainerContents contents = carrier.get(DataComponents.CONTAINER);
+			if (contents != null) {
+				LOGGER.info("[DD-pick-srv] slot {} has CONTAINER carrier={}", i, carrier);
+				for (ItemStack stored : contents.allItemsCopyStream().toList()) {
+					LOGGER.info("[DD-pick-srv]   stored={} sameItem={}", stored, ItemStack.isSameItem(stored, target));
+					if (!stored.isEmpty() && ItemStack.isSameItem(stored, target)
+							&& stored.getCount() < bestCount) {
+						bestCount = stored.getCount();
+						bestContainerSlot = i;
+						bestBundleSlot = -1;
+					}
+				}
+			}
+
+			BundleContents bundle = carrier.get(DataComponents.BUNDLE_CONTENTS);
+			if (bundle != null) {
+				for (ItemStackTemplate tmpl : bundle.items()) {
+					ItemStack stored = tmpl.create();
+					if (!stored.isEmpty() && ItemStack.isSameItem(stored, target)
+							&& tmpl.count() < bestCount) {
+						bestCount = tmpl.count();
+						bestBundleSlot = i;
+						bestContainerSlot = -1;
+					}
+				}
+			}
+		}
+
+		int available = deeperdark$spaceForItem(inventory, target);
+		if (available <= 0) return false;
+
+		if (bestContainerSlot >= 0) {
+			ItemStack carrier = inventory.getItem(bestContainerSlot);
+			ItemContainerContents contents = carrier.get(DataComponents.CONTAINER);
+			if (contents == null) return false;
+			java.util.List<ItemStack> items = contents.allItemsCopyStream()
+					.collect(java.util.stream.Collectors.toCollection(java.util.ArrayList::new));
+			for (int j = 0; j < items.size(); j++) {
+				ItemStack stored = items.get(j);
+				if (!stored.isEmpty() && ItemStack.isSameItem(stored, target)) {
+					int extract = Math.min(stored.getCount(), available);
+					ItemStack extracted = stored.copyWithCount(extract);
+					stored.shrink(extract);
+					if (stored.isEmpty()) items.set(j, ItemStack.EMPTY);
+					carrier.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(items));
+					inventory.add(extracted);
+					return true;
+				}
+			}
+		}
+
+		if (bestBundleSlot >= 0) {
+			ItemStack carrier = inventory.getItem(bestBundleSlot);
+			BundleContents bundle = carrier.get(DataComponents.BUNDLE_CONTENTS);
+			if (bundle == null) return false;
+			java.util.List<ItemStackTemplate> templates = new java.util.ArrayList<>(bundle.items());
+			for (int j = 0; j < templates.size(); j++) {
+				ItemStackTemplate tmpl = templates.get(j);
+				ItemStack stored = tmpl.create();
+				if (!stored.isEmpty() && ItemStack.isSameItem(stored, target)) {
+					int extract = Math.min(tmpl.count(), available);
+					ItemStack extracted = stored.copyWithCount(extract);
+					int remaining = tmpl.count() - extract;
+					if (remaining <= 0) {
+						templates.remove(j);
+					} else {
+						templates.set(j, tmpl.withCount(remaining));
+					}
+					carrier.set(DataComponents.BUNDLE_CONTENTS, new BundleContents(java.util.List.copyOf(templates)));
+					inventory.add(extracted);
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/** Returns total space available in the player's 36 main inventory slots for the given item type. */
+	private static int deeperdark$spaceForItem(Inventory inventory, ItemStack target) {
+		int space = 0;
+		for (int i = 0; i < 36; i++) {
+			ItemStack slot = inventory.getItem(i);
+			if (slot.isEmpty()) {
+				space += target.getMaxStackSize();
+			} else if (ItemStack.isSameItem(slot, target)) {
+				space += target.getMaxStackSize() - slot.getCount();
+			}
+		}
+		return space;
 	}
 
 	private static void playSound(ServerPlayer player, ItemStack stack, boolean open) {
