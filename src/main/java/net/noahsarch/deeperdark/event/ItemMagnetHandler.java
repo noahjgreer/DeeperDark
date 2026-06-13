@@ -156,9 +156,15 @@ public class ItemMagnetHandler {
 
         for (ItemEntity item : level.getEntitiesOfClass(ItemEntity.class, searchBox)) {
             if (excludeEntityId != null && item.getUUID().equals(excludeEntityId)) continue;
-            // Skip items deliberately dropped by the magnet holder — lets them give items to others.
-            // The flag persists (unlike vanilla's thrower field which clears after 40 ticks) until pickup.
-            if (magnetHolderUUID != null && magnetHolderUUID.equals(playerDroppedItems.get(item.getUUID()))) continue;
+            if (magnetHolderUUID != null) {
+                // Seed the persistent map from vanilla thrower data while it's available.
+                // This catches the item on the very first tick after it's dropped.
+                Entity owner = item.getOwner();
+                if (owner != null && magnetHolderUUID.equals(owner.getUUID())) {
+                    playerDroppedItems.putIfAbsent(item.getUUID(), magnetHolderUUID);
+                }
+                if (magnetHolderUUID.equals(playerDroppedItems.get(item.getUUID()))) continue;
+            }
 
             Vec3 diff = center.subtract(item.position());
             double dist = diff.length();

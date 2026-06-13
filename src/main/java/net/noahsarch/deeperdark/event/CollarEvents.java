@@ -359,6 +359,10 @@ public class CollarEvents {
 
         UUID playerUUID = player.getUUID();
         for (net.minecraft.world.entity.item.ItemEntity item : level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, searchBox)) {
+            net.minecraft.world.entity.Entity owner = item.getOwner();
+            if (owner != null && playerUUID.equals(owner.getUUID())) {
+                ItemMagnetHandler.markDroppedByPlayer(item.getUUID(), playerUUID);
+            }
             if (ItemMagnetHandler.isDroppedByPlayer(item.getUUID(), playerUUID)) continue;
             Vec3 diff = center.subtract(item.position());
             double dist = diff.length();
