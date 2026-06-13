@@ -102,6 +102,7 @@
     "ContainerCloseIdCheckMixin"
   ],
   "client": [
+    "AbstractContainerScreenAccessor",
     "PickBlockContainerMixin",
     "AbstractRecipeBookScreenMixin",
     "ContainerScreenOpenMixin",

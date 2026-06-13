@@ -20,6 +20,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Environment(EnvType.CLIENT)
 @Mixin(InventoryScreen.class)
@@ -102,6 +103,36 @@ public abstract class InventoryScreenMixin extends AbstractContainerScreen<Inven
         int yo = this.topPos;
         graphics.blit(RenderPipelines.GUI_TEXTURED, CRAFTING_TRINKET_PANEL,
             xo, yo, 0.0F, 0.0F, PANEL_W, PANEL_H, 256, 256);
+    }
+
+    // ── Status effects shift ──────────────────────────────────────────────────
+    // When the crafting panel is open it sits PANEL_W px to the right of imageWidth.
+    // EffectsInInventory positions status effects at (leftPos + imageWidth + 2), so we
+    // temporarily widen imageWidth by PANEL_W before those calls run and restore it after.
+
+    @Unique
+    private boolean deeperdark$panelOpen() {
+        return (this.menu instanceof CraftingPanelHolder h) && h.deeperdark$isPanelOpen();
+    }
+
+    @Inject(method = "extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIF)V", at = @At("HEAD"))
+    private void deeperdark$bumpWidthBeforeEffects(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a, CallbackInfo ci) {
+        if (deeperdark$panelOpen()) ((AbstractContainerScreenAccessor)(Object)this).deeperdark$setImageWidth(this.imageWidth + PANEL_W);
+    }
+
+    @Inject(method = "extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIF)V", at = @At("RETURN"))
+    private void deeperdark$restoreWidthAfterEffects(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a, CallbackInfo ci) {
+        if (deeperdark$panelOpen()) ((AbstractContainerScreenAccessor)(Object)this).deeperdark$setImageWidth(this.imageWidth - PANEL_W);
+    }
+
+    @Inject(method = "showsActiveEffects()Z", at = @At("HEAD"))
+    private void deeperdark$bumpWidthForEffectCheck(CallbackInfoReturnable<Boolean> cir) {
+        if (deeperdark$panelOpen()) ((AbstractContainerScreenAccessor)(Object)this).deeperdark$setImageWidth(this.imageWidth + PANEL_W);
+    }
+
+    @Inject(method = "showsActiveEffects()Z", at = @At("RETURN"))
+    private void deeperdark$restoreWidthAfterEffectCheck(CallbackInfoReturnable<Boolean> cir) {
+        if (deeperdark$panelOpen()) ((AbstractContainerScreenAccessor)(Object)this).deeperdark$setImageWidth(this.imageWidth - PANEL_W);
     }
 
 }
