@@ -34,7 +34,7 @@ public class ShulkerBoxItemInsertMixin {
         boolean isEnderChest = self.is(Items.ENDER_CHEST);
         if (!isShulker && !isEnderChest) return;
 
-        if (clickAction != ClickAction.PRIMARY || other.isEmpty()) return;
+        if (clickAction != ClickAction.SECONDARY || other.isEmpty()) return;
 
         // Block insertion when this item is currently open from inventory (UUID marker present).
         CustomData selfData = self.get(DataComponents.CUSTOM_DATA);

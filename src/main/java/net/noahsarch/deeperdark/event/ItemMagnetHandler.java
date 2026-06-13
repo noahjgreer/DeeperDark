@@ -17,6 +17,7 @@ import net.noahsarch.deeperdark.item.ItemMagnetItem;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ItemMagnetHandler {
 
@@ -26,6 +27,21 @@ public class ItemMagnetHandler {
     // call (RMB still held), so it only counts down after the player releases RMB.
     // Must be > 4 (the client's right-click repeat rate) so holding never drains it to 0.
     private static final int POST_EAT_HOLD_TICKS = 8;
+
+    // Maps item entity UUID → player UUID who dropped it. Persists until pickup.
+    private static final Map<UUID, UUID> playerDroppedItems = new ConcurrentHashMap<>();
+
+    public static void markDroppedByPlayer(UUID itemEntityUUID, UUID playerUUID) {
+        playerDroppedItems.put(itemEntityUUID, playerUUID);
+    }
+
+    public static void clearDroppedItem(UUID itemEntityUUID) {
+        playerDroppedItems.remove(itemEntityUUID);
+    }
+
+    public static boolean isDroppedByPlayer(UUID itemEntityUUID, UUID playerUUID) {
+        return playerUUID.equals(playerDroppedItems.get(itemEntityUUID));
+    }
 
     private static final Map<UUID, Integer> activationTicks = new HashMap<>();
     private static final Map<UUID, InteractionHand> activationHand = new HashMap<>();
@@ -140,11 +156,9 @@ public class ItemMagnetHandler {
 
         for (ItemEntity item : level.getEntitiesOfClass(ItemEntity.class, searchBox)) {
             if (excludeEntityId != null && item.getUUID().equals(excludeEntityId)) continue;
-            // When not actively activating, don't pull items thrown by the holder (lets them give items to others)
-            if (!activating && magnetHolderUUID != null) {
-                Entity owner = item.getOwner();
-                if (owner != null && magnetHolderUUID.equals(owner.getUUID())) continue;
-            }
+            // Skip items deliberately dropped by the magnet holder — lets them give items to others.
+            // The flag persists (unlike vanilla's thrower field which clears after 40 ticks) until pickup.
+            if (magnetHolderUUID != null && magnetHolderUUID.equals(playerDroppedItems.get(item.getUUID()))) continue;
 
             Vec3 diff = center.subtract(item.position());
             double dist = diff.length();

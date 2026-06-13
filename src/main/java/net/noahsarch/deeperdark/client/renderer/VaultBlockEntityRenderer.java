@@ -3,6 +3,7 @@ package net.noahsarch.deeperdark.client.renderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.blockentity.AbstractEndPortalRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
@@ -10,6 +11,7 @@ import net.minecraft.client.renderer.entity.ItemEntityRenderer;
 import net.minecraft.client.renderer.entity.state.ItemClusterRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.item.ItemModelResolver;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -62,6 +64,17 @@ public class VaultBlockEntityRenderer implements BlockEntityRenderer<VaultBlockE
     @Override
     public void submit(VaultBERState state, PoseStack poseStack, SubmitNodeCollector nodes,
                        CameraRenderState camera) {
+        // Flip X winding so inner faces are front-facing: the far inner wall shows through the
+        // transparent-centre holes, giving a "looking into portal space" appearance rather than
+        // the effect appearing to be painted on the outer surface. The -0.98 X scale also insets
+        // the geometry by 1% to avoid z-fighting with the block texture.
+        poseStack.pushPose();
+        poseStack.translate(0.5, 0.5, 0.5);
+        poseStack.scale(-0.98f, 0.98f, 0.98f);
+        poseStack.translate(-0.5, -0.5, -0.5);
+        AbstractEndPortalRenderer.submitSpecial(RenderTypes.endGateway(), poseStack, nodes);
+        poseStack.popPose();
+
         if (state.displayItem == null) return;
 
         poseStack.pushPose();

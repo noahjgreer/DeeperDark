@@ -1,6 +1,18 @@
 {
-    "model": {
+  "model": {
+    "type": "minecraft:composite",
+    "models": [
+      {
         "type": "minecraft:model",
         "model": "deeperdark:block/large_item_vault"
-    }
+      },
+      {
+        "type": "minecraft:special",
+        "base": "deeperdark:block/large_item_vault",
+        "model": {
+          "type": "deeperdark:vault"
+        }
+      }
+    ]
+  }
 }

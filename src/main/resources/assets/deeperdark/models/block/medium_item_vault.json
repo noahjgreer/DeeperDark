@@ -3,10 +3,10 @@
   "textures": {
     "down": "deeperdark:block/medium_item_vault_bottom",
     "up": "deeperdark:block/medium_item_vault_top",
-    "north": "deeperdark:block/medium_item_vault_side",
-    "south": "deeperdark:block/medium_item_vault_side",
-    "east": "deeperdark:block/medium_item_vault_side",
-    "west": "deeperdark:block/medium_item_vault_side",
+    "north": { "sprite": "deeperdark:block/medium_item_vault_side", "force_translucent": true },
+    "south": { "sprite": "deeperdark:block/medium_item_vault_side", "force_translucent": true },
+    "east":  { "sprite": "deeperdark:block/medium_item_vault_side", "force_translucent": true },
+    "west":  { "sprite": "deeperdark:block/medium_item_vault_side", "force_translucent": true },
     "particle": "deeperdark:block/medium_item_vault_side"
   }
 }

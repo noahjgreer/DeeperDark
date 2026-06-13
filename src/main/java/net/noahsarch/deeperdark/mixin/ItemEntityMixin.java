@@ -3,6 +3,7 @@ package net.noahsarch.deeperdark.mixin;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.server.level.ServerLevel;
@@ -11,6 +12,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.Explosion;
 import net.noahsarch.deeperdark.DeeperDarkConfig;
 import net.noahsarch.deeperdark.duck.EntityAccessor;
+import net.noahsarch.deeperdark.event.ItemMagnetHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -73,5 +75,10 @@ public abstract class ItemEntityMixin extends Entity {
     @Inject(method = "ignoreExplosion", at = @At("HEAD"), cancellable = true)
     private void deeperdark$allowExplosionKnockback(Explosion explosion, CallbackInfoReturnable<Boolean> cir) {
         cir.setReturnValue(false);
+    }
+
+    @Inject(method = "playerTouch", at = @At("HEAD"))
+    private void deeperdark$clearDroppedFlag(Player player, CallbackInfo ci) {
+        ItemMagnetHandler.clearDroppedItem(((Entity)(Object)this).getUUID());
     }
 }

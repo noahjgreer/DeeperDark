@@ -54,7 +54,7 @@ public class ModBlocks {
         ResourceKey<Block> blockKey = keyOfBlock(name);
         Block block = new BoxBlock(settings.setId(blockKey));
         ResourceKey<Item> itemKey = keyOfItem(name);
-        BoxItem boxItem = new BoxItem(block, new Item.Properties().setId(itemKey).useBlockDescriptionPrefix());
+        BoxItem boxItem = new BoxItem(block, new Item.Properties().setId(itemKey).useBlockDescriptionPrefix().stacksTo(1));
         Registry.register(BuiltInRegistries.ITEM, itemKey, boxItem);
         return Registry.register(BuiltInRegistries.BLOCK, blockKey, block);
     }
@@ -270,18 +270,21 @@ public class ModBlocks {
             BlockBehaviour.Properties.of()
                     .strength(150F, 1200F)
                     .sound(VaultBlock.VAULT_SOUND_TYPE)
+                    .lightLevel(state -> 15)
                     .noOcclusion());
     public static final Block MEDIUM_ITEM_VAULT = registerVaultBlock(
             "medium_item_vault",
             BlockBehaviour.Properties.of()
                     .strength(150F, 1200F)
                     .sound(VaultBlock.VAULT_SOUND_TYPE)
+                    .lightLevel(state -> 15)
                     .noOcclusion());
     public static final Block LARGE_ITEM_VAULT = registerVaultBlock(
             "large_item_vault",
             BlockBehaviour.Properties.of()
                     .strength(150F, 1200F)
                     .sound(VaultBlock.VAULT_SOUND_TYPE)
+                    .lightLevel(state -> 15)
                     .noOcclusion());
 
     public static final Block COLLAR_BENCH = register(

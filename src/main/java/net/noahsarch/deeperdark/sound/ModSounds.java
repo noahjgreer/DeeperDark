@@ -30,6 +30,7 @@ public class ModSounds {
     public static final SoundEvent COLLAR_BENCH_USE = register("block.collarbench.use");
     public static final SoundEvent DYNAMITE_EXPLODE = register("block.dynamite.explode");
     public static final SoundEvent SIPHON_SUCK = register("block.siphon.suck");
+    public static final SoundEvent ITEM_VAULT_LOOP = register("block.item_vault.loop");
 
     private static SoundEvent register(String name) {
         Identifier id = Identifier.fromNamespaceAndPath(Deeperdark.MOD_ID, name);

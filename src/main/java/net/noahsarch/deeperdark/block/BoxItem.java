@@ -17,11 +17,6 @@ public class BoxItem extends BlockItem {
         super(block, properties);
     }
 
-    @Override
-    public boolean canFitInsideContainerItems() {
-        return false;
-    }
-
     /**
      * Left-click with cursor item on a box in any inventory slot → insert as many as fit.
      * Mirrors bundle insertion behaviour so the "+" indicator interaction feels native.
@@ -30,7 +25,7 @@ public class BoxItem extends BlockItem {
     public boolean overrideOtherStackedOnMe(
             ItemStack self, ItemStack other, Slot slot,
             ClickAction clickAction, Player player, SlotAccess carriedAccess) {
-        if (clickAction != ClickAction.PRIMARY || other.isEmpty()) return false;
+        if (clickAction != ClickAction.SECONDARY || other.isEmpty()) return false;
         // Block nesting containers inside containers.
         if (ContainerItemUtil.getContainerSize(other) >= 0) return false;
         // Block insertion when this exact container item is currently open from inventory.

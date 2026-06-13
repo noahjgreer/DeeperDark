@@ -30,6 +30,8 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.noahsarch.deeperdark.menu.ModMenus;
 import net.noahsarch.deeperdark.menu.VaultMenu;
+import net.minecraft.world.level.Level;
+import net.noahsarch.deeperdark.sound.ModSounds;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,10 +48,20 @@ public class VaultBlockEntity extends BlockEntity implements MenuProvider, Conta
         }
     }
 
-    private static final Codec<VaultEntry> ENTRY_CODEC = RecordCodecBuilder.create(inst -> inst.group(
+    public static final Codec<VaultEntry> ENTRY_CODEC = RecordCodecBuilder.create(inst -> inst.group(
         ItemStack.CODEC.fieldOf("item").forGetter(e -> e.representative),
         Codec.INT.fieldOf("count").forGetter(e -> e.count)
     ).apply(inst, VaultEntry::new));
+
+    public static final net.minecraft.network.codec.StreamCodec<net.minecraft.network.RegistryFriendlyByteBuf, VaultEntry> ENTRY_STREAM_CODEC =
+        net.minecraft.network.codec.StreamCodec.composite(
+            ItemStack.STREAM_CODEC, e -> e.representative,
+            net.minecraft.network.codec.ByteBufCodecs.VAR_INT, e -> e.count,
+            VaultEntry::new
+        );
+
+    public static final net.minecraft.network.codec.StreamCodec<net.minecraft.network.RegistryFriendlyByteBuf, java.util.List<VaultEntry>> ENTRIES_STREAM_CODEC =
+        ENTRY_STREAM_CODEC.apply(net.minecraft.network.codec.ByteBufCodecs.list());
 
     private final VaultTier tier;
     private final List<VaultEntry> entries = new ArrayList<>();
@@ -148,29 +160,48 @@ public class VaultBlockEntity extends BlockEntity implements MenuProvider, Conta
     @Override
     protected void collectImplicitComponents(DataComponentMap.Builder builder) {
         super.collectImplicitComponents(builder);
-        List<ItemStack> stacks = new ArrayList<>();
+        if (entries.isEmpty()) return;
+
+        // Full data: store all entries in our custom component (no size limit).
+        builder.set(net.noahsarch.deeperdark.component.ModComponents.VAULT_ENTRIES, new ArrayList<>(entries));
+
+        // Capped preview for tooltip mods (ItemContainerContents hard-limits at 256 slots).
+        List<ItemStack> preview = new ArrayList<>();
+        outer:
         for (VaultEntry entry : entries) {
-            // Split into maxStackSize batches so ItemStack.validateStrict passes
             int batchSize = entry.representative.getMaxStackSize();
             int remaining = entry.count;
             while (remaining > 0) {
+                if (preview.size() >= 256) break outer;
                 int batch = Math.min(remaining, batchSize);
-                stacks.add(entry.representative.copyWithCount(batch));
+                preview.add(entry.representative.copyWithCount(batch));
                 remaining -= batch;
             }
         }
-        if (!stacks.isEmpty()) {
-            builder.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(stacks));
+        if (!preview.isEmpty()) {
+            builder.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(preview));
         }
     }
 
     @Override
     protected void applyImplicitComponents(DataComponentGetter getter) {
         super.applyImplicitComponents(getter);
+        entries.clear();
+
+        // Prefer the lossless custom component; fall back to the capped CONTAINER preview
+        // for vault items created before this component was introduced.
+        List<VaultEntry> stored = getter.get(net.noahsarch.deeperdark.component.ModComponents.VAULT_ENTRIES);
+        if (stored != null) {
+            int max = tier.maxTypes;
+            for (int i = 0; i < stored.size() && i < max; i++) {
+                entries.add(stored.get(i));
+            }
+            return;
+        }
+
+        // Legacy fallback: reconstruct from CONTAINER preview (may be lossy for large vaults).
         ItemContainerContents contents = getter.get(DataComponents.CONTAINER);
         if (contents == null) return;
-        entries.clear();
-        // Merge consecutive same-item stacks back into single entries
         for (net.minecraft.world.item.ItemStackTemplate template : contents.nonEmptyItems()) {
             ItemStack stack = template.create();
             if (stack.isEmpty()) continue;
@@ -276,6 +307,12 @@ public class VaultBlockEntity extends BlockEntity implements MenuProvider, Conta
     @Override public void clearContent() { entries.clear(); setChanged(); }
 
     // ---- End Container ----
+
+    public static void tick(Level level, BlockPos pos, BlockState state, VaultBlockEntity entity) {
+        if (level.getGameTime() % 16L == 0L) {
+            level.playSound(null, pos, ModSounds.ITEM_VAULT_LOOP, SoundSource.BLOCKS, 1.0F, 1.0F);
+        }
+    }
 
     enum VaultTier {
         SMALL(1, "container.deeperdark.small_item_vault"),

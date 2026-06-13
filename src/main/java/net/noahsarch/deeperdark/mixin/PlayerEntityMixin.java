@@ -10,6 +10,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Leashable;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.ItemContainerContents;
@@ -22,12 +23,14 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.noahsarch.deeperdark.duck.CollarHolder;
 import net.noahsarch.deeperdark.duck.EntityAccessor;
+import net.noahsarch.deeperdark.event.ItemMagnetHandler;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Player.class)
 public abstract class PlayerEntityMixin extends LivingEntity implements Leashable {
@@ -138,6 +141,14 @@ public abstract class PlayerEntityMixin extends LivingEntity implements Leashabl
         if (collar.isEmpty()) return false;
         ItemContainerContents contents = collar.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY);
         return contents.nonEmptyItemCopyStream().anyMatch(s -> s.is(Items.SADDLE));
+    }
+
+    @Inject(method = "drop(Lnet/minecraft/world/item/ItemStack;Z)Lnet/minecraft/world/entity/item/ItemEntity;", at = @At("RETURN"))
+    private void deeperdark$trackDroppedItem(ItemStack stack, boolean throwRandomly, CallbackInfoReturnable<ItemEntity> cir) {
+        ItemEntity dropped = cir.getReturnValue();
+        if (dropped != null && !((Entity)(Object)this).level().isClientSide()) {
+            ItemMagnetHandler.markDroppedByPlayer(dropped.getUUID(), ((Entity)(Object)this).getUUID());
+        }
     }
 
     @Override

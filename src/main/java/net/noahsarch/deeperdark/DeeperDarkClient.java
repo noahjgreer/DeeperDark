@@ -17,10 +17,13 @@ import net.noahsarch.deeperdark.autoupdate.AutoUpdater;
 import net.noahsarch.deeperdark.autoupdate.AutoUpdaterScreen;
 import net.noahsarch.deeperdark.util.IngredientItemRegistry;
 import net.noahsarch.deeperdark.block.ModBlockEntities;
+import net.minecraft.client.renderer.special.SpecialModelRenderers;
+import net.minecraft.resources.Identifier;
 import net.noahsarch.deeperdark.client.renderer.CreatureEntityRenderer;
 import net.noahsarch.deeperdark.client.renderer.PrimedDynamiteRenderer;
 import net.noahsarch.deeperdark.client.renderer.SaddlePlayerLayer;
 import net.noahsarch.deeperdark.client.renderer.VaultBlockEntityRenderer;
+import net.noahsarch.deeperdark.client.renderer.VaultItemSpecialRenderer;
 import net.noahsarch.deeperdark.client.screen.BoxScreen;
 import net.noahsarch.deeperdark.client.screen.VaultScreen;
 import net.noahsarch.deeperdark.entity.ModEntities;
@@ -29,6 +32,7 @@ import net.noahsarch.deeperdark.intro.DeeperDarkLogoScreen;
 import net.noahsarch.deeperdark.menu.ModMenus;
 import net.noahsarch.deeperdark.event.VoidParticleHandler;
 import net.noahsarch.deeperdark.payload.AllIngredientsConsumableSyncPacket;
+import net.noahsarch.deeperdark.payload.OpenFromScreenPayload;
 import net.noahsarch.deeperdark.payload.PlayerLeashPacket;
 import net.noahsarch.deeperdark.payload.VoidFogSyncPacket;
 
@@ -36,6 +40,10 @@ import net.noahsarch.deeperdark.payload.VoidFogSyncPacket;
 public class DeeperDarkClient implements ClientModInitializer {
 
     private static boolean updateCheckShown = false;
+
+    /** Set by OpenFromScreenPayload when the server opens a container from the inventory screen.
+     *  ContainerScreenOpenMixin uses this to decide whether closing should return to inventory. */
+    public static int fromScreenContainerId = -1;
 
     @Override
     public void onInitializeClient() {
@@ -49,6 +57,10 @@ public class DeeperDarkClient implements ClientModInitializer {
         MenuScreens.register(ModMenus.LARGE_VAULT, VaultScreen::new);
 
         BlockEntityRenderers.register(ModBlockEntities.VAULT, VaultBlockEntityRenderer::new);
+        SpecialModelRenderers.ID_MAPPER.put(
+            Identifier.fromNamespaceAndPath(Deeperdark.MOD_ID, "vault"),
+            VaultItemSpecialRenderer.Unbaked.MAP_CODEC
+        );
         EntityRenderers.register(ModEntities.CREATURE, CreatureEntityRenderer::new);
         EntityRenderers.register(ModEntities.PRIMED_DYNAMITE, PrimedDynamiteRenderer::new);
         LivingEntityRenderLayerRegistrationCallback.EVENT
@@ -101,6 +113,9 @@ public class DeeperDarkClient implements ClientModInitializer {
 
         ClientPlayNetworking.registerGlobalReceiver(VoidFogSyncPacket.ID, (payload, context) ->
                 DeeperDarkConfig.get().voidFogEnabled = payload.enabled());
+
+        ClientPlayNetworking.registerGlobalReceiver(OpenFromScreenPayload.ID, (payload, context) ->
+                fromScreenContainerId = payload.containerId());
 
         ClientPlayNetworking.registerGlobalReceiver(AllIngredientsConsumableSyncPacket.ID, (payload, context) -> {
             DeeperDarkConfig.get().allIngredientsConsumable = payload.enabled();

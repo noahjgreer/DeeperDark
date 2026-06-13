@@ -98,7 +98,8 @@
     "PodzolBlockMixin",
     "ShulkerBoxItemInsertMixin",
     "ContainerItemUseInHandMixin",
-    "PickBlockContainerServerMixin"
+    "PickBlockContainerServerMixin",
+    "ContainerCloseIdCheckMixin"
   ],
   "client": [
     "PickBlockContainerMixin",

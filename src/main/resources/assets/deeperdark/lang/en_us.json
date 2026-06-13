@@ -173,5 +173,7 @@
   "subtitles.deeperdark.entity.snake.tongue": "Snake flicks tongue",
   "subtitles.deeperdark.block.collarbench.use": "Collar receives work",
   "subtitles.deeperdark.item.collar.jingle": "Collar jingles",
-  "subtitles.deeperdark.item.magnet.activate": "Magnet activates"
+  "subtitles.deeperdark.item.magnet.activate": "Magnet activates",
+  "item.deeperdark.vault.empty": "Empty",
+  "subtitles.deeperdark.block.item_vault.loop": "Item Vault hums"
 }

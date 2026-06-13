@@ -18,6 +18,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomData;
+import net.noahsarch.deeperdark.DeeperDarkClient;
 import net.noahsarch.deeperdark.block.ModBlocks;
 import net.noahsarch.deeperdark.client.ContainerItemKeyHandler;
 import net.noahsarch.deeperdark.inventory.ContainerItemUtil;
@@ -65,6 +66,7 @@ public abstract class ContainerScreenOpenMixin<T extends AbstractContainerMenu> 
         boolean isInventoryKey = mc.options.keyInventory.matches(event);
         if (!isEscape && !isInventoryKey) return;
 
+        DeeperDarkClient.fromScreenContainerId = -1;
         this.onClose();
         mc.setScreen(new InventoryScreen(mc.player));
         cir.setReturnValue(true);
@@ -162,20 +164,14 @@ public abstract class ContainerScreenOpenMixin<T extends AbstractContainerMenu> 
     }
 
     /**
-     * True if any player-inventory slot in the current menu holds an item stamped
-     * with FROM_SCREEN_MARKER_KEY (opened from inventory) or NESTED_FROM_KEY (opened
-     * as a nested container inside another container).
+     * True only when this container was opened from the inventory screen via the
+     * Alt key quick-open feature. The server sends OpenFromScreenPayload with the
+     * containerId whenever such an open occurs; we simply compare that stored ID
+     * to this menu's containerId. This is immune to stale NBT markers and nested
+     * container chains (a child has a different containerId than the parent).
      */
     private boolean deeperdark$isOpenedFromScreen() {
-        for (Slot slot : this.menu.slots) {
-            if (!(slot.container instanceof Inventory)) continue;
-            CustomData data = slot.getItem().get(net.minecraft.core.component.DataComponents.CUSTOM_DATA);
-            if (data == null) continue;
-            net.minecraft.nbt.CompoundTag tag = data.copyTag();
-            if (tag.contains(ItemBackedContainer.FROM_SCREEN_MARKER_KEY)) return true;
-            if (tag.contains(ItemBackedContainer.NESTED_FROM_KEY)) return true;
-        }
-        return false;
+        return this.menu.containerId == DeeperDarkClient.fromScreenContainerId;
     }
 
     /** True if this item has an open-container UUID marker (any open method). */

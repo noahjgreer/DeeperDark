@@ -47,6 +47,7 @@ import net.noahsarch.deeperdark.duck.CollarHolder;
 import net.noahsarch.deeperdark.item.CollarItem;
 import net.noahsarch.deeperdark.item.CollarTier;
 import net.noahsarch.deeperdark.item.ItemMagnetItem;
+import net.noahsarch.deeperdark.event.ItemMagnetHandler;
 import net.noahsarch.deeperdark.sound.ModSounds;
 
 import java.util.HashMap;
@@ -356,7 +357,9 @@ public class CollarEvents {
             center.x + xpRadius, center.y + xpRadius, center.z + xpRadius
         );
 
+        UUID playerUUID = player.getUUID();
         for (net.minecraft.world.entity.item.ItemEntity item : level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, searchBox)) {
+            if (ItemMagnetHandler.isDroppedByPlayer(item.getUUID(), playerUUID)) continue;
             Vec3 diff = center.subtract(item.position());
             double dist = diff.length();
             if (dist < 0.5 || dist > radius) continue;

@@ -8,6 +8,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.noahsarch.deeperdark.block.ModBlocks;
+import net.noahsarch.deeperdark.block.VaultBlockEntity;
+import net.noahsarch.deeperdark.component.ModComponents;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,87 +41,109 @@ public final class ContainerItemUtil {
 
     /**
      * Returns true if the cursor can be quick-inserted into the vault item.
-     * Reads the CONTAINER component to check existing entry types and capacity.
+     * Uses deeperdark:vault_entries as source of truth; falls back to CONTAINER for legacy items.
      */
     public static boolean canVaultInsert(ItemStack vaultItem, ItemStack cursor) {
         if (cursor.isEmpty()) return false;
         int maxTypes = getVaultMaxTypes(vaultItem);
         if (maxTypes < 0) return false;
 
-        ItemContainerContents contents = vaultItem.get(DataComponents.CONTAINER);
-        if (contents == null) return true; // Empty vault, any item can start a new entry
+        List<VaultBlockEntity.VaultEntry> entries = vaultItem.get(ModComponents.VAULT_ENTRIES);
+        if (entries != null) {
+            for (VaultBlockEntity.VaultEntry e : entries) {
+                if (ItemStack.isSameItemSameComponents(e.representative, cursor)) return true;
+            }
+            return entries.size() < maxTypes;
+        }
 
-        // Reconstruct unique entry types from the batched CONTAINER data
-        List<ItemStack> entries = new ArrayList<>();
+        // Legacy fallback: vault item predates the vault_entries component.
+        ItemContainerContents contents = vaultItem.get(DataComponents.CONTAINER);
+        if (contents == null) return true;
+        List<ItemStack> types = new ArrayList<>();
         for (ItemStackTemplate template : contents.nonEmptyItems()) {
             ItemStack s = template.create();
             if (s.isEmpty()) continue;
             boolean seen = false;
-            for (ItemStack e : entries) {
+            for (ItemStack e : types) {
                 if (ItemStack.isSameItemSameComponents(e, s)) { seen = true; break; }
             }
-            if (!seen && entries.size() < maxTypes) entries.add(s.copyWithCount(1));
+            if (!seen && types.size() < maxTypes) types.add(s.copyWithCount(1));
         }
-
-        // Cursor matches an existing type → vault always has room (unbounded per type)
-        for (ItemStack e : entries) {
+        for (ItemStack e : types) {
             if (ItemStack.isSameItemSameComponents(e, cursor)) return true;
         }
-        // New type → needs an empty slot
-        return entries.size() < maxTypes;
+        return types.size() < maxTypes;
     }
 
     /**
-     * Inserts all cursor items into the vault's CONTAINER component (merging by type).
-     * Vaults have unlimited per-type capacity, so the cursor is always fully consumed.
+     * Inserts all cursor items into the vault item, updating both deeperdark:vault_entries
+     * (lossless full data) and DataComponents.CONTAINER (capped tooltip preview).
      */
     public static boolean tryVaultInsert(ItemStack vaultItem, ItemStack cursor, SlotAccess carriedAccess) {
         if (!canVaultInsert(vaultItem, cursor)) return false;
         int maxTypes = getVaultMaxTypes(vaultItem);
 
-        // Decode current entries
-        ItemContainerContents contents = vaultItem.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY);
-        List<ItemStack> entries = new ArrayList<>();
-        for (ItemStackTemplate template : contents.nonEmptyItems()) {
-            ItemStack s = template.create();
-            if (s.isEmpty()) continue;
-            boolean merged = false;
-            for (ItemStack e : entries) {
-                if (ItemStack.isSameItemSameComponents(e, s)) {
-                    long sum = (long) e.getCount() + s.getCount();
-                    e.setCount((int) Math.min(sum, Integer.MAX_VALUE));
-                    merged = true;
-                    break;
-                }
+        // Build working entry list from the lossless component, or reconstruct from legacy CONTAINER.
+        List<VaultBlockEntity.VaultEntry> rawEntries = vaultItem.get(ModComponents.VAULT_ENTRIES);
+        List<VaultBlockEntity.VaultEntry> entries = new ArrayList<>();
+        if (rawEntries != null) {
+            for (VaultBlockEntity.VaultEntry e : rawEntries) {
+                entries.add(new VaultBlockEntity.VaultEntry(e.representative, e.count));
             }
-            if (!merged && entries.size() < maxTypes) entries.add(s.copy());
+        } else {
+            ItemContainerContents contents = vaultItem.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY);
+            for (ItemStackTemplate template : contents.nonEmptyItems()) {
+                ItemStack s = template.create();
+                if (s.isEmpty()) continue;
+                boolean merged = false;
+                for (VaultBlockEntity.VaultEntry e : entries) {
+                    if (ItemStack.isSameItemSameComponents(e.representative, s)) {
+                        long sum = (long) e.count + s.getCount();
+                        e.count = (int) Math.min(sum, Integer.MAX_VALUE);
+                        merged = true;
+                        break;
+                    }
+                }
+                if (!merged && entries.size() < maxTypes)
+                    entries.add(new VaultBlockEntity.VaultEntry(s.copyWithCount(1), s.getCount()));
+            }
         }
 
-        // Add cursor items into matching entry or create a new entry
+        // Merge cursor into matching entry or add a new one.
         boolean inserted = false;
-        for (ItemStack e : entries) {
-            if (ItemStack.isSameItemSameComponents(e, cursor)) {
-                long sum = (long) e.getCount() + cursor.getCount();
-                e.setCount((int) Math.min(sum, Integer.MAX_VALUE));
+        for (VaultBlockEntity.VaultEntry e : entries) {
+            if (ItemStack.isSameItemSameComponents(e.representative, cursor)) {
+                long sum = (long) e.count + cursor.getCount();
+                e.count = (int) Math.min(sum, Integer.MAX_VALUE);
                 inserted = true;
                 break;
             }
         }
-        if (!inserted) entries.add(cursor.copy());
+        if (!inserted) entries.add(new VaultBlockEntity.VaultEntry(cursor.copyWithCount(1), cursor.getCount()));
 
-        // Re-encode entries back to the CONTAINER component (batch by maxStackSize)
-        List<ItemStack> stacks = new ArrayList<>();
-        for (ItemStack e : entries) {
-            int batchSize = e.getMaxStackSize();
-            int remaining = e.getCount();
+        // Write back lossless data.
+        vaultItem.set(ModComponents.VAULT_ENTRIES, entries);
+
+        // Regenerate capped CONTAINER preview (≤256 stacks) for tooltip mods.
+        List<ItemStack> preview = new ArrayList<>();
+        outer:
+        for (VaultBlockEntity.VaultEntry e : entries) {
+            int batchSize = e.representative.getMaxStackSize();
+            int remaining = e.count;
             while (remaining > 0) {
+                if (preview.size() >= 256) break outer;
                 int batch = Math.min(remaining, batchSize);
-                stacks.add(e.copyWithCount(batch));
+                preview.add(e.representative.copyWithCount(batch));
                 remaining -= batch;
             }
         }
-        vaultItem.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(stacks));
-        carriedAccess.set(ItemStack.EMPTY); // Vault always accepts all inserted items
+        if (!preview.isEmpty()) {
+            vaultItem.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(preview));
+        } else {
+            vaultItem.remove(DataComponents.CONTAINER);
+        }
+
+        carriedAccess.set(ItemStack.EMPTY);
         return true;
     }
 

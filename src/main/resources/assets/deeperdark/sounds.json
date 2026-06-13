@@ -388,6 +388,15 @@
     ],
     "subtitle": "subtitles.deeperdark.block.dynamite.explode"
   },
+  "block.item_vault.loop": {
+    "sounds": [
+      {
+        "name": "deeperdark:block/item_vault/loop",
+        "attenuation_distance": 16
+      }
+    ],
+    "subtitle": "subtitles.deeperdark.block.item_vault.loop"
+  },
   "block.box.close": {
     "sounds": [
       {
