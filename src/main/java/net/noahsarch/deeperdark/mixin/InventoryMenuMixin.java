@@ -215,6 +215,11 @@ public abstract class InventoryMenuMixin extends AbstractContainerMenu implement
                 ItemStack result = stack.copy();
                 collarSlot.setByPlayer(stack.copy());
                 slot.setByPlayer(ItemStack.EMPTY);
+                // ResultSlot.onTake() consumes crafting ingredients; skipping it
+                // leaves the grid full while the collar equips → duplication.
+                if (slot instanceof ResultSlot) {
+                    slot.onTake(player, result);
+                }
                 cir.setReturnValue(result);
                 return;
             }
