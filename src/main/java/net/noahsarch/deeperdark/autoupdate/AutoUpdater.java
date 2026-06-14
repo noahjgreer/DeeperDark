@@ -21,6 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Environment(EnvType.CLIENT)
 public class AutoUpdater {
@@ -107,41 +108,52 @@ public class AutoUpdater {
         String encodedName = rawUrl.substring(rawUrl.lastIndexOf('/') + 1);
         String newFileName = URLDecoder.decode(encodedName, StandardCharsets.UTF_8);
         Path newJar = modsDir.resolve(newFileName);
-        Path tempJar = modsDir.resolve(newFileName + ".tmp");
 
-        HttpURLConnection conn = openConnection(rawUrl);
-        int status = conn.getResponseCode();
-        if (status != 200) {
-            conn.disconnect();
-            throw new IOException("Download server responded with HTTP " + status);
-        }
+        // Delete any stale deeperdark jars from previous failed/duplicate update cycles.
+        // These are not the currently-loaded jar so they are not locked by the JVM.
+        purgeStaleDeeperdarkFiles(modsDir, currentJar, newJar);
 
-        long totalBytes = info.fileSize() > 0 ? info.fileSize() : conn.getContentLengthLong();
+        // If the target jar already exists on disk, Fabric may have picked an older duplicate
+        // as the "current" version (due to lexicographic prerelease ordering). Skip the
+        // download — the file is already there.
+        if (!Files.exists(newJar)) {
+            Path tempJar = modsDir.resolve(newFileName + ".tmp");
 
-        try {
-            try (InputStream is = conn.getInputStream();
-                 FileOutputStream fos = new FileOutputStream(tempJar.toFile())) {
-                byte[] buffer = new byte[8192];
-                long downloaded = 0;
-                int read;
-                while ((read = is.read(buffer)) != -1) {
-                    fos.write(buffer, 0, read);
-                    downloaded += read;
-                    if (onProgress != null) {
-                        onProgress.onProgress(downloaded, Math.max(totalBytes, downloaded));
+            HttpURLConnection conn = openConnection(rawUrl);
+            int status = conn.getResponseCode();
+            if (status != 200) {
+                conn.disconnect();
+                throw new IOException("Download server responded with HTTP " + status);
+            }
+
+            long totalBytes = info.fileSize() > 0 ? info.fileSize() : conn.getContentLengthLong();
+
+            try {
+                try (InputStream is = conn.getInputStream();
+                     FileOutputStream fos = new FileOutputStream(tempJar.toFile())) {
+                    byte[] buffer = new byte[8192];
+                    long downloaded = 0;
+                    int read;
+                    while ((read = is.read(buffer)) != -1) {
+                        fos.write(buffer, 0, read);
+                        downloaded += read;
+                        if (onProgress != null) {
+                            onProgress.onProgress(downloaded, Math.max(totalBytes, downloaded));
+                        }
                     }
                 }
+            } catch (IOException e) {
+                Files.deleteIfExists(tempJar);
+                conn.disconnect();
+                throw e;
             }
-        } catch (IOException e) {
-            Files.deleteIfExists(tempJar);
             conn.disconnect();
-            throw e;
-        }
-        conn.disconnect();
 
-        // Atomically place the new JAR
-        Files.move(tempJar, newJar, StandardCopyOption.REPLACE_EXISTING);
-        LOGGER.info("[AutoUpdater] Downloaded new JAR to: {}", newJar);
+            Files.move(tempJar, newJar, StandardCopyOption.REPLACE_EXISTING);
+            LOGGER.info("[AutoUpdater] Downloaded new JAR to: {}", newJar);
+        } else {
+            LOGGER.info("[AutoUpdater] New JAR already present, skipping download: {}", newJar);
+        }
 
         // Schedule the old JAR for removal on next startup (Windows holds the file open)
         schedulePendingDelete(modsDir, currentJar);
@@ -152,12 +164,17 @@ public class AutoUpdater {
     private static final String PENDING_DELETE_FILE = ".deeperdark-pending-delete";
 
     /**
-     * Called at startup before the update check. Removes any JARs that couldn't be
-     * deleted in the previous session because the JVM held them open (Windows).
+     * Called at startup. Cleans up leftover deeperdark .bak files and any JARs that
+     * couldn't be deleted in the previous session because the JVM held them open (Windows).
      */
     public static void processPendingDeletes() {
         Path modsDir = getModsDir();
         if (modsDir == null) return;
+
+        // Always sweep for .bak files first — they are never loaded by Fabric so they
+        // are never locked, and can be deleted unconditionally.
+        purgeDeeperdarkBakFiles(modsDir);
+
         Path marker = modsDir.resolve(PENDING_DELETE_FILE);
         if (!Files.exists(marker)) return;
 
@@ -169,23 +186,31 @@ public class AutoUpdater {
                 Path target = Path.of(trimmed);
                 Path bak = target.resolveSibling(target.getFileName().toString() + ".bak");
 
-                boolean jarGone = !Files.exists(target) || tryDelete(target);
-                boolean bakGone = !Files.exists(bak) || tryDelete(bak);
+                boolean jarExists = Files.exists(target);
+                boolean bakExists = Files.exists(bak);
 
-                if (!jarGone) {
-                    // Direct delete failed (file still locked on Windows) — retry the .bak rename
-                    // so at least Fabric won't load it next session.
-                    try {
-                        Files.move(target, bak, StandardCopyOption.REPLACE_EXISTING);
-                        LOGGER.info("[AutoUpdater] Renamed old JAR to .bak for next-launch cleanup: {}", bak);
-                        bakGone = false; // still need to clean up the .bak next time
-                        jarGone = true;
-                    } catch (IOException ex) {
-                        LOGGER.warn("[AutoUpdater] Could not rename old JAR to .bak: {}", ex.getMessage());
+                if (jarExists) {
+                    if (tryDelete(target)) {
+                        jarExists = false;
+                    } else {
+                        // Direct delete failed (file still locked) — retry the .bak rename so
+                        // Fabric skips it next session, then clean up the .bak the session after.
+                        try {
+                            Files.move(target, bak, StandardCopyOption.REPLACE_EXISTING);
+                            LOGGER.info("[AutoUpdater] Renamed old JAR to .bak for next-launch cleanup: {}", bak);
+                            jarExists = false;
+                            bakExists = true;
+                        } catch (IOException ex) {
+                            LOGGER.warn("[AutoUpdater] Could not rename old JAR to .bak: {}", ex.getMessage());
+                        }
                     }
                 }
 
-                if (!jarGone && !bakGone) {
+                if (bakExists && !tryDelete(bak)) {
+                    bakExists = Files.exists(bak); // re-check; tryDelete logs on failure
+                }
+
+                if (jarExists || bakExists) {
                     allCleared = false;
                 }
             }
@@ -206,7 +231,7 @@ public class AutoUpdater {
         } catch (IOException ignored) {}
 
         // On Windows the JVM memory-maps the JAR; write it to the pending-delete file
-        // so the next launch cleans it up before Fabric loads any mods.
+        // so the next launch cleans it up.
         Path marker = modsDir.resolve(PENDING_DELETE_FILE);
         try {
             Files.writeString(marker, oldJar.toAbsolutePath().toString() + "\n",
@@ -218,12 +243,44 @@ public class AutoUpdater {
             LOGGER.warn("[AutoUpdater] Could not schedule pending delete: {}", e.getMessage());
         }
 
-        // Also try rename-to-.bak so Fabric ignores it even if delete at next launch fails
+        // Also rename to .bak so Fabric ignores it next session even if the pending-delete
+        // cleanup fails for any reason.
         try {
             Path bak = oldJar.resolveSibling(oldJar.getFileName().toString() + ".bak");
             Files.move(oldJar, bak, StandardCopyOption.REPLACE_EXISTING);
             LOGGER.info("[AutoUpdater] Renamed old JAR to .bak: {}", bak);
         } catch (IOException ignored) {}
+    }
+
+    /**
+     * Deletes all deeperdark-*.jar and deeperdark-*.jar.bak files in the mods directory
+     * except {@code currentJar} (currently loaded/locked) and {@code targetJar} (the jar
+     * we are about to place). Call this before each download to prevent accumulation.
+     */
+    private static void purgeStaleDeeperdarkFiles(Path modsDir, Path currentJar, Path targetJar) {
+        try (Stream<Path> stream = Files.list(modsDir)) {
+            stream.forEach(p -> {
+                String name = p.getFileName().toString();
+                if (!name.startsWith("deeperdark-")) return;
+                if (p.equals(currentJar) || p.equals(targetJar)) return;
+                if (!name.endsWith(".jar") && !name.endsWith(".jar.bak")) return;
+                tryDelete(p);
+            });
+        } catch (IOException e) {
+            LOGGER.warn("[AutoUpdater] Could not scan for stale deeperdark files: {}", e.getMessage());
+        }
+    }
+
+    /** Deletes all deeperdark-*.jar.bak files. These are never loaded by Fabric so never locked. */
+    private static void purgeDeeperdarkBakFiles(Path modsDir) {
+        try (Stream<Path> stream = Files.list(modsDir)) {
+            stream.filter(p -> {
+                String name = p.getFileName().toString();
+                return name.startsWith("deeperdark-") && name.endsWith(".jar.bak");
+            }).forEach(AutoUpdater::tryDelete);
+        } catch (IOException e) {
+            LOGGER.warn("[AutoUpdater] Could not scan for stale .bak files: {}", e.getMessage());
+        }
     }
 
     private static boolean tryDelete(Path path) {
