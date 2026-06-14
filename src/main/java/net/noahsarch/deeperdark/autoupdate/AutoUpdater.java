@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
-import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -163,14 +162,36 @@ public class AutoUpdater {
         if (!Files.exists(marker)) return;
 
         try {
+            boolean allCleared = true;
             for (String line : Files.readAllLines(marker, StandardCharsets.UTF_8)) {
                 String trimmed = line.strip();
                 if (trimmed.isEmpty()) continue;
                 Path target = Path.of(trimmed);
-                tryDelete(target);
-                tryDelete(target.resolveSibling(target.getFileName().toString() + ".bak"));
+                Path bak = target.resolveSibling(target.getFileName().toString() + ".bak");
+
+                boolean jarGone = !Files.exists(target) || tryDelete(target);
+                boolean bakGone = !Files.exists(bak) || tryDelete(bak);
+
+                if (!jarGone) {
+                    // Direct delete failed (file still locked on Windows) — retry the .bak rename
+                    // so at least Fabric won't load it next session.
+                    try {
+                        Files.move(target, bak, StandardCopyOption.REPLACE_EXISTING);
+                        LOGGER.info("[AutoUpdater] Renamed old JAR to .bak for next-launch cleanup: {}", bak);
+                        bakGone = false; // still need to clean up the .bak next time
+                        jarGone = true;
+                    } catch (IOException ex) {
+                        LOGGER.warn("[AutoUpdater] Could not rename old JAR to .bak: {}", ex.getMessage());
+                    }
+                }
+
+                if (!jarGone && !bakGone) {
+                    allCleared = false;
+                }
             }
-            Files.deleteIfExists(marker);
+            if (allCleared) {
+                Files.deleteIfExists(marker);
+            }
         } catch (IOException e) {
             LOGGER.warn("[AutoUpdater] Failed to process pending deletes: {}", e.getMessage());
         }
@@ -205,11 +226,15 @@ public class AutoUpdater {
         } catch (IOException ignored) {}
     }
 
-    private static void tryDelete(Path path) {
+    private static boolean tryDelete(Path path) {
         try {
-            Files.deleteIfExists(path);
-            LOGGER.info("[AutoUpdater] Deleted: {}", path);
-        } catch (IOException ignored) {}
+            boolean deleted = Files.deleteIfExists(path);
+            if (deleted) LOGGER.info("[AutoUpdater] Deleted: {}", path);
+            return deleted;
+        } catch (IOException e) {
+            LOGGER.warn("[AutoUpdater] Could not delete {}: {}", path, e.getMessage());
+            return false;
+        }
     }
 
     private static Path getModsDir() {
