@@ -7,6 +7,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.EffectsInInventory;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
@@ -19,8 +20,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Environment(EnvType.CLIENT)
 @Mixin(InventoryScreen.class)
@@ -106,33 +107,36 @@ public abstract class InventoryScreenMixin extends AbstractContainerScreen<Inven
     }
 
     // ── Status effects shift ──────────────────────────────────────────────────
-    // When the crafting panel is open it sits PANEL_W px to the right of imageWidth.
-    // EffectsInInventory positions status effects at (leftPos + imageWidth + 2), so we
-    // temporarily widen imageWidth by PANEL_W before those calls run and restore it after.
+    // EffectsInInventory uses (screen.leftPos + screen.imageWidth + 2) as its x-origin.
+    // The crafting panel occupies PANEL_W px starting at that same x, so we redirect the
+    // two EffectsInInventory calls and temporarily shift leftPos right by PANEL_W so the
+    // effects land beyond the panel. leftPos is non-final so no accessor tricks are needed.
 
     @Unique
     private boolean deeperdark$panelOpen() {
         return (this.menu instanceof CraftingPanelHolder h) && h.deeperdark$isPanelOpen();
     }
 
-    @Inject(method = "extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIF)V", at = @At("HEAD"))
-    private void deeperdark$bumpWidthBeforeEffects(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a, CallbackInfo ci) {
-        if (deeperdark$panelOpen()) ((AbstractContainerScreenAccessor)(Object)this).deeperdark$setImageWidth(this.imageWidth + PANEL_W);
+    @Redirect(method = "extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIF)V",
+        at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/client/gui/screens/inventory/EffectsInInventory;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;II)V"))
+    private void deeperdark$redirectEffectsExtract(EffectsInInventory effects,
+                                                    GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+        boolean open = deeperdark$panelOpen();
+        if (open) this.leftPos += PANEL_W;
+        effects.extractRenderState(graphics, mouseX, mouseY);
+        if (open) this.leftPos -= PANEL_W;
     }
 
-    @Inject(method = "extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIF)V", at = @At("RETURN"))
-    private void deeperdark$restoreWidthAfterEffects(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a, CallbackInfo ci) {
-        if (deeperdark$panelOpen()) ((AbstractContainerScreenAccessor)(Object)this).deeperdark$setImageWidth(this.imageWidth - PANEL_W);
-    }
-
-    @Inject(method = "showsActiveEffects()Z", at = @At("HEAD"))
-    private void deeperdark$bumpWidthForEffectCheck(CallbackInfoReturnable<Boolean> cir) {
-        if (deeperdark$panelOpen()) ((AbstractContainerScreenAccessor)(Object)this).deeperdark$setImageWidth(this.imageWidth + PANEL_W);
-    }
-
-    @Inject(method = "showsActiveEffects()Z", at = @At("RETURN"))
-    private void deeperdark$restoreWidthAfterEffectCheck(CallbackInfoReturnable<Boolean> cir) {
-        if (deeperdark$panelOpen()) ((AbstractContainerScreenAccessor)(Object)this).deeperdark$setImageWidth(this.imageWidth - PANEL_W);
+    @Redirect(method = "showsActiveEffects()Z",
+        at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/client/gui/screens/inventory/EffectsInInventory;canSeeEffects()Z"))
+    private boolean deeperdark$redirectCanSeeEffects(EffectsInInventory effects) {
+        boolean open = deeperdark$panelOpen();
+        if (open) this.leftPos += PANEL_W;
+        boolean result = effects.canSeeEffects();
+        if (open) this.leftPos -= PANEL_W;
+        return result;
     }
 
 }
