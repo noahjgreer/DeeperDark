@@ -34,7 +34,10 @@ import net.minecraft.world.level.Level;
 import net.noahsarch.deeperdark.sound.ModSounds;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 public class VaultBlockEntity extends BlockEntity implements MenuProvider, Container {
 
@@ -62,6 +65,9 @@ public class VaultBlockEntity extends BlockEntity implements MenuProvider, Conta
 
     public static final net.minecraft.network.codec.StreamCodec<net.minecraft.network.RegistryFriendlyByteBuf, java.util.List<VaultEntry>> ENTRIES_STREAM_CODEC =
         ENTRY_STREAM_CODEC.apply(net.minecraft.network.codec.ByteBufCodecs.list());
+
+    // One sound per 16³-block cell per sound window. Caps per-cluster hum at one source.
+    private static final Map<Level, HashMap<Long, Long>> CELL_LAST_PLAYED = new WeakHashMap<>();
 
     private final VaultTier tier;
     private final List<VaultEntry> entries = new ArrayList<>();
@@ -309,9 +315,14 @@ public class VaultBlockEntity extends BlockEntity implements MenuProvider, Conta
     // ---- End Container ----
 
     public static void tick(Level level, BlockPos pos, BlockState state, VaultBlockEntity entity) {
-        if (level.getGameTime() % 16L == 0L) {
-            level.playSound(null, pos, ModSounds.ITEM_VAULT_LOOP, SoundSource.BLOCKS, 1.0F, 1.0F);
-        }
+        if (level.getGameTime() % 16L != 0L) return;
+        long gameTime = level.getGameTime();
+        long cellKey = BlockPos.asLong(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4);
+        HashMap<Long, Long> cellMap = CELL_LAST_PLAYED.computeIfAbsent(level, k -> new HashMap<>());
+        Long lastPlayed = cellMap.get(cellKey);
+        if (lastPlayed != null && lastPlayed >= gameTime - 15L) return;
+        cellMap.put(cellKey, gameTime);
+        level.playSound(null, pos, ModSounds.ITEM_VAULT_LOOP, SoundSource.BLOCKS, 1.0F, 1.0F);
     }
 
     enum VaultTier {
