@@ -403,10 +403,6 @@ public class Deeperdark implements ModInitializer {
 		net.minecraft.world.item.component.CustomData existing = stack.get(DataComponents.CUSTOM_DATA);
 		if (existing != null && existing.copyTag().contains(ItemBackedContainer.OPEN_MARKER_KEY)) return;
 
-		// Find which player-inventory slot holds the parent container (has OPEN_MARKER_KEY).
-		int parentInventorySlot = findParentInventorySlot(player);
-		if (parentInventorySlot < 0) return;
-
 		net.minecraft.world.Container parentStorage = slot.container;
 		int slotInParent = slot.getContainerSlot();
 
@@ -421,13 +417,20 @@ public class Deeperdark implements ModInitializer {
 			return;
 		}
 
-		// Stamp NESTED_FROM_KEY on the parent item BEFORE player.openMenu() closes the
-		// current menu and removes its own OPEN_MARKER_KEY.  Stored as a boolean flag —
-		// findNestedFromSlot() uses the live loop index rather than a stored slot number,
-		// so the parent can be moved freely without breaking the back-navigation.
-		ItemStack parentItem = player.getInventory().getItem(parentInventorySlot);
-		net.minecraft.world.item.component.CustomData.update(DataComponents.CUSTOM_DATA, parentItem,
-				tag -> tag.putBoolean(ItemBackedContainer.NESTED_FROM_KEY, true));
+		// Find which player-inventory slot holds the parent container (has OPEN_MARKER_KEY).
+		// -1 means the parent is a placed block container (chest, barrel, etc.) — that's fine;
+		// we just skip the NESTED_FROM stamp so closing the child doesn't attempt to auto-reopen
+		// a block container (which manages its own open/close independently).
+		int parentInventorySlot = findParentInventorySlot(player);
+		if (parentInventorySlot >= 0) {
+			// Stamp NESTED_FROM_KEY on the parent item BEFORE player.openMenu() closes the
+			// current menu and removes its own OPEN_MARKER_KEY.  Stored as a boolean flag —
+			// findNestedFromSlot() uses the live loop index rather than a stored slot number,
+			// so the parent can be moved freely without breaking the back-navigation.
+			ItemStack parentItem = player.getInventory().getItem(parentInventorySlot);
+			net.minecraft.world.item.component.CustomData.update(DataComponents.CUSTOM_DATA, parentItem,
+					tag -> tag.putBoolean(ItemBackedContainer.NESTED_FROM_KEY, true));
+		}
 
 		playSound(player, stack, true);
 		LOGGER.info("[DD-nested] opening {} slotInParent={} parentSlot={}", stack.getItem(), slotInParent, parentInventorySlot);
