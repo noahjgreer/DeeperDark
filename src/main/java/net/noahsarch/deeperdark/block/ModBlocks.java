@@ -82,8 +82,21 @@ public class ModBlocks {
         return Registry.register(BuiltInRegistries.BLOCK, blockKey, block);
     }
 
+    public static final Block QUICKSAND = register(
+            "quicksand",
+            QuicksandBlock::new,
+            BlockBehaviour.Properties.of()
+                    .strength(0.5F)
+                    .noCollision()
+                    .sound(SoundType.SAND),
+            true);
+
     public static void initialize() {
         Deeperdark.LOGGER.info("Registering ModBlocks for deeperdark");
+
+        CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.NATURAL_BLOCKS).register(content -> {
+            content.accept(QUICKSAND);
+        });
 
         CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.BUILDING_BLOCKS).register(content -> {
             content.accept(GUNPOWDER_BLOCK);

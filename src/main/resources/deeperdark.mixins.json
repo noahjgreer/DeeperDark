@@ -26,7 +26,9 @@
     "GlassBottleItemMixin",
     "IceBlockMixin",
     "ItemEntityMixin",
+    "DamageSourceQuicksandMixin",
     "LivingEntityMixin",
+    "PowderSnowBlockMixin",
     "LoomScreenHandlerMixin",
     "MatchToolLootConditionMixin",
     "MerchantEntityMixin",
@@ -111,7 +113,10 @@
     "HumanoidArmorLayerMixin",
     "PassengerPickableMixin",
     "CreativeCollarSlotMixin",
-    "VoidFogMixin"
+    "VoidFogMixin",
+    "QuicksandFogMixin",
+    "GuiQuicksandMixin",
+    "GuiHeartTypeQuicksandMixin"
   ],
   "injectors": {
     "defaultRequire": 1

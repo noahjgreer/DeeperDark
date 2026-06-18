@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "": [
+      {"model": "deeperdark:block/quicksand"},
+      {"model": "deeperdark:block/quicksand", "y": 90},
+      {"model": "deeperdark:block/quicksand", "y": 180},
+      {"model": "deeperdark:block/quicksand", "y": 270}
+    ]
+  }
+}

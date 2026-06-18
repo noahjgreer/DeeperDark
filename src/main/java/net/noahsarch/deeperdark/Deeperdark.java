@@ -246,6 +246,7 @@ public class Deeperdark implements ModInitializer {
 
 
         DeepDarkBiomeModifier.init();
+        net.noahsarch.deeperdark.worldgen.ModWorldgen.initialize();
 
         // Register diamond as compostable (silly easter egg!)
         // Since registerCompostableItem is private, we access the public map directly
@@ -286,6 +287,9 @@ public class Deeperdark implements ModInitializer {
 
 		// Register player leash handler (leash players with a lead)
 		net.noahsarch.deeperdark.event.PlayerLeashHandler.register();
+
+		// Apply speed debuff when walking on quicksand/powder snow with non-leather boots
+		net.noahsarch.deeperdark.event.BootsOnSoftGroundHandler.register();
 
 		// Register creature entity type
 		net.noahsarch.deeperdark.entity.ModEntities.initialize();

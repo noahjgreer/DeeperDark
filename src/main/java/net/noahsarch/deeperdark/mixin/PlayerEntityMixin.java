@@ -9,9 +9,15 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Leashable;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.noahsarch.deeperdark.block.ModBlocks;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.storage.ValueInput;
@@ -170,5 +176,16 @@ public abstract class PlayerEntityMixin extends LivingEntity implements Leashabl
             return InteractionResult.SUCCESS;
         }
         return super.interact(player, hand, pos);
+    }
+
+    /**
+     * When freeze damage hits a player who is inside quicksand, substitute the drowning
+     * hurt sound so the experience feels like suffocation rather than freezing.
+     */
+    @Inject(method = "getHurtSound", at = @At("RETURN"), cancellable = true)
+    private void deeperdark$quicksandHurtSound(DamageSource source, CallbackInfoReturnable<SoundEvent> cir) {
+        if (source.is(DamageTypeTags.IS_FREEZING) && this.getInBlockState().is(ModBlocks.QUICKSAND)) {
+            cir.setReturnValue(SoundEvents.PLAYER_HURT);
+        }
     }
 }
