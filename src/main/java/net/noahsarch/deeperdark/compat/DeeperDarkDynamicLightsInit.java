@@ -19,6 +19,8 @@ public class DeeperDarkDynamicLightsInit implements DynamicLightsInitializer {
         var type1 = CollarGlowBerriesLuminance.TYPE;
         @SuppressWarnings("unused")
         var type2 = CollarLavaBucketLuminance.TYPE;
+        @SuppressWarnings("unused")
+        var type3 = CollarLanternLuminance.TYPE;
 
         context.entityLightSourceManager().onRegisterEvent().register(
             Identifier.fromNamespaceAndPath("deeperdark", "collar_glow_berries"),
@@ -28,6 +30,11 @@ public class DeeperDarkDynamicLightsInit implements DynamicLightsInitializer {
         context.entityLightSourceManager().onRegisterEvent().register(
             Identifier.fromNamespaceAndPath("deeperdark", "collar_lava_bucket"),
             ctx -> ctx.register(EntityType.PLAYER, CollarLavaBucketLuminance.INSTANCE)
+        );
+
+        context.entityLightSourceManager().onRegisterEvent().register(
+            Identifier.fromNamespaceAndPath("deeperdark", "collar_lantern"),
+            ctx -> ctx.register(EntityType.PLAYER, CollarLanternLuminance.INSTANCE)
         );
     }
 }

@@ -371,6 +371,7 @@ public class CollarBenchMenu extends AbstractContainerMenu {
         boolean hasSponge = false, hasGold = false, hasBell = false;
         boolean hasMagnet = false, hasBlazeRod = false, hasGlowBerries = false;
         boolean hasCraftingTable = false, hasRedstone = false, hasArrow = false;
+        boolean hasLantern = false, hasSoulLantern = false;
         for (ItemStack s : trinkets) {
             if (s.isEmpty()) continue;
             if (s.is(Items.SPONGE) || s.is(Items.WET_SPONGE)) hasSponge = true;
@@ -382,9 +383,11 @@ public class CollarBenchMenu extends AbstractContainerMenu {
             if (s.is(Items.CRAFTING_TABLE)) hasCraftingTable = true;
             if (s.is(Items.REDSTONE_BLOCK) || s.is(Items.REDSTONE_TORCH)) hasRedstone = true;
             if (s.is(Items.ARROW)) hasArrow = true;
+            if (s.is(Items.LANTERN)) hasLantern = true;
+            if (s.is(Items.SOUL_LANTERN)) hasSoulLantern = true;
         }
-        // Flag indices: 0=sponge, 1=gold, 2=bell, 3=magnet, 4=blaze_rod, 5=glow_berries, 6=crafting_table, 7=redstone, 8=arrow
-        List<Boolean> flags = List.of(hasSponge, hasGold, hasBell, hasMagnet, hasBlazeRod, hasGlowBerries, hasCraftingTable, hasRedstone, hasArrow);
+        // Flag indices: 0=sponge, 1=gold, 2=bell, 3=magnet, 4=blaze_rod, 5=glow_berries, 6=crafting_table, 7=redstone, 8=arrow, 9=lantern, 10=soul_lantern
+        List<Boolean> flags = List.of(hasSponge, hasGold, hasBell, hasMagnet, hasBlazeRod, hasGlowBerries, hasCraftingTable, hasRedstone, hasArrow, hasLantern, hasSoulLantern);
         CustomModelData existing = result.getOrDefault(DataComponents.CUSTOM_MODEL_DATA, CustomModelData.EMPTY);
         result.set(DataComponents.CUSTOM_MODEL_DATA,
             new CustomModelData(existing.floats(), flags, existing.strings(), existing.colors()));

@@ -14,6 +14,9 @@ public final class QuicksandClientTracker {
     private static final long SUPPRESS_FOR_TICKS = 100L;
 
     public static boolean isActive(long currentGameTick) {
-        return currentGameTick - lastInQuicksandTick < SUPPRESS_FOR_TICKS;
+        // Guard against the sentinel value: Long.MIN_VALUE subtracted from any positive tick overflows
+        // to a large negative number, which would incorrectly satisfy the < check.
+        return lastInQuicksandTick != Long.MIN_VALUE
+                && currentGameTick - lastInQuicksandTick < SUPPRESS_FOR_TICKS;
     }
 }

@@ -47,6 +47,20 @@
       {
         "type": "minecraft:condition",
         "property": "minecraft:custom_model_data",
+        "index": 10,
+        "on_true": { "type": "minecraft:model", "model": "deeperdark:item/collar_trinket_soul_lantern" },
+        "on_false": { "type": "minecraft:empty" }
+      },
+      {
+        "type": "minecraft:condition",
+        "property": "minecraft:custom_model_data",
+        "index": 9,
+        "on_true": { "type": "minecraft:model", "model": "deeperdark:item/collar_trinket_lantern" },
+        "on_false": { "type": "minecraft:empty" }
+      },
+      {
+        "type": "minecraft:condition",
+        "property": "minecraft:custom_model_data",
         "index": 2,
         "on_true": { "type": "minecraft:model", "model": "deeperdark:item/collar_trinket_bell" },
         "on_false": { "type": "minecraft:empty" }

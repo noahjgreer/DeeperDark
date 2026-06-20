@@ -60,8 +60,9 @@ public class QuicksandBlock extends Block {
     protected void entityInside(
             BlockState state, Level level, BlockPos pos, Entity entity,
             InsideBlockEffectApplier effectApplier, boolean isPrecise) {
-        boolean walking = canWalkOnQuicksand(entity);
-        if (!walking && (!(entity instanceof LivingEntity) || entity.getInBlockState().is(this))) {
+        // Apply viscosity to any entity physically inside the block, including boot wearers.
+        // getInBlockState() check prevents this from firing while standing on the surface.
+        if (!(entity instanceof LivingEntity) || entity.getInBlockState().is(this)) {
             entity.makeStuckInBlock(state, new Vec3(
                     IN_BLOCK_HORIZONTAL_SPEED_MULTIPLIER,
                     IN_BLOCK_VERTICAL_SPEED_MULTIPLIER,
@@ -81,12 +82,14 @@ public class QuicksandBlock extends Block {
                 }
             }
         }
-        // Only begin suffocation when the entity's head is submerged and they cannot walk on it.
-        if (!walking) {
-            BlockPos eyePos = BlockPos.containing(entity.getX(), entity.getEyeY(), entity.getZ());
-            if (level.getBlockState(eyePos).is(this)) {
-                effectApplier.apply(InsideBlockEffectType.FREEZE);
-            }
+        // Suffocation is based purely on head position — boots prevent sinking, not drowning.
+        // We bypass effectApplier.apply(FREEZE) here because canFreeze() returns false for entities
+        // wearing freeze_immune_wearables (e.g. leather boots), which would silently skip the freeze
+        // tick increment. We want quicksand to suffocate regardless of worn items.
+        BlockPos eyePos = BlockPos.containing(entity.getX(), entity.getEyeY(), entity.getZ());
+        if (level.getBlockState(eyePos).is(this)) {
+            entity.setIsInPowderSnow(true);
+            entity.setTicksFrozen(Math.min(entity.getTicksRequiredToFreeze(), entity.getTicksFrozen() + 1));
         }
         effectApplier.apply(InsideBlockEffectType.EXTINGUISH);
     }

@@ -107,6 +107,8 @@ public class CollarEvents {
         boolean hasLavaBucket = false;
         boolean hasCraftingTable = false;
         boolean hasArrow = false;
+        boolean hasLantern = false;
+        boolean hasSoulLantern = false;
 
         for (int i = 0; i < trinkets.size(); i++) {
             ItemStack trinket = trinkets.get(i);
@@ -160,6 +162,14 @@ public class CollarEvents {
                 hasArrow = true;
             }
 
+            if (trinket.is(Items.LANTERN)) {
+                hasLantern = true;
+            }
+
+            if (trinket.is(Items.SOUL_LANTERN)) {
+                hasSoulLantern = true;
+            }
+
             if (isAttractable(trinket)) {
                 hasAttractable = true;
             }
@@ -190,8 +200,8 @@ public class CollarEvents {
         }
 
         // Update CustomModelData flags so the item model can conditionally show trinket layers.
-        // Flag indices: 0=sponge, 1=gold, 2=bell, 3=magnet, 4=blaze_rod, 5=glow_berries, 6=crafting_table, 7=redstone, 8=arrow
-        List<Boolean> flags = List.of(hasSponge, hasGold, hasBell, hasMagnet, hasBlazeRod, hasGlowBerries, hasCraftingTable, hasRedstone, hasArrow);
+        // Flag indices: 0=sponge, 1=gold, 2=bell, 3=magnet, 4=blaze_rod, 5=glow_berries, 6=crafting_table, 7=redstone, 8=arrow, 9=lantern, 10=soul_lantern
+        List<Boolean> flags = List.of(hasSponge, hasGold, hasBell, hasMagnet, hasBlazeRod, hasGlowBerries, hasCraftingTable, hasRedstone, hasArrow, hasLantern, hasSoulLantern);
         CustomModelData existing = collar.getOrDefault(DataComponents.CUSTOM_MODEL_DATA, CustomModelData.EMPTY);
         CustomModelData updated = new CustomModelData(existing.floats(), flags, existing.strings(), existing.colors());
         if (!updated.equals(existing)) {
