@@ -30,6 +30,7 @@
     "DamageSourceQuicksandMixin",
     "LivingEntityMixin",
     "PowderSnowBlockMixin",
+    "SoftGroundSpeedMixin",
     "LoomScreenHandlerMixin",
     "MatchToolLootConditionMixin",
     "MerchantEntityMixin",

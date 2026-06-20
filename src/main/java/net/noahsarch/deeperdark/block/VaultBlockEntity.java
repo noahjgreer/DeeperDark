@@ -166,10 +166,17 @@ public class VaultBlockEntity extends BlockEntity implements MenuProvider, Conta
     @Override
     protected void collectImplicitComponents(DataComponentMap.Builder builder) {
         super.collectImplicitComponents(builder);
-        if (entries.isEmpty()) return;
 
-        // Full data: store all entries in our custom component (no size limit).
+        // Always write VAULT_ENTRIES (even when empty) so it overwrites any stale component
+        // carried in this.components from when the block was originally placed.
+        // BlockEntity.collectComponents() seeds the result with this.components before calling
+        // us, so a conditional early-return would leave the old data intact.
         builder.set(net.noahsarch.deeperdark.component.ModComponents.VAULT_ENTRIES, new ArrayList<>(entries));
+
+        if (entries.isEmpty()) {
+            builder.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(List.of()));
+            return;
+        }
 
         // Capped preview for tooltip mods (ItemContainerContents hard-limits at 256 slots).
         List<ItemStack> preview = new ArrayList<>();
@@ -279,7 +286,8 @@ public class VaultBlockEntity extends BlockEntity implements MenuProvider, Conta
 
     @Override
     public Component getDisplayName() {
-        return Component.translatable(tier.titleKey);
+        Component customName = this.components().get(DataComponents.CUSTOM_NAME);
+        return customName != null ? customName : Component.translatable(tier.titleKey);
     }
 
     @Override

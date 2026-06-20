@@ -8,11 +8,13 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.biome.Biome.Precipitation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DoorBlock;
@@ -45,7 +47,9 @@ public class ModBlocks {
         Block block = new VaultBlock(settings.setId(blockKey));
         ResourceKey<Item> itemKey = keyOfItem(name);
         VaultItem vaultItem = new VaultItem(block,
-                new Item.Properties().setId(itemKey).useBlockDescriptionPrefix().stacksTo(1));
+                new Item.Properties().setId(itemKey).useBlockDescriptionPrefix().stacksTo(1)
+                        .component(DataComponents.TOOLTIP_DISPLAY,
+                                TooltipDisplay.DEFAULT.withHidden(DataComponents.CONTAINER, true)));
         Registry.register(BuiltInRegistries.ITEM, itemKey, vaultItem);
         return Registry.register(BuiltInRegistries.BLOCK, blockKey, block);
     }
