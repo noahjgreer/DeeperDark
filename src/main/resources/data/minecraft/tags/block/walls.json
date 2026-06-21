@@ -1,0 +1,12 @@
+{
+  "replace": false,
+  "values": [
+    "deeperdark:stone_wall",
+    "deeperdark:quartz_wall",
+    "deeperdark:deepslate_wall",
+    "deeperdark:end_stone_wall",
+    "deeperdark:purpur_wall",
+    "deeperdark:basalt_wall",
+    "deeperdark:resin_wall"
+  ]
+}

@@ -17,9 +17,13 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.biome.Biome.Precipitation;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.RotatedPillarBlock;
+import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.StairBlock;
+import net.minecraft.world.level.block.WallBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
@@ -108,7 +112,25 @@ public class ModBlocks {
             content.accept(FLINT_BLOCK);
             content.accept(ROTTEN_FLESH_BLOCK);
             content.accept(ENDER_PEARL_BLOCK);
+            content.accept(CHISELED_STONE);
+            content.accept(STONE_WALL);
+            content.accept(QUARTZ_WALL);
+            content.accept(DEEPSLATE_STAIRS);
+            content.accept(DEEPSLATE_SLAB);
+            content.accept(DEEPSLATE_WALL);
+            content.accept(END_STONE_STAIRS);
+            content.accept(END_STONE_SLAB);
+            content.accept(END_STONE_WALL);
+            content.accept(PURPUR_WALL);
+            content.accept(BASALT_STAIRS);
+            content.accept(BASALT_SLAB);
+            content.accept(BASALT_WALL);
+            content.accept(RESIN_STAIRS);
+            content.accept(RESIN_SLAB);
+            content.accept(RESIN_WALL);
+            content.accept(STONE_PILLAR);
             content.accept(SANDSTONE_PILLAR);
+            content.accept(RED_SANDSTONE_PILLAR);
             content.accept(STONE_BRICK_PILLAR);
             content.accept(DEEPSLATE_BRICK_PILLAR);
             content.accept(GLASS_DOOR);
@@ -312,8 +334,26 @@ public class ModBlocks {
                     .sound(SoundType.WOOD),
             true);
 
+    public static final Block STONE_PILLAR = register(
+            "stone_pillar",
+            RotatedPillarBlock::new,
+            BlockBehaviour.Properties.of()
+                    .strength(1.5F, 6.0F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE),
+            true);
+
     public static final Block SANDSTONE_PILLAR = register(
             "sandstone_pillar",
+            RotatedPillarBlock::new,
+            BlockBehaviour.Properties.of()
+                    .strength(0.8F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE),
+            true);
+
+    public static final Block RED_SANDSTONE_PILLAR = register(
+            "red_sandstone_pillar",
             RotatedPillarBlock::new,
             BlockBehaviour.Properties.of()
                     .strength(0.8F)
@@ -337,6 +377,149 @@ public class ModBlocks {
                     .strength(3.0F, 6.0F)
                     .requiresCorrectToolForDrops()
                     .sound(SoundType.DEEPSLATE_BRICKS),
+            true);
+
+    public static final Block CHISELED_STONE = register(
+            "chiseled_stone",
+            Block::new,
+            BlockBehaviour.Properties.of()
+                    .strength(1.5F, 6.0F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE),
+            true);
+
+    // ── Parity blocks: missing base-material variants ─────────────────────────
+
+    public static final Block STONE_WALL = register(
+            "stone_wall",
+            WallBlock::new,
+            BlockBehaviour.Properties.of()
+                    .strength(1.5F, 6.0F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE),
+            true);
+
+    public static final Block QUARTZ_WALL = register(
+            "quartz_wall",
+            WallBlock::new,
+            BlockBehaviour.Properties.of()
+                    .strength(0.8F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE),
+            true);
+
+    public static final Block DEEPSLATE_STAIRS = register(
+            "deepslate_stairs",
+            p -> new StairBlock(Blocks.DEEPSLATE.defaultBlockState(), p),
+            BlockBehaviour.Properties.of()
+                    .strength(3.0F, 6.0F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.DEEPSLATE),
+            true);
+
+    public static final Block DEEPSLATE_SLAB = register(
+            "deepslate_slab",
+            SlabBlock::new,
+            BlockBehaviour.Properties.of()
+                    .strength(3.0F, 6.0F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.DEEPSLATE),
+            true);
+
+    public static final Block DEEPSLATE_WALL = register(
+            "deepslate_wall",
+            WallBlock::new,
+            BlockBehaviour.Properties.of()
+                    .strength(3.0F, 6.0F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.DEEPSLATE),
+            true);
+
+    public static final Block END_STONE_STAIRS = register(
+            "end_stone_stairs",
+            p -> new StairBlock(Blocks.END_STONE.defaultBlockState(), p),
+            BlockBehaviour.Properties.of()
+                    .strength(3.0F, 9.0F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE),
+            true);
+
+    public static final Block END_STONE_SLAB = register(
+            "end_stone_slab",
+            SlabBlock::new,
+            BlockBehaviour.Properties.of()
+                    .strength(3.0F, 9.0F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE),
+            true);
+
+    public static final Block END_STONE_WALL = register(
+            "end_stone_wall",
+            WallBlock::new,
+            BlockBehaviour.Properties.of()
+                    .strength(3.0F, 9.0F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE),
+            true);
+
+    public static final Block PURPUR_WALL = register(
+            "purpur_wall",
+            WallBlock::new,
+            BlockBehaviour.Properties.of()
+                    .strength(1.5F, 6.0F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE),
+            true);
+
+    public static final Block BASALT_STAIRS = register(
+            "basalt_stairs",
+            p -> new StairBlock(Blocks.BASALT.defaultBlockState(), p),
+            BlockBehaviour.Properties.of()
+                    .strength(1.25F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.BASALT),
+            true);
+
+    public static final Block BASALT_SLAB = register(
+            "basalt_slab",
+            SlabBlock::new,
+            BlockBehaviour.Properties.of()
+                    .strength(1.25F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.BASALT),
+            true);
+
+    public static final Block BASALT_WALL = register(
+            "basalt_wall",
+            WallBlock::new,
+            BlockBehaviour.Properties.of()
+                    .strength(1.25F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.BASALT),
+            true);
+
+    public static final Block RESIN_STAIRS = register(
+            "resin_stairs",
+            p -> new StairBlock(Blocks.RESIN_BLOCK.defaultBlockState(), p),
+            BlockBehaviour.Properties.of()
+                    .strength(1.5F)
+                    .sound(SoundType.RESIN),
+            true);
+
+    public static final Block RESIN_SLAB = register(
+            "resin_slab",
+            SlabBlock::new,
+            BlockBehaviour.Properties.of()
+                    .strength(1.5F)
+                    .sound(SoundType.RESIN),
+            true);
+
+    public static final Block RESIN_WALL = register(
+            "resin_wall",
+            WallBlock::new,
+            BlockBehaviour.Properties.of()
+                    .strength(1.5F)
+                    .sound(SoundType.RESIN),
             true);
 
     // Glass doors — uses a custom BlockSetType backed by the glass door sounds.

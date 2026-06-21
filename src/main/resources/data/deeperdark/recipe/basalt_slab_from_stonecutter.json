@@ -1,0 +1,5 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "minecraft:basalt",
+  "result": { "id": "deeperdark:basalt_slab", "count": 2 }
+}

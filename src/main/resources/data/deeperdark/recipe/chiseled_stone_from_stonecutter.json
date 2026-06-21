@@ -1,0 +1,5 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "minecraft:stone",
+  "result": { "id": "deeperdark:chiseled_stone", "count": 1 }
+}

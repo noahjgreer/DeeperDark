@@ -1,0 +1,5 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "minecraft:deepslate",
+  "result": { "id": "deeperdark:deepslate_slab", "count": 2 }
+}

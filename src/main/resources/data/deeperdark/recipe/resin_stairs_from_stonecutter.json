@@ -1,0 +1,5 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "minecraft:resin_block",
+  "result": { "id": "deeperdark:resin_stairs", "count": 1 }
+}

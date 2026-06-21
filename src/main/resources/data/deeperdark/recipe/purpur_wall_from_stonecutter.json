@@ -1,0 +1,5 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "minecraft:purpur_block",
+  "result": { "id": "deeperdark:purpur_wall", "count": 1 }
+}

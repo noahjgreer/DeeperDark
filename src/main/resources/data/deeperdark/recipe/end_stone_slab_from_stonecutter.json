@@ -1,0 +1,5 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "minecraft:end_stone",
+  "result": { "id": "deeperdark:end_stone_slab", "count": 2 }
+}

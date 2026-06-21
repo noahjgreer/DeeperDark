@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": { "#": "minecraft:purpur_block" },
+  "pattern": [ "###", "###" ],
+  "result": { "id": "deeperdark:purpur_wall", "count": 6 }
+}

@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "#",
+    "#"
+  ],
+  "key": {
+    "#": { "item": "minecraft:stone_slab" }
+  },
+  "result": {
+    "id": "deeperdark:chiseled_stone",
+    "count": 1
+  }
+}
