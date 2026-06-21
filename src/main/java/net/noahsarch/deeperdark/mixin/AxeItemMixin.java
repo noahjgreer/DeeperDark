@@ -15,23 +15,15 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.Map;
-
 @Mixin(AxeItem.class)
 public class AxeItemMixin {
 
-    @Inject(method = "useOn", at = @At("HEAD"), cancellable = true)
-    private void onUseOnBlock(UseOnContext context, CallbackInfoReturnable<InteractionResult> cir) {
-        Map<Block, Block> strippedBlocks = AxeItemAccessor.getStrippedBlocks();
-        BlockState state = context.getLevel().getBlockState(context.getClickedPos());
-        if (strippedBlocks.containsKey(state.getBlock())) {
-            cir.setReturnValue(InteractionResult.PASS);
-        }
-    }
-
+    // Vanilla AxeItem.useOn returns PASS for any block not in its STRIPPABLES map
+    // (which contains only wood logs). Mossy blocks are not in that map, so vanilla
+    // naturally returns PASS for them — we only need to intercept at RETURN.
     @Inject(method = "useOn", at = @At("RETURN"), cancellable = true)
     private void deeperdark$stripMoss(UseOnContext context, CallbackInfoReturnable<InteractionResult> cir) {
-        // Only step in when vanilla left the interaction unhandled
+        // Only step in when vanilla left the interaction unhandled.
         if (cir.getReturnValue() != InteractionResult.PASS) return;
 
         BlockPos pos = context.getClickedPos();

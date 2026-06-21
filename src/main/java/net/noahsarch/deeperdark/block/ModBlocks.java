@@ -132,6 +132,7 @@ public class ModBlocks {
             content.accept(SANDSTONE_PILLAR);
             content.accept(RED_SANDSTONE_PILLAR);
             content.accept(STONE_BRICK_PILLAR);
+            content.accept(MOSSY_STONE_BRICK_PILLAR);
             content.accept(DEEPSLATE_BRICK_PILLAR);
             content.accept(GLASS_DOOR);
             content.accept(WHITE_STAINED_GLASS_DOOR);
@@ -363,6 +364,15 @@ public class ModBlocks {
 
     public static final Block STONE_BRICK_PILLAR = register(
             "stone_brick_pillar",
+            RotatedPillarBlock::new,
+            BlockBehaviour.Properties.of()
+                    .strength(1.5F, 6.0F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE),
+            true);
+
+    public static final Block MOSSY_STONE_BRICK_PILLAR = register(
+            "mossy_stone_brick_pillar",
             RotatedPillarBlock::new,
             BlockBehaviour.Properties.of()
                     .strength(1.5F, 6.0F)

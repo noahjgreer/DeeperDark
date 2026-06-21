@@ -212,7 +212,7 @@ public class DeeperDarkConfig {
         // Cobblestone/stone brick mossing configuration
         public boolean mossGrowthEnabled = true; // If true, cobblestone and stone bricks slowly moss over time
         public int mossTickCheckFrequency = 3; // How many random ticks to skip between checks (higher = slower)
-        public double mossBaseChance = 0.001; // Base chance per valid tick to moss (very low for 5-10 day timing)
+        public double mossBaseChance = 0.1; // Base chance per sampled block to moss (~5 days water-adjacent, ~10 days for stone bricks)
         public double mossNearbyBonus = 0.05; // Additional chance per nearby mossy block
         public double mossUnderwaterMultiplier = 3.0; // Multiplier for mossing speed when underwater
         public double stoneBrickMossMultiplier = 0.5; // Multiplier for stone brick mossing speed (slower than cobble)
@@ -361,7 +361,7 @@ public class DeeperDarkConfig {
                     # Moss Growth Configuration:
                     # mossGrowthEnabled: if true, cobblestone and stone bricks slowly moss over time (default: true)
                     # mossTickCheckFrequency: how many random ticks to skip between moss checks (higher = slower, default: 3)
-                    # mossBaseChance: base probability per valid tick to convert to mossy (default: 0.001 for ~5-10 in-game days)
+                    # mossBaseChance: probability that a sampled block converts when eligible (default: 0.1 for ~5-10 in-game days near water)
                     # mossNearbyBonus: additional chance per adjacent mossy block (default: 0.05)
                     # mossUnderwaterMultiplier: multiplier for mossing speed when underwater (default: 3.0)
                     # stoneBrickMossMultiplier: multiplier for stone brick mossing (default: 0.5, twice as slow as cobble)

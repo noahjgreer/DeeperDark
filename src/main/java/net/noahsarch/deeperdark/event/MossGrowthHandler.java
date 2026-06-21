@@ -12,6 +12,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.FluidState;
 import net.noahsarch.deeperdark.DeeperDarkConfig;
+import net.noahsarch.deeperdark.block.ModBlocks;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,6 +33,7 @@ public class MossGrowthHandler {
         register(Blocks.STONE_BRICK_WALL,   Blocks.MOSSY_STONE_BRICK_WALL);
         register(Blocks.STONE_BRICK_SLAB,   Blocks.MOSSY_STONE_BRICK_SLAB);
         register(Blocks.STONE_BRICK_STAIRS, Blocks.MOSSY_STONE_BRICK_STAIRS);
+        register(ModBlocks.STONE_BRICK_PILLAR, ModBlocks.MOSSY_STONE_BRICK_PILLAR);
     }
 
     private static void register(Block plain, Block mossy) {
@@ -64,10 +66,14 @@ public class MossGrowthHandler {
                     int cz = centerCZ + dz;
                     if (!world.hasChunk(cx, cz)) continue;
 
-                    // 5 random positions per chunk per second — like vanilla randomTickSpeed=3
-                    for (int i = 0; i < 5; i++) {
+                    // 20 random positions per chunk per second, sampled within the
+                    // surface-relevant Y band (-64 to +64). This keeps the sampling dense
+                    // enough for the base chance to produce conversions in a reasonable
+                    // number of in-game days. The full 384-block world height would make
+                    // the sampling far too sparse.
+                    for (int i = 0; i < 20; i++) {
                         int x = (cx << 4) + random.nextInt(16);
-                        int y = world.getMinY() + random.nextInt(world.getHeight());
+                        int y = world.getMinY() + random.nextInt(128);
                         int z = (cz << 4) + random.nextInt(16);
                         BlockPos pos = new BlockPos(x, y, z);
                         tryMoss(world, pos, world.getBlockState(pos), random, config);
@@ -84,17 +90,20 @@ public class MossGrowthHandler {
         if (mossyVariant == null) return;
 
         boolean isStoneBrick = (plain == Blocks.STONE_BRICKS || plain == Blocks.STONE_BRICK_WALL
-                || plain == Blocks.STONE_BRICK_SLAB || plain == Blocks.STONE_BRICK_STAIRS);
+                || plain == Blocks.STONE_BRICK_SLAB || plain == Blocks.STONE_BRICK_STAIRS
+                || plain == ModBlocks.STONE_BRICK_PILLAR);
+
+        double stoneMult = isStoneBrick ? config.stoneBrickMossMultiplier : 1.0;
 
         boolean adjacentToWater = isAdjacentToWater(world, pos);
 
         double chance;
         if (adjacentToWater) {
-            // Primary mossing — water contact
-            chance = config.mossBaseChance * (isStoneBrick ? config.stoneBrickMossMultiplier : 1.0);
+            // Water contact gives the underwater multiplier (default 3×).
+            chance = config.mossBaseChance * config.mossUnderwaterMultiplier * stoneMult;
         } else if (hasAdjacentMoss(world, pos)) {
-            // Slow spreading from existing moss
-            chance = config.mossBaseChance * 0.15 * (isStoneBrick ? config.stoneBrickMossMultiplier : 1.0);
+            // Slow spreading from existing moss, using the configurable nearby bonus.
+            chance = config.mossBaseChance * config.mossNearbyBonus * stoneMult;
         } else {
             return;
         }
