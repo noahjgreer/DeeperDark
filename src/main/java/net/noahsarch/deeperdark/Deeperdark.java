@@ -92,6 +92,9 @@ public class Deeperdark implements ModInitializer {
 		// Register custom data components
 		net.noahsarch.deeperdark.component.ModComponents.initialize();
 
+		// Register custom fluids before blocks (MILK_BLOCK depends on MILK_STILL)
+		net.noahsarch.deeperdark.fluid.ModFluids.initialize();
+
 		// Register custom blocks/items before recipes or events use them
 		ModBlocks.initialize();
 		ModBlockEntities.initialize();
@@ -110,19 +113,19 @@ public class Deeperdark implements ModInitializer {
 		PayloadTypeRegistry.clientboundPlay().register(AllIngredientsConsumableSyncPacket.ID, AllIngredientsConsumableSyncPacket.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(OpenFromScreenPayload.ID, OpenFromScreenPayload.CODEC);
 
-		// Container-from-inventory: client → server
+		// Container-from-inventory: client â†’ server
 		PayloadTypeRegistry.serverboundPlay().register(OpenContainerItemPayload.ID, OpenContainerItemPayload.CODEC);
 		ServerPlayNetworking.registerGlobalReceiver(OpenContainerItemPayload.ID, (payload, context) ->
 			context.server().execute(() -> openContainerFromInventory(context.player(), payload.slot(), true))
 		);
 
-		// Container-within-container: client → server
+		// Container-within-container: client â†’ server
 		PayloadTypeRegistry.serverboundPlay().register(OpenNestedContainerPayload.ID, OpenNestedContainerPayload.CODEC);
 		ServerPlayNetworking.registerGlobalReceiver(OpenNestedContainerPayload.ID, (payload, context) ->
 			context.server().execute(() -> openContainerFromCurrentMenu(context.player(), payload.menuSlotIndex()))
 		);
 
-		// Collar crafting panel state sync: client → server
+		// Collar crafting panel state sync: client â†’ server
 		PayloadTypeRegistry.serverboundPlay().register(SyncCraftingPanelPayload.ID, SyncCraftingPanelPayload.CODEC);
 		ServerPlayNetworking.registerGlobalReceiver(SyncCraftingPanelPayload.ID, (payload, context) ->
 			context.server().execute(() -> {
@@ -133,7 +136,7 @@ public class Deeperdark implements ModInitializer {
 			})
 		);
 
-		// Pick-block from containers: client → server
+		// Pick-block from containers: client â†’ server
 		PayloadTypeRegistry.serverboundPlay().register(PickFromContainerPayload.ID, PickFromContainerPayload.CODEC);
 		ServerPlayNetworking.registerGlobalReceiver(PickFromContainerPayload.ID, (payload, context) ->
 			context.server().execute(() -> {
@@ -419,13 +422,13 @@ public class Deeperdark implements ModInitializer {
 		}
 
 		// Find which player-inventory slot holds the parent container (has OPEN_MARKER_KEY).
-		// -1 means the parent is a placed block container (chest, barrel, etc.) — that's fine;
+		// -1 means the parent is a placed block container (chest, barrel, etc.) â€” that's fine;
 		// we just skip the NESTED_FROM stamp so closing the child doesn't attempt to auto-reopen
 		// a block container (which manages its own open/close independently).
 		int parentInventorySlot = findParentInventorySlot(player);
 		if (parentInventorySlot >= 0) {
 			// Stamp NESTED_FROM_KEY on the parent item BEFORE player.openMenu() closes the
-			// current menu and removes its own OPEN_MARKER_KEY.  Stored as a boolean flag —
+			// current menu and removes its own OPEN_MARKER_KEY.  Stored as a boolean flag â€”
 			// findNestedFromSlot() uses the live loop index rather than a stored slot number,
 			// so the parent can be moved freely without breaking the back-navigation.
 			ItemStack parentItem = player.getInventory().getItem(parentInventorySlot);

@@ -12,7 +12,11 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.Consumable;
+import net.minecraft.world.item.component.Consumables;
 import net.minecraft.world.item.component.CustomModelData;
+import net.minecraft.world.item.consume_effects.ClearAllStatusEffectsConsumeEffect;
 import net.noahsarch.deeperdark.Deeperdark;
 
 public class ModItems {
@@ -79,6 +83,12 @@ public class ModItems {
                 creativeTab.accept(DIAMOND_COLLAR);
                 creativeTab.accept(NETHERITE_COLLAR);
             });
+
+        CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.FOOD_AND_DRINKS)
+            .register(creativeTab -> creativeTab.accept(MILK_BOTTLE));
+
+        CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.COMBAT)
+            .register(creativeTab -> creativeTab.accept(SPLASH_MILK_BOTTLE));
     }
 
     public static final Item LEATHER_SCRAP = register(
@@ -115,4 +125,21 @@ public class ModItems {
         "netherite_item_magnet",
         props -> new ItemMagnetItem(ItemMagnetItem.MagnetType.NETHERITE, props),
         new Item.Properties().fireResistant());
+
+    public static final Item MILK_BOTTLE = register(
+        "milk_bottle",
+        Item::new,
+        new Item.Properties()
+            .stacksTo(16)
+            .usingConvertsTo(Items.GLASS_BOTTLE)
+            .component(DataComponents.CONSUMABLE,
+                Consumable.builder()
+                    .consumeSeconds(1.6F)
+                    .onConsume(ClearAllStatusEffectsConsumeEffect.INSTANCE)
+                    .build()));
+
+    public static final Item SPLASH_MILK_BOTTLE = register(
+        "splash_milk_bottle",
+        SplashMilkBottleItem::new,
+        new Item.Properties().stacksTo(16));
 }

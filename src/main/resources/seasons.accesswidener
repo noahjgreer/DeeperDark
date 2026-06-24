@@ -16,3 +16,9 @@ accessible field net/minecraft/world/level/biome/Biome specialEffects Lnet/minec
 
 # Required for ItemMixin to read sneak key binding
 accessible field net/minecraft/client/KeyMapping key Lcom/mojang/blaze3d/platform/InputConstants$Key;
+
+# Required for ModFluids to register milk bucket into vanilla cauldron dispatchers
+accessible method net/minecraft/core/cauldron/CauldronInteraction$Dispatcher put (Lnet/minecraft/world/item/Item;Lnet/minecraft/core/cauldron/CauldronInteraction;)V
+
+# Required for MilkBucketPlacementMixin to raytrace from outside Item's package
+accessible method net/minecraft/world/item/Item getPlayerPOVHitResult (Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/level/ClipContext$Fluid;)Lnet/minecraft/world/phys/BlockHitResult;

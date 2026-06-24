@@ -35,7 +35,11 @@ public class GoldenCauldronBlock extends CauldronBlock {
     protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
                                            Player player, InteractionHand hand, BlockHitResult hit) {
         Item item = stack.getItem();
-        if (item == Items.WATER_BUCKET) {
+        if (item == Items.MILK_BUCKET) {
+            return GoldenCauldronHelper.fillGoldenCauldron(level, pos, player, hand, stack,
+                ModBlocks.MILK_GOLDEN_CAULDRON.defaultBlockState(),
+                SoundEvents.BUCKET_EMPTY);
+        } else if (item == Items.WATER_BUCKET) {
             return GoldenCauldronHelper.fillGoldenCauldron(level, pos, player, hand, stack,
                 ModBlocks.WATER_GOLDEN_CAULDRON.defaultBlockState().setValue(LayeredCauldronBlock.LEVEL, 3),
                 SoundEvents.BUCKET_EMPTY);

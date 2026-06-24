@@ -8,49 +8,56 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.noahsarch.deeperdark.item.ModItems;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.block.LavaCauldronBlock;
+import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
-public class GoldenLavaCauldronBlock extends LavaCauldronBlock {
+/**
+ * Golden cauldron filled with milk. Non-layered (full or empty), like lava.
+ */
+public class GoldenMilkCauldronBlock extends LavaCauldronBlock {
 
-    public GoldenLavaCauldronBlock(BlockBehaviour.Properties properties) {
+    public GoldenMilkCauldronBlock(BlockBehaviour.Properties properties) {
         super(properties);
     }
 
     @Override
     protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
-                                           Player player, InteractionHand hand, BlockHitResult hit) {
+                                          Player player, InteractionHand hand, BlockHitResult hit) {
         Item item = stack.getItem();
 
         if (item == Items.BUCKET) {
             return GoldenCauldronHelper.emptyGoldenCauldron(level, pos, player, hand, stack,
-                new ItemStack(Items.LAVA_BUCKET), SoundEvents.BUCKET_FILL_LAVA);
+                    new ItemStack(Items.MILK_BUCKET), SoundEvents.BUCKET_FILL);
+
+        } else if (item == Items.GLASS_BOTTLE) {
+            return GoldenCauldronHelper.emptyGoldenCauldron(level, pos, player, hand, stack,
+                    new ItemStack(ModItems.MILK_BOTTLE), SoundEvents.BOTTLE_FILL);
 
         } else if (item == Items.MILK_BUCKET) {
+            // Already full of milk
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
+
+        } else if (item == Items.WATER_BUCKET) {
             return GoldenCauldronHelper.fillGoldenCauldron(level, pos, player, hand, stack,
-                ModBlocks.MILK_GOLDEN_CAULDRON.defaultBlockState(),
-                SoundEvents.BUCKET_EMPTY);
+                    ModBlocks.WATER_GOLDEN_CAULDRON.defaultBlockState().setValue(LayeredCauldronBlock.LEVEL, 3),
+                    SoundEvents.BUCKET_EMPTY);
 
         } else if (item == Items.LAVA_BUCKET) {
             if (GoldenCauldronHelper.isUnderWater(level, pos)) return InteractionResult.CONSUME;
             return GoldenCauldronHelper.fillGoldenCauldron(level, pos, player, hand, stack,
-                ModBlocks.LAVA_GOLDEN_CAULDRON.defaultBlockState(),
-                SoundEvents.BUCKET_EMPTY_LAVA);
-
-        } else if (item == Items.WATER_BUCKET) {
-            return GoldenCauldronHelper.fillGoldenCauldron(level, pos, player, hand, stack,
-                ModBlocks.WATER_GOLDEN_CAULDRON.defaultBlockState().setValue(LayeredCauldronBlock.LEVEL, 3),
-                SoundEvents.BUCKET_EMPTY);
+                    ModBlocks.LAVA_GOLDEN_CAULDRON.defaultBlockState(),
+                    SoundEvents.BUCKET_EMPTY_LAVA);
 
         } else if (item == Items.POWDER_SNOW_BUCKET) {
             if (GoldenCauldronHelper.isUnderWater(level, pos)) return InteractionResult.CONSUME;
             return GoldenCauldronHelper.fillGoldenCauldron(level, pos, player, hand, stack,
-                ModBlocks.POWDER_SNOW_GOLDEN_CAULDRON.defaultBlockState().setValue(LayeredCauldronBlock.LEVEL, 3),
-                SoundEvents.BUCKET_EMPTY_POWDER_SNOW);
+                    ModBlocks.POWDER_SNOW_GOLDEN_CAULDRON.defaultBlockState().setValue(LayeredCauldronBlock.LEVEL, 3),
+                    SoundEvents.BUCKET_EMPTY_POWDER_SNOW);
         }
 
         return super.useItemOn(stack, state, level, pos, player, hand, hit);

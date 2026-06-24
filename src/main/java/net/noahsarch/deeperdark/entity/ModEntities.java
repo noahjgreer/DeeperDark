@@ -45,6 +45,21 @@ public class ModEntities {
                     .build(PRIMED_DYNAMITE_KEY)
     );
 
+    public static final ResourceKey<EntityType<?>> THROWN_SPLASH_MILK_KEY = ResourceKey.create(
+            Registries.ENTITY_TYPE,
+            Identifier.fromNamespaceAndPath(Deeperdark.MOD_ID, "thrown_splash_milk")
+    );
+
+    public static final EntityType<ThrownSplashMilk> THROWN_SPLASH_MILK = Registry.register(
+            BuiltInRegistries.ENTITY_TYPE,
+            THROWN_SPLASH_MILK_KEY,
+            EntityType.Builder.<ThrownSplashMilk>of(ThrownSplashMilk::new, MobCategory.MISC)
+                    .sized(0.25F, 0.25F)
+                    .clientTrackingRange(4)
+                    .updateInterval(10)
+                    .build(THROWN_SPLASH_MILK_KEY)
+    );
+
     public static void initialize() {
         // Reference this class to trigger the static field initializers above,
         // which register the entity type. Called from Deeperdark.onInitialize().

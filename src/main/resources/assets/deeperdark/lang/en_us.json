@@ -197,5 +197,9 @@
   "subtitles.deeperdark.item.collar.jingle": "Collar jingles",
   "subtitles.deeperdark.item.magnet.activate": "Magnet activates",
   "item.deeperdark.vault.empty": "Empty",
-  "subtitles.deeperdark.block.item_vault.loop": "Item Vault hums"
+  "subtitles.deeperdark.block.item_vault.loop": "Item Vault hums",
+  "block.deeperdark.milk_cauldron": "Milk Cauldron",
+  "block.deeperdark.milk_golden_cauldron": "Milk Golden Cauldron",
+  "item.deeperdark.milk_bottle": "Milk Bottle",
+  "item.deeperdark.splash_milk_bottle": "Splash Milk Bottle"
 }

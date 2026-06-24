@@ -52,6 +52,11 @@ public class GoldenLayeredCauldronBlock extends LayeredCauldronBlock {
             return GoldenCauldronHelper.emptyGoldenCauldron(level, pos, player, hand, stack,
                 new ItemStack(emptyResultItem), emptySound);
 
+        } else if (item == Items.MILK_BUCKET) {
+            return GoldenCauldronHelper.fillGoldenCauldron(level, pos, player, hand, stack,
+                ModBlocks.MILK_GOLDEN_CAULDRON.defaultBlockState(),
+                SoundEvents.BUCKET_EMPTY);
+
         } else if (item == Items.WATER_BUCKET) {
             return GoldenCauldronHelper.fillGoldenCauldron(level, pos, player, hand, stack,
                 ModBlocks.WATER_GOLDEN_CAULDRON.defaultBlockState().setValue(LayeredCauldronBlock.LEVEL, 3),

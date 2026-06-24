@@ -1,6 +1,10 @@
 package net.noahsarch.deeperdark;
 
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderingRegistry;
+import net.minecraft.client.renderer.block.FluidModel;
+import net.minecraft.client.resources.model.sprite.Material;
+import net.noahsarch.deeperdark.fluid.ModFluids;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
@@ -11,6 +15,7 @@ import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.entity.EntityRenderers;
+import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Leashable;
@@ -48,6 +53,16 @@ public class DeeperDarkClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        // Register milk fluid rendering (white tint on water sprites)
+        FluidRenderingRegistry.register(
+            ModFluids.MILK_STILL,
+            ModFluids.MILK_FLOWING,
+            new FluidModel.Unbaked(
+                new Material(Identifier.fromNamespaceAndPath(Deeperdark.MOD_ID, "block/milk_still")),
+                new Material(Identifier.fromNamespaceAndPath(Deeperdark.MOD_ID, "block/milk_flow")),
+                null,
+                null));
+
         ContainerItemKeyHandler.register();
         MenuScreens.register(ModMenus.COLLAR, net.noahsarch.deeperdark.client.screen.CollarScreen::new);
         MenuScreens.register(ModMenus.COLLAR_BENCH, net.noahsarch.deeperdark.client.screen.CollarBenchScreen::new);
@@ -64,6 +79,7 @@ public class DeeperDarkClient implements ClientModInitializer {
         );
         EntityRenderers.register(ModEntities.CREATURE, CreatureEntityRenderer::new);
         EntityRenderers.register(ModEntities.PRIMED_DYNAMITE, PrimedDynamiteRenderer::new);
+        EntityRenderers.register(ModEntities.THROWN_SPLASH_MILK, ThrownItemRenderer::new);
         LivingEntityRenderLayerRegistrationCallback.EVENT
                 .register((entityType, entityRenderer, registrationHelper, context) -> {
                     if (entityRenderer instanceof AvatarRenderer<?> avatarRenderer) {
@@ -76,7 +92,7 @@ public class DeeperDarkClient implements ClientModInitializer {
             context.client().execute(() -> {
                 if (context.client().level == null)
                     return;
-                // Find the leashed entity — check local player first since level.getEntity()
+                // Find the leashed entity â€” check local player first since level.getEntity()
                 // may not find the local player in all code paths.
                 Entity leashed = context.client().level.getEntity(payload.leashedEntityId());
                 if (leashed == null && context.client().player != null
@@ -100,7 +116,7 @@ public class DeeperDarkClient implements ClientModInitializer {
                         leashedLeashable.setLeashedTo(holder, false);
                         // The leash rope is rendered on the LEASHED entity's model, which the local
                         // player can't see in first-person. Fix: also set the holder to visually point
-                        // back to the local player — the holder's model then renders a rope coming
+                        // back to the local player â€” the holder's model then renders a rope coming
                         // toward the camera, which IS visible in first-person.
                         if (leashed == context.client().player && holder instanceof Leashable holderLeashable) {
                             holderLeashable.setLeashedTo(leashed, false);

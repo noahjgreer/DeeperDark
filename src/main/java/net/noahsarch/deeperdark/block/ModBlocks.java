@@ -271,6 +271,32 @@ public class ModBlocks {
                     p),
             Properties.ofLegacyCopy(GOLDEN_CAULDRON),
             false);
+    public static final Block MILK_CAULDRON = register(
+            "milk_cauldron",
+            MilkCauldronBlock::new,
+            BlockBehaviour.Properties.of()
+                    .strength(2.0F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE),
+            false);
+    public static final Block MILK_GOLDEN_CAULDRON = register(
+            "milk_golden_cauldron",
+            GoldenMilkCauldronBlock::new,
+            Properties.ofLegacyCopy(GOLDEN_CAULDRON),
+            false);
+    public static final Block MILK_BLOCK = register(
+            "milk_block",
+            p -> new net.minecraft.world.level.block.LiquidBlock(
+                    (net.minecraft.world.level.material.FlowingFluid) net.noahsarch.deeperdark.fluid.ModFluids.MILK_STILL,
+                    p),
+            BlockBehaviour.Properties.of()
+                    .noCollision()
+                    .strength(100.0F)
+                    .pushReaction(net.minecraft.world.level.material.PushReaction.DESTROY)
+                    .replaceable()
+                    .liquid()
+                    .noLootTable(),
+            false);
     public static final Block SIPHON = register(
             "siphon",
             SiphonBlock::new,
