@@ -18,6 +18,7 @@
   "autoUpdater.update.confirm": "Install",
   "autoUpdater.update.decline": "Update Later",
   "block.deeperdark.quicksand": "Quicksand",
+  "block.deeperdark.igneous_sponge": "Igneous Sponge",
   "death.attack.quicksand_suffocation": "%1$s was suffocated in quicksand",
   "death.attack.quicksand_suffocation.player": "%1$s was suffocated in quicksand whilst fighting %2$s",
   "block.deeperdark.dynamite": "Dynamite",

@@ -1,6 +1,7 @@
 {
     "replace": false,
     "values": [
+        "deeperdark:igneous_sponge",
         "deeperdark:gunpowder_block",
         "deeperdark:flint_block",
         "deeperdark:golden_cauldron",

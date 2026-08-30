@@ -99,11 +99,20 @@ public class ModBlocks {
                     .sound(SoundType.SAND),
             true);
 
+    public static final Block IGNEOUS_SPONGE = register(
+            "igneous_sponge",
+            IgneousSpongeBlock::new,
+            BlockBehaviour.Properties.of()
+                    .strength(0.6F)
+                    .sound(SoundType.BASALT),
+            true);
+
     public static void initialize() {
         Deeperdark.LOGGER.info("Registering ModBlocks for deeperdark");
 
         CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.NATURAL_BLOCKS).register(content -> {
             content.accept(QUICKSAND);
+            content.accept(IGNEOUS_SPONGE);
         });
 
         CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.BUILDING_BLOCKS).register(content -> {
