@@ -16,6 +16,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 import net.noahsarch.deeperdark.Deeperdark;
 import net.noahsarch.deeperdark.duck.EntityAccessor;
+import net.noahsarch.deeperdark.recipe.IgneousSpongeRecipe;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -33,10 +34,12 @@ import java.util.WeakHashMap;
  * Uses the same Direct Holder approach as the organ noteblock sound.
  */
 @Mixin(ResultSlot.class)
-public class CraftingResultSlotMixin {
+public abstract class CraftingResultSlotMixin {
 
     @Shadow @Final private Player player;
     @Shadow @Final private CraftingContainer craftSlots;
+
+    @Shadow protected abstract void checkTakeAchievements(ItemStack carried);
 
     @Unique
     private static final Identifier CRAFTING_SOUND_ID = Identifier.fromNamespaceAndPath(Deeperdark.MOD_ID, "block.crafting_table.craft");
@@ -123,5 +126,46 @@ public class CraftingResultSlotMixin {
                 ));
             }
         }
+    }
+
+    /**
+     * Bulk igneous sponge crafting.
+     *
+     * <p>Vanilla always consumes exactly one item per grid slot, but
+     * {@link net.noahsarch.deeperdark.recipe.IgneousSpongeRecipe} scales its
+     * output to the smaller of the two input stacks, so the craft has to be
+     * settled here instead: consume that many magma blocks and buckets, put the
+     * matching number of lava buckets back in the bucket slot, and hand the
+     * player any empty buckets the craft did not need (dropping them if the
+     * inventory is full).
+     *
+     * <p>The check is deliberately structural rather than a recipe-manager
+     * lookup: {@code onTake} also runs client-side for prediction, where no
+     * recipe manager is available, and the passed-in {@code carried} stack is
+     * already empty when a shift-click moved the whole result away.
+     */
+    @Inject(method = "onTake", at = @At("HEAD"), cancellable = true)
+    private void deeperdark$bulkIgneousSpongeCraft(Player player, ItemStack carried, CallbackInfo ci) {
+        int crafts = IgneousSpongeRecipe.craftCount(this.craftSlots);
+        if (crafts <= 0) return;
+
+        int magmaSlot = IgneousSpongeRecipe.findSlot(this.craftSlots, Items.MAGMA_BLOCK);
+        int bucketSlot = IgneousSpongeRecipe.findSlot(this.craftSlots, Items.BUCKET);
+        if (magmaSlot < 0 || bucketSlot < 0) return;
+
+        this.checkTakeAchievements(carried);
+
+        this.craftSlots.removeItem(magmaSlot, crafts);
+        this.craftSlots.removeItem(bucketSlot, crafts);
+
+        // Whatever empty buckets the craft could not pair with a magma block;
+        // the slot itself is needed for the lava buckets we just filled.
+        ItemStack unusedBuckets = this.craftSlots.getItem(bucketSlot).copy();
+        this.craftSlots.setItem(bucketSlot, new ItemStack(Items.LAVA_BUCKET, crafts));
+        if (!unusedBuckets.isEmpty() && !this.player.getInventory().add(unusedBuckets)) {
+            this.player.drop(unusedBuckets, false);
+        }
+
+        ci.cancel();
     }
 }

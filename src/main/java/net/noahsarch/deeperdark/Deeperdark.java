@@ -201,6 +201,9 @@ public class Deeperdark implements ModInitializer {
 				net.noahsarch.deeperdark.recipe.WoolShearingRecipe.SERIALIZER_ID,
 				net.noahsarch.deeperdark.recipe.WoolShearingRecipe.SERIALIZER);
 
+		// Water and lava buckets stack to 64 so igneous sponges can be crafted in bulk
+		net.noahsarch.deeperdark.item.StackableBuckets.initialize();
+
 		// Register igneous sponge recipe (magma block + bucket, returns a lava bucket)
 		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER,
 				net.noahsarch.deeperdark.recipe.IgneousSpongeRecipe.SERIALIZER_ID,
