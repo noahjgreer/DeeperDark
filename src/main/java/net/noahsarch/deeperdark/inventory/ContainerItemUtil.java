@@ -83,31 +83,7 @@ public final class ContainerItemUtil {
         if (!canVaultInsert(vaultItem, cursor)) return false;
         int maxTypes = getVaultMaxTypes(vaultItem);
 
-        // Build working entry list from the lossless component, or reconstruct from legacy CONTAINER.
-        List<VaultBlockEntity.VaultEntry> rawEntries = vaultItem.get(ModComponents.VAULT_ENTRIES);
-        List<VaultBlockEntity.VaultEntry> entries = new ArrayList<>();
-        if (rawEntries != null) {
-            for (VaultBlockEntity.VaultEntry e : rawEntries) {
-                entries.add(new VaultBlockEntity.VaultEntry(e.representative, e.count));
-            }
-        } else {
-            ItemContainerContents contents = vaultItem.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY);
-            for (ItemStackTemplate template : contents.nonEmptyItems()) {
-                ItemStack s = template.create();
-                if (s.isEmpty()) continue;
-                boolean merged = false;
-                for (VaultBlockEntity.VaultEntry e : entries) {
-                    if (ItemStack.isSameItemSameComponents(e.representative, s)) {
-                        long sum = (long) e.count + s.getCount();
-                        e.count = (int) Math.min(sum, Integer.MAX_VALUE);
-                        merged = true;
-                        break;
-                    }
-                }
-                if (!merged && entries.size() < maxTypes)
-                    entries.add(new VaultBlockEntity.VaultEntry(s.copyWithCount(1), s.getCount()));
-            }
-        }
+        List<VaultBlockEntity.VaultEntry> entries = readVaultEntries(vaultItem, maxTypes);
 
         // Merge cursor into matching entry or add a new one.
         boolean inserted = false;
@@ -121,10 +97,51 @@ public final class ContainerItemUtil {
         }
         if (!inserted) entries.add(new VaultBlockEntity.VaultEntry(cursor.copyWithCount(1), cursor.getCount()));
 
-        // Write back lossless data.
+        writeVaultEntries(vaultItem, entries);
+        carriedAccess.set(ItemStack.EMPTY);
+        return true;
+    }
+
+    /**
+     * Reads a vault item's contents as a mutable entry list, reconstructing from the
+     * legacy CONTAINER component for items that predate deeperdark:vault_entries.
+     */
+    public static List<VaultBlockEntity.VaultEntry> readVaultEntries(ItemStack vaultItem, int maxTypes) {
+        List<VaultBlockEntity.VaultEntry> rawEntries = vaultItem.get(ModComponents.VAULT_ENTRIES);
+        List<VaultBlockEntity.VaultEntry> entries = new ArrayList<>();
+        if (rawEntries != null) {
+            for (VaultBlockEntity.VaultEntry e : rawEntries) {
+                entries.add(new VaultBlockEntity.VaultEntry(e.representative, e.count));
+            }
+            return entries;
+        }
+
+        ItemContainerContents contents = vaultItem.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY);
+        for (ItemStackTemplate template : contents.nonEmptyItems()) {
+            ItemStack s = template.create();
+            if (s.isEmpty()) continue;
+            boolean merged = false;
+            for (VaultBlockEntity.VaultEntry e : entries) {
+                if (ItemStack.isSameItemSameComponents(e.representative, s)) {
+                    long sum = (long) e.count + s.getCount();
+                    e.count = (int) Math.min(sum, Integer.MAX_VALUE);
+                    merged = true;
+                    break;
+                }
+            }
+            if (!merged && entries.size() < maxTypes)
+                entries.add(new VaultBlockEntity.VaultEntry(s.copyWithCount(1), s.getCount()));
+        }
+        return entries;
+    }
+
+    /**
+     * Writes the lossless deeperdark:vault_entries component and regenerates the
+     * capped CONTAINER preview (≤256 stacks) that tooltip mods read.
+     */
+    public static void writeVaultEntries(ItemStack vaultItem, List<VaultBlockEntity.VaultEntry> entries) {
         vaultItem.set(ModComponents.VAULT_ENTRIES, entries);
 
-        // Regenerate capped CONTAINER preview (≤256 stacks) for tooltip mods.
         List<ItemStack> preview = new ArrayList<>();
         outer:
         for (VaultBlockEntity.VaultEntry e : entries) {
@@ -142,9 +159,58 @@ public final class ContainerItemUtil {
         } else {
             vaultItem.remove(DataComponents.CONTAINER);
         }
+    }
 
-        carriedAccess.set(ItemStack.EMPTY);
-        return true;
+    /**
+     * Merges {@code incoming} into stacks the box already holds of that exact item, never
+     * opening a new slot. Shrinks {@code incoming} by the amount moved and returns that amount.
+     * Used by the hopper trinket, which must only route items to containers already stocking them.
+     */
+    public static int insertMatchingOnly(ItemStack containerItem, ItemStack incoming, int size) {
+        if (incoming.isEmpty() || size <= 0) return 0;
+
+        NonNullList<ItemStack> items = NonNullList.withSize(size, ItemStack.EMPTY);
+        containerItem.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY).copyInto(items);
+
+        int inserted = 0;
+        for (int i = 0; i < size && !incoming.isEmpty(); i++) {
+            ItemStack slot = items.get(i);
+            if (slot.isEmpty() || !ItemStack.isSameItemSameComponents(slot, incoming)) continue;
+            int amount = Math.min(slot.getMaxStackSize() - slot.getCount(), incoming.getCount());
+            if (amount > 0) {
+                slot.grow(amount);
+                incoming.shrink(amount);
+                inserted += amount;
+            }
+        }
+
+        if (inserted > 0) {
+            containerItem.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(new ArrayList<>(items)));
+        }
+        return inserted;
+    }
+
+    /**
+     * Vault counterpart of {@link #insertMatchingOnly}: adds to an existing vault entry only,
+     * never claiming a free entry slot. Shrinks {@code incoming} and returns the amount moved.
+     */
+    public static int insertMatchingOnlyVault(ItemStack vaultItem, ItemStack incoming) {
+        int maxTypes = getVaultMaxTypes(vaultItem);
+        if (maxTypes < 0 || incoming.isEmpty()) return 0;
+
+        List<VaultBlockEntity.VaultEntry> entries = readVaultEntries(vaultItem, maxTypes);
+        for (VaultBlockEntity.VaultEntry e : entries) {
+            if (!ItemStack.isSameItemSameComponents(e.representative, incoming)) continue;
+            // Vault entries are effectively unbounded; cap at Integer.MAX_VALUE like tryVaultInsert.
+            int room = Integer.MAX_VALUE - e.count;
+            int amount = Math.min(room, incoming.getCount());
+            if (amount <= 0) return 0;
+            e.count += amount;
+            incoming.shrink(amount);
+            writeVaultEntries(vaultItem, entries);
+            return amount;
+        }
+        return 0;
     }
 
     /** Returns true if at least 1 of cursor can be placed into the container. */

@@ -12,8 +12,13 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.Explosion;
 import net.noahsarch.deeperdark.DeeperDarkConfig;
 import net.noahsarch.deeperdark.duck.EntityAccessor;
+import net.minecraft.stats.Stats;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.noahsarch.deeperdark.event.HopperTrinketHandler;
 import net.noahsarch.deeperdark.event.ItemMagnetHandler;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -23,6 +28,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ItemEntity.class)
 public abstract class ItemEntityMixin extends Entity {
+
+    @Shadow private int pickupDelay;
+    @Shadow private java.util.UUID target;
+
+    @Shadow public abstract ItemStack getItem();
 
     @Unique
     private Vec3 deeperdark$lastVelocity = Vec3.ZERO;
@@ -80,5 +90,37 @@ public abstract class ItemEntityMixin extends Entity {
     @Inject(method = "playerTouch", at = @At("HEAD"))
     private void deeperdark$clearDroppedFlag(Player player, CallbackInfo ci) {
         ItemMagnetHandler.clearDroppedItem(((Entity)(Object)this).getUUID());
+    }
+
+    /**
+     * Hopper trinket: divert the pickup into matching container items the player is carrying.
+     * Anything left over falls through to vanilla, which adds it to the inventory as usual;
+     * if the whole stack was routed we finish the pickup ourselves and cancel.
+     */
+    @Inject(method = "playerTouch", at = @At("HEAD"), cancellable = true)
+    private void deeperdark$routeToCollarHopper(Player player, CallbackInfo ci) {
+        if (this.level().isClientSide()) return;
+        // Mirror vanilla's pickup gate so a delayed or reserved drop isn't siphoned early.
+        if (this.pickupDelay != 0) return;
+        if (this.target != null && !this.target.equals(player.getUUID())) return;
+
+        ItemStack stack = this.getItem();
+        if (stack.isEmpty()) return;
+
+        Item item = stack.getItem();
+        int moved = HopperTrinketHandler.route(player, stack);
+        if (moved == 0) return;
+
+        player.awardStat(Stats.ITEM_PICKED_UP.get(item), moved);
+        if (stack.isEmpty()) {
+            // Whole stack absorbed: play out the rest of the vanilla pickup and stop here.
+            // Injector order at HEAD isn't guaranteed, so clear the magnet flag before cancelling.
+            ItemMagnetHandler.clearDroppedItem(this.getUUID());
+            player.take((ItemEntity) (Object) this, moved);
+            player.onItemPickup((ItemEntity) (Object) this);
+            this.discard();
+            ci.cancel();
+        }
+        // Partial: vanilla continues with the shrunken stack and handles take/stats for the rest.
     }
 }
