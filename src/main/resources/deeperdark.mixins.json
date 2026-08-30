@@ -109,7 +109,9 @@
     "ShulkerBoxItemInsertMixin",
     "ContainerItemUseInHandMixin",
     "PickBlockContainerServerMixin",
-    "ContainerCloseIdCheckMixin"
+    "ContainerCloseIdCheckMixin",
+    "SwordBlockingItemMixin",
+    "SwordBlockingLivingEntityMixin"
   ],
   "client": [
     "PickBlockContainerMixin",

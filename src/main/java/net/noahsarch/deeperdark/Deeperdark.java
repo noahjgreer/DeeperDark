@@ -293,6 +293,9 @@ public class Deeperdark implements ModInitializer {
 		// Server-side ports for unmaintained 1.21.11 mods.
 		LeavesBeGonePort.register();
 
+		// Sword blocking, ported from Minecraft 1.8.
+		net.noahsarch.deeperdark.ported.SwordBlockingPort.register();
+
 		// Register moss growth handler for cobblestone/stone brick mossing
 		net.noahsarch.deeperdark.event.MossGrowthHandler.register();
 

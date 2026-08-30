@@ -225,6 +225,10 @@ public class DeeperDarkConfig {
         public List<String> playerSoundExclusions = new ArrayList<>();
         public Map<String, Double> playerSoundVolumes = new HashMap<>();
 
+        // Sword blocking (ported from 1.8) configuration
+        public boolean swordBlockingEnabled = true; // If true, swords can be raised to block like in 1.8
+        public boolean swordBlockingRequiresNoShield = true; // If true, holding a shield suppresses sword blocking
+
         // Leaves Be Gone (server-only port) configuration
         public boolean leavesBeGoneEnabled = true;
         public int leavesDecayMinTicks = 5;
