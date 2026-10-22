@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version "${loom_version}"
+	id 'net.fabricmc.fabric-loom' version "${loom_version}"
 	id 'maven-publish'
 }
 
@@ -31,18 +31,22 @@ fabricApi {
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings loom.layered {
-		mappings(rootProject.file("mappings.tiny"))
-	}
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	// YAML config support - include it in the jar
 	include implementation('org.yaml:snakeyaml:2.1')
 
-	// Optional dev-test mods are installed via the installDevMods task (see below).
+	// Optional mods to test compat in dev runs (not bundled)
+	localRuntime files(
+		"libs/lambdynamiclights-4.10.2+26.1.2.jar",
+		"libs/yumi-commons-event-2.0.0.jar",
+		"libs/yumi-commons-core-2.0.0.jar",
+		"libs/yumi-commons-collections-2.0.0.jar",
+		"libs/stack-to-nearby-chests-mc26.1.1-0.5.16.jar"
+	)
 
 	// LambDynamicLights soft dependency (compile-only; not bundled, must be provided at runtime)    
     compileOnly files(
@@ -84,32 +88,6 @@ processResources {
 	exclude "**/Thumbs.db", "**/.DS_Store", "**/desktop.ini"
 }
 
-// For MC 26.1.2 which ships unobfuscated: official names == named names.
-// Fabric Loader's computeRuntimeNamespace() uses hasAnyMappings() to detect dev mode;
-// our empty tiny (no class entries) makes hasAnyMappings() return false, so it defaults
-// to "official" as the runtime namespace. Patch launch.cfg to set both properties:
-//   - fabric.runtimeMappingNamespace=named  (overrides computeRuntimeNamespace before any logic)
-//   - fabric.defaultModDistributionNamespace=named  (fixes mod distribution namespace check)
-tasks.named("generateDLIConfig").configure {
-	doLast {
-		def launchCfg = project.file(".gradle/loom-cache/launch.cfg")
-		if (launchCfg.exists()) {
-			def content = launchCfg.text
-			content = content.replace(
-				"fabric.defaultModDistributionNamespace=official",
-				"fabric.defaultModDistributionNamespace=named"
-			)
-			if (!content.contains("fabric.runtimeMappingNamespace=")) {
-				content = content.replace(
-					"fabric.defaultModDistributionNamespace=named",
-					"fabric.runtimeMappingNamespace=named\n\tfabric.defaultModDistributionNamespace=named"
-				)
-			}
-			launchCfg.text = content
-		}
-	}
-}
-
 tasks.withType(JavaCompile).configureEach {
 	it.options.release = 25
 }
@@ -133,113 +111,6 @@ jar {
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
-// Dev-mode optional mod installer
-//
-// MC 26.1.2 ships unobfuscated (official == named).  Loom's remapper still
-// fails on modLocalRuntime JARs because the empty mappings.tiny has no class
-// entries to satisfy access widener lookups.  This task sidesteps the remapper
-// entirely: it copies each optional mod JAR to run/mods/, patching every
-// .accesswidener and .classtweaker header from "official" to "named" (no-op
-// for class names, fixes the namespace declaration the loader checks).
-// Nested JARs (Jar-in-Jar) are patched recursively so their bundled deps work.
-//
-// Usage: ./gradlew installDevMods   (also runs automatically before runClient/runServer)
-// To remove: delete run/mods/
-// ──────────────────────────────────────────────────────────────────────────────
-import java.util.zip.*
-
-// Nested JARs to drop from jackfredlib — incompatible with MC 26.1.2 (use intermediary class names)
-def JACKFREDLIB_EXCLUDED = [
-    'META-INF/jars/jackfredlib-gps-1.0.7+1.21.6.jar',
-    'META-INF/jars/jackfredlib-extracommandsourcedata-1.1.1+1.21.6.jar'
-] as Set
-
-def patchJarNamespace  // forward declaration for recursion
-patchJarNamespace = { File src, File dst, Set excludeNestedJars = [] ->
-    dst.parentFile.mkdirs()
-    def buf = new byte[65536]
-    dst.withOutputStream { fos ->
-        def zout = new ZipOutputStream(new BufferedOutputStream(fos))
-        new ZipInputStream(src.newInputStream()).withCloseable { zin ->
-            def entry
-            while ((entry = zin.getNextEntry()) != null) {
-                // Skip excluded nested JARs entirely
-                if (excludeNestedJars.contains(entry.name)) {
-                    zin.readAllBytes()  // drain the entry
-                    continue
-                }
-                zout.putNextEntry(new ZipEntry(entry.name))
-                if (entry.name.endsWith('.accesswidener') || entry.name.endsWith('.classtweaker') || entry.name.endsWith('.ct')) {
-                    def text = new String(zin.readAllBytes(), 'UTF-8')
-                        .replaceFirst(/(?m)^((?:accessWidener|classTweaker)\s+v\d+\s+)(official|intermediary)\b/, '$1named')
-                    zout.write(text.getBytes('UTF-8'))
-                } else if (entry.name == 'fabric.mod.json' && !excludeNestedJars.isEmpty()) {
-                    // Strip excluded entries from the "jars" array in fabric.mod.json
-                    def text = new String(zin.readAllBytes(), 'UTF-8')
-                    excludeNestedJars.each { excluded ->
-                        def filename = excluded.replaceAll('.*/', '')
-                        text = text.replaceAll(/\{\s*"file"\s*:\s*"[^"]*${java.util.regex.Pattern.quote(filename)}[^"]*"\s*\}\s*,?\s*/, '')
-                        text = text.replaceAll(/,\s*\{\s*"file"\s*:\s*"[^"]*${java.util.regex.Pattern.quote(filename)}[^"]*"\s*\}/, '')
-                    }
-                    zout.write(text.getBytes('UTF-8'))
-                } else if (entry.name ==~ /META-INF\/jars\/.+\.jar/) {
-                    def ti = File.createTempFile('jij-in-', '.jar')
-                    def to = File.createTempFile('jij-out-', '.jar')
-                    try {
-                        ti.bytes = zin.readAllBytes()
-                        patchJarNamespace(ti, to)
-                        zout.write(to.bytes)
-                    } finally { ti.delete(); to.delete() }
-                } else {
-                    int n
-                    while ((n = zin.read(buf)) != -1) zout.write(buf, 0, n)
-                }
-                zout.closeEntry()
-            }
-        }
-        zout.close()
-    }
-}
-
-def devModPaths = [
-    'libs/lambdynamiclights-4.10.2+26.1.2.jar',
-    'libs/yumi-commons-event-2.0.0.jar',
-    'libs/yumi-commons-core-2.0.0.jar',
-    'libs/yumi-commons-collections-2.0.0.jar',
-    'libs/stack-to-nearby-chests-mc26.1.1-0.5.16.jar'
-    // ChestTracker and jackfredlib cannot run in this dev environment:
-    // their bytecode references MC classes by intermediary names (class_XXXX)
-    // which require Fabric's intermediary→named runtime remapper, but this
-    // project's empty mappings.tiny provides no translation.
-    // Test ChestTracker compat by running the built JAR in your actual game.
-]
-
-tasks.register('installDevMods') {
-    group = 'fabric'
-    description = 'Patches optional-mod JARs (official→named) and copies them to run/mods/.'
-    def runModsDir = project.file('run/mods')
-    inputs.files devModPaths.collect { project.file(it) }
-    outputs.upToDateWhen { false }  // always run; internal check skips unchanged files
-
-    doLast {
-        runModsDir.mkdirs()
-        devModPaths.each { rel ->
-            def src = project.file(rel)
-            if (!src.exists()) { logger.warn("Dev mod not found, skipping: $rel"); return }
-            def dst = new File(runModsDir, src.name)
-            if (!dst.exists() || dst.lastModified() < src.lastModified()) {
-                logger.lifecycle("Installing dev mod: ${src.name}")
-                def exclusions = src.name.startsWith('jackfredlib-') && !src.name.contains('jackfredlib-base') ? JACKFREDLIB_EXCLUDED : ([] as Set)
-                patchJarNamespace(src, dst, exclusions)
-            }
-        }
-    }
-}
-
-tasks.named('runClient') { dependsOn 'installDevMods' }
-tasks.named('runServer') { dependsOn 'installDevMods' }
-
-// ──────────────────────────────────────────────────────────────────────────────
 // GitHub Release task
 //
 // Usage:
@@ -254,8 +125,8 @@ tasks.named('runServer') { dependsOn 'installDevMods' }
 // ──────────────────────────────────────────────────────────────────────────────
 tasks.register('buildGitRelease') {
     group = 'publishing'
-    description = 'Builds the remapped mod JAR and publishes it as a GitHub release.'
-    dependsOn remapJar
+    description = 'Builds the mod JAR and publishes it as a GitHub release.'
+    dependsOn jar
 
     doLast {
         // ── 1. Resolve token ─────────────────────────────────────────────────────
@@ -307,9 +178,9 @@ tasks.register('buildGitRelease') {
         def ownerRepo = repoMatcher.group(1)
 
         // ── 4. Resolve JAR file and derive names ─────────────────────────────────
-        def jarFile = remapJar.archiveFile.get().asFile
+        def jarFile = jar.archiveFile.get().asFile
         if (!jarFile.exists()) {
-            throw new GradleException("Remapped JAR not found at: ${jarFile}")
+            throw new GradleException("JAR not found at: ${jarFile}")
         }
         def releaseName  = jarFile.name - '.jar'
         def tagName      = "v${project.version}"
