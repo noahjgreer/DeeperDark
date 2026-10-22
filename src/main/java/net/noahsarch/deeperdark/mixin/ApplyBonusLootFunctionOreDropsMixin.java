@@ -45,7 +45,7 @@ public class ApplyBonusLootFunctionOreDropsMixin {
         }
 
         // Get the tool that was used
-        net.minecraft.world.item.ItemInstance tool = context.getParameter(LootContextParams.TOOL);
+        net.minecraft.world.item.ItemInstance tool = context.getOptionalParameter(LootContextParams.TOOL);
         if (tool == null) {
             return;
         }

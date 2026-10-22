@@ -1204,7 +1204,7 @@ public class CreatureManager {
         // Calculate total path length
         double totalLength = 0;
         for (int i = 1; i < path.size(); i++) {
-            totalLength += path.get(i).getCenter().distanceTo(path.get(i - 1).getCenter());
+            totalLength += Vec3.atCenterOf(path.get(i)).distanceTo(Vec3.atCenterOf(path.get(i - 1)));
         }
 
         // Place nuggets along the path up to trail_reach percentage
@@ -1214,13 +1214,13 @@ public class CreatureManager {
         int nuggetsPlaced = 0;
 
         for (int i = 1; i < path.size(); i++) {
-            double segmentLength = path.get(i).getCenter().distanceTo(path.get(i - 1).getCenter());
+            double segmentLength = Vec3.atCenterOf(path.get(i)).distanceTo(Vec3.atCenterOf(path.get(i - 1)));
             traveled += segmentLength;
 
             if (traveled > reachDistance) break;
 
             if (traveled - lastNuggetDist >= config.trailSeparation) {
-                Vec3 nuggetPos = path.get(i).getCenter();
+                Vec3 nuggetPos = Vec3.atCenterOf(path.get(i));
                 ItemEntity nugget = new ItemEntity(world, nuggetPos.x, nuggetPos.y, nuggetPos.z, new ItemStack(Items.COPPER_NUGGET));
                 nugget.setNoPickUpDelay();
                 nugget.setDeltaMovement(Vec3.ZERO);

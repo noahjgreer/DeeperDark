@@ -23,7 +23,9 @@ import org.jspecify.annotations.Nullable;
 
 public class CollarBenchBlock extends BaseEntityBlock {
 
+    //? if <26.3 {
     public static final MapCodec<CollarBenchBlock> CODEC = simpleCodec(CollarBenchBlock::new);
+    //?}
     public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
 
     public CollarBenchBlock(BlockBehaviour.Properties properties) {
@@ -31,10 +33,12 @@ public class CollarBenchBlock extends BaseEntityBlock {
         this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
     }
 
+    //? if <26.3 {
     @Override
     protected MapCodec<? extends BaseEntityBlock> codec() {
         return CODEC;
     }
+    //?}
 
     @Nullable
     @Override

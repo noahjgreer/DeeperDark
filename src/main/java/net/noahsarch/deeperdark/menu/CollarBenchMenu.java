@@ -16,6 +16,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomModelData;
 import net.minecraft.world.item.component.ItemContainerContents;
+//? if >=26.3 {
+/*import net.minecraft.util.Prediction;
+*///?}
 import net.noahsarch.deeperdark.component.CollarFuelData;
 import net.noahsarch.deeperdark.component.ModComponents;
 import net.noahsarch.deeperdark.item.CollarItem;
@@ -142,7 +145,11 @@ public class CollarBenchMenu extends AbstractContainerMenu {
                     if (remaining > 0) {
                         ItemStack returnStack = fuelStack.copy();
                         returnStack.setCount(remaining);
+                        //? if >=26.3 {
+                        /*taker.getInventory().placeItemBackInInventory(returnStack, Prediction.PREDICTED);
+                        *///?} else {
                         taker.getInventory().placeItemBackInInventory(returnStack);
+                        //?}
                     }
                 }
                 // Consume inputs
@@ -489,7 +496,11 @@ public class CollarBenchMenu extends AbstractContainerMenu {
                     }
                     if (!fromOriginal) {
                         // Newly added by player — return it without embedding
+                        //? if >=26.3 {
+                        /*player.getInventory().placeItemBackInInventory(current.copy(), Prediction.SERVER_ONLY);
+                        *///?} else {
                         player.getInventory().placeItemBackInInventory(current.copy());
+                        //?}
                     }
                 }
                 trinketContainer.setItem(i, ItemStack.EMPTY);
@@ -499,13 +510,21 @@ public class CollarBenchMenu extends AbstractContainerMenu {
                 ItemStack cancelledCollar = lastCollarStack.copy();
                 cancelledCollar.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(reconciledTrinkets));
                 updateModelFlags(cancelledCollar, reconciledTrinkets);
+                //? if >=26.3 {
+                /*player.getInventory().placeItemBackInInventory(cancelledCollar, Prediction.SERVER_ONLY);
+                *///?} else {
                 player.getInventory().placeItemBackInInventory(cancelledCollar);
+                //?}
                 beContainer.setItem(COLLAR_INPUT_SLOT, ItemStack.EMPTY);
             }
             // Return fuel (never consumed on cancel)
             ItemStack fuel = beContainer.getItem(FUEL_INPUT_SLOT);
             if (!fuel.isEmpty()) {
+                //? if >=26.3 {
+                /*player.getInventory().placeItemBackInInventory(fuel, Prediction.SERVER_ONLY);
+                *///?} else {
                 player.getInventory().placeItemBackInInventory(fuel);
+                //?}
                 beContainer.setItem(FUEL_INPUT_SLOT, ItemStack.EMPTY);
             }
         } else {
@@ -513,7 +532,11 @@ public class CollarBenchMenu extends AbstractContainerMenu {
             for (int i = 0; i < beContainer.getContainerSize(); i++) {
                 ItemStack s = beContainer.getItem(i);
                 if (!s.isEmpty()) {
+                    //? if >=26.3 {
+                    /*player.getInventory().placeItemBackInInventory(s, Prediction.SERVER_ONLY);
+                    *///?} else {
                     player.getInventory().placeItemBackInInventory(s);
+                    //?}
                     beContainer.setItem(i, ItemStack.EMPTY);
                 }
             }

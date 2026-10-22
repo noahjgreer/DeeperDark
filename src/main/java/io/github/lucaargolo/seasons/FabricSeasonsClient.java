@@ -42,7 +42,7 @@ public class FabricSeasonsClient implements ClientModInitializer {
             ColorsCache.clearCache();
 
             if (FabricSeasons.CONFIG.isValidInDimension(level.dimension())
-                    && client.levelRenderer != null && client.player != null) {
+                    && client.player != null) {
                 colorsDirtyTick++;
                 if (colorsDirtyNeeded || colorsDirtyTick >= COLORS_DIRTY_INTERVAL) {
                     colorsDirtyNeeded = false;
@@ -57,7 +57,7 @@ public class FabricSeasonsClient implements ClientModInitializer {
                     int r = client.options.renderDistance().get();
                     int sx = Mth.floor(client.player.getX()) >> 4;
                     int sz = Mth.floor(client.player.getZ()) >> 4;
-                    client.levelRenderer.setSectionRangeDirty(
+                    level.setSectionRangeDirty(
                             sx - r, level.getMinSectionY(), sz - r,
                             sx + r, level.getMaxSectionY(), sz + r);
                 }

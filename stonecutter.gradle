@@ -3,3 +3,29 @@ plugins {
 }
 
 stonecutter.active "26.1.2"
+
+stonecutter.parameters {
+	// Pure renames. Anything beyond a rename gets a //? if comment at the use site.
+	replacements.string(current.parsed >= "26.3") {
+		replace("net.minecraft.world.entity.monster.EnderMan", "net.minecraft.world.entity.monster.Enderman")
+		replace("EnderMan.class", "Enderman.class")
+		replace("net.minecraft.world.level.block.RedStoneWireBlock;", "net.minecraft.world.level.block.RedstoneWireBlock;")
+		replace("RedStoneWireBlock.class", "RedstoneWireBlock.class")
+		replace("RedStoneWireBlock.POWER", "RedstoneWireBlock.POWER")
+		replace(".hurtMarked", ".syncVelocity")
+		replace("net.minecraft.advancements.CriteriaTriggers", "net.minecraft.advancements.triggers.CriteriaTriggers")
+		replace("net.minecraft.advancements.criterion.ItemPredicate", "net.minecraft.advancements.predicates.ItemPredicate")
+		replace("PushReaction.DESTROY", "PushReaction.POPPED")
+		replace("EntityType.PLAYER", "net.minecraft.world.entity.EntityTypes.PLAYER")
+		replace("EntityType.ITEM_DISPLAY", "net.minecraft.world.entity.EntityTypes.ITEM_DISPLAY")
+		replace("EntityType.CREEPER", "net.minecraft.world.entity.EntityTypes.CREEPER")
+		replace("EntityType.LIGHTNING_BOLT", "net.minecraft.world.entity.EntityTypes.LIGHTNING_BOLT")
+		replace("EntityType.VILLAGER", "net.minecraft.world.entity.EntityTypes.VILLAGER")
+		replace("BlockPos.withinManhattan(", "BlockPos.withinBoxByManhattanDistance(")
+		replace(".mulPose(Axis.", ".rotate(Axis.")
+		replace(".allItemsCopyStream()", ".itemCopies()")
+		replace(".getOptionalParameter(", ".getOptional(")
+		replace("LightEngine.getLightBlockInto(", "LightEngine.getLightDampeningInto(")
+		replace(".isInstantenous()", ".isInstantaneous()")
+	}
+}

@@ -25,7 +25,9 @@ import net.noahsarch.deeperdark.sound.ModSounds;
 
 public class SiphonBlock extends Block {
 
+    //? if <26.3 {
     public static final MapCodec<SiphonBlock> CODEC = simpleCodec(SiphonBlock::new);
+    //?}
     public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
 
     private static final int XP_COST = 8;
@@ -35,10 +37,12 @@ public class SiphonBlock extends Block {
         this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
     }
 
+    //? if <26.3 {
     @Override
     protected MapCodec<SiphonBlock> codec() {
         return CODEC;
     }
+    //?}
 
     @Override
     protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {

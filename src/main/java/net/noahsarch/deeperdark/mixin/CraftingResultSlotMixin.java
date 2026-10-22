@@ -14,6 +14,9 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
+//? if >=26.3 {
+/*import net.minecraft.util.Prediction;
+*///?}
 import net.noahsarch.deeperdark.Deeperdark;
 import net.noahsarch.deeperdark.duck.EntityAccessor;
 import net.noahsarch.deeperdark.recipe.IgneousSpongeRecipe;
@@ -163,7 +166,11 @@ public abstract class CraftingResultSlotMixin {
         ItemStack unusedBuckets = this.craftSlots.getItem(bucketSlot).copy();
         this.craftSlots.setItem(bucketSlot, new ItemStack(Items.LAVA_BUCKET, crafts));
         if (!unusedBuckets.isEmpty() && !this.player.getInventory().add(unusedBuckets)) {
+            //? if >=26.3 {
+            /*this.player.drop(unusedBuckets, false, Prediction.PREDICTED);
+            *///?} else {
             this.player.drop(unusedBuckets, false);
+            //?}
         }
 
         ci.cancel();

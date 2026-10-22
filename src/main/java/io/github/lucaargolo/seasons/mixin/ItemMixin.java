@@ -40,9 +40,13 @@ public class ItemMixin {
         if (client.level == null) return;
 
         KeyMapping keyShift = client.options.keyShift;
+        //? if >=26.3 {
+        /*boolean sneaking = InputConstants.isKeyDown(keyShift.key.getValue());
+        *///?} else {
         boolean sneaking = InputConstants.isKeyDown(
                 client.getWindow(),
                 keyShift.key.getValue());
+        //?}
 
         if (!sneaking) {
             tooltip.accept(Component.translatable("tooltip.seasons.hold_shift",

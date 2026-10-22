@@ -144,7 +144,11 @@ public abstract class BiomeMixin implements BiomeMixed {
 
         // Swamp uses per-position noise — never cache
         if (specialEffects.grassColorModifier() == BiomeSpecialEffects.GrassColorModifier.SWAMP) {
+            //? if >=26.3 {
+            /*double noise = Biome.BIOME_INFO_NOISE.get(x * 0.0225, z * 0.0225);
+            *///?} else {
             double noise = Biome.BIOME_INFO_NOISE.getValue(x * 0.0225, z * 0.0225, false);
+            //?}
             cir.setReturnValue(noise < -0.1
                     ? GrassSeasonColors.getBlendedSwampColor1(current, current.getNext(), t)
                     : GrassSeasonColors.getBlendedSwampColor2(current, current.getNext(), t));

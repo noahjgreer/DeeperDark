@@ -140,10 +140,7 @@ public class SeasonCommand {
                 .getOrThrow(WorldClocks.OVERWORLD);
             serverLevel.clockManager().setTotalTicks(clock, time);
         }
-        Holder<WorldClock> clock = source.getLevel().registryAccess()
-            .lookupOrThrow(Registries.WORLD_CLOCK)
-            .getOrThrow(WorldClocks.OVERWORLD);
-        int i = (int) (source.getLevel().clockManager().getTotalTicks(clock) % 24000L);
+        int i = (int) (FabricSeasons.getOverworldTime(source.getLevel()) % 24000L);
         source.sendSuccess(() -> Component.translatable("commands.time.set", i), true);
         broadcastTimeSync(source);
         return i;
@@ -155,12 +152,13 @@ public class SeasonCommand {
                 .lookupOrThrow(Registries.WORLD_CLOCK)
                 .getOrThrow(WorldClocks.OVERWORLD);
             ServerClockManager cm = serverLevel.clockManager();
+            //? if >=26.3 {
+            /*cm.setTotalTicks(clock, cm.getInstance(clock).totalTicks() + time);
+            *///?} else {
             cm.setTotalTicks(clock, cm.getTotalTicks(clock) + time);
+            //?}
         }
-        Holder<WorldClock> clock = source.getLevel().registryAccess()
-            .lookupOrThrow(Registries.WORLD_CLOCK)
-            .getOrThrow(WorldClocks.OVERWORLD);
-        int i = (int) (source.getLevel().clockManager().getTotalTicks(clock) % 24000L);
+        int i = (int) (FabricSeasons.getOverworldTime(source.getLevel()) % 24000L);
         source.sendSuccess(() -> Component.translatable("commands.time.set", i), true);
         broadcastTimeSync(source);
         return i;

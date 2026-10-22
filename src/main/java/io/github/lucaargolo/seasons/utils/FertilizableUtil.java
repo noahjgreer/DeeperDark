@@ -11,6 +11,9 @@ import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.BonemealableBlock;
 import net.minecraft.world.level.block.state.BlockState;
+//? if >=26.3 {
+/*import net.minecraft.world.level.block.BonemealSource;
+*///?}
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 public class FertilizableUtil {
@@ -35,7 +38,11 @@ public class FertilizableUtil {
         }
     }
 
+    //? if >=26.3 {
+    /*public static <F extends Block & BonemealableBlock> void growInject(F fertilizable, ServerLevel world, RandomSource random, BlockPos pos, BlockState state, BonemealSource source, CallbackInfo ci) {
+    *///?} else {
     public static <F extends Block & BonemealableBlock> void growInject(F fertilizable, ServerLevel world, RandomSource random, BlockPos pos, BlockState state, CallbackInfo ci) {
+    //?}
         if (FabricSeasons.CONFIG.isSeasonMessingBonemeal() && seasons$shouldInject) {
             float multiplier = 1f + getMultiplier(world, pos, state);
             while (multiplier > 0f) {
@@ -43,7 +50,11 @@ public class FertilizableUtil {
                 float rand = random.nextFloat();
                 if (multiplier >= rand) {
                     seasons$shouldInject = false;
+                    //? if >=26.3 {
+                    /*fertilizable.performBonemeal(world, random, pos, state, source);
+                    *///?} else {
                     fertilizable.performBonemeal(world, random, pos, state);
+                    //?}
                 }
             }
             seasons$shouldInject = true;

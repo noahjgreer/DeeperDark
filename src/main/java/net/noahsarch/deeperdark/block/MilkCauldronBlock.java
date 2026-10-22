@@ -24,17 +24,21 @@ import net.minecraft.world.level.gameevent.GameEvent;
 
 public class MilkCauldronBlock extends AbstractCauldronBlock {
 
+    //? if <26.3 {
     public static final MapCodec<MilkCauldronBlock> CODEC = simpleCodec(MilkCauldronBlock::new);
+    //?}
 
     public MilkCauldronBlock(BlockBehaviour.Properties properties) {
         // Pass EMPTY dispatcher as dummy — we fully override useItemOn
         super(properties, CauldronInteractions.EMPTY);
     }
 
+    //? if <26.3 {
     @Override
     public MapCodec<MilkCauldronBlock> codec() {
         return CODEC;
     }
+    //?}
 
     @Override
     public boolean isFull(BlockState state) {

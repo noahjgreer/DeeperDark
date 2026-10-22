@@ -78,14 +78,12 @@ public class ComponentShapelessRecipe extends NormalCraftingRecipe {
 
     private static boolean matchesTemplate(ItemStackTemplate prototype, ItemStack candidate) {
         if (candidate.getItem() != prototype.item().value()) return false;
-        for (var entry : prototype.components().entrySet()) {
-            var type = entry.getKey();
-            var required = entry.getValue();
-            if (required.isPresent()) {
-                if (!Objects.equals(candidate.get(type), required.get())) return false;
-            } else {
-                if (candidate.has(type)) return false;
-            }
+        var changes = prototype.components().split();
+        for (var required : changes.added()) {
+            if (!Objects.equals(candidate.get(required.type()), required.value())) return false;
+        }
+        for (var removed : changes.removed()) {
+            if (candidate.has(removed)) return false;
         }
         return true;
     }

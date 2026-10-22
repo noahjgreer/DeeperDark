@@ -30,7 +30,9 @@ import net.minecraft.world.phys.BlockHitResult;
 
 public class VaultBlock extends BaseEntityBlock {
 
+    //? if <26.3 {
     public static final MapCodec<VaultBlock> CODEC = simpleCodec(VaultBlock::new);
+    //?}
     public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
 
     // Obsidian-like sounds at pitch 0 (very low-pitched)
@@ -47,10 +49,12 @@ public class VaultBlock extends BaseEntityBlock {
         this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
     }
 
+    //? if <26.3 {
     @Override
     protected MapCodec<? extends BaseEntityBlock> codec() {
         return CODEC;
     }
+    //?}
 
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {

@@ -14,6 +14,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
+//? if >=26.3 {
+/*import net.minecraft.util.Prediction;
+*///?}
 import net.noahsarch.deeperdark.duck.CollarHolder;
 import net.noahsarch.deeperdark.payload.PlayerLeashPacket;
 
@@ -42,7 +45,11 @@ public class PlayerLeashHandler {
                     if (!player.hasInfiniteMaterials()) {
                         ItemStack lead = new ItemStack(Items.LEAD);
                         if (!player.getInventory().add(lead)) {
+                            //? if >=26.3 {
+                            /*player.drop(lead, false, Prediction.SERVER_ONLY);
+                            *///?} else {
                             player.drop(lead, false);
+                            //?}
                         }
                     }
                     level.playSound(null, player.blockPosition(), SoundEvents.LEAD_UNTIED, SoundSource.PLAYERS, 1.0F, 1.0F);

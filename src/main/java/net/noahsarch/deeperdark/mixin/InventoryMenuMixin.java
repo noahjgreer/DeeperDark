@@ -16,6 +16,9 @@ import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeType;
+//? if >=26.3 {
+/*import net.minecraft.util.Prediction;
+*///?}
 import net.noahsarch.deeperdark.duck.CollarHolder;
 import net.noahsarch.deeperdark.duck.CraftingPanelHolder;
 import net.noahsarch.deeperdark.item.CollarItem;
@@ -238,7 +241,11 @@ public abstract class InventoryMenuMixin extends AbstractContainerMenu implement
             // Only proceed if items were actually moved (matches vanilla CraftingMenu pattern)
             if (stack.getCount() == result.getCount()) { cir.setReturnValue(ItemStack.EMPTY); return; }
             slot.onTake(player, stack);
+            //? if >=26.3 {
+            /*player.drop(stack, false, Prediction.PREDICTED);
+            *///?} else {
             player.drop(stack, false);
+            //?}
             cir.setReturnValue(result);
             return;
         }

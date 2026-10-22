@@ -49,7 +49,9 @@ import org.jspecify.annotations.Nullable;
 
 public class GunpowderTrailBlock extends Block {
 
+    //? if <26.3 {
     public static final MapCodec<GunpowderTrailBlock> CODEC = simpleCodec(GunpowderTrailBlock::new);
+    //?}
 
     // Reuse vanilla redstone side properties so blockstate values match vanilla conventions
     public static final EnumProperty<RedstoneSide> NORTH = BlockStateProperties.NORTH_REDSTONE;
@@ -75,10 +77,12 @@ public class GunpowderTrailBlock extends Block {
     // Flat shape matching redstone dust, includes the narrow column for the center dot
     private static final VoxelShape SHAPE = Block.box(3, 0, 3, 13, 1, 13);
 
+    //? if <26.3 {
     @Override
     public MapCodec<GunpowderTrailBlock> codec() {
         return CODEC;
     }
+    //?}
 
     public GunpowderTrailBlock(BlockBehaviour.Properties properties) {
         super(properties);

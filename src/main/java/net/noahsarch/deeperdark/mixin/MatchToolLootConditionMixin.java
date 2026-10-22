@@ -28,7 +28,7 @@ public abstract class MatchToolLootConditionMixin {
 
     @Inject(method = "test", at = @At("HEAD"), cancellable = true)
     private void deeperdark$implicitSilkTouch(LootContext lootContext, CallbackInfoReturnable<Boolean> cir) {
-        ItemStack stack = (ItemStack) lootContext.getParameter(LootContextParams.TOOL);
+        ItemStack stack = (ItemStack) lootContext.getOptionalParameter(LootContextParams.TOOL);
 
         if (stack != null && deeperdark$isGoldenTool(stack)) {
              ItemStack modifiedStack = stack.copy();

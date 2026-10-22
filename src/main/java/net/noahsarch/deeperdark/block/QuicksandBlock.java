@@ -28,7 +28,9 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class QuicksandBlock extends Block {
 
+    //? if <26.3 {
     public static final MapCodec<QuicksandBlock> CODEC = simpleCodec(QuicksandBlock::new);
+    //?}
 
     private static final float HORIZONTAL_PARTICLE_MOMENTUM_FACTOR = 0.083333336F;
     private static final float IN_BLOCK_HORIZONTAL_SPEED_MULTIPLIER = 0.9F;
@@ -40,10 +42,12 @@ public class QuicksandBlock extends Block {
         super(properties);
     }
 
+    //? if <26.3 {
     @Override
     public MapCodec<QuicksandBlock> codec() {
         return CODEC;
     }
+    //?}
 
     /** True for mobs tagged as powder-snow-walkable, or any LivingEntity wearing boots. */
     public static boolean canWalkOnQuicksand(Entity entity) {

@@ -21,6 +21,9 @@ import net.noahsarch.deeperdark.payload.VoidFogSyncPacket;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.server.permissions.Permission;
 import net.minecraft.server.permissions.PermissionLevel;
+//? if >=26.3 {
+/*import net.minecraft.util.Prediction;
+*///?}
 
 import java.util.HashMap;
 import java.util.Map;
@@ -272,7 +275,11 @@ public class DeeperDarkCommands {
 
             boolean inserted = player.getInventory().add(giveStack);
             if (!inserted) {
+                //? if >=26.3 {
+                /*player.drop(giveStack, false, Prediction.SERVER_ONLY);
+                *///?} else {
                 player.drop(giveStack, false);
+                //?}
             }
 
             source.sendSuccess(() -> Component.literal("Gave ")

@@ -83,6 +83,9 @@ public class NoteBlockMixin {
     @Unique
     private boolean deeperdark$isCopperBlock(BlockState state) {
         Block block = state.getBlock();
+        //? if >=26.3 {
+        /*return Blocks.COPPER_BLOCK.asList().contains(block) || Blocks.CUT_COPPER.asList().contains(block);
+        *///?} else {
         return block == Blocks.COPPER_BLOCK ||
                block == Blocks.EXPOSED_COPPER ||
                block == Blocks.WEATHERED_COPPER ||
@@ -99,5 +102,6 @@ public class NoteBlockMixin {
                block == Blocks.WAXED_EXPOSED_CUT_COPPER ||
                block == Blocks.WAXED_WEATHERED_CUT_COPPER ||
                block == Blocks.WAXED_OXIDIZED_CUT_COPPER;
+        //?}
     }
 }

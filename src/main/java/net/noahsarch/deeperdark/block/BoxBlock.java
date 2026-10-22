@@ -27,7 +27,9 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jspecify.annotations.Nullable;
 
 public class BoxBlock extends BaseEntityBlock {
+    //? if <26.3 {
     public static final MapCodec<BoxBlock> CODEC = simpleCodec(BoxBlock::new);
+    //?}
     public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
 
     public BoxBlock(BlockBehaviour.Properties properties) {
@@ -35,10 +37,12 @@ public class BoxBlock extends BaseEntityBlock {
         this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
     }
 
+    //? if <26.3 {
     @Override
     protected MapCodec<? extends BaseEntityBlock> codec() {
         return CODEC;
     }
+    //?}
 
     @Nullable
     @Override

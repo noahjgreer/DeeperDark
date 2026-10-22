@@ -28,21 +28,17 @@ public class ComponentIngredient implements CustomIngredient {
         if (stack.getItem() != prototype.getItem()) return false;
 
         // Match explicit component changes required by the recipe
-        net.minecraft.core.component.DataComponentPatch changes = prototype.getComponentsPatch();
-        for (java.util.Map.Entry<net.minecraft.core.component.DataComponentType<?>, java.util.Optional<?>> entry : changes.entrySet()) {
-            net.minecraft.core.component.DataComponentType<?> type = entry.getKey();
-            java.util.Optional<?> requiredValue = entry.getValue();
-
-            if (requiredValue.isPresent()) {
-                // Requirement: Stack must have this exact value
-                if (!java.util.Objects.equals(stack.get(type), requiredValue.get())) {
-                    return false;
-                }
-            } else {
-                // Requirement: Stack must NOT have this component
-                if (stack.has(type)) {
-                    return false;
-                }
+        net.minecraft.core.component.DataComponentPatch.SplitResult changes = prototype.getComponentsPatch().split();
+        // Requirement: Stack must have these exact values
+        for (net.minecraft.core.component.TypedDataComponent<?> required : changes.added()) {
+            if (!java.util.Objects.equals(stack.get(required.type()), required.value())) {
+                return false;
+            }
+        }
+        // Requirement: Stack must NOT have these components
+        for (net.minecraft.core.component.DataComponentType<?> removed : changes.removed()) {
+            if (stack.has(removed)) {
+                return false;
             }
         }
         return true;

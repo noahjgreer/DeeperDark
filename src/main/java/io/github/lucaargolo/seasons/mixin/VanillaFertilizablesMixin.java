@@ -14,6 +14,9 @@ import net.minecraft.world.level.block.StemBlock;
 import net.minecraft.world.level.block.SweetBerryBushBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
+//? if >=26.3 {
+/*import net.minecraft.world.level.block.BonemealSource;
+*///?}
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -32,7 +35,12 @@ public abstract class VanillaFertilizablesMixin extends Block implements Bonemea
     }
 
     @Inject(at = @At("HEAD"), method = "performBonemeal", cancellable = true)
+    //? if >=26.3 {
+    /*public void growInject(ServerLevel world, RandomSource random, BlockPos pos, BlockState state, BonemealSource source, CallbackInfo ci) {
+        FertilizableUtil.growInject(this, world, random, pos, state, source, ci);
+    *///?} else {
     public void growInject(ServerLevel world, RandomSource random, BlockPos pos, BlockState state, CallbackInfo ci) {
         FertilizableUtil.growInject(this, world, random, pos, state, ci);
+    //?}
     }
 }

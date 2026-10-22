@@ -24,7 +24,9 @@ import org.jspecify.annotations.Nullable;
  * sponge with an empty bucket.
  */
 public class IgneousSpongeBlock extends Block {
+    //? if <26.3 {
     public static final MapCodec<IgneousSpongeBlock> CODEC = simpleCodec(IgneousSpongeBlock::new);
+    //?}
 
     public static final int MAX_DEPTH = 6;
     public static final int MAX_COUNT = 64;
@@ -35,10 +37,12 @@ public class IgneousSpongeBlock extends Block {
         super(properties);
     }
 
+    //? if <26.3 {
     @Override
     public MapCodec<IgneousSpongeBlock> codec() {
         return CODEC;
     }
+    //?}
 
     @Override
     protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {

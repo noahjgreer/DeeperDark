@@ -35,13 +35,17 @@ import org.jspecify.annotations.Nullable;
 
 public class DynamiteBlock extends Block {
 
+    //? if <26.3 {
     public static final MapCodec<DynamiteBlock> CODEC = simpleCodec(DynamiteBlock::new);
+    //?}
     public static final BooleanProperty UNSTABLE = BlockStateProperties.UNSTABLE;
 
+    //? if <26.3 {
     @Override
     public MapCodec<DynamiteBlock> codec() {
         return CODEC;
     }
+    //?}
 
     public DynamiteBlock(BlockBehaviour.Properties properties) {
         super(properties);
