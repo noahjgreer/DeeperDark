@@ -19,7 +19,11 @@ repositories {
 }
 
 loom {
-	accessWidenerPath = file("src/main/resources/seasons.accesswidener")
+	accessWidenerPath = rootProject.file("src/main/resources/seasons.accesswidener")
+
+	runs.configureEach {
+		runDir = "../../run" // shared by every version
+	}
 }
 
 fabricApi {
@@ -29,8 +33,8 @@ fabricApi {
 }
 
 dependencies {
-	// To change the versions see the gradle.properties file
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	// Versions are in gradle.properties and versions/<minecraft version>/gradle.properties
+	minecraft "com.mojang:minecraft:${stonecutter.current.version}"
 	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
@@ -39,41 +43,16 @@ dependencies {
 	// YAML config support - include it in the jar
 	include implementation('org.yaml:snakeyaml:2.1')
 
-	// Optional mods to test compat in dev runs (not bundled)
-	localRuntime files(
-		"libs/lambdynamiclights-4.10.2+26.1.2.jar",
-		"libs/yumi-commons-event-2.0.0.jar",
-		"libs/yumi-commons-core-2.0.0.jar",
-		"libs/yumi-commons-collections-2.0.0.jar",
-		"libs/stack-to-nearby-chests-mc26.1.1-0.5.16.jar"
-	)
-
-	// LambDynamicLights soft dependency (compile-only; not bundled, must be provided at runtime)    
-    compileOnly files(
-		"libs/lambdynamiclights-api-4.10.2+26.1.2.jar",
-		"libs/yumi-commons-event-2.0.0.jar",
-		"libs/yumi-commons-core-2.0.0.jar",
-		"libs/yumi-commons-collections-2.0.0.jar"
-	)
-
-	// ChestTracker + jackfredlib soft dependency (compile-only; not bundled)
-	compileOnly files(
-		"libs/chesttracker-2.8.2+26.1.2.jar",
-		"libs/jackfredlib-0.10.7+1.21.6.jar",
-		"libs/jackfredlib-base-1.4.1+1.21.6.jar"
-	)
-
-	// Stack to Nearby Chests soft dependency (compile-only; not bundled)
-	compileOnly files(
-		"libs/stack-to-nearby-chests-mc26.1.1-0.5.16.jar"
-	)
+	compileOnly files(project.compat_jars.split(',').collect { "${rootDir}/libs/$it" })
+	localRuntime files(project.dev_mod_jars.split(',').collect { "${rootDir}/libs/$it" })
 }
 
 processResources {
 	inputs.property "version", project.version
+	inputs.property "minecraft", stonecutter.current.version
 
 	filesMatching("fabric.mod.json") {
-		expand "version": inputs.properties.version
+		expand "version": inputs.properties.version, "minecraft": inputs.properties.minecraft
 	}
 
 	// Exclude workflow/source files that bloat the jar (mirrors build_resource_pack.py exclusions)
@@ -105,7 +84,7 @@ java {
 jar {
 	inputs.property "archivesName", project.base.archivesName
 
-	from("LICENSE") {
+	from(rootProject.file("LICENSE")) {
 		rename { "${it}_${inputs.properties.archivesName}"}
 	}
 }
@@ -132,7 +111,7 @@ tasks.register('buildGitRelease') {
         // ── 1. Resolve token ─────────────────────────────────────────────────────
         def token = System.getenv('GITHUB_TOKEN')
         if (!token) {
-            def tokenFile = file('.token')
+            def tokenFile = rootProject.file('.token')
             if (tokenFile.exists()) {
                 token = tokenFile.text
             }
@@ -147,7 +126,7 @@ tasks.register('buildGitRelease') {
         }
 
         // ── 2. Read remote origin URL from .git/config ───────────────────────────
-        def gitConfigFile = file('.git/config')
+        def gitConfigFile = rootProject.file('.git/config')
         if (!gitConfigFile.exists()) {
             throw new GradleException("No .git/config found — is this a git repository?")
         }
