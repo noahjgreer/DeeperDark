@@ -10,7 +10,17 @@ import net.minecraft.world.inventory.DispenserMenu;
 import net.minecraft.world.inventory.ShulkerBoxMenu;
 import net.noahsarch.deeperdark.menu.BoxMenu;
 import net.minecraft.world.item.ItemStack;
+//? if >=26.3 {
+/*import net.fabricmc.fabric.api.item.v1.DefaultItemComponentEvents;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.component.Compostable;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProviders;
+*///?} else {
 import net.minecraft.world.level.block.ComposterBlock;
+//?}
+//? if <26.3 {
+import net.noahsarch.deeperdark.potion.CustomBrewingRecipeHandler;
+//?}
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.Registry;
@@ -45,7 +55,6 @@ import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.block.state.BlockState;
 import net.noahsarch.deeperdark.item.ModItems;
 import net.noahsarch.deeperdark.portal.SlipPortalHandler;
-import net.noahsarch.deeperdark.potion.CustomBrewingRecipeHandler;
 import net.noahsarch.deeperdark.ported.LeavesBeGonePort;
 import net.noahsarch.deeperdark.sound.ModSounds;
 import net.noahsarch.deeperdark.villager.ModVillagers;
@@ -259,9 +268,21 @@ public class Deeperdark implements ModInitializer {
         DeepDarkBiomeModifier.init();
         net.noahsarch.deeperdark.worldgen.ModWorldgen.initialize();
 
+        //? if >=26.3 {
+        /*DefaultItemComponentEvents.MODIFY.register(context -> {
+            // Register diamond as compostable (silly easter egg!)
+            context.modify(Items.DIAMOND, builder -> builder.set(DataComponents.COMPOSTABLE,
+                    new Compostable(ContextIntProviders.COMPOSTABLE_ALWAYS_ADD_ONE)));
+            // Shears strip logs like an axe; 26.1.2 does this in ShearsItemMixin
+            context.modify(Items.SHEARS, (builder, lookup, item) -> lookup.lookupOrThrow(Registries.BLOCK_TRANSFORMER)
+                    .get(ResourceKey.create(Registries.BLOCK_TRANSFORMER, Identifier.fromNamespaceAndPath(MOD_ID, "shears")))
+                    .ifPresent(transformer -> builder.set(DataComponents.BLOCK_TRANSFORMER, transformer)));
+        });
+        *///?} else {
         // Register diamond as compostable (silly easter egg!)
         // Since registerCompostableItem is private, we access the public map directly
         ComposterBlock.COMPOSTABLES.put(Items.DIAMOND.asItem(), 1.0f);
+        //?}
 
         // Register the effects
 //        Registry.register(Registries.STATUS_EFFECT, Identifier.withDefaultNamespace("deeperdark:scentless"), SCENTLESS);
@@ -271,8 +292,10 @@ public class Deeperdark implements ModInitializer {
 //        ScentlessPotion.registerPotions();
 
 
-        // Register dimension freezing effect
+        // 26.3 brews the scentless potion from data/deeperdark/recipe/brewing/
+        //? if <26.3 {
         CustomBrewingRecipeHandler.register();
+        //?}
 
 //        ModVillagers.registerVillagers();
 

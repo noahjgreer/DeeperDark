@@ -1,0 +1,61 @@
+{
+  "type": "minecraft:brewing",
+  "input": {
+    "item": "minecraft:potion",
+    "potion_contents": {
+      "potions": [
+        "minecraft:water",
+        "minecraft:mundane",
+        "minecraft:awkward"
+      ]
+    }
+  },
+  "reagent": {
+    "item": "minecraft:echo_shard"
+  },
+  "output": {
+    "id": "minecraft:potion",
+    "components": {
+      "minecraft:potion_contents": {
+        "custom_color": 5414601,
+        "custom_effects": [
+          {
+            "id": "minecraft:wind_charged",
+            "duration": 9600,
+            "show_icon": false
+          }
+        ]
+      },
+      "minecraft:lore": [
+        {
+          "translate": "effect.deeperdark.scentless.duration",
+          "with": [
+            "8:00"
+          ],
+          "color": "blue",
+          "italic": false
+        },
+        {
+          "translate": "effect.deeperdark.scentless.desc.1",
+          "color": "gray",
+          "italic": false
+        },
+        {
+          "translate": "effect.deeperdark.scentless.desc.2",
+          "color": "gray",
+          "italic": false
+        }
+      ],
+      "minecraft:tooltip_display": {
+        "hidden_components": [
+          "minecraft:potion_contents"
+        ]
+      },
+      "minecraft:custom_name": {
+        "translate": "potion.deeperdark.scentless.name",
+        "color": "white",
+        "italic": false
+      }
+    }
+  }
+}

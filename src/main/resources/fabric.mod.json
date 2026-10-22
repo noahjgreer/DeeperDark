@@ -33,6 +33,7 @@
 	},
 	"mixins": [
 		"deeperdark.mixins.json",
+		"deeperdark.versioned.mixins.json",
 		"seasons.mixins.json",
 		"deeperdark.compat.stacktonearbychests.mixins.json",
 		"deeperdark.compat.distanthorizons.mixins.json"

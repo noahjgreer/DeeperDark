@@ -1,6 +1,9 @@
 package net.noahsarch.deeperdark.event;
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+//? if >=26.3 {
+/*import net.fabricmc.fabric.api.item.v1.BlockTransformerHelper;
+*///?}
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -43,6 +46,10 @@ public class MossGrowthHandler {
 
     public static void register() {
         ServerTickEvents.END_LEVEL_TICK.register(MossGrowthHandler::onWorldTick);
+        //? if >=26.3 {
+        /*// Axes scrape the moss off; 26.1.2 does this in AxeItemMixin
+        STRIPPED.forEach(BlockTransformerHelper::registerStripping);
+        *///?}
     }
 
     private static void onWorldTick(ServerLevel world) {

@@ -1,0 +1,386 @@
+[
+  {
+    "block_state_provider": {
+      "type": "minecraft:rule_based",
+      "rules": [
+        {
+          "if_true": {
+            "type": "minecraft:matching_blocks",
+            "blocks": "minecraft:oak_wood"
+          },
+          "then": {
+            "type": "minecraft:copy_properties",
+            "source": {
+              "id": "minecraft:stripped_oak_wood",
+              "properties": {
+                "axis": "y"
+              }
+            }
+          }
+        },
+        {
+          "if_true": {
+            "type": "minecraft:matching_blocks",
+            "blocks": "minecraft:oak_log"
+          },
+          "then": {
+            "type": "minecraft:copy_properties",
+            "source": {
+              "id": "minecraft:stripped_oak_log",
+              "properties": {
+                "axis": "y"
+              }
+            }
+          }
+        },
+        {
+          "if_true": {
+            "type": "minecraft:matching_blocks",
+            "blocks": "minecraft:dark_oak_wood"
+          },
+          "then": {
+            "type": "minecraft:copy_properties",
+            "source": {
+              "id": "minecraft:stripped_dark_oak_wood",
+              "properties": {
+                "axis": "y"
+              }
+            }
+          }
+        },
+        {
+          "if_true": {
+            "type": "minecraft:matching_blocks",
+            "blocks": "minecraft:dark_oak_log"
+          },
+          "then": {
+            "type": "minecraft:copy_properties",
+            "source": {
+              "id": "minecraft:stripped_dark_oak_log",
+              "properties": {
+                "axis": "y"
+              }
+            }
+          }
+        },
+        {
+          "if_true": {
+            "type": "minecraft:matching_blocks",
+            "blocks": "minecraft:pale_oak_wood"
+          },
+          "then": {
+            "type": "minecraft:copy_properties",
+            "source": {
+              "id": "minecraft:stripped_pale_oak_wood",
+              "properties": {
+                "axis": "y"
+              }
+            }
+          }
+        },
+        {
+          "if_true": {
+            "type": "minecraft:matching_blocks",
+            "blocks": "minecraft:pale_oak_log"
+          },
+          "then": {
+            "type": "minecraft:copy_properties",
+            "source": {
+              "id": "minecraft:stripped_pale_oak_log",
+              "properties": {
+                "axis": "y"
+              }
+            }
+          }
+        },
+        {
+          "if_true": {
+            "type": "minecraft:matching_blocks",
+            "blocks": "minecraft:poplar_wood"
+          },
+          "then": {
+            "type": "minecraft:copy_properties",
+            "source": {
+              "id": "minecraft:stripped_poplar_wood",
+              "properties": {
+                "axis": "y"
+              }
+            }
+          }
+        },
+        {
+          "if_true": {
+            "type": "minecraft:matching_blocks",
+            "blocks": "minecraft:poplar_log"
+          },
+          "then": {
+            "type": "minecraft:copy_properties",
+            "source": {
+              "id": "minecraft:stripped_poplar_log",
+              "properties": {
+                "axis": "y"
+              }
+            }
+          }
+        },
+        {
+          "if_true": {
+            "type": "minecraft:matching_blocks",
+            "blocks": "minecraft:acacia_wood"
+          },
+          "then": {
+            "type": "minecraft:copy_properties",
+            "source": {
+              "id": "minecraft:stripped_acacia_wood",
+              "properties": {
+                "axis": "y"
+              }
+            }
+          }
+        },
+        {
+          "if_true": {
+            "type": "minecraft:matching_blocks",
+            "blocks": "minecraft:acacia_log"
+          },
+          "then": {
+            "type": "minecraft:copy_properties",
+            "source": {
+              "id": "minecraft:stripped_acacia_log",
+              "properties": {
+                "axis": "y"
+              }
+            }
+          }
+        },
+        {
+          "if_true": {
+            "type": "minecraft:matching_blocks",
+            "blocks": "minecraft:cherry_wood"
+          },
+          "then": {
+            "type": "minecraft:copy_properties",
+            "source": {
+              "id": "minecraft:stripped_cherry_wood",
+              "properties": {
+                "axis": "y"
+              }
+            }
+          }
+        },
+        {
+          "if_true": {
+            "type": "minecraft:matching_blocks",
+            "blocks": "minecraft:cherry_log"
+          },
+          "then": {
+            "type": "minecraft:copy_properties",
+            "source": {
+              "id": "minecraft:stripped_cherry_log",
+              "properties": {
+                "axis": "y"
+              }
+            }
+          }
+        },
+        {
+          "if_true": {
+            "type": "minecraft:matching_blocks",
+            "blocks": "minecraft:birch_wood"
+          },
+          "then": {
+            "type": "minecraft:copy_properties",
+            "source": {
+              "id": "minecraft:stripped_birch_wood",
+              "properties": {
+                "axis": "y"
+              }
+            }
+          }
+        },
+        {
+          "if_true": {
+            "type": "minecraft:matching_blocks",
+            "blocks": "minecraft:birch_log"
+          },
+          "then": {
+            "type": "minecraft:copy_properties",
+            "source": {
+              "id": "minecraft:stripped_birch_log",
+              "properties": {
+                "axis": "y"
+              }
+            }
+          }
+        },
+        {
+          "if_true": {
+            "type": "minecraft:matching_blocks",
+            "blocks": "minecraft:jungle_wood"
+          },
+          "then": {
+            "type": "minecraft:copy_properties",
+            "source": {
+              "id": "minecraft:stripped_jungle_wood",
+              "properties": {
+                "axis": "y"
+              }
+            }
+          }
+        },
+        {
+          "if_true": {
+            "type": "minecraft:matching_blocks",
+            "blocks": "minecraft:jungle_log"
+          },
+          "then": {
+            "type": "minecraft:copy_properties",
+            "source": {
+              "id": "minecraft:stripped_jungle_log",
+              "properties": {
+                "axis": "y"
+              }
+            }
+          }
+        },
+        {
+          "if_true": {
+            "type": "minecraft:matching_blocks",
+            "blocks": "minecraft:spruce_wood"
+          },
+          "then": {
+            "type": "minecraft:copy_properties",
+            "source": {
+              "id": "minecraft:stripped_spruce_wood",
+              "properties": {
+                "axis": "y"
+              }
+            }
+          }
+        },
+        {
+          "if_true": {
+            "type": "minecraft:matching_blocks",
+            "blocks": "minecraft:spruce_log"
+          },
+          "then": {
+            "type": "minecraft:copy_properties",
+            "source": {
+              "id": "minecraft:stripped_spruce_log",
+              "properties": {
+                "axis": "y"
+              }
+            }
+          }
+        },
+        {
+          "if_true": {
+            "type": "minecraft:matching_blocks",
+            "blocks": "minecraft:warped_stem"
+          },
+          "then": {
+            "type": "minecraft:copy_properties",
+            "source": {
+              "id": "minecraft:stripped_warped_stem",
+              "properties": {
+                "axis": "y"
+              }
+            }
+          }
+        },
+        {
+          "if_true": {
+            "type": "minecraft:matching_blocks",
+            "blocks": "minecraft:warped_hyphae"
+          },
+          "then": {
+            "type": "minecraft:copy_properties",
+            "source": {
+              "id": "minecraft:stripped_warped_hyphae",
+              "properties": {
+                "axis": "y"
+              }
+            }
+          }
+        },
+        {
+          "if_true": {
+            "type": "minecraft:matching_blocks",
+            "blocks": "minecraft:crimson_stem"
+          },
+          "then": {
+            "type": "minecraft:copy_properties",
+            "source": {
+              "id": "minecraft:stripped_crimson_stem",
+              "properties": {
+                "axis": "y"
+              }
+            }
+          }
+        },
+        {
+          "if_true": {
+            "type": "minecraft:matching_blocks",
+            "blocks": "minecraft:crimson_hyphae"
+          },
+          "then": {
+            "type": "minecraft:copy_properties",
+            "source": {
+              "id": "minecraft:stripped_crimson_hyphae",
+              "properties": {
+                "axis": "y"
+              }
+            }
+          }
+        },
+        {
+          "if_true": {
+            "type": "minecraft:matching_blocks",
+            "blocks": "minecraft:mangrove_wood"
+          },
+          "then": {
+            "type": "minecraft:copy_properties",
+            "source": {
+              "id": "minecraft:stripped_mangrove_wood",
+              "properties": {
+                "axis": "y"
+              }
+            }
+          }
+        },
+        {
+          "if_true": {
+            "type": "minecraft:matching_blocks",
+            "blocks": "minecraft:mangrove_log"
+          },
+          "then": {
+            "type": "minecraft:copy_properties",
+            "source": {
+              "id": "minecraft:stripped_mangrove_log",
+              "properties": {
+                "axis": "y"
+              }
+            }
+          }
+        },
+        {
+          "if_true": {
+            "type": "minecraft:matching_blocks",
+            "blocks": "minecraft:bamboo_block"
+          },
+          "then": {
+            "type": "minecraft:copy_properties",
+            "source": {
+              "id": "minecraft:stripped_bamboo_block",
+              "properties": {
+                "axis": "y"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "item_damage_per_use": 1,
+    "sound": "minecraft:item.axe.strip"
+  }
+]

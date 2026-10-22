@@ -39,11 +39,7 @@ public class ShearsItemMixin {
                 CriteriaTriggers.ITEM_USED_ON_BLOCK.trigger((ServerPlayer)playerEntity, blockPos, itemStack);
             }
 
-            //? if >=26.3 {
-            /*world.playSound(playerEntity, blockPos, SoundEvents.AXE_STRIP.value(), SoundSource.BLOCKS, 1.0F, 1.0F);
-            *///?} else {
             world.playSound(playerEntity, blockPos, SoundEvents.AXE_STRIP, SoundSource.BLOCKS, 1.0F, 1.0F);
-            //?}
 
             BlockState newState = strippedBlock.defaultBlockState();
             if (blockState.hasProperty(RotatedPillarBlock.AXIS)) {

@@ -9,6 +9,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
+import net.noahsarch.deeperdark.potion.CustomBrewingRecipeHandler;
 import net.noahsarch.deeperdark.potion.ScentlessPotion;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -75,7 +76,7 @@ public class BrewingStandMixin {
                          potionKey.equals(mundaneKey) ||
                          potionKey.equals(awkwardKey))) {
                         System.out.println("DEBUG - Creating scentless potion in slot " + i);
-                        slots.set(i, ScentlessPotion.createScentlessPotion(false));
+                        slots.set(i, CustomBrewingRecipeHandler.createScentlessPotion(false));
                         customRecipeHandled = true;
                     }
                 }
@@ -83,7 +84,7 @@ public class BrewingStandMixin {
                 else if (ingredient.getItem() == Items.REDSTONE &&
                          ScentlessPotion.isScentlessPotion(potionStack)) {
                     System.out.println("DEBUG - Creating LONG scentless potion in slot " + i);
-                    slots.set(i, ScentlessPotion.createScentlessPotion(true));
+                    slots.set(i, CustomBrewingRecipeHandler.createScentlessPotion(true));
                     customRecipeHandled = true;
                 }
             }

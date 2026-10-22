@@ -18,6 +18,12 @@ repositories {
 	// for more information about repositories.
 }
 
+// Version-only classes and resources (whole files that exist on one Minecraft version only)
+sourceSets.main {
+	java.srcDir rootProject.file("src/main/java-${stonecutter.current.version}")
+	resources.srcDir rootProject.file("src/main/resources-${stonecutter.current.version}")
+}
+
 loom {
 	accessWidenerPath = rootProject.file("src/main/resources/seasons.accesswidener")
 
