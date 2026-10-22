@@ -16,6 +16,9 @@ public class ModWorldgen {
             Identifier.fromNamespaceAndPath("deeperdark", "quicksand_patch")
     );
 
+    // Vanilla's built-in registry bootstrap (used by some mods at runtime) can't resolve datapack-only biomes like black_mesa.
+    public static final ThreadLocal<Boolean> BOOTSTRAPPING_VANILLA_REGISTRIES = ThreadLocal.withInitial(() -> false);
+
     public static void initialize() {
         BiomeModifications.addFeature(
                 BiomeSelectors.includeByKey(Biomes.DESERT),

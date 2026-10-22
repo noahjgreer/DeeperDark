@@ -57,6 +57,7 @@
     "TreeFeatureMixin",
     "UpdateStructureBlockC2SPacketMixin",
     "VanillaBiomeParametersMixin",
+    "MultiNoiseBiomeSourceParameterListsMixin",
     "WardenEntityBrainMixin",
     "WardenEntityMixin",
     "WitchEntityMixin",

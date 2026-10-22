@@ -6,6 +6,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.biome.OverworldBiomeBuilder;
+import net.noahsarch.deeperdark.worldgen.ModWorldgen;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,7 +21,7 @@ public class VanillaBiomeParametersMixin {
 
     @Inject(method = "pickBadlandsBiome", at = @At("HEAD"), cancellable = true)
     private void deeperdark$replaceBadlandsWithBlackMesa(int humidity, Climate.Parameter weirdness, CallbackInfoReturnable<ResourceKey<Biome>> cir) {
-        if (humidity == 2) {
+        if (humidity == 2 && !ModWorldgen.BOOTSTRAPPING_VANILLA_REGISTRIES.get()) {
             // Make black_mesa much rarer: deterministic selection based on the weirdness range.
             // This keeps worldgen deterministic while reducing the overall size of black_mesa regions.
             long seed = weirdness.min() * 31L + weirdness.max() * 13L + humidity;
