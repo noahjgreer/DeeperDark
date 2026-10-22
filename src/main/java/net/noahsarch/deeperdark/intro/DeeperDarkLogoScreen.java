@@ -3,8 +3,7 @@ package net.noahsarch.deeperdark.intro;
 import com.mojang.blaze3d.pipeline.BlendFunction;
 import com.mojang.blaze3d.pipeline.ColorTargetState;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
-import com.mojang.blaze3d.platform.DestFactor;
-import com.mojang.blaze3d.platform.SourceFactor;
+import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
@@ -13,12 +12,16 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.renderer.RenderPipelines;
+//? if >=26.3 {
+/*import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
+import net.minecraft.client.renderer.BindGroupLayouts;
+*///?}
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.ARGB;
-import org.lwjgl.glfw.GLFW;
 
 @Environment(EnvType.CLIENT)
 public class DeeperDarkLogoScreen extends Screen {
@@ -38,25 +41,24 @@ public class DeeperDarkLogoScreen extends Screen {
     private static final SoundEvent INTRO_SOUND = SoundEvent.createVariableRangeEvent(
             Identifier.fromNamespaceAndPath("deeperdark", "intro"));
 
-    // Standard (SRC_ALPHA, ONE_MINUS_SRC_ALPHA) blending — matches original GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA
-    private static final RenderPipeline INTRO_TEXTURED = RenderPipeline
-            .builder(RenderPipelines.GUI_TEXTURED_SNIPPET)
-            .withLocation(Identifier.fromNamespaceAndPath("deeperdark", "pipeline/intro_textured"))
-            .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
-            .build();
-
-    // Alpha-weighted additive (SRC_ALPHA, ONE) — matches original GL_SRC_ALPHA, GL_ONE
+    // Vanilla GUI_TEXTURED with alpha-weighted additive blending (SRC_ALPHA, ONE), matching the
+    // original GL_SRC_ALPHA, GL_ONE. 26.3 made the GUI snippets private, so it is spelled out there.
     private static final RenderPipeline INTRO_TEXTURED_ADDITIVE = RenderPipeline
+            //? if >=26.3 {
+            /*.builder()
+            .withBindGroupLayout(BindGroupLayouts.GLOBALS)
+            .withBindGroupLayout(BindGroupLayouts.PROJECTION)
+            .withBindGroupLayout(BindGroupLayouts.DYNAMIC_TRANSFORMS)
+            .withVertexShader("core/position_tex_color")
+            .withFragmentShader("core/position_tex_color")
+            .withBindGroupLayout(BindGroupLayouts.SAMPLER0)
+            .withVertexBinding(0, DefaultVertexFormat.POSITION_TEX_COLOR)
+            .withPrimitiveTopology(PrimitiveTopology.QUADS)
+            *///?} else {
             .builder(RenderPipelines.GUI_TEXTURED_SNIPPET)
+            //?}
             .withLocation(Identifier.fromNamespaceAndPath("deeperdark", "pipeline/intro_textured_additive"))
-            .withColorTargetState(new ColorTargetState(new BlendFunction(SourceFactor.SRC_ALPHA, DestFactor.ONE)))
-            .build();
-
-    // Translucent solid fill — GUI_SNIPPET + TRANSLUCENT for overlays, scanlines, noise
-    private static final RenderPipeline INTRO_FILL = RenderPipeline
-            .builder(RenderPipelines.GUI_SNIPPET)
-            .withLocation(Identifier.fromNamespaceAndPath("deeperdark", "pipeline/intro_fill"))
-            .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
+            .withColorTargetState(new ColorTargetState(BlendFunction.LIGHTNING))
             .build();
 
     private static final int BLEND_ONE                = 1;
@@ -241,18 +243,18 @@ public class DeeperDarkLogoScreen extends Screen {
     public boolean keyPressed(KeyEvent event) {
         int key = event.key();
 
-        if (key == GLFW.GLFW_KEY_F6) {
+        if (key == InputConstants.KEY_F6) {
             this.debugOverlayEnabled = !this.debugOverlayEnabled;
             return true;
         }
-        if (key == GLFW.GLFW_KEY_F7) {
+        if (key == InputConstants.KEY_F7) {
             this.debugLoopEnabled = !this.debugLoopEnabled;
             if (this.debugLoopEnabled) {
                 this.restartDebugLoopCycle();
             }
             return true;
         }
-        if (key == GLFW.GLFW_KEY_R) {
+        if (key == InputConstants.KEY_R) {
             resetAllParametersToDefaults();
             return true;
         }
@@ -261,21 +263,21 @@ public class DeeperDarkLogoScreen extends Screen {
             return super.keyPressed(event);
         }
 
-        if (key == GLFW.GLFW_KEY_UP) {
+        if (key == InputConstants.KEY_UP) {
             this.selectedParameter = (this.selectedParameter - 1 + PARAM_COUNT) % PARAM_COUNT;
             return true;
         }
-        if (key == GLFW.GLFW_KEY_DOWN) {
+        if (key == InputConstants.KEY_DOWN) {
             this.selectedParameter = (this.selectedParameter + 1) % PARAM_COUNT;
             return true;
         }
 
         boolean coarse = event.hasShiftDown();
-        if (key == GLFW.GLFW_KEY_LEFT) {
+        if (key == InputConstants.KEY_LEFT) {
             this.adjustSelectedParameter(-1, coarse);
             return true;
         }
-        if (key == GLFW.GLFW_KEY_RIGHT) {
+        if (key == InputConstants.KEY_RIGHT) {
             this.adjustSelectedParameter(1, coarse);
             return true;
         }
@@ -479,7 +481,7 @@ public class DeeperDarkLogoScreen extends Screen {
         int iconTop = Math.round(centerY - iconSize * 0.5F);
         int yLine   = iconTop + Math.round(topPx);
         int alpha   = (int)(clamp01(iconAlpha * 0.25F) * 255.0F);
-        g.fill(INTRO_FILL, Math.round(centerX - iconSize * 0.5F), yLine,
+        g.fill(RenderPipelines.GUI, Math.round(centerX - iconSize * 0.5F), yLine,
                Math.round(centerX + iconSize * 0.5F), yLine + 1,
                (alpha << 24) | 0xFFFFFF);
     }
@@ -493,7 +495,7 @@ public class DeeperDarkLogoScreen extends Screen {
         for (int y = 0; y < this.height; y += spacing) {
             float wave  = 0.75F + 0.25F * (float) Math.sin(elapsedSeconds * scanlineScrollSpeed + y * 0.14F);
             int   alpha = (int)(clamp01(scanlineAlpha * wave) * 255.0F);
-            g.fill(INTRO_FILL, 0, y, this.width, y + 1, alpha << 24);
+            g.fill(RenderPipelines.GUI, 0, y, this.width, y + 1, alpha << 24);
         }
     }
 
@@ -515,7 +517,7 @@ public class DeeperDarkLogoScreen extends Screen {
             int y     = (int)(noiseHash01(frame, i * 59 + 17) * this.height);
             int size  = 1 + (int)(noiseHash01(frame, i * 83 + 9) * maxSize);
             int alpha = (int)(clamp01(noiseAlpha * (0.35F + 0.65F * gate)) * 255.0F);
-            g.fill(INTRO_FILL, x, y, x + size, y + size, (alpha << 24) | 0xFFFFFF);
+            g.fill(RenderPipelines.GUI, x, y, x + size, y + size, (alpha << 24) | 0xFFFFFF);
         }
     }
 
@@ -564,7 +566,7 @@ public class DeeperDarkLogoScreen extends Screen {
         int color = argb(alpha, red, green, blue);
         // Additive when blendDst == BLEND_ONE; normal alpha otherwise
         boolean additive = (blendDst == BLEND_ONE);
-        RenderPipeline pipeline = additive ? INTRO_TEXTURED_ADDITIVE : INTRO_TEXTURED;
+        RenderPipeline pipeline = additive ? INTRO_TEXTURED_ADDITIVE : RenderPipelines.GUI_TEXTURED;
 
         // Setting textureWidth = w and srcWidth = w gives UV u0=0, u1=1 (full texture)
         g.blit(pipeline, TEXTURE_ID, x, y, 0.0f, 0.0f, w, h, w, h, w, h, color);
@@ -601,7 +603,7 @@ public class DeeperDarkLogoScreen extends Screen {
         int bandI = Math.max(1, Math.round(bandHeight));
 
         int color = argb(alpha, 1.0f, 1.0f, 1.0f);
-        g.blit(INTRO_TEXTURED, TEXTURE_ID,
+        g.blit(RenderPipelines.GUI_TEXTURED, TEXTURE_ID,
                 sx, sy, 0.0f, topI, sw, sh, iconSize, bandI, iconSize, iconSize, color);
     }
 
@@ -697,7 +699,7 @@ public class DeeperDarkLogoScreen extends Screen {
 
     private void fillBlackOverlay(GuiGraphicsExtractor g, float alpha) {
         int overlayAlpha = (int)(clamp01(alpha) * 255.0F);
-        g.fill(INTRO_FILL, 0, 0, this.width, this.height, overlayAlpha << 24);
+        g.fill(RenderPipelines.GUI, 0, 0, this.width, this.height, overlayAlpha << 24);
     }
 
     // ===== Debug parameter tweaking =====

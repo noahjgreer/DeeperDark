@@ -4,7 +4,11 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
+//? if >=26.3 {
+/*import net.minecraft.client.gui.Hud;
+*///?} else {
 import net.minecraft.client.gui.Gui;
+//?}
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
@@ -22,7 +26,11 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Environment(EnvType.CLIENT)
+//? if >=26.3 {
+/*@Mixin(Hud.class)
+*///?} else {
 @Mixin(Gui.class)
+//?}
 public class GuiQuicksandMixin {
 
     @Shadow private float vignetteBrightness;

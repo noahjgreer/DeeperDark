@@ -5,7 +5,8 @@ plugins {
 stonecutter.active "26.1.2"
 
 stonecutter.parameters {
-	// Pure renames. Anything beyond a rename gets a //? if comment at the use site.
+	// Renames and moves that keep the call shape (x.setScreen -> x.gui.setScreen). Anything
+	// else gets a //? if comment at the use site. A missed site fails the 26.3 compile.
 	replacements.string(current.parsed >= "26.3") {
 		replace("net.minecraft.world.entity.monster.EnderMan", "net.minecraft.world.entity.monster.Enderman")
 		replace("EnderMan.class", "Enderman.class")
@@ -27,5 +28,15 @@ stonecutter.parameters {
 		replace(".getOptionalParameter(", ".getOptional(")
 		replace("LightEngine.getLightBlockInto(", "LightEngine.getLightDampeningInto(")
 		replace(".isInstantenous()", ".isInstantaneous()")
+		replace("com.mojang.blaze3d.pipeline.BlendFunction", "com.mojang.renderpearl.api.pipeline.BlendFunction")
+		replace("com.mojang.blaze3d.pipeline.ColorTargetState", "com.mojang.renderpearl.api.pipeline.ColorTargetState")
+		replace("com.mojang.blaze3d.pipeline.RenderPipeline", "com.mojang.renderpearl.api.pipeline.RenderPipeline")
+		replace("InputConstants.Type.KEYSYM", "InputConstants.Type.KEYBOARD")
+		replace("gameRenderer.getMainCamera()", "gameRenderer.mainCamera()")
+		replace("minecraft.setScreen(", "minecraft.gui.setScreen(")
+		replace("client.setScreen(", "client.gui.setScreen(")
+		replace("mc.setScreen(", "mc.gui.setScreen(")
+		replace("client.screen instanceof", "client.gui.screen() instanceof")
+		replace("mc.screen instanceof", "mc.gui.screen() instanceof")
 	}
 }

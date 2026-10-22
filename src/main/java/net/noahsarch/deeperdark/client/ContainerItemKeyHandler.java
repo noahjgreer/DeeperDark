@@ -8,9 +8,6 @@ import net.minecraft.client.KeyMapping;
 
 @Environment(EnvType.CLIENT)
 public class ContainerItemKeyHandler {
-    // GLFW_KEY_LEFT_ALT = 342
-    private static final int GLFW_KEY_LEFT_ALT = 342;
-
     /**
      * Keybind for opening a shulker box or box held in the player's inventory.
      * Defaults to Left Alt. Appears in Options → Controls under Inventory.
@@ -19,7 +16,7 @@ public class ContainerItemKeyHandler {
     public static final KeyMapping KEY = new KeyMapping(
         "key.deeperdark.open_container_item",
         InputConstants.Type.KEYSYM,
-        GLFW_KEY_LEFT_ALT,
+        InputConstants.KEY_LALT,
         KeyMapping.Category.INVENTORY
     );
 

@@ -1,8 +1,5 @@
 package net.noahsarch.deeperdark.autoupdate;
 
-import com.mojang.blaze3d.pipeline.BlendFunction;
-import com.mojang.blaze3d.pipeline.ColorTargetState;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -10,17 +7,10 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
 import net.noahsarch.deeperdark.DeeperDarkConfig;
 
 @Environment(EnvType.CLIENT)
 public class AutoUpdaterScreen extends Screen {
-
-    private static final RenderPipeline FADE_PIPELINE = RenderPipeline
-            .builder(RenderPipelines.GUI_SNIPPET)
-            .withLocation(Identifier.fromNamespaceAndPath("deeperdark", "pipeline/autoupdater_fade"))
-            .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
-            .build();
 
     private static final float FADE_OUT_DURATION_TICKS = 15.0f; // 0.75 seconds
 
@@ -186,7 +176,7 @@ public class AutoUpdaterScreen extends Screen {
         // Fade-out overlay — drawn last so it covers everything including buttons
         if (fadingOut && fadeOutAlpha > 0.0f) {
             int a = (int)(fadeOutAlpha * 255);
-            g.fill(FADE_PIPELINE, 0, 0, this.width, this.height, a << 24);
+            g.fill(RenderPipelines.GUI, 0, 0, this.width, this.height, a << 24);
         }
     }
 

@@ -1,5 +1,6 @@
 package net.noahsarch.deeperdark.mixin;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -62,7 +63,7 @@ public abstract class ContainerScreenOpenMixin<T extends AbstractContainerMenu> 
         if (!deeperdark$isOpenedFromScreen()) return;
 
         Minecraft mc = Minecraft.getInstance();
-        boolean isEscape = event.key() == 256; // GLFW_KEY_ESCAPE
+        boolean isEscape = event.key() == InputConstants.KEY_ESCAPE;
         boolean isInventoryKey = mc.options.keyInventory.matches(event);
         if (!isEscape && !isInventoryKey) return;
 

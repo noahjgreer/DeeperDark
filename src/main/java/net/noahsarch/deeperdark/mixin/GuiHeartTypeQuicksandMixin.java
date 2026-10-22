@@ -10,7 +10,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Environment(EnvType.CLIENT)
+//? if >=26.3 {
+/*@Mixin(targets = "net.minecraft.client.gui.Hud$HeartType")
+*///?} else {
 @Mixin(targets = "net.minecraft.client.gui.Gui$HeartType")
+//?}
 public class GuiHeartTypeQuicksandMixin {
 
     /**

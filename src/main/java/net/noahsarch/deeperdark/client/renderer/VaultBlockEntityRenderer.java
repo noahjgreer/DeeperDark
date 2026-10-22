@@ -72,7 +72,11 @@ public class VaultBlockEntityRenderer implements BlockEntityRenderer<VaultBlockE
         poseStack.translate(0.5, 0.5, 0.5);
         poseStack.scale(-0.98f, 0.98f, 0.98f);
         poseStack.translate(-0.5, -0.5, -0.5);
+        //? if >=26.3 {
+        /*AbstractEndPortalRenderer.submitSpecial(RenderTypes.endGateway(), poseStack, nodes, 0);
+        *///?} else {
         AbstractEndPortalRenderer.submitSpecial(RenderTypes.endGateway(), poseStack, nodes);
+        //?}
         poseStack.popPose();
 
         if (state.displayItem == null) return;
