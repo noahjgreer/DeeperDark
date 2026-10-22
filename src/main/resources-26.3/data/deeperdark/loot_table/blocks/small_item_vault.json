@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "deeperdark:small_item_vault",
+          "modifier": {
+            "type": "minecraft:copy_components",
+            "source": "block_entity"
+          }
+        }
+      ]
+    }
+  ],
+  "random_sequence": "deeperdark:blocks/small_item_vault"
+}

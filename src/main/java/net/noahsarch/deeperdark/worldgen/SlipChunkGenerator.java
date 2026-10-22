@@ -28,6 +28,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import net.minecraft.world.level.biome.BiomeManager;
+//? if >=26.3 {
+/*import java.util.Set;
+import net.minecraft.core.Holder;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.levelgen.densityfunction.SamplerContext;
+import org.jspecify.annotations.Nullable;
+*///?}
 
 public class SlipChunkGenerator extends ChunkGenerator {
     public static final MapCodec<SlipChunkGenerator> CODEC = RecordCodecBuilder.mapCodec(instance ->
@@ -55,7 +62,8 @@ public class SlipChunkGenerator extends ChunkGenerator {
         return CODEC;
     }
 
-    private void ensureTemplateLoaded(MinecraftServer server) {
+    // Worldgen threads call this concurrently
+    private synchronized void ensureTemplateLoaded(MinecraftServer server) {
         if (!templatesLoaded && server != null) {
             try {
                 StructureTemplateManager manager = server.getStructureManager();
@@ -141,6 +149,7 @@ public class SlipChunkGenerator extends ChunkGenerator {
         }
     }
 
+    //? if <26.3 {
     @Override
     public void applyCarvers(WorldGenRegion chunkRegion, long seed, RandomState noiseConfig,
                       net.minecraft.world.level.biome.BiomeManager biomeAccess,
@@ -171,6 +180,7 @@ public class SlipChunkGenerator extends ChunkGenerator {
         }
         // No surface building needed - we place the entire structure in populateNoise
     }
+    //?}
 
     @Override
     public void spawnOriginalMobs(WorldGenRegion region) {
@@ -182,7 +192,21 @@ public class SlipChunkGenerator extends ChunkGenerator {
         return 384;
     }
 
+    //? if >=26.3 {
+    /*@Override
+    public CompletableFuture<ChunkAccess> buildTerrain(ChunkAccess chunk, Blender blender, RandomState noiseConfig,
+                                                   StructureManager structureAccessor, BiomeManager biomeManager,
+                                                   @Nullable WorldGenRegion region, Set<Holder<Biome>> possibleBiomes) {
+        // 26.3 merged the noise, surface and carver steps; the region hands us the server up front
+        if (cachedServer == null && region != null) {
+            cachedServer = region.getServer();
+        }
+        return fillFromNoise(blender, noiseConfig, structureAccessor, chunk);
+    }
+
+    *///?} else {
     @Override
+    //?}
     public CompletableFuture<ChunkAccess> fillFromNoise(Blender blender, RandomState noiseConfig,
                                                    StructureManager structureAccessor, ChunkAccess chunk) {
         // If templates aren't loaded yet, try to get the server and load them
@@ -474,7 +498,11 @@ public class SlipChunkGenerator extends ChunkGenerator {
     }
 
     @Override
+    //? if >=26.3 {
+    /*public void addDebugScreenInfo(List<String> text, RandomState noiseConfig, BlockPos pos, SamplerContext samplerContext) {
+    *///?} else {
     public void addDebugScreenInfo(List<String> text, RandomState noiseConfig, BlockPos pos) {
+    //?}
         text.add("Slip Room Generator");
         if (roomSize != null) {
             int roomX = Math.floorDiv(pos.getX(), roomSize.getX());

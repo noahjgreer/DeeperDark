@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "deeperdark:basalt_slab",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": 2,
+            "condition": {
+              "type": "minecraft:match_block",
+              "blocks": "deeperdark:basalt_slab",
+              "state": {
+                "type": "double"
+              }
+            }
+          }
+        }
+      ],
+      "condition": {
+        "type": "minecraft:survives_explosion"
+      }
+    }
+  ]
+}

@@ -152,7 +152,7 @@ public class SkeletonMobMixin implements BabySkeletonAccessor, BabyCreeperAccess
         Mob self = (Mob)(Object)this;
         var scaleAttr = self.getAttribute(Attributes.SCALE);
         var speedAttr = self.getAttribute(Attributes.MOVEMENT_SPEED);
-        var goalSelector = ((MobEntityAccessor) self).getGoalSelector();
+        var goalSelector = ((MobEntityAccessor) self).deeperdark$getGoalSelector();
         if (isBaby) {
             if (scaleAttr != null) scaleAttr.setBaseValue(0.5);
             if (speedAttr != null && !speedAttr.hasModifier(BABY_SPIDER_SPEED_MODIFIER_ID)) {

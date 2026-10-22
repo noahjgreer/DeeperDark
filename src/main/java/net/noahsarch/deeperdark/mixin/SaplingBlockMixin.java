@@ -17,7 +17,11 @@ import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.chunk.ChunkGenerator;
+//? if >=26.3 {
+/*import net.minecraft.world.level.levelgen.feature.Feature;
+*///?} else {
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+//?}
 import net.minecraft.data.worldgen.features.TreeFeatures;
 import net.noahsarch.deeperdark.Deeperdark;
 import org.spongepowered.asm.mixin.Mixin;
@@ -770,8 +774,13 @@ public abstract class SaplingBlockMixin {
         );
         playersToTeleport.addAll(world.getEntitiesOfClass(Player.class, saplingArea, p -> true));
 
+        //? if >=26.3 {
+        /*Holder<Feature> fancyOakFeature = world.registryAccess()
+            .lookupOrThrow(Registries.FEATURE)
+        *///?} else {
         Holder<ConfiguredFeature<?, ?>> fancyOakFeature = world.registryAccess()
             .lookupOrThrow(Registries.CONFIGURED_FEATURE)
+        //?}
             .get(TreeFeatures.FANCY_OAK)
             .orElse(null);
 

@@ -9,7 +9,9 @@ import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessor;
+//? if <26.3 {
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType;
+//?}
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.LevelReader;
@@ -18,7 +20,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
+//? if >=26.3 {
+/*public class PaleMansionProcessor implements StructureProcessor {
+*///?} else {
 public class PaleMansionProcessor extends StructureProcessor {
+//?}
     public static final PaleMansionProcessor INSTANCE = new PaleMansionProcessor();
     public static final MapCodec<PaleMansionProcessor> CODEC = MapCodec.unit(() -> INSTANCE);
 
@@ -47,7 +53,11 @@ public class PaleMansionProcessor extends StructureProcessor {
 
     @Nullable
     @Override
+    //? if >=26.3 {
+    /*public StructureTemplate.StructureBlockInfo processBlock(LevelReader world, BlockPos pos, BlockPos pivot, BlockPos templateRelativePos, StructureTemplate.StructureBlockInfo currentBlockInfo, StructurePlaceSettings data) {
+    *///?} else {
     public StructureTemplate.StructureBlockInfo processBlock(LevelReader world, BlockPos pos, BlockPos pivot, StructureTemplate.StructureBlockInfo originalBlockInfo, StructureTemplate.StructureBlockInfo currentBlockInfo, StructurePlaceSettings data) {
+    //?}
         BlockState currentState = currentBlockInfo.state();
 
         if (currentState.getBlock() == Blocks.BIRCH_PLANKS) {
@@ -73,8 +83,13 @@ public class PaleMansionProcessor extends StructureProcessor {
     }
 
     @Override
+    //? if >=26.3 {
+    /*public MapCodec<PaleMansionProcessor> codec() {
+        return CODEC;
+    *///?} else {
     protected StructureProcessorType<?> getType() {
         return net.noahsarch.deeperdark.Deeperdark.PALE_MANSION_PROCESSOR;
+    //?}
     }
 }
 

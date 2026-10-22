@@ -2,8 +2,8 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {"item": "deeperdark:milk_bottle"},
-    {"item": "minecraft:gunpowder"}
+    "deeperdark:milk_bottle",
+    "minecraft:gunpowder"
   ],
   "result": {"id": "deeperdark:splash_milk_bottle", "count": 1}
 }

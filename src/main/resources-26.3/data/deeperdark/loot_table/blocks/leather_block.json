@@ -1,0 +1,62 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:alternatives",
+          "children": [
+            {
+              "type": "minecraft:item",
+              "name": "deeperdark:leather_block",
+              "condition": {
+                "type": "minecraft:match_tool",
+                "predicate": {
+                  "enchantments": [
+                    {
+                      "enchantment": "minecraft:silk_touch",
+                      "levels": {
+                        "min": 1
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "type": "minecraft:item",
+              "name": "minecraft:leather",
+              "modifier": {
+                "type": "minecraft:set_count",
+                "count": 9
+              },
+              "condition": {
+                "type": "minecraft:any_of",
+                "terms": [
+                  {
+                    "type": "minecraft:match_tool",
+                    "predicate": {
+                      "items": "#minecraft:swords"
+                    }
+                  },
+                  {
+                    "type": "minecraft:match_tool",
+                    "predicate": {
+                      "items": "minecraft:shears"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "type": "minecraft:item",
+              "name": "deeperdark:leather_block"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "random_sequence": "deeperdark:blocks/leather_block"
+}

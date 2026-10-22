@@ -66,13 +66,17 @@ import net.fabricmc.api.ModInitializer;
 import net.minecraft.world.item.Items;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+//? if <26.3 {
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType;
+//?}
 import net.noahsarch.deeperdark.worldgen.PaleMansionProcessor;
 import net.minecraft.core.registries.Registries;
 
 public class Deeperdark implements ModInitializer {
 	public static final String MOD_ID = "deeperdark";
+	//? if <26.3 {
 	public static StructureProcessorType<PaleMansionProcessor> PALE_MANSION_PROCESSOR;
+	//?}
 
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
@@ -115,7 +119,11 @@ public class Deeperdark implements ModInitializer {
 				Identifier.fromNamespaceAndPath(MOD_ID, "slip_room_generator"),
 				SlipChunkGenerator.CODEC);
 
+		//? if >=26.3 {
+		/*Registry.register(net.minecraft.core.registries.BuiltInRegistries.STRUCTURE_PROCESSOR, Identifier.fromNamespaceAndPath(MOD_ID, "pale_mansion_processor"), PaleMansionProcessor.CODEC);
+		*///?} else {
 		PALE_MANSION_PROCESSOR = Registry.register(net.minecraft.core.registries.BuiltInRegistries.STRUCTURE_PROCESSOR, Identifier.fromNamespaceAndPath(MOD_ID, "pale_mansion_processor"), () -> PaleMansionProcessor.CODEC);
+		//?}
 
 		PayloadTypeRegistry.clientboundPlay().register(PlayerLeashPacket.ID, PlayerLeashPacket.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(VoidFogSyncPacket.ID, VoidFogSyncPacket.CODEC);

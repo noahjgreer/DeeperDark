@@ -1,15 +1,10 @@
 package net.noahsarch.deeperdark.mixin;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.LevelSimulatedReader;
-import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.levelgen.feature.TreeFeature;
-import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
+import net.minecraft.world.level.levelgen.feature.featuresize.FeatureSize;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
 /**
  * Mixin to remove horizontal (X and Z) space checks for tree growth.
@@ -20,41 +15,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class TreeFeatureMixin {
 
     /**
-     * Inject at the head of getTopPosition to override the horizontal checking behavior.
-     * Instead of checking blocks in a radius at each height level, we only check
-     * the center column (the trunk position).
+     * getMaxFreeTreeHeight checks a square of this radius at each height; a radius of 0
+     * leaves only the trunk column.
      */
-    @Inject(method = "getMaxFreeTreeHeight", at = @At("HEAD"), cancellable = true)
-    private void deeperdark$skipHorizontalChecks(WorldGenLevel world, int height, BlockPos pos, TreeConfiguration config, CallbackInfoReturnable<Integer> cir) {
-        BlockPos.MutableBlockPos mutable = new BlockPos.MutableBlockPos();
-
-        // Only check the center column (vertical checks only)
-        for (int y = 0; y <= height + 1; y++) {
-            mutable.set(pos.getX(), pos.getY() + y, pos.getZ());
-
-            // Check if the trunk position can be replaced
-            if (!config.trunkPlacer.isFree(world, mutable)) {
-                // If we can't place at this vertical position, return adjusted height
-                cir.setReturnValue(y - 2);
-                return;
-            }
-
-            // Also check for vines if needed
-            if (!config.ignoreVines && isVine(world, mutable)) {
-                cir.setReturnValue(y - 2);
-                return;
-            }
-        }
-
-        // All vertical checks passed, return full height
-        cir.setReturnValue(height);
-    }
-
-    /**
-     * Helper method to check for vines (mirrors TreeFeature.isVine)
-     */
-    @Unique
-    private static boolean isVine(WorldGenLevel world, BlockPos pos) {
-        return world.isStateAtPosition(pos, state -> state.is(net.minecraft.world.level.block.Blocks.VINE));
+    @Redirect(method = "getMaxFreeTreeHeight", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/level/levelgen/feature/featuresize/FeatureSize;getSizeAtHeight(II)I"))
+    private int deeperdark$onlyCheckTrunkColumn(FeatureSize size, int treeHeight, int yo) {
+        return 0;
     }
 }

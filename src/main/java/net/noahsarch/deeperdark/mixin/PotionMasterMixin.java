@@ -7,8 +7,11 @@ import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.item.trading.MerchantOffers;
 import net.minecraft.world.entity.npc.villager.VillagerData;
 import net.minecraft.world.entity.npc.villager.VillagerProfession;
+//? if <26.3 {
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
+import org.spongepowered.asm.mixin.injection.Redirect;
+//?}
 import net.noahsarch.deeperdark.duck.PotionMasterDuck;
 import net.noahsarch.deeperdark.villager.ModVillagers;
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,7 +19,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Villager.class)
@@ -71,8 +73,8 @@ public abstract class PotionMasterMixin implements PotionMasterDuck {
         }
     }
 
-    // We redirect the matchesKey check in mobTick to prevent the villager from resetting its customer
-    // when it has the NONE profession (which we forcing for visuals) but is a Potion Master.
+    //? if <26.3 {
+    // Keeps a Potion Master (NONE profession for visuals) trading; 26.3 only stops trading when offers are empty.
     @Redirect(method = "customServerAiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/Holder;is(Lnet/minecraft/resources/ResourceKey;)Z"))
     public boolean deeperdark$preventCustomerReset(Holder<VillagerProfession> instance, ResourceKey<VillagerProfession> key) {
         if (this.isPotionMaster && key.equals(VillagerProfession.NONE)) {
@@ -83,4 +85,5 @@ public abstract class PotionMasterMixin implements PotionMasterDuck {
         }
         return instance.is(key);
     }
+    //?}
 }

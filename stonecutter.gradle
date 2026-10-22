@@ -38,5 +38,6 @@ stonecutter.parameters {
 		replace("mc.setScreen(", "mc.gui.setScreen(")
 		replace("client.screen instanceof", "client.gui.screen() instanceof")
 		replace("mc.screen instanceof", "mc.gui.screen() instanceof")
+		replace("server.getStructureManager()", "server.getStructureTemplateManager()")
 	}
 }
