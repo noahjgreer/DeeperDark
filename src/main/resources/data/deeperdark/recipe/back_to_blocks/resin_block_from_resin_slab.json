@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "#": "deeperdark:resin_slab"
+  },
+  "pattern": [
+    "##"
+  ],
+  "result": {
+    "id": "minecraft:resin_block"
+  }
+}

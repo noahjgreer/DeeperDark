@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    "minecraft:moss_block",
+    "minecraft:pink_petals",
+    "minecraft:pink_petals"
+  ],
+  "result": {
+    "id": "minecraft:spore_blossom"
+  }
+}

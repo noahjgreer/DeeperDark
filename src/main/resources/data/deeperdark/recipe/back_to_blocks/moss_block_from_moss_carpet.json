@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "#": "minecraft:moss_carpet"
+  },
+  "pattern": [
+    "###"
+  ],
+  "result": {
+    "id": "minecraft:moss_block",
+    "count": 2
+  }
+}

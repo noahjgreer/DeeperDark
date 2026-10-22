@@ -3,5 +3,5 @@
   "category": "building",
   "key": { "#": "minecraft:basalt" },
   "pattern": [ "#  ", "## ", "###" ],
-  "result": { "id": "deeperdark:basalt_stairs", "count": 4 }
+  "result": { "id": "deeperdark:basalt_stairs", "count": 8 }
 }

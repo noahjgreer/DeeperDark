@@ -3,5 +3,5 @@
   "category": "building",
   "key": { "#": "minecraft:deepslate" },
   "pattern": [ "#  ", "## ", "###" ],
-  "result": { "id": "deeperdark:deepslate_stairs", "count": 4 }
+  "result": { "id": "deeperdark:deepslate_stairs", "count": 8 }
 }

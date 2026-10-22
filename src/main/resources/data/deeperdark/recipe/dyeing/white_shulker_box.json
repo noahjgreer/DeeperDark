@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:shulker_shell",
+    "minecraft:chest",
+    "minecraft:shulker_shell",
+    "minecraft:white_dye"
+  ],
+  "result": {
+    "id": "minecraft:white_shulker_box"
+  }
+}

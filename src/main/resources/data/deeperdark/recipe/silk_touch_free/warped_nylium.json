@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    "minecraft:netherrack",
+    [
+      "minecraft:warped_fungus",
+      "minecraft:warped_roots"
+    ]
+  ],
+  "result": {
+    "id": "minecraft:warped_nylium"
+  }
+}

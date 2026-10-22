@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "#": "minecraft:light_gray_carpet"
+  },
+  "pattern": [
+    "###"
+  ],
+  "result": {
+    "id": "minecraft:light_gray_wool",
+    "count": 2
+  }
+}

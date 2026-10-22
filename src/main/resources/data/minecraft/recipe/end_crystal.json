@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "E": "minecraft:ender_eye",
+    "G": "#c:glass_blocks/cheap",
+    "T": "minecraft:ghast_tear"
+  },
+  "pattern": [
+    "GGG",
+    "GEG",
+    "GTG"
+  ],
+  "result": {
+    "id": "minecraft:end_crystal"
+  }
+}

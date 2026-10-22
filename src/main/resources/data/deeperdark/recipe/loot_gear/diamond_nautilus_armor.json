@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "X": "minecraft:diamond",
+    "S": "minecraft:nautilus_shell"
+  },
+  "pattern": [
+    "X X",
+    "XSX",
+    "X X"
+  ],
+  "result": {
+    "id": "minecraft:diamond_nautilus_armor"
+  }
+}

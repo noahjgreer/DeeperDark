@@ -74,6 +74,8 @@ Main differences:
 4. Decompile the version into `ref-decompiled/Minecraft/<ver>`. See `DecompiledSources.md`.
 5. Set it active, compile, and fix errors with the options in the table above. Then run the
    mixin check on it.
+6. Add it to `VERS` in both `tools/*recipe*.py` scripts, rerun the QoL recipe generator and the
+   conflict checker. See `QolRecipes.md`.
 
 ## Known limits
 

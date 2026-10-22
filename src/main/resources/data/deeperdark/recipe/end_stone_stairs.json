@@ -3,5 +3,5 @@
   "category": "building",
   "key": { "#": "minecraft:end_stone" },
   "pattern": [ "#  ", "## ", "###" ],
-  "result": { "id": "deeperdark:end_stone_stairs", "count": 4 }
+  "result": { "id": "deeperdark:end_stone_stairs", "count": 8 }
 }

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "#": "#c:concrete_powders",
+    "X": "minecraft:lime_dye"
+  },
+  "pattern": [
+    "###",
+    "#X#",
+    "###"
+  ],
+  "result": {
+    "id": "minecraft:lime_concrete_powder",
+    "count": 8
+  },
+  "group": "concrete_powder"
+}

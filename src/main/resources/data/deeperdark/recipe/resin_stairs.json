@@ -3,5 +3,5 @@
   "category": "building",
   "key": { "#": "minecraft:resin_block" },
   "pattern": [ "#  ", "## ", "###" ],
-  "result": { "id": "deeperdark:resin_stairs", "count": 4 }
+  "result": { "id": "deeperdark:resin_stairs", "count": 8 }
 }

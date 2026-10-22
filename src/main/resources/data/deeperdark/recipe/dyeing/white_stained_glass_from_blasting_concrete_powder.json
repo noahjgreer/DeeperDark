@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:blasting",
+  "category": "blocks",
+  "cookingtime": 100,
+  "experience": 0.1,
+  "ingredient": "minecraft:white_concrete_powder",
+  "result": {
+    "id": "minecraft:white_stained_glass"
+  }
+}

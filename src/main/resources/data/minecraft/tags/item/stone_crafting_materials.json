@@ -1,0 +1,24 @@
+{
+  "values": [
+    "minecraft:stone",
+    "minecraft:mossy_cobblestone",
+    "minecraft:deepslate",
+    "minecraft:andesite",
+    "minecraft:diorite",
+    "minecraft:granite",
+    "minecraft:tuff",
+    "minecraft:calcite",
+    "minecraft:dripstone_block",
+    "minecraft:basalt",
+    "minecraft:smooth_basalt",
+    "minecraft:end_stone",
+    {
+      "id": "minecraft:cinnabar",
+      "required": false
+    },
+    {
+      "id": "minecraft:sulfur",
+      "required": false
+    }
+  ]
+}

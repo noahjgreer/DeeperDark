@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:smelting",
+  "category": "blocks",
+  "cookingtime": 200,
+  "experience": 0.1,
+  "ingredient": "minecraft:magenta_concrete_powder",
+  "result": {
+    "id": "minecraft:magenta_stained_glass"
+  }
+}

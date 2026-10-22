@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "B": "minecraft:gold_block"
+  },
+  "pattern": [
+    "BB"
+  ],
+  "result": {
+    "id": "minecraft:light_weighted_pressure_plate",
+    "count": 9
+  }
+}

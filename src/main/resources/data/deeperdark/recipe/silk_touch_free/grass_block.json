@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    "minecraft:dirt",
+    "minecraft:wheat_seeds"
+  ],
+  "result": {
+    "id": "minecraft:grass_block"
+  }
+}

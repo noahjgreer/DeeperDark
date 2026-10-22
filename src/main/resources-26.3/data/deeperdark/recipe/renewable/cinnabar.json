@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "N": "minecraft:netherrack",
+    "R": "minecraft:redstone"
+  },
+  "pattern": [
+    "NR",
+    "RN"
+  ],
+  "result": {
+    "id": "minecraft:cinnabar",
+    "count": 2
+  }
+}

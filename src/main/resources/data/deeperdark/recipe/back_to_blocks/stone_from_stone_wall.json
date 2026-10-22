@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    "deeperdark:stone_wall"
+  ],
+  "result": {
+    "id": "minecraft:stone"
+  }
+}

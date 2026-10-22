@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    "minecraft:polished_basalt",
+    "#minecraft:coals"
+  ],
+  "result": {
+    "id": "minecraft:polished_blackstone"
+  }
+}

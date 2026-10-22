@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    "minecraft:dirt",
+    "minecraft:red_mushroom",
+    "minecraft:brown_mushroom"
+  ],
+  "result": {
+    "id": "minecraft:mycelium"
+  }
+}

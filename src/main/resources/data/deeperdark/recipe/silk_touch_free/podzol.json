@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    "minecraft:dirt",
+    "minecraft:leaf_litter"
+  ],
+  "result": {
+    "id": "minecraft:podzol"
+  }
+}
