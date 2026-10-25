@@ -74,17 +74,64 @@ def bundleModJson = tasks.register('bundleModJson') {
 	}
 }
 
+// Resources identical in every version jar move to the outer jar once. Fabric API serves the
+// outer mod's assets/data like any mod's, so the inner jars only keep what differs.
+def bundleSplit = tasks.register('bundleSplit') {
+	def sharedDir = layout.buildDirectory.dir('bundle/shared')
+	def jarsDir = layout.buildDirectory.dir('bundle/jars')
+	def jarFiles = versionJars.map { jars -> jars.collect { it.get().archiveFile.get().asFile } }
+	dependsOn versionJars
+	inputs.files jarFiles
+	outputs.dirs sharedDir, jarsDir
+
+	doLast {
+		def jars = jarFiles.get().collect { new java.util.zip.ZipFile(it) }
+		try {
+			def first = jars[0]
+			def shared = first.entries().findAll { e ->
+				!e.directory && (e.name.startsWith('assets/') || e.name.startsWith('data/')) &&
+						jars.every { j -> j.getEntry(e.name)?.with { it.crc == e.crc && it.size == e.size } }
+			}*.name as Set
+
+			[sharedDir, jarsDir].each { it.get().asFile.deleteDir() }
+			shared.each { name ->
+				def out = sharedDir.get().file(name).asFile
+				out.parentFile.mkdirs()
+				first.getInputStream(first.getEntry(name)).withCloseable { out.bytes = it.bytes }
+			}
+			jars.each { jar ->
+				def out = jarsDir.get().file(new File(jar.name).name).asFile
+				out.parentFile.mkdirs()
+				new java.util.zip.ZipOutputStream(out.newOutputStream()).withCloseable { zos ->
+					jar.entries().findAll { !(it.name in shared) }.each { e ->
+						def copy = new java.util.zip.ZipEntry(e.name)
+						copy.time = e.time
+						zos.putNextEntry(copy)
+						if (!e.directory) jar.getInputStream(e).withCloseable { zos << it }
+						zos.closeEntry()
+					}
+				}
+			}
+			logger.lifecycle("Bundle: ${shared.size()} shared resources moved to the outer jar")
+		} finally {
+			jars*.close()
+		}
+	}
+}
+
 def bundleJar = tasks.register('bundleJar', Jar) {
 	group = 'build'
 	description = 'Nests every version\'s mod jar in one jar.'
 	archiveBaseName = project.archives_base_name
 	archiveVersion = project.mod_version
 	destinationDirectory = layout.buildDirectory.dir('libs')
-	entryCompression = ZipEntryCompression.STORED // the inner jars are already compressed
-	dependsOn versionJars
 
 	from bundleModJson
-	from(versionJars) { into 'META-INF/jars' }
+	from(bundleSplit.map { layout.buildDirectory.dir('bundle/shared') })
+	from(bundleSplit.map { layout.buildDirectory.dir('bundle/jars') }) {
+		into 'META-INF/jars'
+		entryCompression = ZipEntryCompression.STORED // the inner jars are already compressed
+	}
 	from(file('LICENSE')) { rename { "${it}_${project.archives_base_name}" } }
 }
 

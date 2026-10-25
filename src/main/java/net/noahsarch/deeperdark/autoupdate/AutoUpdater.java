@@ -7,6 +7,7 @@ import com.google.gson.JsonParser;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,8 +37,7 @@ public class AutoUpdater {
     }
 
     public static String getCurrentVersion() {
-        return FabricLoader.getInstance()
-                .getModContainer("deeperdark")
+        return installedMod()
                 .map(c -> c.getMetadata().getVersion().getFriendlyString())
                 .orElse("unknown");
     }
@@ -92,8 +92,7 @@ public class AutoUpdater {
     }
 
     public static void downloadUpdate(UpdateInfo info, ProgressCallback onProgress) throws IOException {
-        Path currentJar = FabricLoader.getInstance()
-                .getModContainer("deeperdark")
+        Path currentJar = installedMod()
                 .orElseThrow(() -> new IOException("Could not locate deeperdark mod container"))
                 .getOrigin().getPaths().get(0);
 
@@ -295,8 +294,7 @@ public class AutoUpdater {
     }
 
     private static Path getModsDir() {
-        return FabricLoader.getInstance()
-                .getModContainer("deeperdark")
+        return installedMod()
                 .map(c -> {
                     try {
                         Path jar = c.getOrigin().getPaths().get(0);
@@ -306,6 +304,13 @@ public class AutoUpdater {
                     }
                 })
                 .orElse(null);
+    }
+
+    // The release jar is the deeperdark_bundle mod; the deeperdark mod inside it is a nested jar
+    // with a "+<minecraft>" version suffix and no file path of its own.
+    private static Optional<ModContainer> installedMod() {
+        FabricLoader loader = FabricLoader.getInstance();
+        return loader.getModContainer("deeperdark_bundle").or(() -> loader.getModContainer("deeperdark"));
     }
 
     private static HttpURLConnection openConnection(String urlStr) throws IOException {

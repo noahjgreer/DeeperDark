@@ -18,7 +18,15 @@ One source tree builds DeeperDark for several Minecraft versions, currently **26
    missing-dependency error instead of loading nothing, and a leftover older deeperdark jar
    can't satisfy the dependency. Mod Menu shows the outer mod under `deeperdark`
    (`custom.modmenu.parent`).
-3. `./gradlew build` builds every version and then the bundle. `buildGitRelease` uploads the
+3. **Shared resources** (`bundleSplit`) shrink the bundle. Any `assets/` or `data/` file that
+   is byte-identical in every version jar moves into the outer jar once, and the nested copies
+   of the inner jars leave it out. This covers almost all of the mod's size: the sounds and
+   textures. Fabric API builds a resource pack for every non-builtin mod, so the outer mod's
+   files load in the `deeperdark` namespace like the inner mod's. The files are disjoint, so the
+   two packs never override each other. Classes stay in the inner jars. The jars under
+   `versions/*/build/libs` stay complete, so dev runs and single-version testing don't depend on
+   the bundle.
+4. `./gradlew build` builds every version and then the bundle. `buildGitRelease` uploads the
    bundle.
 
 The inner jars get a `+<ver>` version suffix so their file names and mod versions differ. A
@@ -79,8 +87,11 @@ Main differences:
 
 ## Known limits
 
-- The bundle is about twice the size of a single-version jar, because each inner jar carries
-  its own copy of the assets.
+- The installed mod is `deeperdark_bundle`. The nested `deeperdark` mod has a `+<ver>` version
+  and no file path (`ModOrigin` kind `NESTED`), so the auto-updater reads the bundle's version
+  and jar path.
+- Identical classes are not shared (about 0.5 MB per version). Sharing them would put the same
+  classes in two places on the class path.
 - ChestTracker has no 26.3 build. Its plugin compiles against the 26.1.2 jar, and on 26.3 it
   never runs.
 - The shears block transformer on 26.3 copies the vanilla axe rules. Logs that other mods
