@@ -196,6 +196,9 @@ public class Deeperdark implements ModInitializer {
 					handler.player, new VoidFogSyncPacket(DeeperDarkConfig.get().voidFogEnabled));
 			net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.send(
 					handler.player, new AllIngredientsConsumableSyncPacket(DeeperDarkConfig.get().allIngredientsConsumable));
+			if (DeeperDarkConfig.get().unlockAllRecipes) {
+				handler.player.awardRecipes(server.getRecipeManager().getRecipes());
+			}
 		});
 
 		GunpowderTrailEvents.register();

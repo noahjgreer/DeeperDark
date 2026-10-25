@@ -254,6 +254,9 @@ public class DeeperDarkConfig {
         // can be consumed (eaten) by players. They provide no food value or effects.
         public boolean allIngredientsConsumable = false;
 
+        // When true, every loaded recipe (all mods and vanilla) is unlocked for players on join.
+        public boolean unlockAllRecipes = true;
+
         // Creature configuration
         public net.noahsarch.deeperdark.creature.CreatureConfig creature = new net.noahsarch.deeperdark.creature.CreatureConfig();
 
@@ -412,6 +415,8 @@ public class DeeperDarkConfig {
                     # allIngredientsConsumable: if true, items in the "ingredients" creative tab that are not
                     #   already edible can be consumed (eaten) by players with no food value or effects (default: false)
                     #   This is an operator-only setting (/dd config all_ingredients_consumable) synced to all clients.
+                    #
+                    # unlockAllRecipes: if true, every recipe from every mod and vanilla is unlocked in the recipe book on join (default: true)
                     #
                     # Auto-Updater Configuration (client-side only):
                     # autoUpdater.repoURL: GitHub releases page URL used to check for and download updates.
