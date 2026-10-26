@@ -30,6 +30,12 @@ is in `#non_flammable_wood`, so it isn't fuel. It is deliberately left out of th
 where trees would grow through it, creaking hearts would accept it, and worldgen would treat it as
 a natural log. `#prevents_nearby_leaf_decay` keeps leaves next to it alive instead.
 
+The walls are in `#minecraft:walls` because gates, bars, pathfinding and the connection logic read
+that tag. Vanilla's `mineable/pickaxe` contains all of `#walls`, and a tag can't exclude entries.
+`ToolMixin` therefore skips the `mineable/pickaxe` rule in `Tool.getMiningSpeed` for blocks in
+`#deeperdark:not_mineable_with_pickaxe`, so wooden walls mine fast only with an axe. Drops are
+unaffected, because the walls don't require a tool.
+
 ## Generated files
 
 `tools/generate_wood_variant_assets.py` writes the blockstates, models, item definitions, recipes,

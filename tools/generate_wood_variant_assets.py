@@ -166,7 +166,8 @@ for wood, bark, log, log_tag in WOODS:
 
 tags = f"{res()}/data/minecraft/tags"
 for path, entries in ((f"{tags}/block/walls.json", walls), (f"{tags}/block/mineable/axe.json", axe),
-                      (f"{tags}/block/prevents_nearby_leaf_decay.json", leaf_support)):
+                      (f"{tags}/block/prevents_nearby_leaf_decay.json", leaf_support),
+                      (f"{res()}/data/deeperdark/tags/block/not_mineable_with_pickaxe.json", walls)):
     for optional in (False, True):
         add_to_tag(path, [i for i, o in entries if o == optional], optional)
 add_to_tag(f"{tags}/item/non_flammable_wood.json", non_flammable, False)

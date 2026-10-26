@@ -16,6 +16,7 @@
     "EnchantmentMixin",
     "WorldMixin",
     "WallBlockMixin",
+    "ToolMixin",
     "ExperienceBottleEntityMixin",
     "FarmlandBlockMixin",
     "FenceBlockMixin",
