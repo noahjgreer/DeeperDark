@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": [
+    "deeperdark:oak_end_grain"
+  ],
+  "result": {
+    "id": "minecraft:oak_log",
+    "count": 1
+  }
+}

@@ -1,6 +1,13 @@
 {
   "type": "minecraft:stonecutting",
-  "ingredient": "minecraft:stripped_pale_oak_wood",
+  "ingredient": [
+    "minecraft:pale_oak_log",
+    "minecraft:pale_oak_wood",
+    "deeperdark:pale_oak_end_grain",
+    "minecraft:stripped_pale_oak_log",
+    "minecraft:stripped_pale_oak_wood",
+    "deeperdark:stripped_pale_oak_end_grain"
+  ],
   "result": {
     "id": "deeperdark:stripped_pale_oak_wood_wall",
     "count": 1

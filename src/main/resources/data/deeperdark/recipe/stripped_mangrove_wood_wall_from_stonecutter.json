@@ -1,6 +1,13 @@
 {
   "type": "minecraft:stonecutting",
-  "ingredient": "minecraft:stripped_mangrove_wood",
+  "ingredient": [
+    "minecraft:mangrove_log",
+    "minecraft:mangrove_wood",
+    "deeperdark:mangrove_end_grain",
+    "minecraft:stripped_mangrove_log",
+    "minecraft:stripped_mangrove_wood",
+    "deeperdark:stripped_mangrove_end_grain"
+  ],
   "result": {
     "id": "deeperdark:stripped_mangrove_wood_wall",
     "count": 1

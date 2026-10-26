@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": [
+    "minecraft:jungle_log",
+    "minecraft:jungle_wood",
+    "deeperdark:jungle_end_grain",
+    "minecraft:stripped_jungle_log",
+    "minecraft:stripped_jungle_wood",
+    "deeperdark:stripped_jungle_end_grain"
+  ],
+  "result": {
+    "id": "deeperdark:jungle_wall",
+    "count": 4
+  }
+}

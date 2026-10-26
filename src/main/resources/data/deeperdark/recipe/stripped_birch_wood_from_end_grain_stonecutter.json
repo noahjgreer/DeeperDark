@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": [
+    "deeperdark:birch_end_grain",
+    "deeperdark:stripped_birch_end_grain"
+  ],
+  "result": {
+    "id": "minecraft:stripped_birch_wood",
+    "count": 1
+  }
+}

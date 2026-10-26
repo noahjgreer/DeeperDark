@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": [
+    "deeperdark:mangrove_end_grain",
+    "deeperdark:stripped_mangrove_end_grain"
+  ],
+  "result": {
+    "id": "minecraft:stripped_mangrove_log",
+    "count": 1
+  }
+}

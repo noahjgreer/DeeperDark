@@ -1,6 +1,9 @@
 {
   "type": "minecraft:stonecutting",
-  "ingredient": "minecraft:bamboo_block",
+  "ingredient": [
+    "minecraft:bamboo_block",
+    "deeperdark:bamboo_end_grain"
+  ],
   "result": {
     "id": "deeperdark:bamboo_block_wall",
     "count": 1

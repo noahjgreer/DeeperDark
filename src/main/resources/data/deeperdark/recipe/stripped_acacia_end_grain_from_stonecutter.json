@@ -1,6 +1,9 @@
 {
   "type": "minecraft:stonecutting",
   "ingredient": [
+    "minecraft:acacia_log",
+    "minecraft:acacia_wood",
+    "deeperdark:acacia_end_grain",
     "minecraft:stripped_acacia_log",
     "minecraft:stripped_acacia_wood"
   ],

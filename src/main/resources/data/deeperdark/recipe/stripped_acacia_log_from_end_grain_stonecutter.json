@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": [
+    "deeperdark:acacia_end_grain",
+    "deeperdark:stripped_acacia_end_grain"
+  ],
+  "result": {
+    "id": "minecraft:stripped_acacia_log",
+    "count": 1
+  }
+}

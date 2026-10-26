@@ -2,7 +2,10 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
-    "#": "minecraft:stripped_cherry_wood"
+    "#": [
+      "minecraft:stripped_cherry_log",
+      "minecraft:stripped_cherry_wood"
+    ]
   },
   "pattern": [
     "###",

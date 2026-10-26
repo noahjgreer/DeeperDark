@@ -7,10 +7,12 @@ import net.fabricmc.fabric.api.registry.FuelValueEvents;
 //?}
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RotatedPillarBlock;
@@ -20,8 +22,9 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 /*import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProviders;
 *///?}
 
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -29,7 +32,8 @@ import java.util.function.Function;
  * Asset and data files come from {@code tools/generate_wood_variant_assets.py}.
  */
 public class WoodVariantBlocks {
-    private static final List<Block> ALL = new ArrayList<>();
+    /** Vanilla item -> the blocks that follow it in the Building Blocks tab. */
+    private static final Map<Identifier, List<Block>> TAB_POSITIONS = new LinkedHashMap<>();
 
     static {
         registerWood("oak", "oak_wood", Blocks.OAK_LOG, Blocks.OAK_FENCE);
@@ -50,16 +54,18 @@ public class WoodVariantBlocks {
     }
 
     private static void registerWood(String wood, String bark, Block log, Block fence) {
-        register(wood + "_wall", WallBlock::new, fence, 20);
-        register(bark + "_wall", WallBlock::new, fence, 20);
-        register("stripped_" + bark + "_wall", WallBlock::new, fence, 20);
         // A pillar so it can copy the log's properties, whose map color reads the axis.
-        register(wood + "_end_grain", RotatedPillarBlock::new, log, 5);
-        register("stripped_" + wood + "_end_grain", RotatedPillarBlock::new, log, 5);
+        TAB_POSITIONS.put(Identifier.withDefaultNamespace("stripped_" + bark), List.of(
+                register(wood + "_end_grain", RotatedPillarBlock::new, log, 5),
+                register("stripped_" + wood + "_end_grain", RotatedPillarBlock::new, log, 5)));
+        TAB_POSITIONS.put(Identifier.withDefaultNamespace(wood + "_fence_gate"), List.of(
+                register(wood + "_wall", WallBlock::new, fence, 20),
+                register(bark + "_wall", WallBlock::new, fence, 20),
+                register("stripped_" + bark + "_wall", WallBlock::new, fence, 20)));
     }
 
     /** Copies {@code template}'s properties; burns like vanilla fences (walls) or logs (end grain) unless nether wood. */
-    private static void register(String name, Function<BlockBehaviour.Properties, Block> factory, Block template, int burnOdds) {
+    private static Block register(String name, Function<BlockBehaviour.Properties, Block> factory, Block template, int burnOdds) {
         boolean burnable = template.defaultBlockState().ignitedByLava();
         ResourceKey<Block> blockKey = ModBlocks.keyOfBlock(name);
         Block block = factory.apply(BlockBehaviour.Properties.ofFullCopy(template).setId(blockKey));
@@ -70,18 +76,19 @@ public class WoodVariantBlocks {
         *///?}
         Registry.register(BuiltInRegistries.ITEM, itemKey, new BlockItem(block, itemProperties));
         Registry.register(BuiltInRegistries.BLOCK, blockKey, block);
-        ALL.add(block);
         if (burnable) FlammableBlockRegistry.getDefaultInstance().add(block, 5, burnOdds);
+        return block;
     }
 
     public static void initialize() {
         // End grain is already fuel through the log item tags.
         //? if <26.3 {
-        FuelValueEvents.BUILD.register((builder, context) -> ALL.stream()
+        FuelValueEvents.BUILD.register((builder, context) -> TAB_POSITIONS.values().stream().flatMap(List::stream)
                 .filter(block -> block instanceof WallBlock && block.defaultBlockState().ignitedByLava())
                 .forEach(block -> builder.add(block, context.baseSmeltTime() * 3 / 2)));
         //?}
         CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.BUILDING_BLOCKS)
-                .register(content -> ALL.forEach(content::accept));
+                .register(content -> TAB_POSITIONS.forEach((after, blocks) ->
+                        content.insertAfter(BuiltInRegistries.ITEM.getValue(after), blocks.toArray(ItemLike[]::new))));
     }
 }

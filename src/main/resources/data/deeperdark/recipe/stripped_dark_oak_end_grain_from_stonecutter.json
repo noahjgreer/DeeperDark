@@ -1,6 +1,9 @@
 {
   "type": "minecraft:stonecutting",
   "ingredient": [
+    "minecraft:dark_oak_log",
+    "minecraft:dark_oak_wood",
+    "deeperdark:dark_oak_end_grain",
     "minecraft:stripped_dark_oak_log",
     "minecraft:stripped_dark_oak_wood"
   ],

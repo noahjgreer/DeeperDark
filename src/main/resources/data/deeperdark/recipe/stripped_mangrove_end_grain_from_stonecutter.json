@@ -1,6 +1,9 @@
 {
   "type": "minecraft:stonecutting",
   "ingredient": [
+    "minecraft:mangrove_log",
+    "minecraft:mangrove_wood",
+    "deeperdark:mangrove_end_grain",
     "minecraft:stripped_mangrove_log",
     "minecraft:stripped_mangrove_wood"
   ],

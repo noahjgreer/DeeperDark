@@ -1,6 +1,10 @@
 {
   "type": "minecraft:stonecutting",
-  "ingredient": "minecraft:spruce_wood",
+  "ingredient": [
+    "minecraft:spruce_log",
+    "minecraft:spruce_wood",
+    "deeperdark:spruce_end_grain"
+  ],
   "result": {
     "id": "deeperdark:spruce_wood_wall",
     "count": 1

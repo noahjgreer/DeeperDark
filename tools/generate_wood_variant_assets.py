@@ -50,6 +50,10 @@ def mc(name):
     return f"minecraft:{name}"
 
 
+def short(item_id):
+    return item_id.split(":", 1)[1]
+
+
 def dd(name):
     return f"deeperdark:{name}"
 
@@ -85,13 +89,17 @@ def end_grain_assets(assets, name, texture):
     write(f"{assets}/items/{name}.json", {"model": {"type": "minecraft:model", "model": dd(f"block/{name}")}})
 
 
-def stonecutting(ingredients, result):
-    return {"type": "minecraft:stonecutting", "ingredient": ingredients, "result": {"id": dd(result), "count": 1}}
+def cut(recipes, file, ingredients, result, count=1):
+    """Stonecutter recipe; ingredient lists may hold the result itself, which is dropped."""
+    ingredients = [i for i in ingredients if i != result]
+    assert ingredients, file
+    write(f"{recipes}/{file}.json",
+          {"type": "minecraft:stonecutting", "ingredient": ingredients, "result": {"id": result, "count": count}})
 
 
 def wall_shaped(ingredients, result):
     return {"type": "minecraft:crafting_shaped", "category": "building", "key": {"#": ingredients},
-            "pattern": ["###", "###"], "result": {"id": dd(result), "count": 6}}
+            "pattern": ["###", "###"], "result": {"id": result, "count": 6}}
 
 
 def loot_table(name, version):
@@ -129,32 +137,42 @@ for wood, bark, log, log_tag in WOODS:
     optional = version is not None
 
     plain = [mc(log)] if log == bark else [mc(log), mc(bark)]
-    stripped = [mc(f"stripped_{x[len('minecraft:'):]}") for x in plain]
-    blocks = {
-        f"{wood}_wall": f"{wood}_planks",
-        f"{bark}_wall": log,
-        f"stripped_{bark}_wall": f"stripped_{log}",
-        f"{wood}_end_grain": f"{log}_top",
-        f"stripped_{wood}_end_grain": f"stripped_{log}_top",
+    stripped = [mc(f"stripped_{short(x)}") for x in plain]
+    blocks = {  # id: (texture, name)
+        f"{wood}_wall": (f"{wood}_planks", f"{title(wood)} Plank Wall"),
+        f"{bark}_wall": (log, f"{title(log)} Wall"),
+        f"stripped_{bark}_wall": (f"stripped_{log}", f"Stripped {title(log)} Wall"),
+        f"{wood}_end_grain": (f"{log}_top", f"{title(log)} End Grain"),
+        f"stripped_{wood}_end_grain": (f"stripped_{log}_top", f"Stripped {title(log)} End Grain"),
     }
-    for name, texture in blocks.items():
+    for name, (texture, display_name) in blocks.items():
         (wall_assets if name.endswith("_wall") else end_grain_assets)(assets, name, texture)
-        lang[f"block.deeperdark.{name}"] = title(name)
+        lang[f"block.deeperdark.{name}"] = display_name
         for v in [version] if version else VERSIONS:
             write(f"{res(v)}/data/deeperdark/loot_table/blocks/{name}.json", loot_table(name, v))
         axe.append((dd(name), optional))
         if name.endswith("_wall"):
             walls.append((dd(name), optional))
 
-    write(f"{recipes}/{wood}_wall_from_stonecutter.json", stonecutting(mc(f"{wood}_planks"), f"{wood}_wall"))
-    # Walls come from the bark block only: from logs, the wall -> bark block recipe would undercut 4 logs -> 3 wood.
-    write(f"{recipes}/{bark}_wall.json", wall_shaped(mc(bark), f"{bark}_wall"))
-    write(f"{recipes}/{bark}_wall_from_stonecutter.json", stonecutting(mc(bark), f"{bark}_wall"))
-    write(f"{recipes}/stripped_{bark}_wall.json", wall_shaped(mc(f"stripped_{bark}"), f"stripped_{bark}_wall"))
-    write(f"{recipes}/stripped_{bark}_wall_from_stonecutter.json",
-          stonecutting(mc(f"stripped_{bark}"), f"stripped_{bark}_wall"))
-    write(f"{recipes}/{wood}_end_grain_from_stonecutter.json", stonecutting(plain, f"{wood}_end_grain"))
-    write(f"{recipes}/stripped_{wood}_end_grain_from_stonecutter.json", stonecutting(stripped, f"stripped_{wood}_end_grain"))
+    # Anything in the log family cuts straight into any variant, one log's worth each, matching the
+    # mod's log -> wood/stripped stonecutting. Plank walls get a log's worth of planks.
+    end_grain, stripped_end_grain = dd(f"{wood}_end_grain"), dd(f"stripped_{wood}_end_grain")
+    unstripped = plain + [end_grain]
+    any_log = unstripped + stripped + [stripped_end_grain]
+    planks_per_log = 2 if wood == "bamboo" else 4
+
+    cut(recipes, f"{wood}_wall_from_stonecutter", [mc(f"{wood}_planks")], dd(f"{wood}_wall"))
+    cut(recipes, f"{wood}_wall_from_logs_stonecutter", any_log, dd(f"{wood}_wall"), planks_per_log)
+    cut(recipes, f"{bark}_wall_from_stonecutter", unstripped, dd(f"{bark}_wall"))
+    cut(recipes, f"stripped_{bark}_wall_from_stonecutter", any_log, dd(f"stripped_{bark}_wall"))
+    cut(recipes, f"{wood}_end_grain_from_stonecutter", unstripped, end_grain)
+    cut(recipes, f"stripped_{wood}_end_grain_from_stonecutter", any_log, stripped_end_grain)
+    for target in plain:
+        cut(recipes, f"{short(target)}_from_end_grain_stonecutter", [end_grain], target)
+    for target in stripped:
+        cut(recipes, f"{short(target)}_from_end_grain_stonecutter", [end_grain, stripped_end_grain], target)
+    write(f"{recipes}/{bark}_wall.json", wall_shaped(plain, dd(f"{bark}_wall")))
+    write(f"{recipes}/stripped_{bark}_wall.json", wall_shaped(stripped, dd(f"stripped_{bark}_wall")))
 
     # Item log tags only (planks, charcoal, fuel): in the block log tags, trees, creaking hearts and
     # worldgen would treat it as a natural log.

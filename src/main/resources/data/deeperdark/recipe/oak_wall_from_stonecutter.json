@@ -1,6 +1,8 @@
 {
   "type": "minecraft:stonecutting",
-  "ingredient": "minecraft:oak_planks",
+  "ingredient": [
+    "minecraft:oak_planks"
+  ],
   "result": {
     "id": "deeperdark:oak_wall",
     "count": 1

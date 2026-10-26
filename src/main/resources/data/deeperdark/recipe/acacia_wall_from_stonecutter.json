@@ -1,6 +1,8 @@
 {
   "type": "minecraft:stonecutting",
-  "ingredient": "minecraft:acacia_planks",
+  "ingredient": [
+    "minecraft:acacia_planks"
+  ],
   "result": {
     "id": "deeperdark:acacia_wall",
     "count": 1

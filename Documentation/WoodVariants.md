@@ -5,17 +5,31 @@
 `block/WoodVariantBlocks` registers five blocks for every wood type (oak, spruce, birch, jungle,
 acacia, dark oak, mangrove, cherry, pale oak, bamboo, crimson, warped, and poplar on 26.3 only):
 
-| Block | Texture | Recipes |
-| --- | --- | --- |
-| `<wood>_wall` | planks | stonecutter: planks |
-| `<bark>_wall` (`oak_wood_wall`, `crimson_hyphae_wall`, `bamboo_block_wall`) | log side | 6 wood `###/###` → 6, stonecutter |
-| `stripped_<bark>_wall` | stripped log side | same, from stripped wood |
-| `<wood>_end_grain` | log top on all six faces | stonecutter: log or wood |
-| `stripped_<wood>_end_grain` | stripped log top | stonecutter: stripped log or wood |
+"Log family" means the log, wood, stripped log, stripped wood and both end grains of one wood type.
 
-Plank walls have no crafting recipe because `###/###` of planks is the vanilla trapdoor.
-The QoL generator derives a wall → wood recipe from each bark wall's shaped recipe. Bark walls
-don't take logs, because log → wall → wood would undercut vanilla's 4 logs → 3 wood.
+| Block (English name) | Texture | Recipes |
+| --- | --- | --- |
+| `<wood>_wall` (Oak Plank Wall) | planks | stonecutter: planks → 1, any log-family block → 4 (bamboo 2) |
+| `<bark>_wall` (Oak Log Wall; ids `oak_wood_wall`, `crimson_hyphae_wall`, `bamboo_block_wall`) | log side | 6 logs/wood `###/###` → 6; stonecutter: log, wood, end grain |
+| `stripped_<bark>_wall` (Stripped Oak Log Wall) | stripped log side | 6 stripped logs/wood → 6; stonecutter: any log-family block |
+| `<wood>_end_grain` (Oak Log End Grain) | log top on all six faces | stonecutter: log, wood |
+| `stripped_<wood>_end_grain` (Stripped Oak Log End Grain) | stripped log top | stonecutter: any log-family block |
+
+Every stonecutter recipe goes straight from its input to the result, with no stripping step first.
+Each one trades one log's worth for one log's worth. That matches the mod's existing log → wood/stripped
+stonecutting (`data/minecraft/recipe/*_stonecutting.json`), so nothing undercuts vanilla's
+4 logs → 3 wood more than that already does. End grain also cuts back into the log and wood, and either end grain
+into the stripped log and wood. Stripping can't be undone, so stripped blocks never cut into
+unstripped ones.
+
+Plank walls have no crafting recipe because `###/###` of planks is the vanilla trapdoor. The QoL
+generator derives a wall → wood recipe from each bark wall's shaped recipe.
+
+English names say what the block is made of. The ids keep their original names (`oak_wall`, `oak_wood_wall`), so
+already placed blocks survive.
+
+In the Building Blocks tab, end grain follows the wood's stripped wood and the walls follow its
+fence gate.
 
 Each block copies the properties of its vanilla fence (walls) or log (end grain), which gives it
 the right strength, sound, map color and lava ignition. End grain is a `RotatedPillarBlock` because

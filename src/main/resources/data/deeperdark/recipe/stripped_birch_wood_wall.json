@@ -2,7 +2,10 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
-    "#": "minecraft:stripped_birch_wood"
+    "#": [
+      "minecraft:stripped_birch_log",
+      "minecraft:stripped_birch_wood"
+    ]
   },
   "pattern": [
     "###",

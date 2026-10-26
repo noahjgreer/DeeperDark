@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": [
+    "deeperdark:warped_end_grain",
+    "deeperdark:stripped_warped_end_grain"
+  ],
+  "result": {
+    "id": "minecraft:stripped_warped_hyphae",
+    "count": 1
+  }
+}

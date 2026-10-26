@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": [
+    "deeperdark:crimson_end_grain"
+  ],
+  "result": {
+    "id": "minecraft:crimson_hyphae",
+    "count": 1
+  }
+}

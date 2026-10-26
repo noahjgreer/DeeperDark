@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": [
+    "minecraft:cherry_log",
+    "minecraft:cherry_wood",
+    "deeperdark:cherry_end_grain",
+    "minecraft:stripped_cherry_log",
+    "minecraft:stripped_cherry_wood",
+    "deeperdark:stripped_cherry_end_grain"
+  ],
+  "result": {
+    "id": "deeperdark:cherry_wall",
+    "count": 4
+  }
+}
