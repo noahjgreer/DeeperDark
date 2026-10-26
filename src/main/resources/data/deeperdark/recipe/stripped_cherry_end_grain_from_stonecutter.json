@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": [
+    "minecraft:stripped_cherry_log",
+    "minecraft:stripped_cherry_wood"
+  ],
+  "result": {
+    "id": "deeperdark:stripped_cherry_end_grain",
+    "count": 1
+  }
+}

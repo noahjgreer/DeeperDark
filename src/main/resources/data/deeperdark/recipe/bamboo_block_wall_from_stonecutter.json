@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "minecraft:bamboo_block",
+  "result": {
+    "id": "deeperdark:bamboo_block_wall",
+    "count": 1
+  }
+}

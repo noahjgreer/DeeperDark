@@ -109,6 +109,7 @@ public class ModBlocks {
 
     public static void initialize() {
         Deeperdark.LOGGER.info("Registering ModBlocks for deeperdark");
+        WoodVariantBlocks.initialize();
 
         CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.NATURAL_BLOCKS).register(content -> {
             content.accept(QUICKSAND);
@@ -176,11 +177,11 @@ public class ModBlocks {
         });
     }
 
-    private static ResourceKey<Block> keyOfBlock(String name) {
+    static ResourceKey<Block> keyOfBlock(String name) {
         return ResourceKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(Deeperdark.MOD_ID, name));
     }
 
-    private static ResourceKey<Item> keyOfItem(String name) {
+    static ResourceKey<Item> keyOfItem(String name) {
         return ResourceKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Deeperdark.MOD_ID, name));
     }
 

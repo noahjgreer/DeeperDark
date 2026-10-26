@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": [
+    "minecraft:jungle_log",
+    "minecraft:jungle_wood"
+  ],
+  "result": {
+    "id": "deeperdark:jungle_end_grain",
+    "count": 1
+  }
+}

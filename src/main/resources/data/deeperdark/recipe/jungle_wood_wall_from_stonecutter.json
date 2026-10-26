@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "minecraft:jungle_wood",
+  "result": {
+    "id": "deeperdark:jungle_wood_wall",
+    "count": 1
+  }
+}

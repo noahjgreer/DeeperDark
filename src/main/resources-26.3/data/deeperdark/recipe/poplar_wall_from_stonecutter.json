@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "minecraft:poplar_planks",
+  "result": {
+    "id": "deeperdark:poplar_wall",
+    "count": 1
+  }
+}

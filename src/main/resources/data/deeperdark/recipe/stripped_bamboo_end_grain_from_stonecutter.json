@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": [
+    "minecraft:stripped_bamboo_block"
+  ],
+  "result": {
+    "id": "deeperdark:stripped_bamboo_end_grain",
+    "count": 1
+  }
+}

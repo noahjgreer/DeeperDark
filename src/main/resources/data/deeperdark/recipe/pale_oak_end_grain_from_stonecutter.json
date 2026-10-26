@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": [
+    "minecraft:pale_oak_log",
+    "minecraft:pale_oak_wood"
+  ],
+  "result": {
+    "id": "deeperdark:pale_oak_end_grain",
+    "count": 1
+  }
+}

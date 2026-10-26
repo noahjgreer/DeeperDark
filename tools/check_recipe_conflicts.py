@@ -39,7 +39,9 @@ def check(v):
     for m in mod:
         load_dir(m, None, tags, "tags/item")
     items = {"minecraft:" + f[:-5] for f in os.listdir(f"{REPO}/ref-decompiled/Minecraft/{v}/assets/assets/minecraft/items")}
-    items |= {"deeperdark:" + f[:-5] for f in os.listdir(f"{REPO}/src/main/resources/assets/deeperdark/items")}
+    for d in (f"{REPO}/src/main/resources/assets/deeperdark/items", f"{REPO}/src/main/resources-{v}/assets/deeperdark/items"):
+        if os.path.isdir(d):
+            items |= {"deeperdark:" + f[:-5] for f in os.listdir(d)}
 
     cache = {}
     def tag(t):

@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": [
+    "minecraft:stripped_poplar_log",
+    "minecraft:stripped_poplar_wood"
+  ],
+  "result": {
+    "id": "deeperdark:stripped_poplar_end_grain",
+    "count": 1
+  }
+}

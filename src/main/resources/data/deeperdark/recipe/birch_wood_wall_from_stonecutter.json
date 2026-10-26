@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "minecraft:birch_wood",
+  "result": {
+    "id": "deeperdark:birch_wood_wall",
+    "count": 1
+  }
+}

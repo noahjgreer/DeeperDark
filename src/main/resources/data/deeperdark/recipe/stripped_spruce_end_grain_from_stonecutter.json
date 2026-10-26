@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": [
+    "minecraft:stripped_spruce_log",
+    "minecraft:stripped_spruce_wood"
+  ],
+  "result": {
+    "id": "deeperdark:stripped_spruce_end_grain",
+    "count": 1
+  }
+}

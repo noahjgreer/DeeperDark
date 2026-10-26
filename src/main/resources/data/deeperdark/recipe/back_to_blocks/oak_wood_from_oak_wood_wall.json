@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    "deeperdark:oak_wood_wall"
+  ],
+  "result": {
+    "id": "minecraft:oak_wood"
+  }
+}

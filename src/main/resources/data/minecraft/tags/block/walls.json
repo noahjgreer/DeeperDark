@@ -7,6 +7,54 @@
     "deeperdark:end_stone_wall",
     "deeperdark:purpur_wall",
     "deeperdark:basalt_wall",
-    "deeperdark:resin_wall"
+    "deeperdark:resin_wall",
+    "deeperdark:oak_wall",
+    "deeperdark:oak_wood_wall",
+    "deeperdark:stripped_oak_wood_wall",
+    "deeperdark:spruce_wall",
+    "deeperdark:spruce_wood_wall",
+    "deeperdark:stripped_spruce_wood_wall",
+    "deeperdark:birch_wall",
+    "deeperdark:birch_wood_wall",
+    "deeperdark:stripped_birch_wood_wall",
+    "deeperdark:jungle_wall",
+    "deeperdark:jungle_wood_wall",
+    "deeperdark:stripped_jungle_wood_wall",
+    "deeperdark:acacia_wall",
+    "deeperdark:acacia_wood_wall",
+    "deeperdark:stripped_acacia_wood_wall",
+    "deeperdark:dark_oak_wall",
+    "deeperdark:dark_oak_wood_wall",
+    "deeperdark:stripped_dark_oak_wood_wall",
+    "deeperdark:mangrove_wall",
+    "deeperdark:mangrove_wood_wall",
+    "deeperdark:stripped_mangrove_wood_wall",
+    "deeperdark:cherry_wall",
+    "deeperdark:cherry_wood_wall",
+    "deeperdark:stripped_cherry_wood_wall",
+    "deeperdark:pale_oak_wall",
+    "deeperdark:pale_oak_wood_wall",
+    "deeperdark:stripped_pale_oak_wood_wall",
+    "deeperdark:bamboo_wall",
+    "deeperdark:bamboo_block_wall",
+    "deeperdark:stripped_bamboo_block_wall",
+    "deeperdark:crimson_wall",
+    "deeperdark:crimson_hyphae_wall",
+    "deeperdark:stripped_crimson_hyphae_wall",
+    "deeperdark:warped_wall",
+    "deeperdark:warped_hyphae_wall",
+    "deeperdark:stripped_warped_hyphae_wall",
+    {
+      "id": "deeperdark:poplar_wall",
+      "required": false
+    },
+    {
+      "id": "deeperdark:poplar_wood_wall",
+      "required": false
+    },
+    {
+      "id": "deeperdark:stripped_poplar_wood_wall",
+      "required": false
+    }
   ]
 }

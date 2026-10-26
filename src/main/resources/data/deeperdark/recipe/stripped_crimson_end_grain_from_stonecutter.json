@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": [
+    "minecraft:stripped_crimson_stem",
+    "minecraft:stripped_crimson_hyphae"
+  ],
+  "result": {
+    "id": "deeperdark:stripped_crimson_end_grain",
+    "count": 1
+  }
+}

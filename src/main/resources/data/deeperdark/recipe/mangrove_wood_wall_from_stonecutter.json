@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "minecraft:mangrove_wood",
+  "result": {
+    "id": "deeperdark:mangrove_wood_wall",
+    "count": 1
+  }
+}

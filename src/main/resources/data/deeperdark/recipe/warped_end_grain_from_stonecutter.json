@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": [
+    "minecraft:warped_stem",
+    "minecraft:warped_hyphae"
+  ],
+  "result": {
+    "id": "deeperdark:warped_end_grain",
+    "count": 1
+  }
+}

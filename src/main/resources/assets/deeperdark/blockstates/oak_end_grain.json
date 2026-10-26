@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "deeperdark:block/oak_end_grain"
+    },
+    "axis=y": {
+      "model": "deeperdark:block/oak_end_grain"
+    },
+    "axis=z": {
+      "model": "deeperdark:block/oak_end_grain"
+    }
+  }
+}

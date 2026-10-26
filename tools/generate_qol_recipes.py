@@ -26,6 +26,9 @@ for f in os.listdir(f"{REPO}/src/main/resources/assets/deeperdark/items"):
     MOD_ITEMS.add("deeperdark:" + f[:-5])
 for v in VERS:
     ITEMS[v] |= MOD_ITEMS
+    d = f"{REPO}/src/main/resources-{v}/assets/deeperdark/items"
+    if os.path.isdir(d):
+        ITEMS[v] |= {"deeperdark:" + f[:-5] for f in os.listdir(d)}
 
 def vanilla(v, name):
     p = f"{REF[v]}/data/minecraft/recipe/{name}.json"

@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "minecraft:acacia_wood",
+  "result": {
+    "id": "deeperdark:acacia_wood_wall",
+    "count": 1
+  }
+}

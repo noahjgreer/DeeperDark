@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "minecraft:stripped_warped_hyphae",
+  "result": {
+    "id": "deeperdark:stripped_warped_hyphae_wall",
+    "count": 1
+  }
+}

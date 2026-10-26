@@ -1,0 +1,37 @@
+{
+  "replace": false,
+  "values": [
+    "deeperdark:oak_end_grain",
+    "deeperdark:stripped_oak_end_grain",
+    "deeperdark:spruce_end_grain",
+    "deeperdark:stripped_spruce_end_grain",
+    "deeperdark:birch_end_grain",
+    "deeperdark:stripped_birch_end_grain",
+    "deeperdark:jungle_end_grain",
+    "deeperdark:stripped_jungle_end_grain",
+    "deeperdark:acacia_end_grain",
+    "deeperdark:stripped_acacia_end_grain",
+    "deeperdark:dark_oak_end_grain",
+    "deeperdark:stripped_dark_oak_end_grain",
+    "deeperdark:mangrove_end_grain",
+    "deeperdark:stripped_mangrove_end_grain",
+    "deeperdark:cherry_end_grain",
+    "deeperdark:stripped_cherry_end_grain",
+    "deeperdark:pale_oak_end_grain",
+    "deeperdark:stripped_pale_oak_end_grain",
+    "deeperdark:bamboo_end_grain",
+    "deeperdark:stripped_bamboo_end_grain",
+    "deeperdark:crimson_end_grain",
+    "deeperdark:stripped_crimson_end_grain",
+    "deeperdark:warped_end_grain",
+    "deeperdark:stripped_warped_end_grain",
+    {
+      "id": "deeperdark:poplar_end_grain",
+      "required": false
+    },
+    {
+      "id": "deeperdark:stripped_poplar_end_grain",
+      "required": false
+    }
+  ]
+}
