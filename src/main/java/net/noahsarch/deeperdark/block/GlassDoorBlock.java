@@ -49,8 +49,9 @@ public class GlassDoorBlock extends DoorBlock {
                 && fromPane.getAxis() == door.getValue(FACING).getClockWise().getAxis();
     }
 
-    // A pane beside either half, or beside the other leaf of a double door, centers the door.
+    // A pane above the door, beside either half, or beside the other leaf of a double door centers it.
     private static boolean isCentered(LevelReader level, BlockPos lowerPos, Direction facing) {
+        if (level.getBlockState(lowerPos.above(2)).getBlock() instanceof IronBarsBlock) return true;
         for (Direction side : new Direction[] {facing.getClockWise(), facing.getCounterClockWise()}) {
             for (BlockPos pos : new BlockPos[] {lowerPos, lowerPos.above()}) {
                 BlockState neighbour = level.getBlockState(pos.relative(side));
@@ -77,10 +78,11 @@ public class GlassDoorBlock extends DoorBlock {
     protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess ticks, BlockPos pos,
             Direction directionToNeighbour, BlockPos neighbourPos, BlockState neighbourState, RandomSource random) {
         BlockState updated = super.updateShape(state, level, ticks, pos, directionToNeighbour, neighbourPos, neighbourState, random);
-        if (!updated.is(this) || directionToNeighbour.getAxis() != state.getValue(FACING).getClockWise().getAxis()) {
-            return updated;
-        }
-        BlockPos lowerPos = state.getValue(HALF) == DoubleBlockHalf.LOWER ? pos : pos.below();
+        boolean upper = state.getValue(HALF) == DoubleBlockHalf.UPPER;
+        boolean affectsCentering = directionToNeighbour.getAxis() == state.getValue(FACING).getClockWise().getAxis()
+                || upper && directionToNeighbour == Direction.UP;
+        if (!updated.is(this) || !affectsCentering) return updated;
+        BlockPos lowerPos = upper ? pos.below() : pos;
         return updated.setValue(CENTERED, isCentered(level, lowerPos, state.getValue(FACING)));
     }
 

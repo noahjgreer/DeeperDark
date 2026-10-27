@@ -9,8 +9,8 @@ because their format differs between versions.
 ## Centered in pane walls
 
 A glass door gets the `centered=true` state when a pane sits in line with it. That means an
-`IronBarsBlock` (any glass pane, iron bars) beside either half, on either side along the door's
-width. It also counts if the neighbour is the other leaf of a double door and the pane is on that
+`IronBarsBlock` (any glass pane, iron bars) directly above the upper half, or beside either half
+on either side along the door's width. It also counts if the neighbour is the other leaf of a double door and the pane is on that
 leaf's far side. The check runs on placement and in `updateShape`, so the door follows panes that
 are added or removed later. The double-door case looks through the other leaf instead of reading
 its `centered` state. Reading the state would let two leaves keep each other centered after the
