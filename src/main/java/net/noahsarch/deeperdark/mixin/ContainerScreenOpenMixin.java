@@ -106,34 +106,15 @@ public abstract class ContainerScreenOpenMixin<T extends AbstractContainerMenu> 
             if (ContainerItemUtil.isOpen(slotItem)) continue;
 
             boolean shouldShow;
-            if (slotItem.is(ItemTags.SHULKER_BOXES)) {
-                // Shulker boxes block only other shulker boxes per spec.
-                if (cursor.is(ItemTags.SHULKER_BOXES)) continue;
-                shouldShow = ContainerItemUtil.canInsert(slotItem, cursor, 27);
-
-            } else if (slotItem.is(ModBlocks.FLIMSY_BOX.asItem())
-                    || slotItem.is(ModBlocks.STURDY_BOX.asItem())
-                    || slotItem.is(ModBlocks.REINFORCED_BOX.asItem())) {
-                // Custom boxes block shulker boxes and all custom boxes.
-                if (cursor.is(ItemTags.SHULKER_BOXES)) continue;
-                if (ContainerItemUtil.getContainerSize(cursor) >= 0) continue;
-                int size = ContainerItemUtil.getContainerSize(slotItem);
-                shouldShow = ContainerItemUtil.canInsert(slotItem, cursor, size);
-
-            } else if (slotItem.is(Items.ENDER_CHEST)) {
-                // Ender chests: actual capacity can't be read client-side reliably.
-                // Show "+" for any non-shulker, non-vault, non-ender-chest cursor.
-                if (cursor.is(ItemTags.SHULKER_BOXES)) continue;
-                if (ContainerItemUtil.isVaultItem(cursor)) continue;
-                if (cursor.is(Items.ENDER_CHEST)) continue;
-                shouldShow = true;
-
+            if (slotItem.is(Items.ENDER_CHEST)) {
+                // Actual ender capacity can't be read client-side; ender-on-ender stacks instead.
+                shouldShow = !cursor.is(Items.ENDER_CHEST);
             } else if (ContainerItemUtil.isVaultItem(slotItem)) {
-                // Vaults block shulker boxes and other vaults.
-                if (cursor.is(ItemTags.SHULKER_BOXES)) continue;
-                if (ContainerItemUtil.isVaultItem(cursor)) continue;
-                shouldShow = ContainerItemUtil.canVaultInsert(slotItem, cursor);
-
+                shouldShow = ContainerItemUtil.canStore(ContainerItemUtil.VAULT_TIER, cursor)
+                        && ContainerItemUtil.canVaultInsert(slotItem, cursor);
+            } else if (ContainerItemUtil.tier(slotItem) > 0) {
+                shouldShow = ContainerItemUtil.canStore(ContainerItemUtil.tier(slotItem), cursor)
+                        && ContainerItemUtil.canInsert(slotItem, cursor, ContainerItemUtil.getContainerSize(slotItem));
             } else {
                 continue; // Not a container item we recognise
             }

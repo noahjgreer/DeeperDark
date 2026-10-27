@@ -2,7 +2,6 @@ package net.noahsarch.deeperdark.block;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.SlotAccess;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ClickAction;
@@ -55,10 +54,7 @@ public class VaultItem extends BlockItem {
             ItemStack self, ItemStack other, Slot slot,
             ClickAction clickAction, Player player, SlotAccess carriedAccess) {
         if (clickAction != ClickAction.SECONDARY || other.isEmpty()) return false;
-        // Per spec: vaults block other vaults and shulker boxes from being inserted.
-        if (ContainerItemUtil.isVaultItem(other)) return false;
-        if (other.is(ItemTags.SHULKER_BOXES)) return false;
-        if (ContainerItemUtil.isOpen(self) || ContainerItemUtil.isOpen(other)) return false;
+        if (ContainerItemUtil.isOpen(self) || !ContainerItemUtil.canStore(ContainerItemUtil.VAULT_TIER, other)) return false;
         return ContainerItemUtil.tryVaultInsert(self, other, carriedAccess);
     }
 }

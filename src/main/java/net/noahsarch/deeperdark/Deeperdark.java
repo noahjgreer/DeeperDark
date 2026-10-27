@@ -8,7 +8,6 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.inventory.ShulkerBoxMenu;
 import net.noahsarch.deeperdark.menu.BoxMenu;
-import net.noahsarch.deeperdark.menu.ReinforcedBoxMenu;
 import net.minecraft.world.item.ItemStack;
 //? if >=26.3 {
 /*import net.fabricmc.fabric.api.item.v1.DefaultItemComponentEvents;
@@ -395,7 +394,7 @@ public class Deeperdark implements ModInitializer {
 		} else if (stack.is(ModBlocks.REINFORCED_BOX.asItem())) {
 			ItemBackedContainer container = ItemBackedContainer.of(player, slot, 9, ModSounds.BOX_CLOSE);
 			result = player.openMenu(new SimpleMenuProvider(
-				(id, inv, p) -> new ReinforcedBoxMenu(id, inv, container),
+				(id, inv, p) -> new BoxMenu(ModMenus.REINFORCED_BOX, id, inv, container, 3),
 				stack.getHoverName()
 			));
 		} else if (stack.is(Items.ENDER_CHEST)) {
@@ -438,9 +437,8 @@ public class Deeperdark implements ModInitializer {
 		ItemStack stack = slot.getItem();
 		if (stack.isEmpty()) return;
 
-		// The ender inventory outlives the item-opened ender chest menu wrapping it.
-		net.minecraft.world.Container parentStorage = slot.container instanceof OpenMarkedContainer omc ? omc.delegate() : slot.container;
-		if (!outlivesMenu(parentStorage)) return;
+		net.minecraft.world.Container parentStorage = slot.container;
+		if (!outlivesMenu(parentStorage, currentMenu)) return;
 		int slotInParent = slot.getContainerSlot();
 
 		// Guard: only item types we actually open nested are supported. Ender chests
@@ -473,35 +471,35 @@ public class Deeperdark implements ModInitializer {
 		LOGGER.info("[DD-nested] opening {} slotInParent={} parentSlot={}", stack.getItem(), slotInParent, parentInventorySlot);
 
 		if (stack.is(ItemTags.SHULKER_BOXES)) {
-			ItemBackedContainer container = ItemBackedContainer.ofNested(player, parentStorage, slotInParent, 27, net.minecraft.sounds.SoundEvents.SHULKER_BOX_CLOSE);
+			ItemBackedContainer container = ItemBackedContainer.ofNested(player, currentMenu, parentStorage, slotInParent, 27, net.minecraft.sounds.SoundEvents.SHULKER_BOX_CLOSE);
 			var result = player.openMenu(new SimpleMenuProvider(
 				(id, inv, p) -> new net.minecraft.world.inventory.ShulkerBoxMenu(id, inv, container),
 				stack.getHoverName()
 			));
 			LOGGER.info("[DD-nested] shulker openMenu result={}", result);
 		} else if (stack.is(ModBlocks.FLIMSY_BOX.asItem())) {
-			ItemBackedContainer container = ItemBackedContainer.ofNested(player, parentStorage, slotInParent, 3, net.noahsarch.deeperdark.sound.ModSounds.BOX_CLOSE);
+			ItemBackedContainer container = ItemBackedContainer.ofNested(player, currentMenu, parentStorage, slotInParent, 3, net.noahsarch.deeperdark.sound.ModSounds.BOX_CLOSE);
 			var result = player.openMenu(new SimpleMenuProvider(
 				(id, inv, p) -> new net.noahsarch.deeperdark.menu.BoxMenu(ModMenus.FLIMSY_BOX, id, inv, container, 1),
 				stack.getHoverName()
 			));
 			LOGGER.info("[DD-nested] flimsy openMenu result={}", result);
 		} else if (stack.is(ModBlocks.STURDY_BOX.asItem())) {
-			ItemBackedContainer container = ItemBackedContainer.ofNested(player, parentStorage, slotInParent, 6, net.noahsarch.deeperdark.sound.ModSounds.BOX_CLOSE);
+			ItemBackedContainer container = ItemBackedContainer.ofNested(player, currentMenu, parentStorage, slotInParent, 6, net.noahsarch.deeperdark.sound.ModSounds.BOX_CLOSE);
 			var result = player.openMenu(new SimpleMenuProvider(
 				(id, inv, p) -> new net.noahsarch.deeperdark.menu.BoxMenu(ModMenus.STURDY_BOX, id, inv, container, 2),
 				stack.getHoverName()
 			));
 			LOGGER.info("[DD-nested] sturdy openMenu result={}", result);
 		} else if (stack.is(ModBlocks.REINFORCED_BOX.asItem())) {
-			ItemBackedContainer container = ItemBackedContainer.ofNested(player, parentStorage, slotInParent, 9, net.noahsarch.deeperdark.sound.ModSounds.BOX_CLOSE);
+			ItemBackedContainer container = ItemBackedContainer.ofNested(player, currentMenu, parentStorage, slotInParent, 9, net.noahsarch.deeperdark.sound.ModSounds.BOX_CLOSE);
 			var result = player.openMenu(new SimpleMenuProvider(
-				(id, inv, p) -> new ReinforcedBoxMenu(id, inv, container),
+				(id, inv, p) -> new BoxMenu(ModMenus.REINFORCED_BOX, id, inv, container, 3),
 				stack.getHoverName()
 			));
 			LOGGER.info("[DD-nested] reinforced openMenu result={}", result);
 		} else if (ContainerItemUtil.isVaultItem(stack)) {
-			ItemBackedVaultEntity entity = new ItemBackedVaultEntity(player, parentStorage, slotInParent);
+			ItemBackedVaultEntity entity = new ItemBackedVaultEntity(player, currentMenu, parentStorage, slotInParent);
 			var result = player.openMenu(new SimpleMenuProvider(
 				(id, inv, p) -> new VaultMenu(entity.getVaultMenuType(), id, inv, entity),
 				stack.getHoverName()
@@ -512,16 +510,19 @@ public class Deeperdark implements ModInitializer {
 	}
 
 	/**
-	 * True if items in {@code container} persist after its menu closes. Crafting grids, result
+	 * True if items in {@code container} persist after {@code menu} closes. Crafting grids, result
 	 * slots, anvil inputs and the like are emptied or orphaned on close, so a container item
 	 * nested-opened from them would be edited as a phantom copy (lost or duplicated items).
+	 * The nested child then stays valid only while {@code menu.stillValid} holds.
 	 */
-	private static boolean outlivesMenu(net.minecraft.world.Container container) {
+	private static boolean outlivesMenu(net.minecraft.world.Container container, net.minecraft.world.inventory.AbstractContainerMenu menu) {
 		return container instanceof net.minecraft.world.level.block.entity.BlockEntity
 				|| container instanceof net.minecraft.world.entity.Entity
 				|| container instanceof net.minecraft.world.CompoundContainer
 				|| container instanceof net.minecraft.world.inventory.PlayerEnderChestContainer
-				|| container instanceof ItemBackedContainer ibc && !ibc.isNested();
+				|| container instanceof OpenMarkedContainer
+				|| container instanceof ItemBackedContainer ibc && !ibc.isNested()
+				|| menu instanceof net.minecraft.world.inventory.AbstractMountInventoryMenu;
 	}
 
 	/** Returns the player-inventory slot of the item-opened container that owns {@code container}, or -1. */

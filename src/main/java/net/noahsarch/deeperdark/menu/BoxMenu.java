@@ -1,6 +1,5 @@
 package net.noahsarch.deeperdark.menu;
 
-import net.minecraft.tags.ItemTags;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -46,18 +45,15 @@ public class BoxMenu extends AbstractContainerMenu {
         }
     }
 
-    /** Box storage slot; vanilla slots never ask the container, so an open box could be put in itself. */
-    public static class BoxSlot extends Slot {
-        public BoxSlot(Container container, int slot, int x, int y) {
+    /** Checks the box rule itself so the client, whose container is a plain SimpleContainer, predicts rejections. */
+    private static class BoxSlot extends Slot {
+        BoxSlot(Container container, int slot, int x, int y) {
             super(container, slot, x, y);
         }
 
         @Override
         public boolean mayPlace(ItemStack stack) {
-            // Per spec: custom boxes block all shulker boxes and all custom boxes.
-            if (stack.is(ItemTags.SHULKER_BOXES)) return false;
-            if (ContainerItemUtil.getContainerSize(stack) >= 0) return false;
-            return this.container.canPlaceItem(this.getContainerSlot(), stack);
+            return ContainerItemUtil.canStore(ContainerItemUtil.BOX_TIER, stack);
         }
     }
 

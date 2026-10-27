@@ -9,6 +9,7 @@ import net.minecraft.world.entity.ContainerUser;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
@@ -74,6 +75,15 @@ public class ItemBackedContainer extends SimpleContainer {
     private final int slotInParent;
 
     /**
+     * The menu this was nested-opened from (closed by now, but its stillValid still reports
+     * whether the parent storage is in reach), or null for top-level containers.
+     */
+    private final @Nullable AbstractContainerMenu parentMenu;
+
+    /** {@link ContainerItemUtil#tier} of the opened item, for {@link #canPlaceItem}. */
+    private final int tier;
+
+    /**
      * Guard against double-invocation of stopOpen. MC sometimes sends a stale
      * ServerboundContainerClosePacket echo (from transitioning to a new menu) that
      * arrives while the new menu is already open, causing stopOpen to fire twice.
@@ -81,14 +91,16 @@ public class ItemBackedContainer extends SimpleContainer {
     private boolean stopOpenCalled = false;
 
     private ItemBackedContainer(ServerPlayer player, ItemStack sourceStack, int size,
-                                 @Nullable SoundEvent closeSound, @Nullable Container parentStorage,
-                                 int slotInParent) {
+                                 @Nullable SoundEvent closeSound, @Nullable AbstractContainerMenu parentMenu,
+                                 @Nullable Container parentStorage, int slotInParent) {
         super(size);
         this.player = player;
         this.openId = UUID.randomUUID().toString();
         this.closeSound = closeSound;
+        this.parentMenu = parentMenu;
         this.parentStorage = parentStorage;
         this.slotInParent = slotInParent;
+        this.tier = ContainerItemUtil.tier(sourceStack);
 
         CustomData.update(DataComponents.CUSTOM_DATA, sourceStack, tag -> tag.putString(OPEN_MARKER_KEY, openId));
 
@@ -102,7 +114,7 @@ public class ItemBackedContainer extends SimpleContainer {
     /** Opens a container item from the player's own inventory at {@code inventorySlot}. */
     public static ItemBackedContainer of(ServerPlayer player, int inventorySlot, int size, @Nullable SoundEvent closeSound) {
         ItemStack stack = player.getInventory().getItem(inventorySlot);
-        return new ItemBackedContainer(player, stack, size, closeSound, null, -1);
+        return new ItemBackedContainer(player, stack, size, closeSound, null, null, -1);
     }
 
     /**
@@ -110,10 +122,10 @@ public class ItemBackedContainer extends SimpleContainer {
      * inside an ender chest). The tracked item is looked up in {@code parentStorage} rather
      * than the player's main inventory.
      */
-    public static ItemBackedContainer ofNested(ServerPlayer player, Container parentStorage,
+    public static ItemBackedContainer ofNested(ServerPlayer player, AbstractContainerMenu parentMenu, Container parentStorage,
                                                 int slotInParent, int size, @Nullable SoundEvent closeSound) {
         ItemStack stack = parentStorage.getItem(slotInParent);
-        return new ItemBackedContainer(player, stack, size, closeSound, parentStorage, slotInParent);
+        return new ItemBackedContainer(player, stack, size, closeSound, parentMenu, parentStorage, slotInParent);
     }
 
     /** Returns true if {@code stack} is the item this container is currently tracking. */
@@ -123,16 +135,13 @@ public class ItemBackedContainer extends SimpleContainer {
 
     @Override
     public boolean canPlaceItem(int slot, ItemStack stack) {
-        if (isTrackingItem(stack)) return false;
-        if (ContainerItemUtil.getContainerSize(stack) >= 0) return false;
-        if (ContainerItemUtil.isVaultItem(stack)) return false;
-        return super.canPlaceItem(slot, stack);
+        return ContainerItemUtil.canStore(tier, stack);
     }
 
     @Override
     public boolean stillValid(Player p) {
-        // A nested child edits a copy held by its parent; once the parent is gone its edits would be lost.
-        return p == this.player && (parentStorage == null || parentStorage.stillValid(p)) && findMarkedItem() != null;
+        // A nested child edits a copy held by its parent; once the parent is out of reach its edits would be lost.
+        return p == this.player && (parentMenu == null || parentMenu.stillValid(p)) && findMarkedItem() != null;
     }
 
     public boolean isNested() {

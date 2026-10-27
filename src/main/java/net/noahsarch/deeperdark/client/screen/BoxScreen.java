@@ -22,11 +22,18 @@ public class BoxScreen extends AbstractContainerScreen<BoxMenu> {
         "textures/gui/container/generic_6.png"
     );
 
+    // The vanilla dispenser screen already has the 3x3 layout BoxMenu uses for three rows.
+    private static final Identifier DISPENSER = Identifier.withDefaultNamespace("textures/gui/container/dispenser.png");
+
     private final Identifier texture;
 
     public BoxScreen(BoxMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title, 176, 166);
-        this.texture = menu.getRowCount() == 2 ? GENERIC_6 : GENERIC_3;
+        this.texture = switch (menu.getRowCount()) {
+            case 2 -> GENERIC_6;
+            case 3 -> DISPENSER;
+            default -> GENERIC_3;
+        };
     }
 
     @Override

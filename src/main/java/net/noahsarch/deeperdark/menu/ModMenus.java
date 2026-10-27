@@ -31,6 +31,11 @@ public class ModMenus {
         ModMenus::createSturdyMenu
     );
 
+    public static final MenuType<BoxMenu> REINFORCED_BOX = register(
+        "reinforced_box",
+        ModMenus::createReinforcedMenu
+    );
+
     public static final MenuType<VaultMenu> SMALL_VAULT = register(
         "small_item_vault",
         ModMenus::createSmallVaultMenu
@@ -60,6 +65,10 @@ public class ModMenus {
 
     private static BoxMenu createSturdyMenu(int containerId, Inventory inventory) {
         return new BoxMenu(STURDY_BOX, containerId, inventory, new SimpleContainer(6), 2);
+    }
+
+    private static BoxMenu createReinforcedMenu(int containerId, Inventory inventory) {
+        return new BoxMenu(REINFORCED_BOX, containerId, inventory, new SimpleContainer(9), 3);
     }
 
     private static VaultMenu createSmallVaultMenu(int containerId, Inventory inventory) {

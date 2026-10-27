@@ -22,7 +22,6 @@ import net.minecraft.world.level.storage.ValueOutput;
 import net.noahsarch.deeperdark.inventory.ContainerItemUtil;
 import net.noahsarch.deeperdark.menu.BoxMenu;
 import net.noahsarch.deeperdark.menu.ModMenus;
-import net.noahsarch.deeperdark.menu.ReinforcedBoxMenu;
 import net.noahsarch.deeperdark.sound.ModSounds;
 
 public class BoxBlockEntity extends RandomizableContainerBlockEntity {
@@ -58,10 +57,10 @@ public class BoxBlockEntity extends RandomizableContainerBlockEntity {
         return this.tier.getSlotCount();
     }
 
-    /** Boxes hold no shulker boxes or boxes; this also stops hoppers inserting them. */
+    /** Same rule as the box opened as an item; hoppers respect it too. */
     @Override
     public boolean canPlaceItem(int slot, ItemStack stack) {
-        return ContainerItemUtil.getContainerSize(stack) < 0;
+        return ContainerItemUtil.canStore(ContainerItemUtil.BOX_TIER, stack);
     }
 
     @Override
@@ -162,7 +161,7 @@ public class BoxBlockEntity extends RandomizableContainerBlockEntity {
         REINFORCED(9, 3, "container.deeperdark.reinforced_box") {
             @Override
             protected AbstractContainerMenu createMenu(int containerId, Inventory inventory, BoxBlockEntity entity) {
-                return new ReinforcedBoxMenu(containerId, inventory, entity);
+                return new BoxMenu(ModMenus.REINFORCED_BOX, containerId, inventory, entity, getRows());
             }
         };
 

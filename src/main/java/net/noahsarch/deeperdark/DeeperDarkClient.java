@@ -68,6 +68,7 @@ public class DeeperDarkClient implements ClientModInitializer {
         MenuScreens.register(ModMenus.COLLAR_BENCH, net.noahsarch.deeperdark.client.screen.CollarBenchScreen::new);
         MenuScreens.register(ModMenus.FLIMSY_BOX, BoxScreen::new);
         MenuScreens.register(ModMenus.STURDY_BOX, BoxScreen::new);
+        MenuScreens.register(ModMenus.REINFORCED_BOX, BoxScreen::new);
         MenuScreens.register(ModMenus.SMALL_VAULT, VaultScreen::new);
         MenuScreens.register(ModMenus.MEDIUM_VAULT, VaultScreen::new);
         MenuScreens.register(ModMenus.LARGE_VAULT, VaultScreen::new);

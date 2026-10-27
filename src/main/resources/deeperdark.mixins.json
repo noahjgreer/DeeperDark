@@ -105,6 +105,7 @@
     "RedStoneWireBlockMixin",
     "SlotPositionAccessor",
     "SlotMutableMixin",
+    "SlotOpenContainerMixin",
     "PodzolBlockMixin",
     "ShulkerBoxItemInsertMixin",
     "ContainerItemUseInHandMixin",

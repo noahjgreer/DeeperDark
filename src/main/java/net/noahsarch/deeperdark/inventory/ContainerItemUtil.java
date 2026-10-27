@@ -41,13 +41,34 @@ public final class ContainerItemUtil {
     }
 
     /**
-     * True if the item is open in a menu, or is an item-opened box/shulker/vault whose nested child
-     * is open. Its live contents are in that menu, so inserting into it or moving it into a
+     * True if the item is open in a menu, or is an item-opened container whose nested child is
+     * open. Its live contents are in that menu, so inserting into it or moving it into a
      * container loses items.
      */
     public static boolean isOpen(ItemStack stack) {
         CustomData data = stack.get(DataComponents.CUSTOM_DATA);
         return data != null && data.copyTag().contains(ItemBackedContainer.OPEN_MARKER_KEY);
+    }
+
+    public static final int BOX_TIER = 1;
+    public static final int VAULT_TIER = 2;
+    public static final int SHULKER_TIER = 3;
+
+    /** A stack's tier as content: shulker 3, vault 2, box 1, anything else 0. */
+    public static int tier(ItemStack stack) {
+        if (stack.is(ItemTags.SHULKER_BOXES)) return SHULKER_TIER;
+        if (isVaultItem(stack)) return VAULT_TIER;
+        return getContainerSize(stack) >= 0 ? BOX_TIER : 0;
+    }
+
+    /**
+     * The one rule for what a container may hold, whether placed or opened as an item. A
+     * container only holds lower-tier containers, which keeps nesting finite, and an open item
+     * goes into nothing (it would vanish into itself or its own nested child). Ender chests
+     * hold anything that isn't open: an ender chest item carries no contents to nest.
+     */
+    public static boolean canStore(int containerTier, ItemStack stack) {
+        return !isOpen(stack) && tier(stack) < containerTier;
     }
 
     /**

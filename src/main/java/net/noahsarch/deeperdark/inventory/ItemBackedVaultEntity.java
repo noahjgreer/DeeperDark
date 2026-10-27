@@ -9,6 +9,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackTemplate;
@@ -48,20 +49,23 @@ public class ItemBackedVaultEntity extends VaultBlockEntity {
     /** Slot index inside parentStorage, or -1 for top-level vaults. */
     private final int slotInParent;
 
+    /** The menu this was nested-opened from, or null for top-level vaults. */
+    private final @Nullable AbstractContainerMenu parentMenu;
+
     /** Guard against double-invocation of stopOpen (stale echo close packets). */
     private boolean stopOpenCalled = false;
 
     /** Opens a vault item held directly in the player's inventory. */
     public ItemBackedVaultEntity(ServerPlayer player, ItemStack sourceStack) {
-        this(player, sourceStack, null, -1);
+        this(player, sourceStack, null, null, -1);
     }
 
     /** Opens a vault item that lives inside another open container (nested). */
-    public ItemBackedVaultEntity(ServerPlayer player, Container parentStorage, int slotInParent) {
-        this(player, parentStorage.getItem(slotInParent), parentStorage, slotInParent);
+    public ItemBackedVaultEntity(ServerPlayer player, AbstractContainerMenu parentMenu, Container parentStorage, int slotInParent) {
+        this(player, parentStorage.getItem(slotInParent), parentMenu, parentStorage, slotInParent);
     }
 
-    private ItemBackedVaultEntity(ServerPlayer player, ItemStack sourceStack,
+    private ItemBackedVaultEntity(ServerPlayer player, ItemStack sourceStack, @Nullable AbstractContainerMenu parentMenu,
                                    @Nullable Container parentStorage, int slotInParent) {
         super(BlockPos.ZERO, blockStateFor(sourceStack));
         this.player   = player;
@@ -69,6 +73,7 @@ public class ItemBackedVaultEntity extends VaultBlockEntity {
         this.menuType = menuTypeFor(sourceStack);
         this.parentStorage = parentStorage;
         this.slotInParent  = slotInParent;
+        this.parentMenu    = parentMenu;
 
         // Stamp the UUID marker so we can track the item across inventory moves.
         CustomData.update(DataComponents.CUSTOM_DATA, sourceStack,
@@ -106,7 +111,7 @@ public class ItemBackedVaultEntity extends VaultBlockEntity {
     @Override
     public boolean stillValid(Player p) {
         // Same rule as ItemBackedContainer: a nested vault dies with its parent.
-        return p == player && (parentStorage == null || parentStorage.stillValid(p)) && findMarkedItem() != null;
+        return p == player && (parentMenu == null || parentMenu.stillValid(p)) && findMarkedItem() != null;
     }
 
     // Suppress the block-entity update path; just write back to the item.

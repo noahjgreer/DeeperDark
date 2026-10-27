@@ -37,10 +37,6 @@ public class OpenMarkedContainer implements Container {
                 tag -> tag.putString(ItemBackedContainer.OPEN_MARKER_KEY, openId));
     }
 
-    public Container delegate() {
-        return delegate;
-    }
-
     public boolean isTrackingItem(ItemStack stack) {
         if (stack.isEmpty()) return false;
         CustomData data = stack.get(DataComponents.CUSTOM_DATA);
@@ -62,11 +58,13 @@ public class OpenMarkedContainer implements Container {
     @Override
     public void stopOpen(ContainerUser user) {
         delegate.stopOpen(user);
+        ItemStack current = findMarkedItem();
+        // A nested child was opened from here and checks this menu's stillValid; keep tracking.
+        if (current != null && current.get(DataComponents.CUSTOM_DATA).copyTag().contains(ItemBackedContainer.NESTED_FROM_KEY)) return;
         if (closeSound != null) {
             player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
                     closeSound, SoundSource.BLOCKS, 1.0f, 1.0f);
         }
-        ItemStack current = findMarkedItem();
         if (current != null) {
             CustomData.update(DataComponents.CUSTOM_DATA, current,
                     tag -> tag.remove(ItemBackedContainer.OPEN_MARKER_KEY));

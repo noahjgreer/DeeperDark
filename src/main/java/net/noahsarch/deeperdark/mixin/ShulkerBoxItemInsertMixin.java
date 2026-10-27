@@ -33,11 +33,10 @@ public class ShulkerBoxItemInsertMixin {
 
         if (clickAction != ClickAction.SECONDARY || other.isEmpty()) return;
 
-        if (ContainerItemUtil.isOpen(self) || ContainerItemUtil.isOpen(other)) return;
+        if (ContainerItemUtil.isOpen(self)) return;
 
         if (isShulker) {
-            // Per spec: shulker boxes only block other shulker boxes from being inserted.
-            if (other.is(ItemTags.SHULKER_BOXES)) return;
+            if (!ContainerItemUtil.canStore(ContainerItemUtil.SHULKER_TIER, other)) return;
             if (ContainerItemUtil.tryInsert(self, other, carriedAccess, 27)) {
                 cir.setReturnValue(true);
             }
@@ -48,8 +47,7 @@ public class ShulkerBoxItemInsertMixin {
             if (player.level().isClientSide()) return;
             // Don't intercept ender-chest-on-ender-chest — let vanilla stacking handle it.
             if (other.is(Items.ENDER_CHEST)) return;
-            if (other.is(ItemTags.SHULKER_BOXES)) return;
-            if (ContainerItemUtil.isVaultItem(other)) return;
+            if (ContainerItemUtil.isOpen(other)) return;
 
             var ec = player.getEnderChestInventory();
             ItemStack remaining = other.copy();

@@ -42,7 +42,7 @@ public final class HopperTrinketHandler {
     public static int route(Player player, ItemStack stack) {
         if (player.level().isClientSide() || stack.isEmpty()) return 0;
         if (!hasHopperTrinket(player)) return 0;
-        // Containers refuse to nest inside one another; don't try to route one into another.
+        // Container items are never auto-routed; nesting them is left to the player.
         if (isContainerItem(stack)) return 0;
 
         int moved = 0;
