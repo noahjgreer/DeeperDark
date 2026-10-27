@@ -6,6 +6,7 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.SlotAccess;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackTemplate;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.noahsarch.deeperdark.block.ModBlocks;
 import net.noahsarch.deeperdark.block.VaultBlockEntity;
@@ -37,6 +38,16 @@ public final class ContainerItemUtil {
 
     public static boolean isVaultItem(ItemStack stack) {
         return getVaultMaxTypes(stack) >= 0;
+    }
+
+    /**
+     * True if the item is open in a menu, or is an item-opened box/shulker/vault whose nested child
+     * is open. Its live contents are in that menu, so inserting into it or moving it into a
+     * container loses items.
+     */
+    public static boolean isOpen(ItemStack stack) {
+        CustomData data = stack.get(DataComponents.CUSTOM_DATA);
+        return data != null && data.copyTag().contains(ItemBackedContainer.OPEN_MARKER_KEY);
     }
 
     /**

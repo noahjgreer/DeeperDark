@@ -9,7 +9,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.noahsarch.deeperdark.inventory.ContainerItemUtil;
-import net.noahsarch.deeperdark.inventory.ItemBackedContainer;
 
 public class BoxItem extends BlockItem {
 
@@ -28,10 +27,7 @@ public class BoxItem extends BlockItem {
         if (clickAction != ClickAction.SECONDARY || other.isEmpty()) return false;
         // Block nesting containers inside containers.
         if (ContainerItemUtil.getContainerSize(other) >= 0) return false;
-        // Block insertion when this exact container item is currently open from inventory.
-        for (Slot s : player.containerMenu.slots) {
-            if (s.container instanceof ItemBackedContainer ibc && ibc.isTrackingItem(self)) return false;
-        }
+        if (ContainerItemUtil.isOpen(self) || ContainerItemUtil.isOpen(other)) return false;
         int size = ContainerItemUtil.getContainerSize(self);
         return ContainerItemUtil.tryInsert(self, other, carriedAccess, size);
     }

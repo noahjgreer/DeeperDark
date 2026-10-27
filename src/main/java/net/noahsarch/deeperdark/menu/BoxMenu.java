@@ -41,16 +41,23 @@ public class BoxMenu extends AbstractContainerMenu {
         for (int row = 0; row < this.rows; row++) {
             for (int col = 0; col < COLUMNS; col++) {
                 int slotIndex = col + row * COLUMNS;
-                this.addSlot(new Slot(container, slotIndex, left + col * 18, top + row * 18) {
-                    @Override
-                    public boolean mayPlace(ItemStack stack) {
-                        // Per spec: custom boxes block all shulker boxes and all custom boxes.
-                        if (stack.is(ItemTags.SHULKER_BOXES)) return false;
-                        if (ContainerItemUtil.getContainerSize(stack) >= 0) return false;
-                        return this.container.canPlaceItem(this.getContainerSlot(), stack);
-                    }
-                });
+                this.addSlot(new BoxSlot(container, slotIndex, left + col * 18, top + row * 18));
             }
+        }
+    }
+
+    /** Box storage slot; vanilla slots never ask the container, so an open box could be put in itself. */
+    public static class BoxSlot extends Slot {
+        public BoxSlot(Container container, int slot, int x, int y) {
+            super(container, slot, x, y);
+        }
+
+        @Override
+        public boolean mayPlace(ItemStack stack) {
+            // Per spec: custom boxes block all shulker boxes and all custom boxes.
+            if (stack.is(ItemTags.SHULKER_BOXES)) return false;
+            if (ContainerItemUtil.getContainerSize(stack) >= 0) return false;
+            return this.container.canPlaceItem(this.getContainerSlot(), stack);
         }
     }
 

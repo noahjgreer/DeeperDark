@@ -37,6 +37,10 @@ public class OpenMarkedContainer implements Container {
                 tag -> tag.putString(ItemBackedContainer.OPEN_MARKER_KEY, openId));
     }
 
+    public Container delegate() {
+        return delegate;
+    }
+
     public boolean isTrackingItem(ItemStack stack) {
         if (stack.isEmpty()) return false;
         CustomData data = stack.get(DataComponents.CUSTOM_DATA);
@@ -64,10 +68,8 @@ public class OpenMarkedContainer implements Container {
         }
         ItemStack current = findMarkedItem();
         if (current != null) {
-            CustomData.update(DataComponents.CUSTOM_DATA, current, tag -> {
-                tag.remove(ItemBackedContainer.OPEN_MARKER_KEY);
-                tag.remove(ItemBackedContainer.FROM_SCREEN_MARKER_KEY);
-            });
+            CustomData.update(DataComponents.CUSTOM_DATA, current,
+                    tag -> tag.remove(ItemBackedContainer.OPEN_MARKER_KEY));
             player.inventoryMenu.broadcastChanges();
         }
     }

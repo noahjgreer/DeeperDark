@@ -1,6 +1,5 @@
 package net.noahsarch.deeperdark.mixin;
 
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.SlotAccess;
 import net.minecraft.world.entity.player.Player;
@@ -9,9 +8,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.component.CustomData;
 import net.noahsarch.deeperdark.inventory.ContainerItemUtil;
-import net.noahsarch.deeperdark.inventory.ItemBackedContainer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -36,9 +33,7 @@ public class ShulkerBoxItemInsertMixin {
 
         if (clickAction != ClickAction.SECONDARY || other.isEmpty()) return;
 
-        // Block insertion when this item is currently open from inventory (UUID marker present).
-        CustomData selfData = self.get(DataComponents.CUSTOM_DATA);
-        if (selfData != null && selfData.copyTag().contains(ItemBackedContainer.OPEN_MARKER_KEY)) return;
+        if (ContainerItemUtil.isOpen(self) || ContainerItemUtil.isOpen(other)) return;
 
         if (isShulker) {
             // Per spec: shulker boxes only block other shulker boxes from being inserted.

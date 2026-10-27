@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 /**
  * Two responsibilities:
  *
- * HEAD — filters stale echo close packets.
+ * Before doCloseContainer — filters stale echo close packets.
  * When the server transitions menus (parent → child), it calls closeContainer() which sends
  * ClientboundContainerClosePacket to the client.  The client must NOT echo back a
  * ServerboundContainerClosePacket for that server-initiated close, but some code paths
@@ -33,8 +33,12 @@ public class ContainerCloseIdCheckMixin {
 
     @Shadow public ServerPlayer player;
 
-    @Inject(method = "handleContainerClose", at = @At("HEAD"), cancellable = true)
+    // Injected after ensureRunningOnSameThread so containerMenu isn't read from the network thread.
+    @Inject(method = "handleContainerClose", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/server/level/ServerPlayer;doCloseContainer()V"), cancellable = true)
     private void deeperdark$checkContainerId(ServerboundContainerClosePacket packet, CallbackInfo ci) {
+        // A reopen queued by a child closed some other way (menu replaced, invalid, disconnect) is stale.
+        Deeperdark.PENDING_PARENT_REOPENS.remove(player.getUUID());
         if (packet.getContainerId() != player.containerMenu.containerId) {
             ci.cancel();
         }

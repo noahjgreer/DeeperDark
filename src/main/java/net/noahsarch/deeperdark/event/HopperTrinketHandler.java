@@ -7,11 +7,9 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.noahsarch.deeperdark.duck.CollarHolder;
 import net.noahsarch.deeperdark.inventory.ContainerItemUtil;
-import net.noahsarch.deeperdark.inventory.ItemBackedContainer;
 import net.noahsarch.deeperdark.item.CollarItem;
 
 /**
@@ -53,7 +51,7 @@ public final class HopperTrinketHandler {
             if (candidate.isEmpty() || candidate == stack) continue;
             // Skip a container the player currently has open — its live contents live in the
             // open menu, not the component, so writing here would be overwritten on close.
-            if (isOpen(candidate)) continue;
+            if (ContainerItemUtil.isOpen(candidate)) continue;
 
             if (ContainerItemUtil.isVaultItem(candidate)) {
                 moved += ContainerItemUtil.insertMatchingOnlyVault(candidate, stack);
@@ -75,10 +73,5 @@ public final class HopperTrinketHandler {
 
     private static boolean isContainerItem(ItemStack stack) {
         return ContainerItemUtil.isVaultItem(stack) || ContainerItemUtil.getContainerSize(stack) > 0;
-    }
-
-    private static boolean isOpen(ItemStack stack) {
-        CustomData data = stack.get(DataComponents.CUSTOM_DATA);
-        return data != null && data.copyTag().contains(ItemBackedContainer.OPEN_MARKER_KEY);
     }
 }

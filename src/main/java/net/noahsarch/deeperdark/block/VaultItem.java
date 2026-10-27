@@ -15,7 +15,6 @@ import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.block.Block;
 import net.noahsarch.deeperdark.component.ModComponents;
 import net.noahsarch.deeperdark.inventory.ContainerItemUtil;
-import net.noahsarch.deeperdark.inventory.ItemBackedVaultEntity;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -59,10 +58,7 @@ public class VaultItem extends BlockItem {
         // Per spec: vaults block other vaults and shulker boxes from being inserted.
         if (ContainerItemUtil.isVaultItem(other)) return false;
         if (other.is(ItemTags.SHULKER_BOXES)) return false;
-        // Block insertion when this exact vault item is currently open from inventory.
-        for (Slot s : player.containerMenu.slots) {
-            if (s.container instanceof ItemBackedVaultEntity ive && ive.isTrackingItem(self)) return false;
-        }
+        if (ContainerItemUtil.isOpen(self) || ContainerItemUtil.isOpen(other)) return false;
         return ContainerItemUtil.tryVaultInsert(self, other, carriedAccess);
     }
 }

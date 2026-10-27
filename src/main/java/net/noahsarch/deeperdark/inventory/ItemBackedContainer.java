@@ -45,8 +45,8 @@ public class ItemBackedContainer extends SimpleContainer {
     /** Key used inside CUSTOM_DATA to hold the open-session UUID. */
     public static final String OPEN_MARKER_KEY = "deeperdark_open";
 
-    /** Stamped only when the container is opened from the inventory screen (not from right-click in hand). */
-    public static final String FROM_SCREEN_MARKER_KEY = "deeperdark_from_screen";
+    /** No longer written; stripped so items that still carry it stack again. */
+    private static final String LEGACY_FROM_SCREEN_KEY = "deeperdark_from_screen";
 
     /**
      * Stamped on the PARENT container item (in the player's inventory) while a nested
@@ -131,7 +131,36 @@ public class ItemBackedContainer extends SimpleContainer {
 
     @Override
     public boolean stillValid(Player p) {
-        return p == this.player && findMarkedItem() != null;
+        // A nested child edits a copy held by its parent; once the parent is gone its edits would be lost.
+        return p == this.player && (parentStorage == null || parentStorage.stillValid(p)) && findMarkedItem() != null;
+    }
+
+    public boolean isNested() {
+        return parentStorage != null;
+    }
+
+    /**
+     * Strips open-session markers from the player's inventory. Call only while no item-backed
+     * menu is open: markers left on items that were dropped or moved away while open would
+     * otherwise block insertion and make closing a nested container reopen the wrong item.
+     */
+    public static void clearStaleMarkers(ServerPlayer player) {
+        Inventory inv = player.getInventory();
+        for (int i = 0; i < inv.getContainerSize(); i++) clearMarkers(inv.getItem(i));
+        clearMarkers(player.containerMenu.getCarried());
+    }
+
+    private static void clearMarkers(ItemStack stack) {
+        CustomData data = stack.get(DataComponents.CUSTOM_DATA);
+        if (data == null) return;
+        CompoundTag tag = data.copyTag();
+        if (tag.contains(OPEN_MARKER_KEY) || tag.contains(NESTED_FROM_KEY) || tag.contains(LEGACY_FROM_SCREEN_KEY)) {
+            CustomData.update(DataComponents.CUSTOM_DATA, stack, t -> {
+                t.remove(OPEN_MARKER_KEY);
+                t.remove(NESTED_FROM_KEY);
+                t.remove(LEGACY_FROM_SCREEN_KEY);
+            });
+        }
     }
 
     /** Write contents back to the source item on every change so NBT is always current. */
@@ -163,10 +192,7 @@ public class ItemBackedContainer extends SimpleContainer {
             saveBack();
             ItemStack current = findMarkedItem();
             if (current != null) {
-                CustomData.update(DataComponents.CUSTOM_DATA, current, tag -> {
-                    tag.remove(OPEN_MARKER_KEY);
-                    tag.remove(FROM_SCREEN_MARKER_KEY);
-                });
+                CustomData.update(DataComponents.CUSTOM_DATA, current, tag -> tag.remove(OPEN_MARKER_KEY));
             }
             player.inventoryMenu.broadcastChanges();
         } else {
@@ -179,10 +205,7 @@ public class ItemBackedContainer extends SimpleContainer {
             if (slotInParent >= 0) {
                 ItemStack childSlotItem = parentStorage.getItem(slotInParent);
                 if (!childSlotItem.isEmpty()) {
-                    CustomData.update(DataComponents.CUSTOM_DATA, childSlotItem, tag -> {
-                        tag.remove(OPEN_MARKER_KEY);
-                        tag.remove(FROM_SCREEN_MARKER_KEY);
-                    });
+                    CustomData.update(DataComponents.CUSTOM_DATA, childSlotItem, tag -> tag.remove(OPEN_MARKER_KEY));
                 }
                 parentStorage.setChanged();
             }

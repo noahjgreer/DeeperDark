@@ -6,9 +6,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.SimpleMenuProvider;
-import net.minecraft.world.inventory.DispenserMenu;
 import net.minecraft.world.inventory.ShulkerBoxMenu;
 import net.noahsarch.deeperdark.menu.BoxMenu;
+import net.noahsarch.deeperdark.menu.ReinforcedBoxMenu;
 import net.minecraft.world.item.ItemStack;
 //? if >=26.3 {
 /*import net.fabricmc.fabric.api.item.v1.DefaultItemComponentEvents;
@@ -141,6 +141,12 @@ public class Deeperdark implements ModInitializer {
 		ServerPlayNetworking.registerGlobalReceiver(OpenNestedContainerPayload.ID, (payload, context) ->
 			context.server().execute(() -> openContainerFromCurrentMenu(context.player(), payload.menuSlotIndex()))
 		);
+
+		net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_SERVER_TICK.register(server -> {
+			for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+				if (player.containerMenu == player.inventoryMenu) ItemBackedContainer.clearStaleMarkers(player);
+			}
+		});
 
 		// Collar crafting panel state sync: client â†’ server
 		PayloadTypeRegistry.serverboundPlay().register(SyncCraftingPanelPayload.ID, SyncCraftingPanelPayload.CODEC);
@@ -350,8 +356,8 @@ public class Deeperdark implements ModInitializer {
 	 * mixin (ContainerItemUseInHandMixin).
 	 *
 	 * @param fromScreen true when invoked via the Alt key from inside an open inventory
-	 *                   screen; causes the FROM_SCREEN_MARKER_KEY to be stamped so that
-	 *                   Escape backs out to inventory rather than exiting to the game.
+	 *                   screen; tells the client so Escape backs out to the inventory
+	 *                   rather than exiting to the game.
 	 */
 	public static void openContainerFromInventory(ServerPlayer player, int slot, boolean fromScreen) {
 		if (slot < 0 || slot >= player.getInventory().getContainerSize()) return;
@@ -365,59 +371,43 @@ public class Deeperdark implements ModInitializer {
 		}
 		if (player.containerMenu instanceof VaultMenu vm && vm.isTrackingItem(stack)) return;
 
-		// When opening from hand, clear any stale FROM_SCREEN_MARKER_KEY left by a
-		// prior session where the item was dropped before the menu could clean it up.
-		if (!fromScreen) {
-			net.minecraft.world.item.component.CustomData existing = stack.get(DataComponents.CUSTOM_DATA);
-			if (existing != null && existing.copyTag().contains(ItemBackedContainer.FROM_SCREEN_MARKER_KEY)) {
-				net.minecraft.world.item.component.CustomData.update(DataComponents.CUSTOM_DATA, stack,
-						tag -> tag.remove(ItemBackedContainer.FROM_SCREEN_MARKER_KEY));
-			}
-		}
-
 		playSound(player, stack, true);
 
 		java.util.OptionalInt result = java.util.OptionalInt.empty();
 		if (stack.is(ItemTags.SHULKER_BOXES)) {
 			ItemBackedContainer container = ItemBackedContainer.of(player, slot, 27, SoundEvents.SHULKER_BOX_CLOSE);
-			if (fromScreen) stampFromScreen(player, slot);
 			result = player.openMenu(new SimpleMenuProvider(
 				(id, inv, p) -> new ShulkerBoxMenu(id, inv, container),
 				stack.getHoverName()
 			));
 		} else if (stack.is(ModBlocks.FLIMSY_BOX.asItem())) {
 			ItemBackedContainer container = ItemBackedContainer.of(player, slot, 3, ModSounds.BOX_CLOSE);
-			if (fromScreen) stampFromScreen(player, slot);
 			result = player.openMenu(new SimpleMenuProvider(
 				(id, inv, p) -> new BoxMenu(ModMenus.FLIMSY_BOX, id, inv, container, 1),
 				stack.getHoverName()
 			));
 		} else if (stack.is(ModBlocks.STURDY_BOX.asItem())) {
 			ItemBackedContainer container = ItemBackedContainer.of(player, slot, 6, ModSounds.BOX_CLOSE);
-			if (fromScreen) stampFromScreen(player, slot);
 			result = player.openMenu(new SimpleMenuProvider(
 				(id, inv, p) -> new BoxMenu(ModMenus.STURDY_BOX, id, inv, container, 2),
 				stack.getHoverName()
 			));
 		} else if (stack.is(ModBlocks.REINFORCED_BOX.asItem())) {
 			ItemBackedContainer container = ItemBackedContainer.of(player, slot, 9, ModSounds.BOX_CLOSE);
-			if (fromScreen) stampFromScreen(player, slot);
 			result = player.openMenu(new SimpleMenuProvider(
-				(id, inv, p) -> new DispenserMenu(id, inv, container),
+				(id, inv, p) -> new ReinforcedBoxMenu(id, inv, container),
 				stack.getHoverName()
 			));
 		} else if (stack.is(Items.ENDER_CHEST)) {
 			OpenMarkedContainer container = new OpenMarkedContainer(
 				player.getEnderChestInventory(), player, stack, SoundEvents.ENDER_CHEST_CLOSE
 			);
-			if (fromScreen) stampFromScreen(player, slot);
 			result = player.openMenu(new SimpleMenuProvider(
 				(id, inv, p) -> ChestMenu.threeRows(id, inv, container),
 				Component.translatable("container.enderchest")
 			));
 		} else if (ContainerItemUtil.isVaultItem(stack)) {
 			ItemBackedVaultEntity entity = new ItemBackedVaultEntity(player, stack);
-			if (fromScreen) stampFromScreen(player, slot);
 			result = player.openMenu(new SimpleMenuProvider(
 				(id, inv, p) -> new VaultMenu(entity.getVaultMenuType(), id, inv, entity),
 				stack.getHoverName()
@@ -448,11 +438,9 @@ public class Deeperdark implements ModInitializer {
 		ItemStack stack = slot.getItem();
 		if (stack.isEmpty()) return;
 
-		// Refuse if already open.
-		net.minecraft.world.item.component.CustomData existing = stack.get(DataComponents.CUSTOM_DATA);
-		if (existing != null && existing.copyTag().contains(ItemBackedContainer.OPEN_MARKER_KEY)) return;
-
-		net.minecraft.world.Container parentStorage = slot.container;
+		// The ender inventory outlives the item-opened ender chest menu wrapping it.
+		net.minecraft.world.Container parentStorage = slot.container instanceof OpenMarkedContainer omc ? omc.delegate() : slot.container;
+		if (!outlivesMenu(parentStorage)) return;
 		int slotInParent = slot.getContainerSlot();
 
 		// Guard: only item types we actually open nested are supported. Ender chests
@@ -466,11 +454,11 @@ public class Deeperdark implements ModInitializer {
 			return;
 		}
 
-		// Find which player-inventory slot holds the parent container (has OPEN_MARKER_KEY).
+		// Find which player-inventory slot holds the item-opened parent container.
 		// -1 means the parent is a placed block container (chest, barrel, etc.) â€” that's fine;
 		// we just skip the NESTED_FROM stamp so closing the child doesn't attempt to auto-reopen
 		// a block container (which manages its own open/close independently).
-		int parentInventorySlot = findParentInventorySlot(player);
+		int parentInventorySlot = findParentInventorySlot(player, slot.container);
 		if (parentInventorySlot >= 0) {
 			// Stamp NESTED_FROM_KEY on the parent item BEFORE player.openMenu() closes the
 			// current menu and removes its own OPEN_MARKER_KEY.  Stored as a boolean flag â€”
@@ -508,7 +496,7 @@ public class Deeperdark implements ModInitializer {
 		} else if (stack.is(ModBlocks.REINFORCED_BOX.asItem())) {
 			ItemBackedContainer container = ItemBackedContainer.ofNested(player, parentStorage, slotInParent, 9, net.noahsarch.deeperdark.sound.ModSounds.BOX_CLOSE);
 			var result = player.openMenu(new SimpleMenuProvider(
-				(id, inv, p) -> new net.minecraft.world.inventory.DispenserMenu(id, inv, container),
+				(id, inv, p) -> new ReinforcedBoxMenu(id, inv, container),
 				stack.getHoverName()
 			));
 			LOGGER.info("[DD-nested] reinforced openMenu result={}", result);
@@ -523,24 +511,28 @@ public class Deeperdark implements ModInitializer {
 		// Ender chests nested inside other containers are not supported.
 	}
 
-	/** Returns the player-inventory slot index of the item currently stamped with OPEN_MARKER_KEY, or -1. */
-	private static int findParentInventorySlot(ServerPlayer player) {
+	/**
+	 * True if items in {@code container} persist after its menu closes. Crafting grids, result
+	 * slots, anvil inputs and the like are emptied or orphaned on close, so a container item
+	 * nested-opened from them would be edited as a phantom copy (lost or duplicated items).
+	 */
+	private static boolean outlivesMenu(net.minecraft.world.Container container) {
+		return container instanceof net.minecraft.world.level.block.entity.BlockEntity
+				|| container instanceof net.minecraft.world.entity.Entity
+				|| container instanceof net.minecraft.world.CompoundContainer
+				|| container instanceof net.minecraft.world.inventory.PlayerEnderChestContainer
+				|| container instanceof ItemBackedContainer ibc && !ibc.isNested();
+	}
+
+	/** Returns the player-inventory slot of the item-opened container that owns {@code container}, or -1. */
+	private static int findParentInventorySlot(ServerPlayer player, net.minecraft.world.Container container) {
 		net.minecraft.world.entity.player.Inventory inv = player.getInventory();
 		for (int i = 0; i < inv.getContainerSize(); i++) {
 			ItemStack s = inv.getItem(i);
-			net.minecraft.world.item.component.CustomData data = s.get(DataComponents.CUSTOM_DATA);
-			if (data != null && data.copyTag().contains(ItemBackedContainer.OPEN_MARKER_KEY)) return i;
+			if (container instanceof ItemBackedContainer ibc && ibc.isTrackingItem(s)) return i;
+			if (container instanceof OpenMarkedContainer omc && omc.isTrackingItem(s)) return i;
 		}
 		return -1;
-	}
-
-	/** Stamps the FROM_SCREEN_MARKER_KEY into the item at the given inventory slot. */
-	private static void stampFromScreen(ServerPlayer player, int slot) {
-		ItemStack s = player.getInventory().getItem(slot);
-		if (!s.isEmpty()) {
-			net.minecraft.world.item.component.CustomData.update(DataComponents.CUSTOM_DATA, s,
-					tag -> tag.putBoolean(ItemBackedContainer.FROM_SCREEN_MARKER_KEY, true));
-		}
 	}
 
 	/** Scans all 36 main inventory slots for container/bundle items, finds the smallest
@@ -588,6 +580,24 @@ public class Deeperdark implements ModInitializer {
 
 		if (bestContainerSlot >= 0) {
 			ItemStack carrier = inventory.getItem(bestContainerSlot);
+			if (ContainerItemUtil.isVaultItem(carrier)) {
+				// A vault's CONTAINER is only a tooltip preview; editing it would leave the real entries untouched (dupe).
+				java.util.List<net.noahsarch.deeperdark.block.VaultBlockEntity.VaultEntry> entries =
+						ContainerItemUtil.readVaultEntries(carrier, ContainerItemUtil.getVaultMaxTypes(carrier));
+				for (int j = 0; j < entries.size(); j++) {
+					net.noahsarch.deeperdark.block.VaultBlockEntity.VaultEntry e = entries.get(j);
+					if (!ItemStack.isSameItem(e.representative, target)) continue;
+					ItemStack extracted = e.representative.copyWithCount(Math.min(Math.min(e.count, available), e.representative.getMaxStackSize()));
+					int requested = extracted.getCount();
+					inventory.add(extracted);
+					// Only what actually fit leaves the vault.
+					e.count -= requested - extracted.getCount();
+					if (e.count <= 0) entries.remove(j);
+					ContainerItemUtil.writeVaultEntries(carrier, entries);
+					return extracted.getCount() < requested;
+				}
+				return false;
+			}
 			ItemContainerContents contents = carrier.get(DataComponents.CONTAINER);
 			if (contents == null) return false;
 			java.util.List<ItemStack> items = contents.allItemsCopyStream()

@@ -105,7 +105,8 @@ public class ItemBackedVaultEntity extends VaultBlockEntity {
 
     @Override
     public boolean stillValid(Player p) {
-        return p == player && findMarkedItem() != null;
+        // Same rule as ItemBackedContainer: a nested vault dies with its parent.
+        return p == player && (parentStorage == null || parentStorage.stillValid(p)) && findMarkedItem() != null;
     }
 
     // Suppress the block-entity update path; just write back to the item.
@@ -130,10 +131,8 @@ public class ItemBackedVaultEntity extends VaultBlockEntity {
 
         ItemStack current = findMarkedItem();
         if (current != null) {
-            CustomData.update(DataComponents.CUSTOM_DATA, current, tag -> {
-                tag.remove(ItemBackedContainer.OPEN_MARKER_KEY);
-                tag.remove(ItemBackedContainer.FROM_SCREEN_MARKER_KEY);
-            });
+            CustomData.update(DataComponents.CUSTOM_DATA, current,
+                    tag -> tag.remove(ItemBackedContainer.OPEN_MARKER_KEY));
         }
 
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(),

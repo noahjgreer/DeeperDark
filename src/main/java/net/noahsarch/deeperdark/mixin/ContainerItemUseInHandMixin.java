@@ -29,20 +29,19 @@ public class ContainerItemUseInHandMixin {
     @Inject(method = "use", at = @At("HEAD"), cancellable = true)
     private void deeperdark$openContainerOnUse(Level level, Player player, InteractionHand hand,
             CallbackInfoReturnable<InteractionResult> cir) {
-        if (level.isClientSide()) return;
-        if (!(player instanceof ServerPlayer serverPlayer)) return;
-
         ItemStack stack = player.getItemInHand(hand);
         boolean isContainer = ContainerItemUtil.getContainerSize(stack) >= 0
                 || stack.is(Items.ENDER_CHEST)
                 || ContainerItemUtil.isVaultItem(stack);
         if (!isContainer) return;
 
-        int slot = hand == InteractionHand.MAIN_HAND
-                ? serverPlayer.getInventory().getSelectedSlot()
-                : Inventory.SLOT_OFFHAND;
-
-        Deeperdark.openContainerFromInventory(serverPlayer, slot, false);
+        if (player instanceof ServerPlayer serverPlayer) {
+            int slot = hand == InteractionHand.MAIN_HAND
+                    ? serverPlayer.getInventory().getSelectedSlot()
+                    : Inventory.SLOT_OFFHAND;
+            Deeperdark.openContainerFromInventory(serverPlayer, slot, false);
+        }
+        // Consume on the client too, or it goes on to use the offhand item as well.
         cir.setReturnValue(InteractionResult.CONSUME);
     }
 }

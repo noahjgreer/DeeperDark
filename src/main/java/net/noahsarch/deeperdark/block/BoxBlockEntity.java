@@ -12,7 +12,6 @@ import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.entity.ContainerUser;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.DispenserMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
@@ -20,8 +19,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.noahsarch.deeperdark.inventory.ContainerItemUtil;
 import net.noahsarch.deeperdark.menu.BoxMenu;
 import net.noahsarch.deeperdark.menu.ModMenus;
+import net.noahsarch.deeperdark.menu.ReinforcedBoxMenu;
 import net.noahsarch.deeperdark.sound.ModSounds;
 
 public class BoxBlockEntity extends RandomizableContainerBlockEntity {
@@ -55,6 +56,12 @@ public class BoxBlockEntity extends RandomizableContainerBlockEntity {
     @Override
     public int getContainerSize() {
         return this.tier.getSlotCount();
+    }
+
+    /** Boxes hold no shulker boxes or boxes; this also stops hoppers inserting them. */
+    @Override
+    public boolean canPlaceItem(int slot, ItemStack stack) {
+        return ContainerItemUtil.getContainerSize(stack) < 0;
     }
 
     @Override
@@ -155,7 +162,7 @@ public class BoxBlockEntity extends RandomizableContainerBlockEntity {
         REINFORCED(9, 3, "container.deeperdark.reinforced_box") {
             @Override
             protected AbstractContainerMenu createMenu(int containerId, Inventory inventory, BoxBlockEntity entity) {
-                return new DispenserMenu(containerId, inventory, entity);
+                return new ReinforcedBoxMenu(containerId, inventory, entity);
             }
         };
 

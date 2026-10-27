@@ -18,12 +18,10 @@ import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.component.CustomData;
 import net.noahsarch.deeperdark.DeeperDarkClient;
 import net.noahsarch.deeperdark.block.ModBlocks;
 import net.noahsarch.deeperdark.client.ContainerItemKeyHandler;
 import net.noahsarch.deeperdark.inventory.ContainerItemUtil;
-import net.noahsarch.deeperdark.inventory.ItemBackedContainer;
 import net.noahsarch.deeperdark.payload.OpenContainerItemPayload;
 import net.noahsarch.deeperdark.payload.OpenNestedContainerPayload;
 import org.jspecify.annotations.Nullable;
@@ -54,7 +52,7 @@ public abstract class ContainerScreenOpenMixin<T extends AbstractContainerMenu> 
      * When Escape or the inventory key is pressed while inside a container that was
      * opened from the player's inventory screen, close the container and go back to
      * the inventory screen instead of returning to the game world.
-     * This only triggers when FROM_SCREEN_MARKER_KEY is present on the item —
+     * This only triggers for containers the server reports as opened from the screen —
      * containers opened via right-click in hand skip back to game normally.
      */
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
@@ -95,7 +93,7 @@ public abstract class ContainerScreenOpenMixin<T extends AbstractContainerMenu> 
     @Inject(method = "extractSlots", at = @At("RETURN"))
     private void deeperdark$renderInsertIndicators(GuiGraphicsExtractor graphics, int mouseX, int mouseY, CallbackInfo ci) {
         ItemStack cursor = this.menu.getCarried();
-        if (cursor.isEmpty()) return;
+        if (cursor.isEmpty() || ContainerItemUtil.isOpen(cursor)) return;
 
         // Advance stratum so "+" fills render above 3D item icons in the current stratum.
         graphics.nextStratum();
@@ -105,7 +103,7 @@ public abstract class ContainerScreenOpenMixin<T extends AbstractContainerMenu> 
             if (!(slot.container instanceof Inventory)) continue;
             ItemStack slotItem = slot.getItem();
             if (slotItem.isEmpty()) continue;
-            if (deeperdark$isContainerOpen(slotItem)) continue;
+            if (ContainerItemUtil.isOpen(slotItem)) continue;
 
             boolean shouldShow;
             if (slotItem.is(ItemTags.SHULKER_BOXES)) {
@@ -155,7 +153,7 @@ public abstract class ContainerScreenOpenMixin<T extends AbstractContainerMenu> 
     private void deeperdark$appendOpenHint(ItemStack itemStack, CallbackInfoReturnable<List<Component>> cir) {
         if (this.hoveredSlot == null) return;
         if (!deeperdark$isOpenableContainer(itemStack)) return;
-        if (deeperdark$isContainerOpen(itemStack)) return;
+        if (ContainerItemUtil.isOpen(itemStack)) return;
 
         List<Component> tooltip = new ArrayList<>(cir.getReturnValue());
         tooltip.add(Component.translatable("tooltip.deeperdark.open_container_hint",
@@ -173,12 +171,6 @@ public abstract class ContainerScreenOpenMixin<T extends AbstractContainerMenu> 
      */
     private boolean deeperdark$isOpenedFromScreen() {
         return this.menu.containerId == DeeperDarkClient.fromScreenContainerId;
-    }
-
-    /** True if this item has an open-container UUID marker (any open method). */
-    private static boolean deeperdark$isContainerOpen(ItemStack stack) {
-        CustomData data = stack.get(net.minecraft.core.component.DataComponents.CUSTOM_DATA);
-        return data != null && data.copyTag().contains(ItemBackedContainer.OPEN_MARKER_KEY);
     }
 
     private static boolean deeperdark$isOpenableContainer(ItemStack stack) {

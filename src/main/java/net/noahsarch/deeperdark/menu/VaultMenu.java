@@ -92,6 +92,8 @@ public class VaultMenu extends AbstractContainerMenu {
 
     @Override
     public void clicked(int slotId, int button, ContainerInput containerInput, Player player) {
+        // Vanilla's hotbar swap writes through setByPlayer, which display slots ignore: it dupes or deletes.
+        if (slotId >= 0 && slotId < maxTypes && containerInput == ContainerInput.SWAP) return;
         if (vault != null && slotId >= 0 && slotId < maxTypes && containerInput == ContainerInput.PICKUP) {
             ItemStack cursor = getCarried();
 
@@ -195,6 +197,12 @@ public class VaultMenu extends AbstractContainerMenu {
         }
 
         return ItemStack.EMPTY;
+    }
+
+    /** Drag-splitting also places via setByPlayer, so the dragged share would vanish. */
+    @Override
+    public boolean canDragTo(Slot slot) {
+        return slot.index >= maxTypes;
     }
 
     @Override
