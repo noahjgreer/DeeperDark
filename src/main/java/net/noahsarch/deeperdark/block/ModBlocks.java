@@ -124,6 +124,7 @@ public class ModBlocks {
             content.accept(ENDER_PEARL_BLOCK);
             content.accept(CHISELED_STONE);
             content.accept(STONE_WALL);
+            content.accept(SMOOTH_STONE_WALL);
             content.accept(QUARTZ_WALL);
             content.accept(DEEPSLATE_STAIRS);
             content.accept(DEEPSLATE_SLAB);
@@ -441,6 +442,15 @@ public class ModBlocks {
             WallBlock::new,
             BlockBehaviour.Properties.of()
                     .strength(1.5F, 6.0F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE),
+            true);
+
+    public static final Block SMOOTH_STONE_WALL = register(
+            "smooth_stone_wall",
+            WallBlock::new,
+            BlockBehaviour.Properties.of()
+                    .strength(2.0F, 6.0F)
                     .requiresCorrectToolForDrops()
                     .sound(SoundType.STONE),
             true);

@@ -3,6 +3,7 @@
   "target": "itemswapper:v2/block_sets/stone_walls",
   "addItems": [
     "deeperdark:stone_wall",
+    "deeperdark:smooth_stone_wall",
     "deeperdark:deepslate_wall",
     "deeperdark:basalt_wall"
   ]

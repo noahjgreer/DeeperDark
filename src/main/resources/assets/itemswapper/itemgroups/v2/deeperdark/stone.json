@@ -4,6 +4,7 @@
   "addItems": [
     "deeperdark:chiseled_stone",
     "deeperdark:stone_pillar",
-    "deeperdark:stone_wall"
+    "deeperdark:stone_wall",
+    "deeperdark:smooth_stone_wall"
   ]
 }

@@ -2,6 +2,7 @@
   "replace": false,
   "values": [
     "deeperdark:stone_wall",
+    "deeperdark:smooth_stone_wall",
     "deeperdark:quartz_wall",
     "deeperdark:deepslate_wall",
     "deeperdark:end_stone_wall",

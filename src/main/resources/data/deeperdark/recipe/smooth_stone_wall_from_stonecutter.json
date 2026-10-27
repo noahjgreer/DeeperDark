@@ -1,0 +1,5 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "minecraft:smooth_stone",
+  "result": { "id": "deeperdark:smooth_stone_wall", "count": 1 }
+}
