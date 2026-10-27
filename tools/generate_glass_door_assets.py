@@ -29,7 +29,6 @@ MODELS_ITEM_DIR = f"{ASSETS}/models/item"
 ITEMS_DIR = f"{ASSETS}/items"
 
 DATA = "src/main/resources/data/deeperdark"
-LOOT_TABLES_DIR = f"{DATA}/loot_table/blocks"
 RECIPES_DIR = f"{DATA}/recipe"
 
 # Vanilla stained glass item IDs (ingredient for crafting recipes)
@@ -59,38 +58,34 @@ def write_json(path, data):
     print(f"  wrote {path}")
 
 
-def fix_glass_door_blockstate():
-    """Fix glass_door.json: swap minecraft: namespace to deeperdark:."""
-    path = f"{BLOCKSTATES_DIR}/glass_door.json"
-    with open(path) as f:
-        data = json.load(f)
-
-    for entry in data["variants"].values():
-        entry["model"] = entry["model"].replace(
-            "minecraft:block/glass_door",
-            "deeperdark:block/glass_door",
-        )
-
-    write_json(path, data)
-    return data
+# Closed-door y rotation per facing; an open door turns a further 90 (left hinge) or 270 (right).
+CLOSED_Y = {"east": 0, "south": 90, "west": 180, "north": 270}
 
 
-def generate_stained_blockstate(base_data, color):
-    """Clone the base blockstate, redirecting all model refs to the stained variant."""
-    prefix = f"{color}_stained_glass_door"
+def generate_blockstate(block_name):
+    """Every facing/half/hinge/open/centered state. Centered doors use the template_centered_* models."""
     variants = {}
-    for state, entry in base_data["variants"].items():
-        new_entry = {"model": entry["model"].replace("deeperdark:block/glass_door", f"deeperdark:block/{prefix}")}
-        if "y" in entry:
-            new_entry["y"] = entry["y"]
-        variants[state] = new_entry
+    for facing, closed_y in CLOSED_Y.items():
+        for half, model_half in (("lower", "bottom"), ("upper", "top")):
+            for hinge in ("left", "right"):
+                for is_open in (False, True):
+                    for centered in (False, True):
+                        y = (closed_y + (0 if not is_open else 90 if hinge == "left" else 270)) % 360
+                        model = (f"deeperdark:block/{block_name}_" + ("centered_" if centered else "")
+                                 + f"{model_half}_{hinge}" + ("_open" if is_open else ""))
+                        entry = {"model": model}
+                        if y:
+                            entry["y"] = y
+                        key = (f"centered={str(centered).lower()},facing={facing},half={half},"
+                               f"hinge={hinge},open={str(is_open).lower()}")
+                        variants[key] = entry
     return {"variants": variants}
 
 
-def generate_block_model(block_name, variant):
-    """One of the 8 directional/open-state models for a door variant."""
+def generate_block_model(block_name, variant, centered):
+    """One of the 16 directional/open-state models for a door variant."""
     return {
-        "parent": f"minecraft:block/door_{variant}",
+        "parent": f"deeperdark:block/template_centered_door_{variant}" if centered else f"minecraft:block/door_{variant}",
         "textures": {
             "bottom": f"deeperdark:block/{block_name}_bottom",
             "top": f"deeperdark:block/{block_name}_top",
@@ -102,36 +97,6 @@ def generate_item_model(item_name):
     return {
         "parent": "minecraft:item/generated",
         "textures": {"layer0": f"deeperdark:item/{item_name}"},
-    }
-
-
-def generate_loot_table(block_id):
-    """Silk-touch-only loot table, matching vanilla glass behaviour."""
-    return {
-        "type": "minecraft:block",
-        "pools": [
-            {
-                "bonus_rolls": 0.0,
-                "conditions": [
-                    {
-                        "condition": "minecraft:match_tool",
-                        "predicate": {
-                            "predicates": {
-                                "minecraft:enchantments": [
-                                    {
-                                        "enchantments": "minecraft:silk_touch",
-                                        "levels": {"min": 1},
-                                    }
-                                ]
-                            }
-                        },
-                    }
-                ],
-                "entries": [{"type": "minecraft:item", "name": block_id}],
-                "rolls": 1.0,
-            }
-        ],
-        "random_sequence": block_id.replace(":", ":blocks/"),
     }
 
 
@@ -162,14 +127,18 @@ def generate_item_definition(item_name):
     }
 
 
-def main():
-    print("=== Fixing base glass_door blockstate ===")
-    base_data = fix_glass_door_blockstate()
+def write_block_models(block_name):
+    for variant in BLOCK_VARIANTS:
+        write_json(f"{MODELS_BLOCK_DIR}/{block_name}_{variant}.json", generate_block_model(block_name, variant, False))
+        write_json(f"{MODELS_BLOCK_DIR}/{block_name}_centered_{variant}.json", generate_block_model(block_name, variant, True))
 
-    print("\n=== Generating base glass_door item model + definition + data ===")
+
+def main():
+    print("=== Generating base glass_door assets + recipe ===")
+    write_json(f"{BLOCKSTATES_DIR}/glass_door.json", generate_blockstate("glass_door"))
+    write_block_models("glass_door")
     write_json(f"{MODELS_ITEM_DIR}/glass_door.json", generate_item_model("glass_door"))
     write_json(f"{ITEMS_DIR}/glass_door.json", generate_item_definition("glass_door"))
-    write_json(f"{LOOT_TABLES_DIR}/glass_door.json", generate_loot_table("deeperdark:glass_door"))
     write_json(f"{RECIPES_DIR}/glass_door.json", generate_recipe("deeperdark:glass_door", "minecraft:glass"))
 
     print("\n=== Generating dye recipe (one-time) ===")
@@ -183,24 +152,16 @@ def main():
         # blockstate
         write_json(
             f"{BLOCKSTATES_DIR}/{block_name}.json",
-            generate_stained_blockstate(base_data, color),
+            generate_blockstate(block_name),
         )
 
-        # 8 block models
-        for variant in BLOCK_VARIANTS:
-            write_json(
-                f"{MODELS_BLOCK_DIR}/{block_name}_{variant}.json",
-                generate_block_model(block_name, variant),
-            )
+        write_block_models(block_name)
 
         # item model
         write_json(f"{MODELS_ITEM_DIR}/{block_name}.json", generate_item_model(block_name))
 
         # item definition
         write_json(f"{ITEMS_DIR}/{block_name}.json", generate_item_definition(block_name))
-
-        # loot table
-        write_json(f"{LOOT_TABLES_DIR}/{block_name}.json", generate_loot_table(block_id))
 
         # crafting recipe
         write_json(

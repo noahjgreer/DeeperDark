@@ -1,124 +1,244 @@
 {
   "variants": {
-    "facing=east,half=lower,hinge=left,open=false": {
+    "centered=false,facing=east,half=lower,hinge=left,open=false": {
       "model": "deeperdark:block/cyan_stained_glass_door_bottom_left"
     },
-    "facing=east,half=lower,hinge=left,open=true": {
+    "centered=true,facing=east,half=lower,hinge=left,open=false": {
+      "model": "deeperdark:block/cyan_stained_glass_door_centered_bottom_left"
+    },
+    "centered=false,facing=east,half=lower,hinge=left,open=true": {
       "model": "deeperdark:block/cyan_stained_glass_door_bottom_left_open",
       "y": 90
     },
-    "facing=east,half=lower,hinge=right,open=false": {
+    "centered=true,facing=east,half=lower,hinge=left,open=true": {
+      "model": "deeperdark:block/cyan_stained_glass_door_centered_bottom_left_open",
+      "y": 90
+    },
+    "centered=false,facing=east,half=lower,hinge=right,open=false": {
       "model": "deeperdark:block/cyan_stained_glass_door_bottom_right"
     },
-    "facing=east,half=lower,hinge=right,open=true": {
+    "centered=true,facing=east,half=lower,hinge=right,open=false": {
+      "model": "deeperdark:block/cyan_stained_glass_door_centered_bottom_right"
+    },
+    "centered=false,facing=east,half=lower,hinge=right,open=true": {
       "model": "deeperdark:block/cyan_stained_glass_door_bottom_right_open",
       "y": 270
     },
-    "facing=east,half=upper,hinge=left,open=false": {
+    "centered=true,facing=east,half=lower,hinge=right,open=true": {
+      "model": "deeperdark:block/cyan_stained_glass_door_centered_bottom_right_open",
+      "y": 270
+    },
+    "centered=false,facing=east,half=upper,hinge=left,open=false": {
       "model": "deeperdark:block/cyan_stained_glass_door_top_left"
     },
-    "facing=east,half=upper,hinge=left,open=true": {
+    "centered=true,facing=east,half=upper,hinge=left,open=false": {
+      "model": "deeperdark:block/cyan_stained_glass_door_centered_top_left"
+    },
+    "centered=false,facing=east,half=upper,hinge=left,open=true": {
       "model": "deeperdark:block/cyan_stained_glass_door_top_left_open",
       "y": 90
     },
-    "facing=east,half=upper,hinge=right,open=false": {
+    "centered=true,facing=east,half=upper,hinge=left,open=true": {
+      "model": "deeperdark:block/cyan_stained_glass_door_centered_top_left_open",
+      "y": 90
+    },
+    "centered=false,facing=east,half=upper,hinge=right,open=false": {
       "model": "deeperdark:block/cyan_stained_glass_door_top_right"
     },
-    "facing=east,half=upper,hinge=right,open=true": {
+    "centered=true,facing=east,half=upper,hinge=right,open=false": {
+      "model": "deeperdark:block/cyan_stained_glass_door_centered_top_right"
+    },
+    "centered=false,facing=east,half=upper,hinge=right,open=true": {
       "model": "deeperdark:block/cyan_stained_glass_door_top_right_open",
       "y": 270
     },
-    "facing=north,half=lower,hinge=left,open=false": {
-      "model": "deeperdark:block/cyan_stained_glass_door_bottom_left",
+    "centered=true,facing=east,half=upper,hinge=right,open=true": {
+      "model": "deeperdark:block/cyan_stained_glass_door_centered_top_right_open",
       "y": 270
     },
-    "facing=north,half=lower,hinge=left,open=true": {
-      "model": "deeperdark:block/cyan_stained_glass_door_bottom_left_open"
-    },
-    "facing=north,half=lower,hinge=right,open=false": {
-      "model": "deeperdark:block/cyan_stained_glass_door_bottom_right",
-      "y": 270
-    },
-    "facing=north,half=lower,hinge=right,open=true": {
-      "model": "deeperdark:block/cyan_stained_glass_door_bottom_right_open",
-      "y": 180
-    },
-    "facing=north,half=upper,hinge=left,open=false": {
-      "model": "deeperdark:block/cyan_stained_glass_door_top_left",
-      "y": 270
-    },
-    "facing=north,half=upper,hinge=left,open=true": {
-      "model": "deeperdark:block/cyan_stained_glass_door_top_left_open"
-    },
-    "facing=north,half=upper,hinge=right,open=false": {
-      "model": "deeperdark:block/cyan_stained_glass_door_top_right",
-      "y": 270
-    },
-    "facing=north,half=upper,hinge=right,open=true": {
-      "model": "deeperdark:block/cyan_stained_glass_door_top_right_open",
-      "y": 180
-    },
-    "facing=south,half=lower,hinge=left,open=false": {
+    "centered=false,facing=south,half=lower,hinge=left,open=false": {
       "model": "deeperdark:block/cyan_stained_glass_door_bottom_left",
       "y": 90
     },
-    "facing=south,half=lower,hinge=left,open=true": {
+    "centered=true,facing=south,half=lower,hinge=left,open=false": {
+      "model": "deeperdark:block/cyan_stained_glass_door_centered_bottom_left",
+      "y": 90
+    },
+    "centered=false,facing=south,half=lower,hinge=left,open=true": {
       "model": "deeperdark:block/cyan_stained_glass_door_bottom_left_open",
       "y": 180
     },
-    "facing=south,half=lower,hinge=right,open=false": {
+    "centered=true,facing=south,half=lower,hinge=left,open=true": {
+      "model": "deeperdark:block/cyan_stained_glass_door_centered_bottom_left_open",
+      "y": 180
+    },
+    "centered=false,facing=south,half=lower,hinge=right,open=false": {
       "model": "deeperdark:block/cyan_stained_glass_door_bottom_right",
       "y": 90
     },
-    "facing=south,half=lower,hinge=right,open=true": {
+    "centered=true,facing=south,half=lower,hinge=right,open=false": {
+      "model": "deeperdark:block/cyan_stained_glass_door_centered_bottom_right",
+      "y": 90
+    },
+    "centered=false,facing=south,half=lower,hinge=right,open=true": {
       "model": "deeperdark:block/cyan_stained_glass_door_bottom_right_open"
     },
-    "facing=south,half=upper,hinge=left,open=false": {
+    "centered=true,facing=south,half=lower,hinge=right,open=true": {
+      "model": "deeperdark:block/cyan_stained_glass_door_centered_bottom_right_open"
+    },
+    "centered=false,facing=south,half=upper,hinge=left,open=false": {
       "model": "deeperdark:block/cyan_stained_glass_door_top_left",
       "y": 90
     },
-    "facing=south,half=upper,hinge=left,open=true": {
+    "centered=true,facing=south,half=upper,hinge=left,open=false": {
+      "model": "deeperdark:block/cyan_stained_glass_door_centered_top_left",
+      "y": 90
+    },
+    "centered=false,facing=south,half=upper,hinge=left,open=true": {
       "model": "deeperdark:block/cyan_stained_glass_door_top_left_open",
       "y": 180
     },
-    "facing=south,half=upper,hinge=right,open=false": {
+    "centered=true,facing=south,half=upper,hinge=left,open=true": {
+      "model": "deeperdark:block/cyan_stained_glass_door_centered_top_left_open",
+      "y": 180
+    },
+    "centered=false,facing=south,half=upper,hinge=right,open=false": {
       "model": "deeperdark:block/cyan_stained_glass_door_top_right",
       "y": 90
     },
-    "facing=south,half=upper,hinge=right,open=true": {
+    "centered=true,facing=south,half=upper,hinge=right,open=false": {
+      "model": "deeperdark:block/cyan_stained_glass_door_centered_top_right",
+      "y": 90
+    },
+    "centered=false,facing=south,half=upper,hinge=right,open=true": {
       "model": "deeperdark:block/cyan_stained_glass_door_top_right_open"
     },
-    "facing=west,half=lower,hinge=left,open=false": {
+    "centered=true,facing=south,half=upper,hinge=right,open=true": {
+      "model": "deeperdark:block/cyan_stained_glass_door_centered_top_right_open"
+    },
+    "centered=false,facing=west,half=lower,hinge=left,open=false": {
       "model": "deeperdark:block/cyan_stained_glass_door_bottom_left",
       "y": 180
     },
-    "facing=west,half=lower,hinge=left,open=true": {
+    "centered=true,facing=west,half=lower,hinge=left,open=false": {
+      "model": "deeperdark:block/cyan_stained_glass_door_centered_bottom_left",
+      "y": 180
+    },
+    "centered=false,facing=west,half=lower,hinge=left,open=true": {
       "model": "deeperdark:block/cyan_stained_glass_door_bottom_left_open",
       "y": 270
     },
-    "facing=west,half=lower,hinge=right,open=false": {
+    "centered=true,facing=west,half=lower,hinge=left,open=true": {
+      "model": "deeperdark:block/cyan_stained_glass_door_centered_bottom_left_open",
+      "y": 270
+    },
+    "centered=false,facing=west,half=lower,hinge=right,open=false": {
       "model": "deeperdark:block/cyan_stained_glass_door_bottom_right",
       "y": 180
     },
-    "facing=west,half=lower,hinge=right,open=true": {
+    "centered=true,facing=west,half=lower,hinge=right,open=false": {
+      "model": "deeperdark:block/cyan_stained_glass_door_centered_bottom_right",
+      "y": 180
+    },
+    "centered=false,facing=west,half=lower,hinge=right,open=true": {
       "model": "deeperdark:block/cyan_stained_glass_door_bottom_right_open",
       "y": 90
     },
-    "facing=west,half=upper,hinge=left,open=false": {
+    "centered=true,facing=west,half=lower,hinge=right,open=true": {
+      "model": "deeperdark:block/cyan_stained_glass_door_centered_bottom_right_open",
+      "y": 90
+    },
+    "centered=false,facing=west,half=upper,hinge=left,open=false": {
       "model": "deeperdark:block/cyan_stained_glass_door_top_left",
       "y": 180
     },
-    "facing=west,half=upper,hinge=left,open=true": {
+    "centered=true,facing=west,half=upper,hinge=left,open=false": {
+      "model": "deeperdark:block/cyan_stained_glass_door_centered_top_left",
+      "y": 180
+    },
+    "centered=false,facing=west,half=upper,hinge=left,open=true": {
       "model": "deeperdark:block/cyan_stained_glass_door_top_left_open",
       "y": 270
     },
-    "facing=west,half=upper,hinge=right,open=false": {
+    "centered=true,facing=west,half=upper,hinge=left,open=true": {
+      "model": "deeperdark:block/cyan_stained_glass_door_centered_top_left_open",
+      "y": 270
+    },
+    "centered=false,facing=west,half=upper,hinge=right,open=false": {
       "model": "deeperdark:block/cyan_stained_glass_door_top_right",
       "y": 180
     },
-    "facing=west,half=upper,hinge=right,open=true": {
+    "centered=true,facing=west,half=upper,hinge=right,open=false": {
+      "model": "deeperdark:block/cyan_stained_glass_door_centered_top_right",
+      "y": 180
+    },
+    "centered=false,facing=west,half=upper,hinge=right,open=true": {
       "model": "deeperdark:block/cyan_stained_glass_door_top_right_open",
       "y": 90
+    },
+    "centered=true,facing=west,half=upper,hinge=right,open=true": {
+      "model": "deeperdark:block/cyan_stained_glass_door_centered_top_right_open",
+      "y": 90
+    },
+    "centered=false,facing=north,half=lower,hinge=left,open=false": {
+      "model": "deeperdark:block/cyan_stained_glass_door_bottom_left",
+      "y": 270
+    },
+    "centered=true,facing=north,half=lower,hinge=left,open=false": {
+      "model": "deeperdark:block/cyan_stained_glass_door_centered_bottom_left",
+      "y": 270
+    },
+    "centered=false,facing=north,half=lower,hinge=left,open=true": {
+      "model": "deeperdark:block/cyan_stained_glass_door_bottom_left_open"
+    },
+    "centered=true,facing=north,half=lower,hinge=left,open=true": {
+      "model": "deeperdark:block/cyan_stained_glass_door_centered_bottom_left_open"
+    },
+    "centered=false,facing=north,half=lower,hinge=right,open=false": {
+      "model": "deeperdark:block/cyan_stained_glass_door_bottom_right",
+      "y": 270
+    },
+    "centered=true,facing=north,half=lower,hinge=right,open=false": {
+      "model": "deeperdark:block/cyan_stained_glass_door_centered_bottom_right",
+      "y": 270
+    },
+    "centered=false,facing=north,half=lower,hinge=right,open=true": {
+      "model": "deeperdark:block/cyan_stained_glass_door_bottom_right_open",
+      "y": 180
+    },
+    "centered=true,facing=north,half=lower,hinge=right,open=true": {
+      "model": "deeperdark:block/cyan_stained_glass_door_centered_bottom_right_open",
+      "y": 180
+    },
+    "centered=false,facing=north,half=upper,hinge=left,open=false": {
+      "model": "deeperdark:block/cyan_stained_glass_door_top_left",
+      "y": 270
+    },
+    "centered=true,facing=north,half=upper,hinge=left,open=false": {
+      "model": "deeperdark:block/cyan_stained_glass_door_centered_top_left",
+      "y": 270
+    },
+    "centered=false,facing=north,half=upper,hinge=left,open=true": {
+      "model": "deeperdark:block/cyan_stained_glass_door_top_left_open"
+    },
+    "centered=true,facing=north,half=upper,hinge=left,open=true": {
+      "model": "deeperdark:block/cyan_stained_glass_door_centered_top_left_open"
+    },
+    "centered=false,facing=north,half=upper,hinge=right,open=false": {
+      "model": "deeperdark:block/cyan_stained_glass_door_top_right",
+      "y": 270
+    },
+    "centered=true,facing=north,half=upper,hinge=right,open=false": {
+      "model": "deeperdark:block/cyan_stained_glass_door_centered_top_right",
+      "y": 270
+    },
+    "centered=false,facing=north,half=upper,hinge=right,open=true": {
+      "model": "deeperdark:block/cyan_stained_glass_door_top_right_open",
+      "y": 180
+    },
+    "centered=true,facing=north,half=upper,hinge=right,open=true": {
+      "model": "deeperdark:block/cyan_stained_glass_door_centered_top_right_open",
+      "y": 180
     }
   }
 }

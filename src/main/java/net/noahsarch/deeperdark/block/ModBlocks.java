@@ -18,7 +18,6 @@ import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.biome.Biome.Precipitation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.SoundType;
@@ -606,14 +605,14 @@ public class ModBlocks {
     private static Block registerGlassDoor(String name, DyeColor color) {
         return register(
                 name,
-                p -> new DoorBlock(GLASS_BLOCK_SET_TYPE, p),
+                p -> new GlassDoorBlock(GLASS_BLOCK_SET_TYPE, p),
                 glassDoorProps().mapColor(color),
                 true);
     }
 
     public static final Block GLASS_DOOR = register(
             "glass_door",
-            p -> new DoorBlock(GLASS_BLOCK_SET_TYPE, p),
+            p -> new GlassDoorBlock(GLASS_BLOCK_SET_TYPE, p),
             glassDoorProps(),
             true);
 

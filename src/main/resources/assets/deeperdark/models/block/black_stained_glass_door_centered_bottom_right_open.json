@@ -1,0 +1,7 @@
+{
+  "parent": "deeperdark:block/template_centered_door_bottom_right_open",
+  "textures": {
+    "bottom": "deeperdark:block/black_stained_glass_door_bottom",
+    "top": "deeperdark:block/black_stained_glass_door_top"
+  }
+}

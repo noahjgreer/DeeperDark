@@ -25,6 +25,7 @@
     "FlowableFluidMixin",
     "GlassBottleItemMixin",
     "IceBlockMixin",
+    "IronBarsBlockMixin",
     "LadderBlockMixin",
     "ItemEntityMixin",
     "DamageSourceQuicksandMixin",
