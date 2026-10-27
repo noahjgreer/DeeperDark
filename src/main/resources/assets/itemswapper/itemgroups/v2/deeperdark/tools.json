@@ -1,0 +1,11 @@
+{
+  "type": "listModification",
+  "target": "itemswapper:v2/tools",
+  "addItems": [
+    "deeperdark:copper_item_magnet",
+    "deeperdark:iron_item_magnet",
+    "deeperdark:golden_item_magnet",
+    "deeperdark:diamond_item_magnet",
+    "deeperdark:netherite_item_magnet"
+  ]
+}

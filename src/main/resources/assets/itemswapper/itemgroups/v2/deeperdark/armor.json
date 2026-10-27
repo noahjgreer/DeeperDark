@@ -1,0 +1,12 @@
+{
+  "type": "listModification",
+  "target": "itemswapper:v2/armor",
+  "addItems": [
+    "deeperdark:leather_collar",
+    "deeperdark:copper_collar",
+    "deeperdark:iron_collar",
+    "deeperdark:diamond_collar",
+    "deeperdark:netherite_collar",
+    "deeperdark:collar"
+  ]
+}

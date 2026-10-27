@@ -1,0 +1,7 @@
+{
+  "type": "paletteModification",
+  "target": "itemswapper:v2/functional/miscellaneous",
+  "addItems": [
+    "deeperdark:glass_door"
+  ]
+}

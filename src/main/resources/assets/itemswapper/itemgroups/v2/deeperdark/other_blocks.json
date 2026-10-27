@@ -1,0 +1,8 @@
+{
+  "type": "paletteModification",
+  "target": "itemswapper:v2/block_sets/other_blocks",
+  "addItems": [
+    "deeperdark:sandstone_pillar",
+    "deeperdark:red_sandstone_pillar"
+  ]
+}

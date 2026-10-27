@@ -1,0 +1,8 @@
+{
+  "type": "paletteModification",
+  "target": "itemswapper:v2/block_sets/other_slabs",
+  "addItems": [
+    "deeperdark:end_stone_slab",
+    "deeperdark:resin_slab"
+  ]
+}

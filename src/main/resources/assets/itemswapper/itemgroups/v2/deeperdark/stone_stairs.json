@@ -1,0 +1,8 @@
+{
+  "type": "paletteModification",
+  "target": "itemswapper:v2/block_sets/stone_stairs",
+  "addItems": [
+    "deeperdark:deepslate_stairs",
+    "deeperdark:basalt_stairs"
+  ]
+}

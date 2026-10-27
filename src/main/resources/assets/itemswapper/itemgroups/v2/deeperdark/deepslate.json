@@ -1,0 +1,10 @@
+{
+  "type": "paletteModification",
+  "target": "itemswapper:v2/the_depths/deepslate",
+  "addItems": [
+    "deeperdark:deepslate_stairs",
+    "deeperdark:deepslate_slab",
+    "deeperdark:deepslate_wall",
+    "deeperdark:deepslate_brick_pillar"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "type": "paletteModification",
+  "target": "itemswapper:v2/the_end/end_stone",
+  "addItems": [
+    "deeperdark:end_stone_stairs",
+    "deeperdark:end_stone_slab",
+    "deeperdark:end_stone_wall"
+  ]
+}

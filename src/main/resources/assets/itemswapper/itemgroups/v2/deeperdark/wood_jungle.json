@@ -1,0 +1,11 @@
+{
+  "type": "paletteModification",
+  "target": "itemswapper:v2/wood/jungle",
+  "addItems": [
+    "deeperdark:jungle_end_grain",
+    "deeperdark:stripped_jungle_end_grain",
+    "deeperdark:jungle_wall",
+    "deeperdark:jungle_wood_wall",
+    "deeperdark:stripped_jungle_wood_wall"
+  ]
+}

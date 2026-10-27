@@ -1,0 +1,9 @@
+{
+  "type": "paletteModification",
+  "target": "itemswapper:v2/nature/resin",
+  "addItems": [
+    "deeperdark:resin_stairs",
+    "deeperdark:resin_slab",
+    "deeperdark:resin_wall"
+  ]
+}

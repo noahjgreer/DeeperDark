@@ -1,0 +1,7 @@
+{
+  "type": "paletteModification",
+  "target": "itemswapper:v2/colors/red",
+  "addItems": [
+    "deeperdark:red_stained_glass_door"
+  ]
+}

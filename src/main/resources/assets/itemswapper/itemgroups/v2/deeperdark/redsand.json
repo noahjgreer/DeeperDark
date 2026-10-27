@@ -1,0 +1,7 @@
+{
+  "type": "paletteModification",
+  "target": "itemswapper:v2/sand/redsand",
+  "addItems": [
+    "deeperdark:red_sandstone_pillar"
+  ]
+}

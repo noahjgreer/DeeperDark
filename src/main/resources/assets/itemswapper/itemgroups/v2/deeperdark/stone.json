@@ -1,0 +1,9 @@
+{
+  "type": "paletteModification",
+  "target": "itemswapper:v2/stone/stone",
+  "addItems": [
+    "deeperdark:chiseled_stone",
+    "deeperdark:stone_pillar",
+    "deeperdark:stone_wall"
+  ]
+}

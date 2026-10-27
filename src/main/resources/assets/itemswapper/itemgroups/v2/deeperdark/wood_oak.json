@@ -1,0 +1,11 @@
+{
+  "type": "paletteModification",
+  "target": "itemswapper:v2/wood/oak",
+  "addItems": [
+    "deeperdark:oak_end_grain",
+    "deeperdark:stripped_oak_end_grain",
+    "deeperdark:oak_wall",
+    "deeperdark:oak_wood_wall",
+    "deeperdark:stripped_oak_wood_wall"
+  ]
+}

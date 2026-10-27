@@ -1,0 +1,11 @@
+{
+  "type": "paletteModification",
+  "target": "itemswapper:v2/crafting/mob_drops",
+  "addItems": [
+    "deeperdark:rotten_flesh_block",
+    "deeperdark:ender_pearl_block",
+    "deeperdark:leather_block",
+    "deeperdark:leather_scrap",
+    "deeperdark:gunpowder_block"
+  ]
+}

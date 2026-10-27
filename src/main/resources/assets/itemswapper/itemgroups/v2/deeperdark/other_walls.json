@@ -1,0 +1,10 @@
+{
+  "type": "paletteModification",
+  "target": "itemswapper:v2/block_sets/other_walls",
+  "addItems": [
+    "deeperdark:end_stone_wall",
+    "deeperdark:purpur_wall",
+    "deeperdark:quartz_wall",
+    "deeperdark:resin_wall"
+  ]
+}

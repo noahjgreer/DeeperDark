@@ -1,0 +1,11 @@
+{
+  "type": "paletteModification",
+  "target": "itemswapper:v2/block_sets/stone_blocks",
+  "addItems": [
+    "deeperdark:chiseled_stone",
+    "deeperdark:stone_pillar",
+    "deeperdark:stone_brick_pillar",
+    "deeperdark:mossy_stone_brick_pillar",
+    "deeperdark:deepslate_brick_pillar"
+  ]
+}

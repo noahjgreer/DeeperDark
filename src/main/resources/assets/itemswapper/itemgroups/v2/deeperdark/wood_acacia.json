@@ -1,0 +1,11 @@
+{
+  "type": "paletteModification",
+  "target": "itemswapper:v2/wood/acacia",
+  "addItems": [
+    "deeperdark:acacia_end_grain",
+    "deeperdark:stripped_acacia_end_grain",
+    "deeperdark:acacia_wall",
+    "deeperdark:acacia_wood_wall",
+    "deeperdark:stripped_acacia_wood_wall"
+  ]
+}

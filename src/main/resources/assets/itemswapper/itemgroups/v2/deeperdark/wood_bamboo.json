@@ -1,0 +1,11 @@
+{
+  "type": "paletteModification",
+  "target": "itemswapper:v2/wood/bamboo",
+  "addItems": [
+    "deeperdark:bamboo_end_grain",
+    "deeperdark:stripped_bamboo_end_grain",
+    "deeperdark:bamboo_wall",
+    "deeperdark:bamboo_block_wall",
+    "deeperdark:stripped_bamboo_block_wall"
+  ]
+}

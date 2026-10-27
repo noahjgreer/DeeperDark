@@ -1,0 +1,11 @@
+{
+  "type": "paletteModification",
+  "target": "itemswapper:v2/wood/mangrove",
+  "addItems": [
+    "deeperdark:mangrove_end_grain",
+    "deeperdark:stripped_mangrove_end_grain",
+    "deeperdark:mangrove_wall",
+    "deeperdark:mangrove_wood_wall",
+    "deeperdark:stripped_mangrove_wood_wall"
+  ]
+}

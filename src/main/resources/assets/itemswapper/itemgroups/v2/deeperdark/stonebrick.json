@@ -1,0 +1,8 @@
+{
+  "type": "paletteModification",
+  "target": "itemswapper:v2/stone/stonebrick",
+  "addItems": [
+    "deeperdark:stone_brick_pillar",
+    "deeperdark:mossy_stone_brick_pillar"
+  ]
+}

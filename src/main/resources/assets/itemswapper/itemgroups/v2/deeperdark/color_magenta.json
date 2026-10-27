@@ -1,0 +1,7 @@
+{
+  "type": "paletteModification",
+  "target": "itemswapper:v2/colors/magenta",
+  "addItems": [
+    "deeperdark:magenta_stained_glass_door"
+  ]
+}

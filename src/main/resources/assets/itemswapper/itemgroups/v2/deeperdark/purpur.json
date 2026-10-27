@@ -1,0 +1,7 @@
+{
+  "type": "paletteModification",
+  "target": "itemswapper:v2/the_end/purpur",
+  "addItems": [
+    "deeperdark:purpur_wall"
+  ]
+}

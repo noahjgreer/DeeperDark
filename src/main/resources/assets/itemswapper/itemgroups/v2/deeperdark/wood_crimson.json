@@ -1,0 +1,11 @@
+{
+  "type": "paletteModification",
+  "target": "itemswapper:v2/wood/crimson",
+  "addItems": [
+    "deeperdark:crimson_end_grain",
+    "deeperdark:stripped_crimson_end_grain",
+    "deeperdark:crimson_wall",
+    "deeperdark:crimson_hyphae_wall",
+    "deeperdark:stripped_crimson_hyphae_wall"
+  ]
+}

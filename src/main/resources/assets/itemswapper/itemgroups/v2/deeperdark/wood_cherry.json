@@ -1,0 +1,11 @@
+{
+  "type": "paletteModification",
+  "target": "itemswapper:v2/wood/cherry",
+  "addItems": [
+    "deeperdark:cherry_end_grain",
+    "deeperdark:stripped_cherry_end_grain",
+    "deeperdark:cherry_wall",
+    "deeperdark:cherry_wood_wall",
+    "deeperdark:stripped_cherry_wood_wall"
+  ]
+}

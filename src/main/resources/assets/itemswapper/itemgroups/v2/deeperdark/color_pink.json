@@ -1,0 +1,7 @@
+{
+  "type": "paletteModification",
+  "target": "itemswapper:v2/colors/pink",
+  "addItems": [
+    "deeperdark:pink_stained_glass_door"
+  ]
+}

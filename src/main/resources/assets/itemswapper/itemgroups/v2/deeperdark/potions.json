@@ -1,0 +1,8 @@
+{
+  "type": "listModification",
+  "target": "itemswapper:v2/consumables/potions",
+  "addItems": [
+    "deeperdark:milk_bottle",
+    "deeperdark:splash_milk_bottle"
+  ]
+}

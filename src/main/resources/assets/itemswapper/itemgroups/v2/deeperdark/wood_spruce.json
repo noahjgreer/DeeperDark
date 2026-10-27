@@ -1,0 +1,11 @@
+{
+  "type": "paletteModification",
+  "target": "itemswapper:v2/wood/spruce",
+  "addItems": [
+    "deeperdark:spruce_end_grain",
+    "deeperdark:stripped_spruce_end_grain",
+    "deeperdark:spruce_wall",
+    "deeperdark:spruce_wood_wall",
+    "deeperdark:stripped_spruce_wood_wall"
+  ]
+}

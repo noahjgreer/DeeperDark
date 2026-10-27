@@ -1,0 +1,9 @@
+{
+  "type": "paletteModification",
+  "target": "itemswapper:v2/functional/functional",
+  "addItems": [
+    "deeperdark:collarbench",
+    "deeperdark:golden_cauldron",
+    "deeperdark:siphon"
+  ]
+}

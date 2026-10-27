@@ -1,0 +1,11 @@
+{
+  "type": "paletteModification",
+  "target": "itemswapper:v2/wood/warped",
+  "addItems": [
+    "deeperdark:warped_end_grain",
+    "deeperdark:stripped_warped_end_grain",
+    "deeperdark:warped_wall",
+    "deeperdark:warped_hyphae_wall",
+    "deeperdark:stripped_warped_hyphae_wall"
+  ]
+}

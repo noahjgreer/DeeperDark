@@ -1,0 +1,11 @@
+{
+  "type": "paletteModification",
+  "target": "itemswapper:v2/wood/poplar",
+  "addItems": [
+    "deeperdark:poplar_end_grain",
+    "deeperdark:stripped_poplar_end_grain",
+    "deeperdark:poplar_wall",
+    "deeperdark:poplar_wood_wall",
+    "deeperdark:stripped_poplar_wood_wall"
+  ]
+}

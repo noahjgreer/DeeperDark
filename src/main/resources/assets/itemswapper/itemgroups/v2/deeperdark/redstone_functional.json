@@ -1,0 +1,8 @@
+{
+  "type": "paletteModification",
+  "target": "itemswapper:v2/technical/redstone_functional",
+  "addItems": [
+    "deeperdark:dynamite",
+    "deeperdark:gunpowder_dust"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "type": "paletteModification",
+  "target": "itemswapper:v2/wood/birch",
+  "addItems": [
+    "deeperdark:birch_end_grain",
+    "deeperdark:stripped_birch_end_grain",
+    "deeperdark:birch_wall",
+    "deeperdark:birch_wood_wall",
+    "deeperdark:stripped_birch_wood_wall"
+  ]
+}

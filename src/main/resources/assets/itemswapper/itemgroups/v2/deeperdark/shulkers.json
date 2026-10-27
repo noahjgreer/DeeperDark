@@ -1,0 +1,9 @@
+{
+  "type": "listModification",
+  "target": "itemswapper:v2/craftables/shulkers",
+  "addItems": [
+    "deeperdark:flimsy_box",
+    "deeperdark:sturdy_box",
+    "deeperdark:reinforced_box"
+  ]
+}

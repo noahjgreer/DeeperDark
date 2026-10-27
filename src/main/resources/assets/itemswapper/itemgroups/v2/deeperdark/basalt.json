@@ -1,0 +1,9 @@
+{
+  "type": "paletteModification",
+  "target": "itemswapper:v2/the_depths/basalt",
+  "addItems": [
+    "deeperdark:basalt_stairs",
+    "deeperdark:basalt_slab",
+    "deeperdark:basalt_wall"
+  ]
+}
