@@ -44,6 +44,7 @@ import java.util.function.Supplier;
  *   /dd border origin/radius/force/info
  *   /dd border config allow_entity_spawning / push_survival_only
  *   /dd creature clear/list/summon/spawn/config ...
+ *   /dd creepiness [config <setting> [value] | trigger <haunt> [player]]
  *   /dd player_sounds [toggle] / volume / send / death / join / hurt / pitch / pitchdeviance
  *   /dd player_sounds set <player> ...   (op only)
  *   /dd config list / <snake_case_setting> [value]
@@ -100,6 +101,10 @@ public class DeeperDarkCommands {
 
             // dd creature (delegated to CreatureCommands)
             .then(net.noahsarch.deeperdark.creature.CreatureCommands.buildCreatureCommand()
+                .requires(IS_OP))
+
+            // dd creepiness (delegated to CreepinessCommands)
+            .then(net.noahsarch.deeperdark.creepiness.CreepinessCommands.buildCreepinessCommand()
                 .requires(IS_OP))
 
             // dd player_sounds (any player; set <player> requires op)
@@ -367,6 +372,7 @@ public class DeeperDarkCommands {
         source.sendSuccess(() -> Component.literal("===== DeeperDark General Configuration =====").withStyle(ChatFormatting.GOLD)
             .append(Component.literal("\n(Border settings: /dd border config)").withStyle(ChatFormatting.GRAY))
             .append(Component.literal("\n(Creature settings: /dd creature config)").withStyle(ChatFormatting.GRAY))
+            .append(Component.literal("\n(Creepiness settings: /dd creepiness config)").withStyle(ChatFormatting.GRAY))
             .append(Component.literal("\n\n--- Nether ---").withStyle(ChatFormatting.YELLOW))
             .append(formatConfigLine("nether_coordinate_multiplier", config.netherCoordinateMultiplier))
             .append(Component.literal("\n\n--- Creeper ---").withStyle(ChatFormatting.YELLOW))

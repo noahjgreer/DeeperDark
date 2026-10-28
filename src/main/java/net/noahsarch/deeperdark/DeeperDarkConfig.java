@@ -162,6 +162,21 @@ public class DeeperDarkConfig {
             changed = true;
         }
 
+        if (config.creepiness == null) {
+            config.creepiness = new net.noahsarch.deeperdark.creepiness.CreepinessConfig();
+            changed = true;
+        }
+
+        if (config.creepiness.minDelayTicks < 20) {
+            config.creepiness.minDelayTicks = 20;
+            changed = true;
+        }
+
+        if (config.creepiness.maxDelayTicks < config.creepiness.minDelayTicks) {
+            config.creepiness.maxDelayTicks = config.creepiness.minDelayTicks;
+            changed = true;
+        }
+
         if (config.itemMagnet == null) {
             config.itemMagnet = new ItemMagnetConfig();
             changed = true;
@@ -259,6 +274,9 @@ public class DeeperDarkConfig {
 
         // Creature configuration
         public net.noahsarch.deeperdark.creature.CreatureConfig creature = new net.noahsarch.deeperdark.creature.CreatureConfig();
+
+        // Old Minecraft creepiness (phantom sounds and ghost blocks) configuration
+        public net.noahsarch.deeperdark.creepiness.CreepinessConfig creepiness = new net.noahsarch.deeperdark.creepiness.CreepinessConfig();
 
         // Auto-updater configuration
         public AutoUpdaterConfig autoUpdater = new AutoUpdaterConfig();
@@ -418,6 +436,10 @@ public class DeeperDarkConfig {
                     #
                     # unlockAllRecipes: if true, every recipe from every mod and vanilla is unlocked in the recipe book on join (default: true)
                     #
+                    # Creepiness Configuration (old Minecraft scares, each heard by one player only; see /dd creepiness):
+                    # creepiness.enabled: if true, each player gets one haunt every minDelayTicks-maxDelayTicks (default: 6000-18000)
+                    # creepiness.caveSounds / mining / footsteps / doors / phantomMobs / follower / ghostBlocks: toggle each haunt
+                    #
                     # Auto-Updater Configuration (client-side only):
                     # autoUpdater.repoURL: GitHub releases page URL used to check for and download updates.
                     # autoUpdater.canDenyUpdate: if true, players can click "Update Later" to skip; if false, that button is disabled.
@@ -435,6 +457,7 @@ public class DeeperDarkConfig {
             representer.addClassTag(ConfigInstance.class, org.yaml.snakeyaml.nodes.Tag.MAP);
             representer.addClassTag(PlayerSoundProfile.class, org.yaml.snakeyaml.nodes.Tag.MAP);
             representer.addClassTag(AutoUpdaterConfig.class, org.yaml.snakeyaml.nodes.Tag.MAP);
+            representer.addClassTag(net.noahsarch.deeperdark.creepiness.CreepinessConfig.class, org.yaml.snakeyaml.nodes.Tag.MAP);
             representer.addClassTag(ItemMagnetConfig.class, org.yaml.snakeyaml.nodes.Tag.MAP);
             representer.addClassTag(ItemMagnetVariantConfig.class, org.yaml.snakeyaml.nodes.Tag.MAP);
 

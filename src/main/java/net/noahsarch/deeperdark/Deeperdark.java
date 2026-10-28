@@ -347,6 +347,8 @@ public class Deeperdark implements ModInitializer {
 		// Register creature system
 		net.noahsarch.deeperdark.creature.CreatureManager.register();
 
+		net.noahsarch.deeperdark.creepiness.CreepinessManager.register();
+
 	}
 
 	/**
