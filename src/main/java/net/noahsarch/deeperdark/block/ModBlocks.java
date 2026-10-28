@@ -18,6 +18,7 @@ import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.biome.Biome.Precipitation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.RailBlock;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.SoundType;
@@ -179,6 +180,11 @@ public class ModBlocks {
             content.accept(MEDIUM_ITEM_VAULT);
             content.accept(LARGE_ITEM_VAULT);
         });
+
+        CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.REDSTONE_BLOCKS).register(content ->
+                content.insertAfter(Items.RAIL, COPPER_RAIL));
+        CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.TOOLS_AND_UTILITIES).register(content ->
+                content.insertAfter(Items.RAIL, COPPER_RAIL));
     }
 
     static ResourceKey<Block> keyOfBlock(String name) {
@@ -603,6 +609,13 @@ public class ModBlocks {
             "cobblestone_brick_wall",
             WallBlock::new,
             BlockBehaviour.Properties.ofFullCopy(COBBLESTONE_BRICKS).forceSolidOn(),
+            true);
+
+    // Slower than a normal rail; see CopperRailDrag.
+    public static final Block COPPER_RAIL = register(
+            "copper_rail",
+            RailBlock::new,
+            BlockBehaviour.Properties.ofFullCopy(Blocks.RAIL).sound(SoundType.COPPER),
             true);
 
     // Glass doors — uses a custom BlockSetType backed by the glass door sounds.

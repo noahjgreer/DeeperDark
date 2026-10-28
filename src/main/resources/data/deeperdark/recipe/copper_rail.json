@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": { "#": "minecraft:stick", "X": "minecraft:copper_ingot" },
+  "pattern": [ "X X", "X#X", "X X" ],
+  "result": { "id": "deeperdark:copper_rail", "count": 16 }
+}

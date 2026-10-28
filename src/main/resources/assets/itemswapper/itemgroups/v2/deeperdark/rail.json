@@ -1,0 +1,7 @@
+{
+  "type": "paletteModification",
+  "target": "itemswapper:v2/technical/rail",
+  "addItems": [
+    "deeperdark:copper_rail"
+  ]
+}

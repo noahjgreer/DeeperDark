@@ -113,7 +113,9 @@
     "PickBlockContainerServerMixin",
     "ContainerCloseIdCheckMixin",
     "SwordBlockingItemMixin",
-    "SwordBlockingLivingEntityMixin"
+    "SwordBlockingLivingEntityMixin",
+    "OldMinecartBehaviorMixin",
+    "NewMinecartBehaviorMixin"
   ],
   "client": [
     "PickBlockContainerMixin",
