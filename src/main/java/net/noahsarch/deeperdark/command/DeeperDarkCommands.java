@@ -15,7 +15,9 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.ChatFormatting;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.noahsarch.deeperdark.DeeperDarkConfig;
+import net.noahsarch.deeperdark.config.ConfigMenu;
 import net.noahsarch.deeperdark.payload.AllIngredientsConsumableSyncPacket;
 import net.noahsarch.deeperdark.payload.VoidFogSyncPacket;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -39,6 +41,7 @@ import java.util.function.Supplier;
  * self-targeting; "set <player>" within it requires operator.
  *
  * Tree overview:
+ *   /dd                       (opens the config menu, see ConfigMenu)
  *   /dd give <item> [amount]
  *   /dd reload
  *   /dd border origin/radius/force/info
@@ -64,6 +67,7 @@ public class DeeperDarkCommands {
 
     private static void registerCommands(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("dd")
+            .executes(DeeperDarkCommands::executeOpenMenu)
 
             // dd give <item> [amount]
             .then(Commands.literal("give")
@@ -250,6 +254,14 @@ public class DeeperDarkCommands {
 
     private static CompletableFuture<Suggestions> suggestItems(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
         return SharedSuggestionProvider.suggest(REGISTRY.keySet(), builder);
+    }
+
+    // ===== Config menu =====
+
+    private static int executeOpenMenu(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        if (ConfigMenu.open(context.getSource().getPlayerOrException())) return 1;
+        context.getSource().sendFailure(Component.translatable("deeperdark.config.no_client_mod").withStyle(ChatFormatting.RED));
+        return 0;
     }
 
     // ===== Give command =====

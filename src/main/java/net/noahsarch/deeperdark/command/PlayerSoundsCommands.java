@@ -260,7 +260,7 @@ public class PlayerSoundsCommands {
 
     // ===== Helpers =====
 
-    private static DeeperDarkConfig.PlayerSoundProfile getOrCreateProfile(String playerName) {
+    public static DeeperDarkConfig.PlayerSoundProfile getOrCreateProfile(String playerName) {
         DeeperDarkConfig.ConfigInstance config = DeeperDarkConfig.get();
         if (config.playerSounds == null) config.playerSounds = new HashMap<>();
         DeeperDarkConfig.PlayerSoundProfile profile = config.playerSounds.get(playerName);

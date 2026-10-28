@@ -30,7 +30,10 @@ import net.noahsarch.deeperdark.client.renderer.PrimedDynamiteRenderer;
 import net.noahsarch.deeperdark.client.renderer.SaddlePlayerLayer;
 import net.noahsarch.deeperdark.client.renderer.VaultBlockEntityRenderer;
 import net.noahsarch.deeperdark.client.renderer.VaultItemSpecialRenderer;
+import net.minecraft.client.Minecraft;
 import net.noahsarch.deeperdark.client.screen.BoxScreen;
+import net.noahsarch.deeperdark.client.screen.ConfigScreen;
+import net.noahsarch.deeperdark.payload.ConfigMenuPayload;
 import net.noahsarch.deeperdark.client.screen.VaultScreen;
 import net.noahsarch.deeperdark.entity.ModEntities;
 import net.noahsarch.deeperdark.client.ContainerItemKeyHandler;
@@ -131,6 +134,11 @@ public class DeeperDarkClient implements ClientModInitializer {
 
         ClientPlayNetworking.registerGlobalReceiver(VoidFogSyncPacket.ID, (payload, context) ->
                 DeeperDarkConfig.get().voidFogEnabled = payload.enabled());
+
+        ClientPlayNetworking.registerGlobalReceiver(ConfigMenuPayload.ID, (payload, context) -> {
+            Minecraft mc = context.client();
+            mc.setScreen(new ConfigScreen(payload));
+        });
 
         ClientPlayNetworking.registerGlobalReceiver(OpenFromScreenPayload.ID, (payload, context) ->
                 fromScreenContainerId = payload.containerId());

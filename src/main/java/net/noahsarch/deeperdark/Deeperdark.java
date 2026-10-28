@@ -36,7 +36,10 @@ import net.noahsarch.deeperdark.inventory.OpenMarkedContainer;
 import net.noahsarch.deeperdark.menu.VaultMenu;
 import net.noahsarch.deeperdark.sound.ModSounds;
 import net.noahsarch.deeperdark.duck.CraftingPanelHolder;
+import net.noahsarch.deeperdark.config.ConfigMenu;
 import net.noahsarch.deeperdark.payload.AllIngredientsConsumableSyncPacket;
+import net.noahsarch.deeperdark.payload.ConfigChangesPayload;
+import net.noahsarch.deeperdark.payload.ConfigMenuPayload;
 import net.noahsarch.deeperdark.payload.OpenContainerItemPayload;
 import net.noahsarch.deeperdark.payload.OpenFromScreenPayload;
 import net.noahsarch.deeperdark.payload.OpenNestedContainerPayload;
@@ -128,6 +131,13 @@ public class Deeperdark implements ModInitializer {
 		PayloadTypeRegistry.clientboundPlay().register(VoidFogSyncPacket.ID, VoidFogSyncPacket.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(AllIngredientsConsumableSyncPacket.ID, AllIngredientsConsumableSyncPacket.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(OpenFromScreenPayload.ID, OpenFromScreenPayload.CODEC);
+
+		// Config menu: "/dd" sends values, Done sends changes back
+		PayloadTypeRegistry.clientboundPlay().register(ConfigMenuPayload.ID, ConfigMenuPayload.CODEC);
+		PayloadTypeRegistry.serverboundPlay().register(ConfigChangesPayload.ID, ConfigChangesPayload.CODEC);
+		ServerPlayNetworking.registerGlobalReceiver(ConfigChangesPayload.ID, (payload, context) ->
+			context.server().execute(() -> ConfigMenu.apply(context.player(), payload))
+		);
 
 		// Container-from-inventory: client â†’ server
 		PayloadTypeRegistry.serverboundPlay().register(OpenContainerItemPayload.ID, OpenContainerItemPayload.CODEC);

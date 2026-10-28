@@ -149,7 +149,7 @@ public class PlayerSoundManager {
         return 0.8f;
     }
 
-    private static Identifier parseSoundId(String rawSoundId) {
+    public static Identifier parseSoundId(String rawSoundId) {
         try {
             if (rawSoundId.contains(":")) {
                 int colon = rawSoundId.indexOf(':');
