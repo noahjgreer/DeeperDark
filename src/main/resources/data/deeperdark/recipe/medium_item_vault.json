@@ -2,13 +2,14 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "#": "minecraft:iron_block",
-    "@": "deeperdark:ender_pearl_block"
+    "C": "minecraft:gold_ingot",
+    "E": "minecraft:ender_pearl",
+    "O": "minecraft:iron_block"
   },
   "pattern": [
-    "###",
-    "#@#",
-    "###"
+    "CEC",
+    "EOE",
+    "CEC"
   ],
   "result": {
     "id": "deeperdark:medium_item_vault",

@@ -2,14 +2,14 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "G": "minecraft:gold_ingot",
-    "S": "minecraft:shulker_shell",
-    "@": "deeperdark:ender_pearl_block"
+    "C": "minecraft:diamond",
+    "E": "minecraft:ender_pearl",
+    "O": "minecraft:gold_block"
   },
   "pattern": [
-    "GSG",
-    "S@S",
-    "GSG"
+    "CEC",
+    "EOE",
+    "CEC"
   ],
   "result": {
     "id": "deeperdark:large_item_vault",
