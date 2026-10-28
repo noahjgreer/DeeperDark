@@ -1,0 +1,4 @@
+{
+  "parent": "minecraft:block/rail_flat",
+  "textures": { "rail": "deeperdark:block/oxidized_copper_rail" }
+}

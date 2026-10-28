@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "group": "waxed_exposed_copper_rail",
+  "ingredients": [
+    "deeperdark:exposed_copper_rail",
+    "minecraft:honeycomb"
+  ],
+  "result": {
+    "id": "deeperdark:waxed_exposed_copper_rail"
+  }
+}

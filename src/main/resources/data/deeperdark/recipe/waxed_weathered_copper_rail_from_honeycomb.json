@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "group": "waxed_weathered_copper_rail",
+  "ingredients": [
+    "deeperdark:weathered_copper_rail",
+    "minecraft:honeycomb"
+  ],
+  "result": {
+    "id": "deeperdark:waxed_weathered_copper_rail"
+  }
+}

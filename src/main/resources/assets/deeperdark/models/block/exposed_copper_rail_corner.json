@@ -1,0 +1,4 @@
+{
+  "parent": "minecraft:block/rail_curved",
+  "textures": { "rail": "deeperdark:block/exposed_copper_rail_corner" }
+}

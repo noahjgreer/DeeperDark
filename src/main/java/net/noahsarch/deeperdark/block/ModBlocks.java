@@ -1,6 +1,7 @@
 package net.noahsarch.deeperdark.block;
 
 import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
+import net.fabricmc.fabric.api.registry.OxidizableBlocksRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.core.cauldron.CauldronInteractions;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -18,7 +19,7 @@ import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.biome.Biome.Precipitation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.RailBlock;
+import net.minecraft.world.level.block.WeatheringCopper.WeatherState;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.SoundType;
@@ -181,10 +182,21 @@ public class ModBlocks {
             content.accept(LARGE_ITEM_VAULT);
         });
 
+        Block[] copperRails = {
+                COPPER_RAIL, EXPOSED_COPPER_RAIL, WEATHERED_COPPER_RAIL, OXIDIZED_COPPER_RAIL,
+                WAXED_COPPER_RAIL, WAXED_EXPOSED_COPPER_RAIL, WAXED_WEATHERED_COPPER_RAIL, WAXED_OXIDIZED_COPPER_RAIL};
         CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.REDSTONE_BLOCKS).register(content ->
-                content.insertAfter(Items.RAIL, COPPER_RAIL));
+                content.insertAfter(Items.RAIL, copperRails));
         CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.TOOLS_AND_UTILITIES).register(content ->
-                content.insertAfter(Items.RAIL, COPPER_RAIL));
+                content.insertAfter(Items.RAIL, copperRails));
+
+        OxidizableBlocksRegistry.registerNextStage(COPPER_RAIL, EXPOSED_COPPER_RAIL);
+        OxidizableBlocksRegistry.registerNextStage(EXPOSED_COPPER_RAIL, WEATHERED_COPPER_RAIL);
+        OxidizableBlocksRegistry.registerNextStage(WEATHERED_COPPER_RAIL, OXIDIZED_COPPER_RAIL);
+        OxidizableBlocksRegistry.registerWaxable(COPPER_RAIL, WAXED_COPPER_RAIL);
+        OxidizableBlocksRegistry.registerWaxable(EXPOSED_COPPER_RAIL, WAXED_EXPOSED_COPPER_RAIL);
+        OxidizableBlocksRegistry.registerWaxable(WEATHERED_COPPER_RAIL, WAXED_WEATHERED_COPPER_RAIL);
+        OxidizableBlocksRegistry.registerWaxable(OXIDIZED_COPPER_RAIL, WAXED_OXIDIZED_COPPER_RAIL);
     }
 
     static ResourceKey<Block> keyOfBlock(String name) {
@@ -611,12 +623,23 @@ public class ModBlocks {
             BlockBehaviour.Properties.ofFullCopy(COBBLESTONE_BRICKS).forceSolidOn(),
             true);
 
-    // Slower than a normal rail; see CopperRailDrag.
-    public static final Block COPPER_RAIL = register(
-            "copper_rail",
-            RailBlock::new,
-            BlockBehaviour.Properties.ofFullCopy(Blocks.RAIL).sound(SoundType.COPPER),
-            true);
+    // Slower the more oxidized; see CopperRailBlock.applyDrag.
+    private static Block registerCopperRail(String name, WeatherState weatherState, boolean waxed) {
+        return register(
+                name,
+                p -> waxed ? new CopperRailBlock(weatherState, p) : new WeatheringCopperRailBlock(weatherState, p),
+                BlockBehaviour.Properties.ofFullCopy(Blocks.RAIL).sound(SoundType.COPPER),
+                true);
+    }
+
+    public static final Block COPPER_RAIL = registerCopperRail("copper_rail", WeatherState.UNAFFECTED, false);
+    public static final Block EXPOSED_COPPER_RAIL = registerCopperRail("exposed_copper_rail", WeatherState.EXPOSED, false);
+    public static final Block WEATHERED_COPPER_RAIL = registerCopperRail("weathered_copper_rail", WeatherState.WEATHERED, false);
+    public static final Block OXIDIZED_COPPER_RAIL = registerCopperRail("oxidized_copper_rail", WeatherState.OXIDIZED, false);
+    public static final Block WAXED_COPPER_RAIL = registerCopperRail("waxed_copper_rail", WeatherState.UNAFFECTED, true);
+    public static final Block WAXED_EXPOSED_COPPER_RAIL = registerCopperRail("waxed_exposed_copper_rail", WeatherState.EXPOSED, true);
+    public static final Block WAXED_WEATHERED_COPPER_RAIL = registerCopperRail("waxed_weathered_copper_rail", WeatherState.WEATHERED, true);
+    public static final Block WAXED_OXIDIZED_COPPER_RAIL = registerCopperRail("waxed_oxidized_copper_rail", WeatherState.OXIDIZED, true);
 
     // Glass doors — uses a custom BlockSetType backed by the glass door sounds.
     // canOpenByWindCharge=false: glass doors shatter rather than swing in wind.

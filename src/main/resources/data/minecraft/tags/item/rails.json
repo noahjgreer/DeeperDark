@@ -1,6 +1,13 @@
 {
   "replace": false,
   "values": [
-    "deeperdark:copper_rail"
+    "deeperdark:copper_rail",
+    "deeperdark:waxed_copper_rail",
+    "deeperdark:exposed_copper_rail",
+    "deeperdark:waxed_exposed_copper_rail",
+    "deeperdark:weathered_copper_rail",
+    "deeperdark:waxed_weathered_copper_rail",
+    "deeperdark:oxidized_copper_rail",
+    "deeperdark:waxed_oxidized_copper_rail"
   ]
 }
