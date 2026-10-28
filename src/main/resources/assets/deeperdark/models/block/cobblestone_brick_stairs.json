@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/stairs",
+  "textures": {
+    "bottom": "deeperdark:block/cobblestone_bricks",
+    "top":    "deeperdark:block/cobblestone_bricks",
+    "side":   "deeperdark:block/cobblestone_bricks"
+  }
+}

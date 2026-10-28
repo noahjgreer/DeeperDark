@@ -17,7 +17,7 @@ They must be in the `itemswapper` namespace (the loader ignores every other name
 
 ## Mapping
 
-Wood variants go into their wood's palette, stone/sandstone/deepslate/basalt/end stone/purpur/quartz/resin
+Wood variants go into their wood's palette, stone/cobblestone brick/sandstone/deepslate/basalt/end stone/purpur/quartz/resin
 blocks into both their material palette and the matching `block_sets/*` palette, coloured glass doors into
 their `colors/*` palette. Collars join the armor list, item magnets the tools list, boxes the shulker list,
 milk bottles the potions list. Storage blocks sit beside their source item in `crafting/*`.

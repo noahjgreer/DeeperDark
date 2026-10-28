@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "type=bottom": { "model": "deeperdark:block/cobblestone_brick_slab" },
+    "type=double": { "model": "deeperdark:block/cobblestone_bricks" },
+    "type=top":    { "model": "deeperdark:block/cobblestone_brick_slab_top" }
+  }
+}

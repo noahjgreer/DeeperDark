@@ -138,6 +138,10 @@ public class ModBlocks {
             content.accept(RESIN_STAIRS);
             content.accept(RESIN_SLAB);
             content.accept(RESIN_WALL);
+            content.accept(COBBLESTONE_BRICKS);
+            content.accept(COBBLESTONE_BRICK_STAIRS);
+            content.accept(COBBLESTONE_BRICK_SLAB);
+            content.accept(COBBLESTONE_BRICK_WALL);
             content.accept(STONE_PILLAR);
             content.accept(SANDSTONE_PILLAR);
             content.accept(RED_SANDSTONE_PILLAR);
@@ -575,6 +579,30 @@ public class ModBlocks {
             BlockBehaviour.Properties.of()
                     .strength(1.5F)
                     .sound(SoundType.RESIN),
+            true);
+
+    public static final Block COBBLESTONE_BRICKS = register(
+            "cobblestone_bricks",
+            Block::new,
+            BlockBehaviour.Properties.ofFullCopy(Blocks.COBBLESTONE),
+            true);
+
+    public static final Block COBBLESTONE_BRICK_STAIRS = register(
+            "cobblestone_brick_stairs",
+            p -> new StairBlock(COBBLESTONE_BRICKS.defaultBlockState(), p),
+            BlockBehaviour.Properties.ofFullCopy(COBBLESTONE_BRICKS),
+            true);
+
+    public static final Block COBBLESTONE_BRICK_SLAB = register(
+            "cobblestone_brick_slab",
+            SlabBlock::new,
+            BlockBehaviour.Properties.ofFullCopy(COBBLESTONE_BRICKS),
+            true);
+
+    public static final Block COBBLESTONE_BRICK_WALL = register(
+            "cobblestone_brick_wall",
+            WallBlock::new,
+            BlockBehaviour.Properties.ofFullCopy(COBBLESTONE_BRICKS).forceSolidOn(),
             true);
 
     // Glass doors — uses a custom BlockSetType backed by the glass door sounds.

@@ -1,0 +1,5 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "minecraft:cobblestone",
+  "result": { "id": "deeperdark:cobblestone_bricks", "count": 1 }
+}

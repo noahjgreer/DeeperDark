@@ -3,6 +3,7 @@
   "target": "itemswapper:v2/block_sets/stone_slabs",
   "addItems": [
     "deeperdark:deepslate_slab",
-    "deeperdark:basalt_slab"
+    "deeperdark:basalt_slab",
+    "deeperdark:cobblestone_brick_slab"
   ]
 }

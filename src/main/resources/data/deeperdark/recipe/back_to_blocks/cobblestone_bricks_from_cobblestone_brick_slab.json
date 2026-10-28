@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "#": "deeperdark:cobblestone_brick_slab"
+  },
+  "pattern": [
+    "##"
+  ],
+  "result": {
+    "id": "deeperdark:cobblestone_bricks"
+  }
+}

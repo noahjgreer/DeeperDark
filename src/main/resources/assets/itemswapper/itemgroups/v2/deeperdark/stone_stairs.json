@@ -3,6 +3,7 @@
   "target": "itemswapper:v2/block_sets/stone_stairs",
   "addItems": [
     "deeperdark:deepslate_stairs",
-    "deeperdark:basalt_stairs"
+    "deeperdark:basalt_stairs",
+    "deeperdark:cobblestone_brick_stairs"
   ]
 }

@@ -1,0 +1,10 @@
+{
+  "type": "paletteModification",
+  "target": "itemswapper:v2/stone/cobblestone",
+  "addItems": [
+    "deeperdark:cobblestone_bricks",
+    "deeperdark:cobblestone_brick_stairs",
+    "deeperdark:cobblestone_brick_slab",
+    "deeperdark:cobblestone_brick_wall"
+  ]
+}
