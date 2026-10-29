@@ -4,6 +4,7 @@
   "addItems": [
     "deeperdark:deepslate_stairs",
     "deeperdark:basalt_stairs",
-    "deeperdark:cobblestone_brick_stairs"
+    "deeperdark:cobblestone_brick_stairs",
+    "deeperdark:smooth_stone_stairs"
   ]
 }
