@@ -1,5 +1,6 @@
 package net.noahsarch.deeperdark.mixin;
 
+import net.noahsarch.deeperdark.DeeperDarkConfig;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -36,14 +37,16 @@ public class ExplosionImplMixin {
         )
     )
     private void deeperdark$forceAllBlockDrops(BlockState state, ServerLevel world, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> stackMerger) {
-        if (!state.getBlock().dropFromExplosion(explosion)) {
+        // Dynamite always silk-touches; the setting only covers other explosions
+        boolean dynamite = explosion.getDirectSourceEntity() instanceof PrimedDynamite;
+        if (!state.getBlock().dropFromExplosion(explosion) || !(dynamite || DeeperDarkConfig.get().explosionsDropAllBlocks)) {
             state.onExplosionHit(world, pos, explosion, stackMerger);
             return;
         }
         if (!state.isAir() && explosion.getBlockInteraction() != Explosion.BlockInteraction.TRIGGER_BLOCK) {
             BlockEntity blockEntity = state.hasBlockEntity() ? world.getBlockEntity(pos) : null;
             ItemStack tool;
-            if (explosion.getDirectSourceEntity() instanceof PrimedDynamite) {
+            if (dynamite) {
                 tool = new ItemStack(Items.GOLDEN_PICKAXE);
                 Holder<Enchantment> silkTouch = world.registryAccess()
                         .lookupOrThrow(Registries.ENCHANTMENT)
@@ -75,7 +78,7 @@ public class ExplosionImplMixin {
         )
     )
     private void deeperdark$alwaysDropStack(Level world, BlockPos pos, ItemStack stack) {
-        if (world instanceof ServerLevel serverWorld && !stack.isEmpty()) {
+        if (world instanceof ServerLevel serverWorld && !stack.isEmpty() && DeeperDarkConfig.get().explosionsDropAllBlocks) {
             ItemEntity itemEntity = new ItemEntity(serverWorld, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, stack);
             itemEntity.setDefaultPickUpDelay();
             serverWorld.addFreshEntity(itemEntity);

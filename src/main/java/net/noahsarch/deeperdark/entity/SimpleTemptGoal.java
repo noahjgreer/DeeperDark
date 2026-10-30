@@ -1,5 +1,6 @@
 package net.noahsarch.deeperdark.entity;
 
+import net.noahsarch.deeperdark.DeeperDarkConfig;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.npc.ClientSideMerchant;
 import net.minecraft.world.entity.player.Player;
@@ -27,6 +28,7 @@ public class SimpleTemptGoal extends Goal {
 
     @Override
     public boolean canUse() {
+        if (!DeeperDarkConfig.get().villagerEmeraldTempt) return false;
         if (this.cooldown > 0) {
             --this.cooldown;
             return false;

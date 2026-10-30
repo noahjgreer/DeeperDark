@@ -1,5 +1,6 @@
 package net.noahsarch.deeperdark.mixin;
 
+import net.noahsarch.deeperdark.DeeperDarkConfig;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.Container;
 import net.minecraft.world.inventory.EnchantmentMenu;
@@ -21,7 +22,7 @@ public class EnchantmentMenuMixin {
     private void deeperdark$addShearsEnchantable(Container container, CallbackInfo ci) {
         if (container == this.enchantSlots) {
             ItemStack stack = container.getItem(0);
-            if (stack.is(Items.SHEARS) && !stack.has(DataComponents.ENCHANTABLE)) {
+            if (DeeperDarkConfig.get().shearsEnchantable && stack.is(Items.SHEARS) && !stack.has(DataComponents.ENCHANTABLE)) {
                 stack.set(DataComponents.ENCHANTABLE, new Enchantable(15));
             }
         }

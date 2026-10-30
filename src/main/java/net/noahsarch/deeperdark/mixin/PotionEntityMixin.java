@@ -1,5 +1,6 @@
 package net.noahsarch.deeperdark.mixin;
 
+import net.noahsarch.deeperdark.DeeperDarkConfig;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.entity.EntityType;
@@ -32,7 +33,7 @@ public abstract class PotionEntityMixin extends ThrowableItemProjectile {
         if (!world.isClientSide()) {
             ItemStack itemStack = this.getItem();
             PotionContents potionContentsComponent = itemStack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
-            if (potionContentsComponent.is(Potions.WATER)) {
+            if (potionContentsComponent.is(Potions.WATER) && DeeperDarkConfig.get().splashWaterExtinguishes) {
                  AABB box = this.getBoundingBox().inflate(4.0, 2.0, 4.0);
                  List<LivingEntity> list = world.getEntitiesOfClass(LivingEntity.class, box, entity -> entity.isOnFire());
                  for (LivingEntity entity : list) {

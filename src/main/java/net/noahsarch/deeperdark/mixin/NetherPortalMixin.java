@@ -1,5 +1,6 @@
 package net.noahsarch.deeperdark.mixin;
 
+import net.noahsarch.deeperdark.DeeperDarkConfig;
 import net.minecraft.world.level.portal.PortalShape;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.Constant;
@@ -12,7 +13,7 @@ public class NetherPortalMixin {
         constant = @Constant(intValue = 2)
     )
     private static int modifyMinWidth(int original) {
-        return 1;
+        return DeeperDarkConfig.get().smallNetherPortals ? 1 : original;
     }
 
     @ModifyConstant(
@@ -20,16 +21,16 @@ public class NetherPortalMixin {
         constant = @Constant(intValue = 3)
     )
     private static int modifyMinHeight(int original) {
-        return 1;
+        return DeeperDarkConfig.get().smallNetherPortals ? 1 : original;
     }
 
     @ModifyConstant(method = "isValid", constant = @Constant(intValue = 2))
     private int modifyIsValidMinWidth(int original) {
-        return 1;
+        return DeeperDarkConfig.get().smallNetherPortals ? 1 : original;
     }
 
     @ModifyConstant(method = "isValid", constant = @Constant(intValue = 3))
     private int modifyIsValidMinHeight(int original) {
-        return 1;
+        return DeeperDarkConfig.get().smallNetherPortals ? 1 : original;
     }
 }

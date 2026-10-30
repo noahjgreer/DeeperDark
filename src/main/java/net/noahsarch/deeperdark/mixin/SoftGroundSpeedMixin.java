@@ -1,5 +1,6 @@
 package net.noahsarch.deeperdark.mixin;
 
+import net.noahsarch.deeperdark.DeeperDarkConfig;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -35,7 +36,7 @@ public class SoftGroundSpeedMixin {
         // Check the block this entity is standing on, using the same position vanilla uses
         // for block speed/jump factors.
         BlockState below = self.level().getBlockState(self.getBlockPosBelowThatAffectsMyMovement());
-        if (!below.is(ModBlocks.QUICKSAND) && !below.is(Blocks.POWDER_SNOW)) return;
+        if (!below.is(ModBlocks.QUICKSAND) && !(below.is(Blocks.POWDER_SNOW) && DeeperDarkConfig.get().anyBootsOnPowderSnow)) return;
 
         // Apply MOVEMENT_EFFICIENCY lerp exactly as LivingEntity.getBlockSpeedFactor() does.
         float efficiency = (float) self.getAttributeValue(Attributes.MOVEMENT_EFFICIENCY);

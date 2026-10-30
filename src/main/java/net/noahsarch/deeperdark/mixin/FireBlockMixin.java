@@ -1,5 +1,6 @@
 package net.noahsarch.deeperdark.mixin;
 
+import net.noahsarch.deeperdark.DeeperDarkConfig;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.FireBlock;
@@ -16,7 +17,7 @@ public class FireBlockMixin {
 
     @Inject(method = "tick", at = @At("HEAD"))
     private void onScheduledTick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random, CallbackInfo ci) {
-        if (world.getBlockState(pos.below()).getBlock() == Blocks.GRASS_BLOCK) {
+        if (DeeperDarkConfig.get().fireCoarseDirt && world.getBlockState(pos.below()).getBlock() == Blocks.GRASS_BLOCK) {
             // 10% chance to turn into coarse dirt
             if (random.nextInt(10) == 0) {
                 world.setBlock(pos.below(), Blocks.COARSE_DIRT.defaultBlockState(), 3);

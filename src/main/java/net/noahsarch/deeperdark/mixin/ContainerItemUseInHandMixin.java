@@ -1,5 +1,6 @@
 package net.noahsarch.deeperdark.mixin;
 
+import net.noahsarch.deeperdark.DeeperDarkConfig;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Inventory;
@@ -33,7 +34,7 @@ public class ContainerItemUseInHandMixin {
         boolean isContainer = ContainerItemUtil.getContainerSize(stack) >= 0
                 || stack.is(Items.ENDER_CHEST)
                 || ContainerItemUtil.isVaultItem(stack);
-        if (!isContainer) return;
+        if (!isContainer || !DeeperDarkConfig.get().openContainerItems) return;
 
         if (player instanceof ServerPlayer serverPlayer) {
             int slot = hand == InteractionHand.MAIN_HAND

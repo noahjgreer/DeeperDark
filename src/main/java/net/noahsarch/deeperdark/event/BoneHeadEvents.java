@@ -1,5 +1,6 @@
 package net.noahsarch.deeperdark.event;
 
+import net.noahsarch.deeperdark.DeeperDarkConfig;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Entity;
@@ -18,7 +19,7 @@ public class BoneHeadEvents {
     public static void register() {
         UseItemCallback.EVENT.register((player, world, hand) -> {
             ItemStack stack = player.getItemInHand(hand);
-            if (!world.isClientSide() && stack.getItem() == Items.BONE) {
+            if (!world.isClientSide() && DeeperDarkConfig.get().boneOnHead && stack.getItem() == Items.BONE) {
                 // Raycast to see if looking at a wolf/dog
                 double reach = 4.5D;
                 Entity target = null;

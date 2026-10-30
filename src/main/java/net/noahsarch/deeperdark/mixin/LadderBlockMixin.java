@@ -1,5 +1,6 @@
 package net.noahsarch.deeperdark.mixin;
 
+import net.noahsarch.deeperdark.DeeperDarkConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
@@ -59,6 +60,7 @@ public class LadderBlockMixin {
     @Inject(method = "getStateForPlacement", at = @At("HEAD"), cancellable = true)
     private void deeperdark$getStateForPlacement(BlockPlaceContext context,
             CallbackInfoReturnable<BlockState> cir) {
+        if (!DeeperDarkConfig.get().ladderTweaks) return;
         Direction clickedFace = context.getClickedFace();
         if (clickedFace != Direction.UP && clickedFace != Direction.DOWN) return;
 
@@ -82,7 +84,7 @@ public class LadderBlockMixin {
     @Inject(method = "canSurvive", at = @At("RETURN"), cancellable = true)
     private void deeperdark$canSurvive(BlockState state, LevelReader level, BlockPos pos,
             CallbackInfoReturnable<Boolean> cir) {
-        if (cir.getReturnValue()) return;
+        if (cir.getReturnValue() || !DeeperDarkConfig.get().ladderTweaks) return;
         Direction facing = state.getValue(LadderBlock.FACING);
         if (deeperdark$isSameFacingLadder(level.getBlockState(pos.above()), facing)
                 || deeperdark$isSameFacingLadder(level.getBlockState(pos.below()), facing)) {
@@ -109,7 +111,7 @@ public class LadderBlockMixin {
             BlockPos pos, Direction directionToNeighbour, BlockPos neighbourPos, BlockState neighbourState,
             RandomSource random, CallbackInfoReturnable<BlockState> cir) {
         // Skip if vanilla already decided to remove this block.
-        if (cir.getReturnValue().isAir()) return;
+        if (cir.getReturnValue().isAir() || !DeeperDarkConfig.get().ladderTweaks) return;
 
         Direction facing = state.getValue(LadderBlock.FACING);
         if (directionToNeighbour != Direction.UP

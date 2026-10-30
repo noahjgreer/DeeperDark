@@ -1,5 +1,6 @@
 package net.noahsarch.deeperdark.mixin;
 
+import net.noahsarch.deeperdark.DeeperDarkConfig;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.Blocks;
@@ -24,7 +25,7 @@ public class IceBlockMixin {
     private void onPlaced(Level world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack, CallbackInfo ci) {
         if (world.isClientSide()) return;
 
-        if (world.dimension() == Level.NETHER) {
+        if (world.dimension() == Level.NETHER && DeeperDarkConfig.get().netherIceEvaporates) {
             Block block = state.getBlock();
             boolean isIce = block == Blocks.ICE
                     || block == Blocks.PACKED_ICE

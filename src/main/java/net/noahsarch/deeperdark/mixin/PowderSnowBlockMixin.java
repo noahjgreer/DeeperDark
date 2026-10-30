@@ -1,5 +1,6 @@
 package net.noahsarch.deeperdark.mixin;
 
+import net.noahsarch.deeperdark.DeeperDarkConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -25,7 +26,7 @@ public class PowderSnowBlockMixin {
      */
     @Inject(method = "canEntityWalkOnPowderSnow", at = @At("HEAD"), cancellable = true)
     private static void deeperdark$anyBootsWalkOnSnow(Entity entity, CallbackInfoReturnable<Boolean> cir) {
-        if (entity instanceof LivingEntity le && !le.getItemBySlot(EquipmentSlot.FEET).isEmpty()) {
+        if (DeeperDarkConfig.get().anyBootsOnPowderSnow && entity instanceof LivingEntity le && !le.getItemBySlot(EquipmentSlot.FEET).isEmpty()) {
             cir.setReturnValue(true);
         }
     }
@@ -39,7 +40,7 @@ public class PowderSnowBlockMixin {
     private void deeperdark$anyBootsCollisionShape(
             BlockState state, BlockGetter level, BlockPos pos,
             CollisionContext context, CallbackInfoReturnable<VoxelShape> cir) {
-        if (!context.isPlacement() && context instanceof EntityCollisionContext entityCtx) {
+        if (DeeperDarkConfig.get().anyBootsOnPowderSnow && !context.isPlacement() && context instanceof EntityCollisionContext entityCtx) {
             Entity entity = entityCtx.getEntity();
             if (entity != null
                     && PowderSnowBlock.canEntityWalkOnPowderSnow(entity)

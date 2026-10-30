@@ -1,5 +1,6 @@
 package net.noahsarch.deeperdark.mixin;
 
+import net.noahsarch.deeperdark.DeeperDarkConfig;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.animal.squid.Squid;
 import net.minecraft.world.entity.player.Player;
@@ -20,7 +21,7 @@ public class SquidMobMixin {
     @Inject(method = "mobInteract", at = @At("HEAD"), cancellable = true)
     private void deeperdark$mobInteract(Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
         Mob self = (Mob)(Object)this;
-        if (!(self instanceof Squid)) return;
+        if (!(self instanceof Squid) || !DeeperDarkConfig.get().squidMilking) return;
 
         ItemStack stack = player.getItemInHand(hand);
         if (stack.getItem() == Items.BUCKET) {

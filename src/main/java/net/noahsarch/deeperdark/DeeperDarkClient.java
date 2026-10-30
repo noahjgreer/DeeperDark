@@ -9,6 +9,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityRenderLayerRegistrationCallback;
 import net.minecraft.client.gui.screens.TitleScreen;
@@ -40,10 +41,10 @@ import net.noahsarch.deeperdark.client.ContainerItemKeyHandler;
 import net.noahsarch.deeperdark.intro.DeeperDarkLogoScreen;
 import net.noahsarch.deeperdark.menu.ModMenus;
 import net.noahsarch.deeperdark.event.VoidParticleHandler;
-import net.noahsarch.deeperdark.payload.AllIngredientsConsumableSyncPacket;
 import net.noahsarch.deeperdark.payload.OpenFromScreenPayload;
 import net.noahsarch.deeperdark.payload.PlayerLeashPacket;
-import net.noahsarch.deeperdark.payload.VoidFogSyncPacket;
+import net.noahsarch.deeperdark.payload.ConfigSyncPayload;
+import net.noahsarch.deeperdark.config.ConfigOptions;
 
 @Environment(EnvType.CLIENT)
 public class DeeperDarkClient implements ClientModInitializer {
@@ -132,8 +133,22 @@ public class DeeperDarkClient implements ClientModInitializer {
 
         VoidParticleHandler.register();
 
-        ClientPlayNetworking.registerGlobalReceiver(VoidFogSyncPacket.ID, (payload, context) ->
-                DeeperDarkConfig.get().voidFogEnabled = payload.enabled());
+        ClientPlayNetworking.registerGlobalReceiver(ConfigSyncPayload.ID, (payload, context) -> {
+            payload.values().forEach((key, value) -> {
+                var option = ConfigOptions.SERVER.get(key);
+                if (option != null) option.set(DeeperDarkConfig.get(), value);
+            });
+            var connection = context.client().getConnection();
+            // The set is only read while the setting is on
+            if (connection != null && DeeperDarkConfig.get().allIngredientsConsumable) {
+                IngredientItemRegistry.buildIngredientSet(connection.registryAccess());
+            }
+        });
+        // Drop a remote server's synced values so they don't carry over into the next world.
+        // Singleplayer shares the integrated server's config object, so it needs no reload.
+        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+            if (!client.hasSingleplayerServer()) DeeperDarkConfig.load();
+        });
 
         ClientPlayNetworking.registerGlobalReceiver(ConfigMenuPayload.ID, (payload, context) -> {
             Minecraft mc = context.client();
@@ -142,16 +157,6 @@ public class DeeperDarkClient implements ClientModInitializer {
 
         ClientPlayNetworking.registerGlobalReceiver(OpenFromScreenPayload.ID, (payload, context) ->
                 fromScreenContainerId = payload.containerId());
-
-        ClientPlayNetworking.registerGlobalReceiver(AllIngredientsConsumableSyncPacket.ID, (payload, context) -> {
-            DeeperDarkConfig.get().allIngredientsConsumable = payload.enabled();
-            context.client().execute(() -> {
-                var connection = context.client().getConnection();
-                if (connection != null) {
-                    IngredientItemRegistry.buildIngredientSet(connection.registryAccess());
-                }
-            });
-        });
 
         ClientTickEvents.START_CLIENT_TICK.register(client -> {
             if (!updateCheckShown && client.screen instanceof TitleScreen) {

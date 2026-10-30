@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -44,7 +45,9 @@ public final class ConfigOptions {
             G.integer("piston_push_limit", 1, 1000, c -> c.pistonPushLimit, (c, v) -> c.pistonPushLimit = v),
             G.bool("void_fog_enabled", c -> c.voidFogEnabled, (c, v) -> c.voidFogEnabled = v),
             G.bool("all_ingredients_consumable", c -> c.allIngredientsConsumable, (c, v) -> c.allIngredientsConsumable = v),
-            G.bool("unlock_all_recipes", c -> c.unlockAllRecipes, (c, v) -> c.unlockAllRecipes = v))),
+            G.bool("unlock_all_recipes", c -> c.unlockAllRecipes, (c, v) -> c.unlockAllRecipes = v),
+            G.bool("small_nether_portals", c -> c.smallNetherPortals, (c, v) -> c.smallNetherPortals = v),
+            G.bool("nether_roof_elytra_burn", c -> c.netherRoofElytraBurn, (c, v) -> c.netherRoofElytraBurn = v))),
         new Category("mobs", Items.ZOMBIE_HEAD, List.of(
             G.integer("creeper_effect_min_seconds", 1, MAX, c -> c.creeperEffectMinSeconds, (c, v) -> c.creeperEffectMinSeconds = v),
             G.integer("creeper_effect_max_seconds", 1, MAX, c -> c.creeperEffectMaxSeconds, (c, v) -> c.creeperEffectMaxSeconds = v),
@@ -53,7 +56,11 @@ public final class ConfigOptions {
             G.bool("baby_spiders_enabled", c -> c.babySpidersEnabled, (c, v) -> c.babySpidersEnabled = v),
             G.bool("enderman_pick_up_all_blocks", c -> c.endermanPickUpAllBlocks, (c, v) -> c.endermanPickUpAllBlocks = v),
             G.decimal("zombie_follow_range", 1, 128, c -> c.zombieFollowRange, (c, v) -> c.zombieFollowRange = v),
-            G.integer("fishing_charged_creeper_chance", 1, MAX, c -> c.fishingChargedCreeperChance, (c, v) -> c.fishingChargedCreeperChance = v))),
+            G.integer("fishing_charged_creeper_chance", 1, MAX, c -> c.fishingChargedCreeperChance, (c, v) -> c.fishingChargedCreeperChance = v),
+            G.bool("squid_milking", c -> c.squidMilking, (c, v) -> c.squidMilking = v),
+            G.bool("villager_emerald_tempt", c -> c.villagerEmeraldTempt, (c, v) -> c.villagerEmeraldTempt = v),
+            G.bool("villager_leashing", c -> c.villagerLeashing, (c, v) -> c.villagerLeashing = v),
+            G.bool("explosive_zombie_villager_cure", c -> c.explosiveZombieVillagerCure, (c, v) -> c.explosiveZombieVillagerCure = v))),
         new Category("fortune", Items.DIAMOND_PICKAXE, List.of(
             G.bool("custom_fortune_enabled", c -> c.customFortuneEnabled, (c, v) -> c.customFortuneEnabled = v),
             G.decimal("fortune_1_drop_chance", 0, 1, c -> c.fortune1DropChance, (c, v) -> c.fortune1DropChance = v),
@@ -62,7 +69,8 @@ public final class ConfigOptions {
             G.integer("fortune_max_drops", 1, MAX, c -> c.fortuneMaxDrops, (c, v) -> c.fortuneMaxDrops = v))),
         new Category("explosions", Items.TNT, List.of(
             G.bool("explosion_item_knockback_enabled", c -> c.explosionItemKnockbackEnabled, (c, v) -> c.explosionItemKnockbackEnabled = v),
-            G.decimal("explosion_item_knockback_multiplier", 1, MAX, c -> c.explosionItemKnockbackMultiplier, (c, v) -> c.explosionItemKnockbackMultiplier = v))),
+            G.decimal("explosion_item_knockback_multiplier", 1, MAX, c -> c.explosionItemKnockbackMultiplier, (c, v) -> c.explosionItemKnockbackMultiplier = v),
+            G.bool("explosions_drop_all_blocks", c -> c.explosionsDropAllBlocks, (c, v) -> c.explosionsDropAllBlocks = v))),
         new Category("moss", Items.MOSSY_COBBLESTONE, List.of(
             G.bool("moss_growth_enabled", c -> c.mossGrowthEnabled, (c, v) -> c.mossGrowthEnabled = v),
             G.integer("moss_tick_check_frequency", 1, MAX, c -> c.mossTickCheckFrequency, (c, v) -> c.mossTickCheckFrequency = v),
@@ -78,6 +86,40 @@ public final class ConfigOptions {
             G.integer("leaves_decay_min_ticks", 1, MAX, c -> c.leavesDecayMinTicks, (c, v) -> c.leavesDecayMinTicks = v),
             G.integer("leaves_decay_max_ticks", 1, MAX, c -> c.leavesDecayMaxTicks, (c, v) -> c.leavesDecayMaxTicks = v),
             G.bool("leaves_be_gone_ignore_other_leaf_types", c -> c.leavesBeGoneIgnoreOtherLeafTypes, (c, v) -> c.leavesBeGoneIgnoreOtherLeafTypes = v))),
+        new Category("players", Items.SADDLE, List.of(
+            G.bool("bone_on_head", c -> c.boneOnHead, (c, v) -> c.boneOnHead = v),
+            G.bool("fish_on_head", c -> c.fishOnHead, (c, v) -> c.fishOnHead = v),
+            G.bool("any_item_on_head", c -> c.anyItemOnHead, (c, v) -> c.anyItemOnHead = v),
+            G.bool("player_leashing", c -> c.playerLeashing, (c, v) -> c.playerLeashing = v),
+            G.bool("player_riding", c -> c.playerRiding, (c, v) -> c.playerRiding = v),
+            G.bool("armor_stand_arms", c -> c.armorStandArms, (c, v) -> c.armorStandArms = v),
+            G.bool("armor_stand_offhand", c -> c.armorStandOffhand, (c, v) -> c.armorStandOffhand = v))),
+        new Category("items", Items.SHULKER_BOX, List.of(
+            G.bool("open_container_items", c -> c.openContainerItems, (c, v) -> c.openContainerItems = v),
+            G.bool("pick_block_from_containers", c -> c.pickBlockFromContainers, (c, v) -> c.pickBlockFromContainers = v),
+            G.bool("fixed_xp_bottle_reward", c -> c.fixedXpBottleReward, (c, v) -> c.fixedXpBottleReward = v),
+            G.bool("splash_water_extinguishes", c -> c.splashWaterExtinguishes, (c, v) -> c.splashWaterExtinguishes = v))),
+        new Category("enchanting", Items.ENCHANTING_TABLE, List.of(
+            G.bool("golden_tools_silk_touch", c -> c.goldenToolsSilkTouch, (c, v) -> c.goldenToolsSilkTouch = v),
+            G.bool("unbreaking_v", c -> c.unbreakingV, (c, v) -> c.unbreakingV = v),
+            G.bool("fortune_xp_bonus", c -> c.fortuneXpBonus, (c, v) -> c.fortuneXpBonus = v),
+            G.bool("shears_enchantable", c -> c.shearsEnchantable, (c, v) -> c.shearsEnchantable = v),
+            G.bool("unlimited_loom_patterns", c -> c.unlimitedLoomPatterns, (c, v) -> c.unlimitedLoomPatterns = v))),
+        new Category("blocks", Items.OAK_SAPLING, List.of(
+            G.bool("fire_coarse_dirt", c -> c.fireCoarseDirt, (c, v) -> c.fireCoarseDirt = v),
+            G.bool("nether_ice_evaporates", c -> c.netherIceEvaporates, (c, v) -> c.netherIceEvaporates = v),
+            G.bool("feather_falling_protects_farmland", c -> c.featherFallingProtectsFarmland, (c, v) -> c.featherFallingProtectsFarmland = v),
+            G.bool("beacon_full_height", c -> c.beaconFullHeight, (c, v) -> c.beaconFullHeight = v),
+            G.bool("crafting_sound", c -> c.craftingSound, (c, v) -> c.craftingSound = v),
+            G.bool("organ_note_block", c -> c.organNoteBlock, (c, v) -> c.organNoteBlock = v),
+            G.bool("giant_oak_trees", c -> c.giantOakTrees, (c, v) -> c.giantOakTrees = v),
+            G.bool("compact_tree_growth", c -> c.compactTreeGrowth, (c, v) -> c.compactTreeGrowth = v),
+            G.bool("podzol_spreading", c -> c.podzolSpreading, (c, v) -> c.podzolSpreading = v),
+            G.bool("ladder_tweaks", c -> c.ladderTweaks, (c, v) -> c.ladderTweaks = v))),
+        new Category("movement", Items.LEATHER_BOOTS, List.of(
+            G.bool("any_boots_on_powder_snow", c -> c.anyBootsOnPowderSnow, (c, v) -> c.anyBootsOnPowderSnow = v),
+            G.bool("depth_strider_in_lava", c -> c.depthStriderInLava, (c, v) -> c.depthStriderInLava = v),
+            G.bool("boat_step_up", c -> c.boatStepUp, (c, v) -> c.boatStepUp = v))),
         new Category("magnets", ModItems.IRON_ITEM_MAGNET, List.of(
             G.decimal("copper_magnet_radius", 0, 256, c -> c.itemMagnet.copper.radius, (c, v) -> c.itemMagnet.copper.radius = v),
             G.decimal("copper_magnet_strength", 0, 10, c -> c.itemMagnet.copper.passiveStrength, (c, v) -> c.itemMagnet.copper.passiveStrength = v),
@@ -132,6 +174,14 @@ public final class ConfigOptions {
     public static final Map<String, ConfigOption<ConfigInstance>> SERVER = CATEGORIES.stream()
         .flatMap(category -> category.options().stream())
         .collect(Collectors.toMap(ConfigOption::key, Function.identity()));
+
+    /** Server settings that client-side code also reads; {@link ConfigSync} sends them to every client. */
+    public static final Set<String> SYNCED = Set.of(
+        "void_fog_enabled", "all_ingredients_consumable", "sword_blocking_enabled", "sword_blocking_requires_no_shield",
+        "small_nether_portals", "squid_milking", "villager_leashing", "explosive_zombie_villager_cure",
+        "any_item_on_head", "player_leashing", "player_riding", "armor_stand_arms", "armor_stand_offhand",
+        "open_container_items", "pick_block_from_containers", "unlimited_loom_patterns",
+        "organ_note_block", "ladder_tweaks", "any_boots_on_powder_snow", "depth_strider_in_lava", "boat_step_up");
 
     /** A player's sound profile: what everyone hears when that player chats, dies, joins or is hurt. */
     public static final List<ConfigOption<PlayerSoundProfile>> PROFILE = List.of(

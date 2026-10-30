@@ -8,10 +8,8 @@ import net.minecraft.server.permissions.Permission;
 import net.minecraft.server.permissions.PermissionLevel;
 import net.noahsarch.deeperdark.DeeperDarkConfig;
 import net.noahsarch.deeperdark.command.PlayerSoundsCommands;
-import net.noahsarch.deeperdark.payload.AllIngredientsConsumableSyncPacket;
 import net.noahsarch.deeperdark.payload.ConfigChangesPayload;
 import net.noahsarch.deeperdark.payload.ConfigMenuPayload;
-import net.noahsarch.deeperdark.payload.VoidFogSyncPacket;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -71,14 +69,7 @@ public final class ConfigMenu {
 
         DeeperDarkConfig.save();
         LOGGER.info("{} changed DeeperDark settings: {}", self, applied);
-        if (applied.contains("void_fog_enabled")) {
-            VoidFogSyncPacket packet = new VoidFogSyncPacket(config.voidFogEnabled);
-            player.level().getServer().getPlayerList().getPlayers().forEach(p -> ServerPlayNetworking.send(p, packet));
-        }
-        if (applied.contains("all_ingredients_consumable")) {
-            AllIngredientsConsumableSyncPacket packet = new AllIngredientsConsumableSyncPacket(config.allIngredientsConsumable);
-            player.level().getServer().getPlayerList().getPlayers().forEach(p -> ServerPlayNetworking.send(p, packet));
-        }
+        ConfigSync.broadcastIfSynced(player.level().getServer(), applied);
         player.sendSystemMessage(Component.translatable("deeperdark.config.saved", applied.size()).withStyle(ChatFormatting.GREEN));
     }
 

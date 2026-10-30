@@ -1,5 +1,6 @@
 package net.noahsarch.deeperdark.mixin;
 
+import net.noahsarch.deeperdark.DeeperDarkConfig;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.vehicle.boat.AbstractBoat;
@@ -33,7 +34,7 @@ public abstract class AbstractBoatEntityMixin extends Entity {
 
     @Override
     public float maxUpStep() {
-        return 1.2F;
+        return DeeperDarkConfig.get().boatStepUp ? 1.2F : super.maxUpStep();
     }
 
     @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))

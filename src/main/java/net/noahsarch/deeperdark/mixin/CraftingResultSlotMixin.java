@@ -1,5 +1,6 @@
 package net.noahsarch.deeperdark.mixin;
 
+import net.noahsarch.deeperdark.DeeperDarkConfig;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.CraftingContainer;
@@ -82,7 +83,7 @@ public abstract class CraftingResultSlotMixin {
     @Inject(method = "onTake", at = @At("HEAD"))
     private void deeperdark$playCraftingSound(Player player, ItemStack stack, CallbackInfo ci) {
         Level world = ((EntityAccessor)player).deeperdark$getWorld();
-        if (player instanceof ServerPlayer serverPlayer && world instanceof ServerLevel serverWorld) {
+        if (DeeperDarkConfig.get().craftingSound && player instanceof ServerPlayer serverPlayer && world instanceof ServerLevel serverWorld) {
             // Check debounce - only play sound if enough time has passed since last craft
             UUID playerUUID = player.getUUID();
             long currentTime = System.currentTimeMillis();

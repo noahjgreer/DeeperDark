@@ -1,5 +1,6 @@
 package net.noahsarch.deeperdark.event;
 
+import net.noahsarch.deeperdark.DeeperDarkConfig;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -29,7 +30,7 @@ public class PlayerTickHandler {
                     handleElytraDamage(player);
                 } else if (world.dimension().equals(Level.NETHER)) {
                     // Check if player is on the Nether roof (above Y=127)
-                    if (player.getY() > 127.0) {
+                    if (player.getY() > 127.0 && DeeperDarkConfig.get().netherRoofElytraBurn) {
                         if (handleElytraDamage(player)) {
                             // Play sizzling sound occasionally
                             if (player.tickCount % 2 == 0) {

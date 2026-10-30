@@ -1,5 +1,6 @@
 package net.noahsarch.deeperdark.mixin;
 
+import net.noahsarch.deeperdark.DeeperDarkConfig;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -16,7 +17,7 @@ public class EnchantmentHelperMixin {
 
     @Inject(method = "getItemEnchantmentLevel", at = @At("RETURN"), cancellable = true)
     private static void deeperdark$implicitSilkTouch(Holder<Enchantment> enchantment, ItemInstance stack, CallbackInfoReturnable<Integer> cir) {
-        if (cir.getReturnValue() == 0) {
+        if (cir.getReturnValue() == 0 && DeeperDarkConfig.get().goldenToolsSilkTouch) {
             if (enchantment.is(Enchantments.SILK_TOUCH)) {
                 if (stack.is(Items.GOLDEN_PICKAXE) ||
                     stack.is(Items.GOLDEN_AXE) ||

@@ -1,5 +1,6 @@
 package net.noahsarch.deeperdark.mixin;
 
+import net.noahsarch.deeperdark.DeeperDarkConfig;
 import net.minecraft.world.level.levelgen.feature.TreeFeature;
 import net.minecraft.world.level.levelgen.feature.featuresize.FeatureSize;
 import org.spongepowered.asm.mixin.Mixin;
@@ -21,6 +22,6 @@ public class TreeFeatureMixin {
     @Redirect(method = "getMaxFreeTreeHeight", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/level/levelgen/feature/featuresize/FeatureSize;getSizeAtHeight(II)I"))
     private int deeperdark$onlyCheckTrunkColumn(FeatureSize size, int treeHeight, int yo) {
-        return 0;
+        return DeeperDarkConfig.get().compactTreeGrowth ? 0 : size.getSizeAtHeight(treeHeight, yo);
     }
 }

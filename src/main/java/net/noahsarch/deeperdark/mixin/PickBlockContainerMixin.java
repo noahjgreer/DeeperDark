@@ -1,5 +1,6 @@
 package net.noahsarch.deeperdark.mixin;
 
+import net.noahsarch.deeperdark.DeeperDarkConfig;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -42,7 +43,7 @@ public class PickBlockContainerMixin {
     @Inject(method = "pickBlockOrEntity", at = @At("HEAD"), cancellable = true)
     private void deeperdark$pickFromContainers(CallbackInfo ci) {
         LOG.info("[DD-pick] pickBlockOrEntity fired, creative={}", player != null && player.getAbilities().instabuild);
-        if (player == null || player.getAbilities().instabuild) return;
+        if (player == null || player.getAbilities().instabuild || !DeeperDarkConfig.get().pickBlockFromContainers) return;
         if (!(hitResult instanceof BlockHitResult blockHit)) return;
         if (level == null) return;
 

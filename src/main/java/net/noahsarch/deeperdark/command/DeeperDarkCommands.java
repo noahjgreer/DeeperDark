@@ -1,6 +1,8 @@
 package net.noahsarch.deeperdark.command;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.ArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -14,13 +16,14 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.ChatFormatting;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.noahsarch.deeperdark.DeeperDarkConfig;
 import net.noahsarch.deeperdark.config.ConfigMenu;
-import net.noahsarch.deeperdark.payload.AllIngredientsConsumableSyncPacket;
-import net.noahsarch.deeperdark.payload.VoidFogSyncPacket;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.noahsarch.deeperdark.config.ConfigOption;
+import net.noahsarch.deeperdark.config.ConfigOptions;
+import net.noahsarch.deeperdark.config.ConfigSync;
 import net.minecraft.server.permissions.Permission;
 import net.minecraft.server.permissions.PermissionLevel;
 //? if >=26.3 {
@@ -28,6 +31,7 @@ import net.minecraft.server.permissions.PermissionLevel;
 *///?}
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
@@ -45,12 +49,12 @@ import java.util.function.Supplier;
  *   /dd give <item> [amount]
  *   /dd reload
  *   /dd border origin/radius/force/info
- *   /dd border config allow_entity_spawning / push_survival_only
+ *   /dd border config allow_entity_spawning / push_survival_only [value]
  *   /dd creature clear/list/summon/spawn/config ...
  *   /dd creepiness [config <setting> [value] | trigger <haunt> [player]]
  *   /dd player_sounds [toggle] / volume / send / death / join / hurt / pitch / pitchdeviance
  *   /dd player_sounds set <player> ...   (op only)
- *   /dd config list / <snake_case_setting> [value]
+ *   /dd config list / <setting> [value]   (generated from ConfigOptions: every setting in the menu)
  */
 public class DeeperDarkCommands {
 
@@ -94,14 +98,8 @@ public class DeeperDarkCommands {
                 .then(Commands.literal("info")
                     .executes(DeeperDarkCommands::executeBorderInfo))
                 .then(Commands.literal("config")
-                    .then(Commands.literal("allow_entity_spawning")
-                        .executes(ctx -> executeConfigQuery(ctx, "allow_entity_spawning"))
-                        .then(Commands.argument("value", BoolArgumentType.bool())
-                            .executes(ctx -> executeConfigBoolean(ctx, "allow_entity_spawning"))))
-                    .then(Commands.literal("push_survival_only")
-                        .executes(ctx -> executeConfigQuery(ctx, "push_survival_only"))
-                        .then(Commands.argument("value", BoolArgumentType.bool())
-                            .executes(ctx -> executeConfigBoolean(ctx, "push_survival_only"))))))
+                    .then(optionNode(ConfigOptions.SERVER.get("allow_entity_spawning")))
+                    .then(optionNode(ConfigOptions.SERVER.get("push_survival_only")))))
 
             // dd creature (delegated to CreatureCommands)
             .then(net.noahsarch.deeperdark.creature.CreatureCommands.buildCreatureCommand()
@@ -114,135 +112,8 @@ public class DeeperDarkCommands {
             // dd player_sounds (any player; set <player> requires op)
             .then(PlayerSoundsCommands.buildPlayerSoundsCommand())
 
-            // dd config <snake_case_setting> [value]
-            .then(Commands.literal("config")
-                .requires(IS_OP)
-                .then(Commands.literal("list")
-                    .executes(DeeperDarkCommands::executeConfigList))
-
-                // Nether
-                .then(Commands.literal("nether_coordinate_multiplier")
-                    .executes(ctx -> executeConfigQuery(ctx, "nether_coordinate_multiplier"))
-                    .then(Commands.argument("value", DoubleArgumentType.doubleArg(0.0))
-                        .executes(ctx -> executeConfigDouble(ctx, "nether_coordinate_multiplier"))))
-
-                // Piston
-                .then(Commands.literal("piston_push_limit")
-                    .executes(ctx -> executeConfigQuery(ctx, "piston_push_limit"))
-                    .then(Commands.argument("value", IntegerArgumentType.integer(1, 1000))
-                        .executes(ctx -> executeConfigInt(ctx, "piston_push_limit"))))
-
-                // Enderman
-                .then(Commands.literal("enderman_pick_up_all_blocks")
-                    .executes(ctx -> executeConfigQuery(ctx, "enderman_pick_up_all_blocks"))
-                    .then(Commands.argument("value", BoolArgumentType.bool())
-                        .executes(ctx -> executeConfigBoolean(ctx, "enderman_pick_up_all_blocks"))))
-
-                // Baby mobs
-                .then(Commands.literal("baby_skeletons_enabled")
-                    .executes(ctx -> executeConfigQuery(ctx, "baby_skeletons_enabled"))
-                    .then(Commands.argument("value", BoolArgumentType.bool())
-                        .executes(ctx -> executeConfigBoolean(ctx, "baby_skeletons_enabled"))))
-                .then(Commands.literal("baby_creepers_enabled")
-                    .executes(ctx -> executeConfigQuery(ctx, "baby_creepers_enabled"))
-                    .then(Commands.argument("value", BoolArgumentType.bool())
-                        .executes(ctx -> executeConfigBoolean(ctx, "baby_creepers_enabled"))))
-                .then(Commands.literal("baby_spiders_enabled")
-                    .executes(ctx -> executeConfigQuery(ctx, "baby_spiders_enabled"))
-                    .then(Commands.argument("value", BoolArgumentType.bool())
-                        .executes(ctx -> executeConfigBoolean(ctx, "baby_spiders_enabled"))))
-
-                // Creeper effects
-                .then(Commands.literal("creeper_effect_min_seconds")
-                    .executes(ctx -> executeConfigQuery(ctx, "creeper_effect_min_seconds"))
-                    .then(Commands.argument("value", IntegerArgumentType.integer(1))
-                        .executes(ctx -> executeConfigInt(ctx, "creeper_effect_min_seconds"))))
-                .then(Commands.literal("creeper_effect_max_seconds")
-                    .executes(ctx -> executeConfigQuery(ctx, "creeper_effect_max_seconds"))
-                    .then(Commands.argument("value", IntegerArgumentType.integer(1))
-                        .executes(ctx -> executeConfigInt(ctx, "creeper_effect_max_seconds"))))
-
-                // Fortune
-                .then(Commands.literal("custom_fortune_enabled")
-                    .executes(ctx -> executeConfigQuery(ctx, "custom_fortune_enabled"))
-                    .then(Commands.argument("value", BoolArgumentType.bool())
-                        .executes(ctx -> executeConfigBoolean(ctx, "custom_fortune_enabled"))))
-                .then(Commands.literal("fortune_1_drop_chance")
-                    .executes(ctx -> executeConfigQuery(ctx, "fortune_1_drop_chance"))
-                    .then(Commands.argument("value", DoubleArgumentType.doubleArg(0.0, 1.0))
-                        .executes(ctx -> executeConfigDouble(ctx, "fortune_1_drop_chance"))))
-                .then(Commands.literal("fortune_2_drop_chance")
-                    .executes(ctx -> executeConfigQuery(ctx, "fortune_2_drop_chance"))
-                    .then(Commands.argument("value", DoubleArgumentType.doubleArg(0.0, 1.0))
-                        .executes(ctx -> executeConfigDouble(ctx, "fortune_2_drop_chance"))))
-                .then(Commands.literal("fortune_3_drop_chance")
-                    .executes(ctx -> executeConfigQuery(ctx, "fortune_3_drop_chance"))
-                    .then(Commands.argument("value", DoubleArgumentType.doubleArg(0.0, 1.0))
-                        .executes(ctx -> executeConfigDouble(ctx, "fortune_3_drop_chance"))))
-                .then(Commands.literal("fortune_max_drops")
-                    .executes(ctx -> executeConfigQuery(ctx, "fortune_max_drops"))
-                    .then(Commands.argument("value", IntegerArgumentType.integer(1))
-                        .executes(ctx -> executeConfigInt(ctx, "fortune_max_drops"))))
-
-                // Explosion item knockback
-                .then(Commands.literal("explosion_item_knockback_enabled")
-                    .executes(ctx -> executeConfigQuery(ctx, "explosion_item_knockback_enabled"))
-                    .then(Commands.argument("value", BoolArgumentType.bool())
-                        .executes(ctx -> executeConfigBoolean(ctx, "explosion_item_knockback_enabled"))))
-                .then(Commands.literal("explosion_item_knockback_multiplier")
-                    .executes(ctx -> executeConfigQuery(ctx, "explosion_item_knockback_multiplier"))
-                    .then(Commands.argument("value", DoubleArgumentType.doubleArg(1.0))
-                        .executes(ctx -> executeConfigDouble(ctx, "explosion_item_knockback_multiplier"))))
-
-                // Fishing
-                .then(Commands.literal("fishing_charged_creeper_chance")
-                    .executes(ctx -> executeConfigQuery(ctx, "fishing_charged_creeper_chance"))
-                    .then(Commands.argument("value", IntegerArgumentType.integer(1))
-                        .executes(ctx -> executeConfigInt(ctx, "fishing_charged_creeper_chance"))))
-
-                // Moss growth
-                .then(Commands.literal("moss_growth_enabled")
-                    .executes(ctx -> executeConfigQuery(ctx, "moss_growth_enabled"))
-                    .then(Commands.argument("value", BoolArgumentType.bool())
-                        .executes(ctx -> executeConfigBoolean(ctx, "moss_growth_enabled"))))
-                .then(Commands.literal("moss_tick_check_frequency")
-                    .executes(ctx -> executeConfigQuery(ctx, "moss_tick_check_frequency"))
-                    .then(Commands.argument("value", IntegerArgumentType.integer(1))
-                        .executes(ctx -> executeConfigInt(ctx, "moss_tick_check_frequency"))))
-                .then(Commands.literal("moss_base_chance")
-                    .executes(ctx -> executeConfigQuery(ctx, "moss_base_chance"))
-                    .then(Commands.argument("value", DoubleArgumentType.doubleArg(0.0, 1.0))
-                        .executes(ctx -> executeConfigDouble(ctx, "moss_base_chance"))))
-                .then(Commands.literal("moss_nearby_bonus")
-                    .executes(ctx -> executeConfigQuery(ctx, "moss_nearby_bonus"))
-                    .then(Commands.argument("value", DoubleArgumentType.doubleArg(0.0, 1.0))
-                        .executes(ctx -> executeConfigDouble(ctx, "moss_nearby_bonus"))))
-                .then(Commands.literal("moss_underwater_multiplier")
-                    .executes(ctx -> executeConfigQuery(ctx, "moss_underwater_multiplier"))
-                    .then(Commands.argument("value", DoubleArgumentType.doubleArg(0.1))
-                        .executes(ctx -> executeConfigDouble(ctx, "moss_underwater_multiplier"))))
-                .then(Commands.literal("stone_brick_moss_multiplier")
-                    .executes(ctx -> executeConfigQuery(ctx, "stone_brick_moss_multiplier"))
-                    .then(Commands.argument("value", DoubleArgumentType.doubleArg(0.0))
-                        .executes(ctx -> executeConfigDouble(ctx, "stone_brick_moss_multiplier"))))
-
-                // Zombie
-                .then(Commands.literal("zombie_follow_range")
-                    .executes(ctx -> executeConfigQuery(ctx, "zombie_follow_range"))
-                    .then(Commands.argument("value", DoubleArgumentType.doubleArg(1.0, 128.0))
-                        .executes(ctx -> executeConfigDouble(ctx, "zombie_follow_range"))))
-
-                // Void fog (client rendering; synced to all players via packet)
-                .then(Commands.literal("void_fog_enabled")
-                    .executes(ctx -> executeConfigQuery(ctx, "void_fog_enabled"))
-                    .then(Commands.argument("value", BoolArgumentType.bool())
-                        .executes(ctx -> executeVoidFogEnabled(ctx))))
-
-                // All ingredients consumable (synced to all players via packet)
-                .then(Commands.literal("all_ingredients_consumable")
-                    .executes(ctx -> executeConfigQuery(ctx, "all_ingredients_consumable"))
-                    .then(Commands.argument("value", BoolArgumentType.bool())
-                        .executes(ctx -> executeAllIngredientsConsumable(ctx)))))
+            // dd config list / <setting> [value]: every setting in the /dd menu
+            .then(configCommand())
 
             // dd reload
             .then(Commands.literal("reload")
@@ -375,54 +246,39 @@ public class DeeperDarkCommands {
         return 1;
     }
 
-    // ===== Config list =====
+    // ===== Config (generated from ConfigOptions) =====
+
+    private static LiteralArgumentBuilder<CommandSourceStack> configCommand() {
+        LiteralArgumentBuilder<CommandSourceStack> config = Commands.literal("config")
+            .requires(IS_OP)
+            .then(Commands.literal("list").executes(DeeperDarkCommands::executeConfigList));
+        ConfigOptions.SERVER.values().forEach(option -> config.then(optionNode(option)));
+        return config;
+    }
+
+    private static LiteralArgumentBuilder<CommandSourceStack> optionNode(ConfigOption<DeeperDarkConfig.ConfigInstance> option) {
+        ArgumentType<?> type = switch (option.kind()) {
+            case BOOL -> BoolArgumentType.bool();
+            case INT -> IntegerArgumentType.integer((int) option.min(), (int) option.max());
+            case DOUBLE -> DoubleArgumentType.doubleArg(option.min(), option.max());
+            case SOUND -> StringArgumentType.string();
+        };
+        return Commands.literal(option.key())
+            .executes(ctx -> executeConfigQuery(ctx, option))
+            .then(Commands.argument("value", type).executes(ctx -> executeConfigSet(ctx, option)));
+    }
 
     private static int executeConfigList(CommandContext<CommandSourceStack> context) {
-        CommandSourceStack source = context.getSource();
         DeeperDarkConfig.ConfigInstance config = DeeperDarkConfig.get();
-
-        source.sendSuccess(() -> Component.literal("===== DeeperDark General Configuration =====").withStyle(ChatFormatting.GOLD)
-            .append(Component.literal("\n(Border settings: /dd border config)").withStyle(ChatFormatting.GRAY))
-            .append(Component.literal("\n(Creature settings: /dd creature config)").withStyle(ChatFormatting.GRAY))
-            .append(Component.literal("\n(Creepiness settings: /dd creepiness config)").withStyle(ChatFormatting.GRAY))
-            .append(Component.literal("\n\n--- Nether ---").withStyle(ChatFormatting.YELLOW))
-            .append(formatConfigLine("nether_coordinate_multiplier", config.netherCoordinateMultiplier))
-            .append(Component.literal("\n\n--- Creeper ---").withStyle(ChatFormatting.YELLOW))
-            .append(formatConfigLine("creeper_effect_min_seconds", config.creeperEffectMinSeconds))
-            .append(formatConfigLine("creeper_effect_max_seconds", config.creeperEffectMaxSeconds))
-            .append(Component.literal("\n\n--- Fortune ---").withStyle(ChatFormatting.YELLOW))
-            .append(formatConfigLine("custom_fortune_enabled", config.customFortuneEnabled))
-            .append(formatConfigLine("fortune_1_drop_chance", config.fortune1DropChance))
-            .append(formatConfigLine("fortune_2_drop_chance", config.fortune2DropChance))
-            .append(formatConfigLine("fortune_3_drop_chance", config.fortune3DropChance))
-            .append(formatConfigLine("fortune_max_drops", config.fortuneMaxDrops))
-            .append(Component.literal("\n\n--- Explosion ---").withStyle(ChatFormatting.YELLOW))
-            .append(formatConfigLine("explosion_item_knockback_enabled", config.explosionItemKnockbackEnabled))
-            .append(formatConfigLine("explosion_item_knockback_multiplier", config.explosionItemKnockbackMultiplier))
-            .append(Component.literal("\n\n--- Piston ---").withStyle(ChatFormatting.YELLOW))
-            .append(formatConfigLine("piston_push_limit", config.pistonPushLimit))
-            .append(Component.literal("\n\n--- Enderman ---").withStyle(ChatFormatting.YELLOW))
-            .append(formatConfigLine("enderman_pick_up_all_blocks", config.endermanPickUpAllBlocks))
-            .append(Component.literal("\n\n--- Baby Mobs ---").withStyle(ChatFormatting.YELLOW))
-            .append(formatConfigLine("baby_skeletons_enabled", config.babySkeletonsEnabled))
-            .append(formatConfigLine("baby_creepers_enabled", config.babyCreepersEnabled))
-            .append(formatConfigLine("baby_spiders_enabled", config.babySpidersEnabled))
-            .append(Component.literal("\n\n--- Fishing ---").withStyle(ChatFormatting.YELLOW))
-            .append(formatConfigLine("fishing_charged_creeper_chance", config.fishingChargedCreeperChance))
-            .append(Component.literal("\n\n--- Moss Growth ---").withStyle(ChatFormatting.YELLOW))
-            .append(formatConfigLine("moss_growth_enabled", config.mossGrowthEnabled))
-            .append(formatConfigLine("moss_tick_check_frequency", config.mossTickCheckFrequency))
-            .append(formatConfigLine("moss_base_chance", config.mossBaseChance))
-            .append(formatConfigLine("moss_nearby_bonus", config.mossNearbyBonus))
-            .append(formatConfigLine("moss_underwater_multiplier", config.mossUnderwaterMultiplier))
-            .append(formatConfigLine("stone_brick_moss_multiplier", config.stoneBrickMossMultiplier))
-            .append(Component.literal("\n\n--- Zombie ---").withStyle(ChatFormatting.YELLOW))
-            .append(formatConfigLine("zombie_follow_range", config.zombieFollowRange))
-            .append(Component.literal("\n\n--- Void Fog ---").withStyle(ChatFormatting.YELLOW))
-            .append(formatConfigLine("void_fog_enabled", config.voidFogEnabled))
-            .append(Component.literal("\n\n--- Ingredients ---").withStyle(ChatFormatting.YELLOW))
-            .append(formatConfigLine("all_ingredients_consumable", config.allIngredientsConsumable))
-            .append(Component.literal("\n\nUse /dd config <setting> [value] to change or query").withStyle(ChatFormatting.GRAY)), false);
+        MutableComponent message = Component.literal("===== DeeperDark Configuration =====").withStyle(ChatFormatting.GOLD);
+        for (ConfigOptions.Category category : ConfigOptions.CATEGORIES) {
+            message.append(Component.literal("\n\n--- ").withStyle(ChatFormatting.YELLOW))
+                .append(Component.translatable("deeperdark.config.category." + category.id()).withStyle(ChatFormatting.YELLOW))
+                .append(Component.literal(" ---").withStyle(ChatFormatting.YELLOW));
+            category.options().forEach(option -> message.append(formatConfigLine(option.key(), option.get(config))));
+        }
+        message.append(Component.literal("\n\nUse /dd config <setting> [value] to change or query").withStyle(ChatFormatting.GRAY));
+        context.getSource().sendSuccess(() -> message, false);
         return 1;
     }
 
@@ -431,180 +287,26 @@ public class DeeperDarkCommands {
             .append(Component.literal(String.valueOf(value)).withStyle(ChatFormatting.AQUA));
     }
 
-    // ===== Config query/set =====
-
-    private static int executeConfigQuery(CommandContext<CommandSourceStack> context, String key) {
-        CommandSourceStack source = context.getSource();
-        DeeperDarkConfig.ConfigInstance config = DeeperDarkConfig.get();
-        Object value = switch (key) {
-            // Border (via dd border config)
-            case "allow_entity_spawning"              -> config.allowEntitySpawning;
-            case "push_survival_only"                 -> config.pushSurvivalModeOnly;
-            // General
-            case "nether_coordinate_multiplier"       -> config.netherCoordinateMultiplier;
-            case "creeper_effect_min_seconds"         -> config.creeperEffectMinSeconds;
-            case "creeper_effect_max_seconds"         -> config.creeperEffectMaxSeconds;
-            case "custom_fortune_enabled"             -> config.customFortuneEnabled;
-            case "fortune_1_drop_chance"              -> config.fortune1DropChance;
-            case "fortune_2_drop_chance"              -> config.fortune2DropChance;
-            case "fortune_3_drop_chance"              -> config.fortune3DropChance;
-            case "fortune_max_drops"                  -> config.fortuneMaxDrops;
-            case "explosion_item_knockback_enabled"   -> config.explosionItemKnockbackEnabled;
-            case "explosion_item_knockback_multiplier"-> config.explosionItemKnockbackMultiplier;
-            case "piston_push_limit"                  -> config.pistonPushLimit;
-            case "enderman_pick_up_all_blocks"        -> config.endermanPickUpAllBlocks;
-            case "baby_skeletons_enabled"             -> config.babySkeletonsEnabled;
-            case "baby_creepers_enabled"              -> config.babyCreepersEnabled;
-            case "baby_spiders_enabled"               -> config.babySpidersEnabled;
-            case "fishing_charged_creeper_chance"     -> config.fishingChargedCreeperChance;
-            case "moss_growth_enabled"                -> config.mossGrowthEnabled;
-            case "moss_tick_check_frequency"          -> config.mossTickCheckFrequency;
-            case "moss_base_chance"                   -> config.mossBaseChance;
-            case "moss_nearby_bonus"                  -> config.mossNearbyBonus;
-            case "moss_underwater_multiplier"         -> config.mossUnderwaterMultiplier;
-            case "stone_brick_moss_multiplier"        -> config.stoneBrickMossMultiplier;
-            case "zombie_follow_range"                -> config.zombieFollowRange;
-            case "void_fog_enabled"                   -> config.voidFogEnabled;
-            case "all_ingredients_consumable"         -> config.allIngredientsConsumable;
-            default -> {
-                source.sendFailure(Component.literal("Unknown config key: " + key).withStyle(ChatFormatting.RED));
-                yield null;
-            }
-        };
-
-        if (value == null) return 0;
-
-        source.sendSuccess(() -> Component.literal(key + ": ").withStyle(ChatFormatting.WHITE)
-            .append(Component.literal(String.valueOf(value)).withStyle(ChatFormatting.AQUA)), false);
+    private static int executeConfigQuery(CommandContext<CommandSourceStack> context, ConfigOption<DeeperDarkConfig.ConfigInstance> option) {
+        context.getSource().sendSuccess(() -> formatConfigLine(option.key(), option.get(DeeperDarkConfig.get())), false);
         return 1;
     }
 
-    private static int executeConfigBoolean(CommandContext<CommandSourceStack> context, String key) {
+    private static int executeConfigSet(CommandContext<CommandSourceStack> context, ConfigOption<DeeperDarkConfig.ConfigInstance> option) {
         CommandSourceStack source = context.getSource();
-        boolean value = BoolArgumentType.getBool(context, "value");
-        DeeperDarkConfig.ConfigInstance config = DeeperDarkConfig.get();
-
-        switch (key) {
-            case "allow_entity_spawning"            -> config.allowEntitySpawning = value;
-            case "push_survival_only"               -> config.pushSurvivalModeOnly = value;
-            case "custom_fortune_enabled"           -> config.customFortuneEnabled = value;
-            case "explosion_item_knockback_enabled" -> config.explosionItemKnockbackEnabled = value;
-            case "enderman_pick_up_all_blocks"      -> config.endermanPickUpAllBlocks = value;
-            case "baby_skeletons_enabled"           -> config.babySkeletonsEnabled = value;
-            case "baby_creepers_enabled"            -> config.babyCreepersEnabled = value;
-            case "baby_spiders_enabled"             -> config.babySpidersEnabled = value;
-            case "moss_growth_enabled"              -> config.mossGrowthEnabled = value;
-            default -> {
-                source.sendFailure(Component.literal("Unknown config key: " + key).withStyle(ChatFormatting.RED));
-                return 0;
-            }
+        Object value = context.getArgument("value", Object.class);
+        if (!option.set(DeeperDarkConfig.get(), String.valueOf(value))) {
+            source.sendFailure(Component.literal("Invalid value for " + option.key() + ": " + value).withStyle(ChatFormatting.RED));
+            return 0;
         }
-
         DeeperDarkConfig.save();
+        ConfigSync.broadcastIfSynced(source.getServer(), List.of(option.key()));
+
+        ChatFormatting color = value instanceof Boolean b ? (b ? ChatFormatting.GREEN : ChatFormatting.RED) : ChatFormatting.GOLD;
         source.sendSuccess(() -> Component.literal("Set ")
-            .append(Component.literal(key).withStyle(ChatFormatting.AQUA))
+            .append(Component.literal(option.key()).withStyle(ChatFormatting.AQUA))
             .append(Component.literal(" to "))
-            .append(Component.literal(String.valueOf(value)).withStyle(value ? ChatFormatting.GREEN : ChatFormatting.RED)), true);
-        return 1;
-    }
-
-    private static int executeConfigInt(CommandContext<CommandSourceStack> context, String key) {
-        CommandSourceStack source = context.getSource();
-        int value = IntegerArgumentType.getInteger(context, "value");
-        DeeperDarkConfig.ConfigInstance config = DeeperDarkConfig.get();
-
-        switch (key) {
-            case "creeper_effect_min_seconds"     -> config.creeperEffectMinSeconds = value;
-            case "creeper_effect_max_seconds"     -> config.creeperEffectMaxSeconds = value;
-            case "fortune_max_drops"              -> config.fortuneMaxDrops = value;
-            case "piston_push_limit"              -> config.pistonPushLimit = value;
-            case "fishing_charged_creeper_chance" -> config.fishingChargedCreeperChance = value;
-            case "moss_tick_check_frequency"      -> config.mossTickCheckFrequency = value;
-            default -> {
-                source.sendFailure(Component.literal("Unknown config key: " + key).withStyle(ChatFormatting.RED));
-                return 0;
-            }
-        }
-
-        DeeperDarkConfig.save();
-        source.sendSuccess(() -> Component.literal("Set ")
-            .append(Component.literal(key).withStyle(ChatFormatting.AQUA))
-            .append(Component.literal(" to "))
-            .append(Component.literal(String.valueOf(value)).withStyle(ChatFormatting.GOLD)), true);
-        return 1;
-    }
-
-    private static int executeConfigDouble(CommandContext<CommandSourceStack> context, String key) {
-        CommandSourceStack source = context.getSource();
-        double value = DoubleArgumentType.getDouble(context, "value");
-        DeeperDarkConfig.ConfigInstance config = DeeperDarkConfig.get();
-
-        switch (key) {
-            case "nether_coordinate_multiplier"        -> config.netherCoordinateMultiplier = value;
-            case "fortune_1_drop_chance"               -> config.fortune1DropChance = value;
-            case "fortune_2_drop_chance"               -> config.fortune2DropChance = value;
-            case "fortune_3_drop_chance"               -> config.fortune3DropChance = value;
-            case "explosion_item_knockback_multiplier" -> config.explosionItemKnockbackMultiplier = value;
-            case "moss_base_chance"                    -> config.mossBaseChance = value;
-            case "moss_nearby_bonus"                   -> config.mossNearbyBonus = value;
-            case "moss_underwater_multiplier"          -> config.mossUnderwaterMultiplier = value;
-            case "stone_brick_moss_multiplier"         -> config.stoneBrickMossMultiplier = value;
-            case "zombie_follow_range"                 -> config.zombieFollowRange = value;
-            default -> {
-                source.sendFailure(Component.literal("Unknown config key: " + key).withStyle(ChatFormatting.RED));
-                return 0;
-            }
-        }
-
-        DeeperDarkConfig.save();
-        source.sendSuccess(() -> Component.literal("Set ")
-            .append(Component.literal(key).withStyle(ChatFormatting.AQUA))
-            .append(Component.literal(" to "))
-            .append(Component.literal(String.valueOf(value)).withStyle(ChatFormatting.GOLD)), true);
-        return 1;
-    }
-
-    // ===== Void fog toggle (broadcasts packet so all clients update immediately) =====
-
-    private static int executeVoidFogEnabled(CommandContext<CommandSourceStack> context) {
-        CommandSourceStack source = context.getSource();
-        boolean value = BoolArgumentType.getBool(context, "value");
-        DeeperDarkConfig.ConfigInstance config = DeeperDarkConfig.get();
-        config.voidFogEnabled = value;
-        DeeperDarkConfig.save();
-
-        net.minecraft.server.MinecraftServer server = source.getServer();
-        if (server != null) {
-            VoidFogSyncPacket packet = new VoidFogSyncPacket(value);
-            server.getPlayerList().getPlayers().forEach(p -> ServerPlayNetworking.send(p, packet));
-        }
-
-        source.sendSuccess(() -> Component.literal("Set ")
-            .append(Component.literal("void_fog_enabled").withStyle(ChatFormatting.AQUA))
-            .append(Component.literal(" to "))
-            .append(Component.literal(String.valueOf(value)).withStyle(value ? ChatFormatting.GREEN : ChatFormatting.RED)), true);
-        return 1;
-    }
-
-    // ===== All ingredients consumable toggle (broadcasts packet so all clients update immediately) =====
-
-    private static int executeAllIngredientsConsumable(CommandContext<CommandSourceStack> context) {
-        CommandSourceStack source = context.getSource();
-        boolean value = BoolArgumentType.getBool(context, "value");
-        DeeperDarkConfig.ConfigInstance config = DeeperDarkConfig.get();
-        config.allIngredientsConsumable = value;
-        DeeperDarkConfig.save();
-
-        net.minecraft.server.MinecraftServer server = source.getServer();
-        if (server != null) {
-            AllIngredientsConsumableSyncPacket packet = new AllIngredientsConsumableSyncPacket(value);
-            server.getPlayerList().getPlayers().forEach(p -> ServerPlayNetworking.send(p, packet));
-        }
-
-        source.sendSuccess(() -> Component.literal("Set ")
-            .append(Component.literal("all_ingredients_consumable").withStyle(ChatFormatting.AQUA))
-            .append(Component.literal(" to "))
-            .append(Component.literal(String.valueOf(value)).withStyle(value ? ChatFormatting.GREEN : ChatFormatting.RED)), true);
+            .append(Component.literal(String.valueOf(value)).withStyle(color)), true);
         return 1;
     }
 
@@ -614,6 +316,7 @@ public class DeeperDarkCommands {
         CommandSourceStack source = context.getSource();
         try {
             DeeperDarkConfig.load();
+            ConfigSync.broadcastIfSynced(source.getServer(), ConfigOptions.SYNCED);
             source.sendSuccess(() -> Component.literal("Successfully reloaded DeeperDark configuration from disk").withStyle(ChatFormatting.GREEN), true);
             return 1;
         } catch (Exception e) {

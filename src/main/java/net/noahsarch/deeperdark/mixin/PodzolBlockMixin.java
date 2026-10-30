@@ -1,5 +1,6 @@
 package net.noahsarch.deeperdark.mixin;
 
+import net.noahsarch.deeperdark.DeeperDarkConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -38,7 +39,8 @@ public class PodzolBlockMixin {
     @Inject(method = "randomTick", at = @At("HEAD"))
     private void deeperdark$randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random,
             CallbackInfo ci) {
-        if (!deeperdark$isPodzol())
+        // isRandomlyTicking is cached per state at startup, so the setting is checked here
+        if (!deeperdark$isPodzol() || !DeeperDarkConfig.get().podzolSpreading)
             return;
 
         if (!deeperdark$canSurvive(state, level, pos)) {

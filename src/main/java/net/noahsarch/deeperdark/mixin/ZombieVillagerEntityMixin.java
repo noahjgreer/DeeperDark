@@ -1,5 +1,6 @@
 package net.noahsarch.deeperdark.mixin;
 
+import net.noahsarch.deeperdark.DeeperDarkConfig;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.monster.zombie.ZombieVillager;
 import net.minecraft.world.entity.player.Player;
@@ -45,7 +46,7 @@ public abstract class ZombieVillagerEntityMixin {
     @Inject(method = "mobInteract", at = @At("HEAD"), cancellable = true)
     private void deeperdark$mobInteract(Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
         ItemStack itemStack = player.getItemInHand(hand);
-        if (itemStack.getItem() == Items.ENCHANTED_GOLDEN_APPLE) {
+        if (itemStack.getItem() == Items.ENCHANTED_GOLDEN_APPLE && DeeperDarkConfig.get().explosiveZombieVillagerCure) {
             ZombieVillager self = (ZombieVillager) (Object) this;
             if (self.hasEffect(MobEffects.WEAKNESS)) {
                 if (!player.isCreative()) {

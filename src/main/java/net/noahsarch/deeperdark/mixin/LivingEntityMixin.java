@@ -1,5 +1,6 @@
 package net.noahsarch.deeperdark.mixin;
 
+import net.noahsarch.deeperdark.DeeperDarkConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.LivingEntity;
@@ -38,7 +39,7 @@ public class LivingEntityMixin {
     private void applyDepthStriderToLava(CallbackInfo ci) {
         LivingEntity self = (LivingEntity) (Object) this;
 
-        if (self.isInLava() && !self.isInWater()) {
+        if (self.isInLava() && !self.isInWater() && DeeperDarkConfig.get().depthStriderInLava) {
             double waterEfficiency = self.getAttributeValue(Attributes.WATER_MOVEMENT_EFFICIENCY);
 
             if (waterEfficiency > 0.0) {
@@ -85,7 +86,7 @@ public class LivingEntityMixin {
 
     @Inject(method = "onClimbable", at = @At("RETURN"), cancellable = true)
     private void deeperdark$onClimbable(CallbackInfoReturnable<Boolean> cir) {
-        if (cir.getReturnValue()) return;
+        if (cir.getReturnValue() || !DeeperDarkConfig.get().ladderTweaks) return;
         LivingEntity self = (LivingEntity)(Object)this;
         if (self.isSpectator()) return;
         BlockPos pos = self.blockPosition();

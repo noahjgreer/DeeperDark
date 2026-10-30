@@ -1,5 +1,6 @@
 package net.noahsarch.deeperdark.mixin;
 
+import net.noahsarch.deeperdark.DeeperDarkConfig;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.Blocks;
@@ -32,7 +33,7 @@ public class NoteBlockMixin {
     @Inject(method = "triggerEvent", at = @At("HEAD"), cancellable = true)
     private void deeperdark$playOrganSound(BlockState state, Level world, BlockPos pos, int type, int data, CallbackInfoReturnable<Boolean> cir) {
         BlockState belowState = world.getBlockState(pos.below());
-        if (deeperdark$isCopperBlock(belowState)) {
+        if (DeeperDarkConfig.get().organNoteBlock && deeperdark$isCopperBlock(belowState)) {
             NoteBlockInstrument instrument = state.getValue(BlockStateProperties.NOTEBLOCK_INSTRUMENT);
             if (!instrument.isTunable() || world.getBlockState(pos.above()).isAir()) {
                 int note = state.getValue(BlockStateProperties.NOTE);

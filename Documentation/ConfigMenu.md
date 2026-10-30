@@ -1,15 +1,17 @@
 # Config menu
 
 Typing `/dd` with no arguments opens an in-game settings screen for all of DeeperDark's config.
-The `/dd ...` subcommands still work unchanged and stay the main tool for server consoles and
-quick edits. The menu edits the same `config/deeperdark.yaml` on the server.
+Every server setting in the menu is also a command, `/dd config <key> [value]` (and
+`/dd config list`), for server consoles and quick edits. Both edit the same
+`config/deeperdark.yaml` on the server.
 
 ## What each player sees
 
 - **Everyone:** *Player Sounds*: what you hear (hear player sounds on/off, volume) and your own
   sound profile (chat/death/join/hurt sound, pitch, pitch variation).
 - **Operators** (permission level 2), additionally: every server category (Border, World, Mobs,
-  Fortune, Explosions, Moss Growth, Combat, Leaf Decay, Item Magnets, The Creature, Creepiness), every
+  Fortune, Explosions, Moss Growth, Combat, Leaf Decay, Players, Items & Containers, Enchanting,
+  Blocks & Plants, Movement, Item Magnets, The Creature, Creepiness), every
   player's sound profile (with their face), and **Add Player** to start a profile for any name,
   online or not.
 
@@ -30,7 +32,7 @@ Modelled on vanilla 26.1.2's in-world game rules screen (`InWorldGameRulesScreen
 3. Done sends `ConfigChangesPayload` with only the changed values. `ConfigMenu.apply` re-checks
    each key against the sender's *current* permissions, parses each value with the same
    `ConfigOption.parse` the client used, applies what passes, logs what doesn't, saves once, and
-   rebroadcasts `VoidFogSyncPacket` / `AllIngredientsConsumableSyncPacket` if those changed.
+   resyncs clients if a synced setting changed (below).
 
 Only diffs are sent, so two operators editing different settings at once don't overwrite each
 other. Adding a player only creates the profile on the server once one of its fields changes.
@@ -43,18 +45,54 @@ Wire keys:
 | `self.KEY`         | a `ConfigOptions.LISTENER` option for the sender | the sender              |
 | `player.NAME.KEY`  | a `ConfigOptions.PROFILE` field of NAME's profile | NAME, or any operator  |
 
+## Feature toggles
+
+Nearly every DeeperDark gameplay tweak has a boolean toggle (default `true` = DeeperDark behaviour,
+`false` = vanilla), checked at the tweak's own mixin or event handler. Not toggleable, on purpose:
+
+- **Registered content** (blocks, items, recipes, gunpowder trails, stackable buckets, rotten
+  flesh food, Warden knockback): fixed at startup, or the item would be useless without it.
+- **Worldgen** (deep dark depth, Black Mesa, pale mansions, lava sea level, structure limits): it
+  would only affect new chunks. `compact_tree_growth` is the exception: it's a sapling feature, so
+  it also changes trees in newly generated chunks.
+- **Infrastructure** (slot/menu fixes, accessors, chat length, structure block limits) and collar
+  trinkets, which are part of the collar item.
+
+Toggling `ladder_tweaks` off lets ladder chains with no wall behind them break on their next
+block update. Toggling `player_riding` off dismounts current player riders. `armor_stand_arms`
+forces `showArms()` but saves each stand's own flag, so turning it off brings back vanilla for
+stands placed without arms. Stands saved before this setting existed stored `ShowArms:true` and
+keep their arms. `podzol_spreading` is
+checked in `randomTick`, since vanilla caches `isRandomlyTicking` per block state at startup.
+
+## Client sync
+
+Settings that client-side code also reads (rendering, movement, placement and interaction
+prediction) are listed in `ConfigOptions.SYNCED`. `ConfigSync` sends all of them in one
+`ConfigSyncPayload` on join, after a menu or command change to any of them, and after
+`/dd reload`. The client writes them into its in-memory config and rebuilds the ingredient set.
+When it leaves a remote server it reloads its own config file, so the server's values don't carry
+over (singleplayer shares the integrated server's config object, so it skips this).
+
+Add a key to `SYNCED` when the feature's code runs on the client too. Otherwise a server with it off
+and a client with it on would mispredict: rubber-banding, ghost blocks or ghost items.
+
 ## Adding a setting
 
 1. Add the field to `DeeperDarkConfig.ConfigInstance` (or a nested config).
 2. Add one line to the right category in `config/ConfigOptions.java` with its range. The default
    comes from a freshly constructed config object automatically.
 3. Add `deeperdark.config.option.KEY` and `KEY.desc` to `en_us.json`.
+4. If client-side code reads it, add the key to `ConfigOptions.SYNCED`.
 
 A new category also needs `deeperdark.config.category.ID` and an icon item.
 
-The commands are separate hand-written trees (`DeeperDarkCommands`, `CreatureCommands`,
-`CreepinessCommands`, `PlayerSoundsCommands`) and are **not** generated from `ConfigOptions`, so a
-setting that should also be on the command line must be added there too. Keep ranges in sync.
+`/dd config <key> [value]` is generated from `ConfigOptions.SERVER` (`DeeperDarkCommands.configCommand`),
+with Brigadier argument ranges taken from the option, so new server settings need no command code.
+`/dd border config` reuses the same generated nodes. The `/dd creature`, `/dd creepiness` and
+`/dd player_sounds` trees are still hand-written (`CreatureCommands`, `CreepinessCommands`,
+`PlayerSoundsCommands`), so creature and creepiness settings can be set either there or through
+`/dd config`. Keep their ranges in sync with `ConfigOptions`.
 
 ## Known limits
 

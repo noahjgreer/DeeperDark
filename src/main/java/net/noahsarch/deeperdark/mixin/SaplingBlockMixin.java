@@ -1,5 +1,6 @@
 package net.noahsarch.deeperdark.mixin;
 
+import net.noahsarch.deeperdark.DeeperDarkConfig;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.Blocks;
@@ -39,7 +40,7 @@ public abstract class SaplingBlockMixin {
     @Inject(method = "advanceTree", at = @At("HEAD"), cancellable = true)
     private void deeperdark$handleGiantOakAndTeleport(ServerLevel world, BlockPos pos, BlockState state, RandomSource random, CallbackInfo ci) {
         Block block = state.getBlock();
-        if (!isOakSapling(block)) {
+        if (!isOakSapling(block) || !DeeperDarkConfig.get().giantOakTrees) {
             deeperdark$teleportPlayersAfterGrowth(world, pos);
             return;
         }

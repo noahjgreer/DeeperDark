@@ -1,5 +1,6 @@
 package net.noahsarch.deeperdark.mixin;
 
+import net.noahsarch.deeperdark.DeeperDarkConfig;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.protocol.game.ClientboundSetPassengersPacket;
@@ -76,7 +77,8 @@ public abstract class PlayerEntityMixin extends LivingEntity implements Leashabl
     @Inject(method = "tick", at = @At("TAIL"))
     private void deeperdark$checkSaddleAndDismount(CallbackInfo ci) {
         Entity self = (Entity)(Object)this;
-        if (!self.level().isClientSide() && self.isVehicle() && !deeperdark$hasSaddleEquipped()) {
+        if (!self.level().isClientSide() && self.isVehicle() && (!deeperdark$hasSaddleEquipped()
+                || !DeeperDarkConfig.get().playerRiding && self.getFirstPassenger() instanceof Player)) {
             self.ejectPassengers();
         }
     }
@@ -149,7 +151,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements Leashabl
     @Override
     public InteractionResult interact(Player player, InteractionHand hand, Vec3 pos) {
         ItemStack itemStack = player.getItemInHand(hand);
-        if (itemStack.is(Items.LEAD) && this.canBeLeashed() && !this.isLeashed()) {
+        if (DeeperDarkConfig.get().playerLeashing && itemStack.is(Items.LEAD) && this.canBeLeashed() && !this.isLeashed()) {
             if (!(this instanceof CollarHolder ch) || ch.deeperdark$getCollarItem().isEmpty()) {
                 return InteractionResult.PASS;
             }
@@ -160,7 +162,8 @@ public abstract class PlayerEntityMixin extends LivingEntity implements Leashabl
             return InteractionResult.SUCCESS;
         }
         // Saddle riding: right-click with an empty hand to ride a player who has a saddle equipped
-        if (hand == InteractionHand.MAIN_HAND
+        if (DeeperDarkConfig.get().playerRiding
+                && hand == InteractionHand.MAIN_HAND
                 && player.getItemInHand(hand).isEmpty()
                 && !player.isPassenger()
                 && !this.isVehicle()

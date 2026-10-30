@@ -1,5 +1,6 @@
 package net.noahsarch.deeperdark.mixin;
 
+import net.noahsarch.deeperdark.DeeperDarkConfig;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.noahsarch.deeperdark.item.CollarItem;
@@ -19,7 +20,7 @@ public abstract class ArmorSlotMixin {
         if (this.slot == EquipmentSlot.HEAD) {
             if (stack.getItem() instanceof CollarItem) {
                 cir.setReturnValue(false);
-            } else {
+            } else if (DeeperDarkConfig.get().anyItemOnHead) {
                 cir.setReturnValue(true);
             }
         }

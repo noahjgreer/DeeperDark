@@ -37,7 +37,8 @@ import net.noahsarch.deeperdark.menu.VaultMenu;
 import net.noahsarch.deeperdark.sound.ModSounds;
 import net.noahsarch.deeperdark.duck.CraftingPanelHolder;
 import net.noahsarch.deeperdark.config.ConfigMenu;
-import net.noahsarch.deeperdark.payload.AllIngredientsConsumableSyncPacket;
+import net.noahsarch.deeperdark.config.ConfigSync;
+import net.noahsarch.deeperdark.payload.ConfigSyncPayload;
 import net.noahsarch.deeperdark.payload.ConfigChangesPayload;
 import net.noahsarch.deeperdark.payload.ConfigMenuPayload;
 import net.noahsarch.deeperdark.payload.OpenContainerItemPayload;
@@ -46,7 +47,6 @@ import net.noahsarch.deeperdark.payload.OpenNestedContainerPayload;
 import net.noahsarch.deeperdark.payload.PickFromContainerPayload;
 import net.noahsarch.deeperdark.payload.SyncCraftingPanelPayload;
 import net.noahsarch.deeperdark.payload.PlayerLeashPacket;
-import net.noahsarch.deeperdark.payload.VoidFogSyncPacket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ClientboundSetHeldSlotPacket;
 import net.minecraft.server.level.ServerLevel;
@@ -128,8 +128,7 @@ public class Deeperdark implements ModInitializer {
 		//?}
 
 		PayloadTypeRegistry.clientboundPlay().register(PlayerLeashPacket.ID, PlayerLeashPacket.CODEC);
-		PayloadTypeRegistry.clientboundPlay().register(VoidFogSyncPacket.ID, VoidFogSyncPacket.CODEC);
-		PayloadTypeRegistry.clientboundPlay().register(AllIngredientsConsumableSyncPacket.ID, AllIngredientsConsumableSyncPacket.CODEC);
+		PayloadTypeRegistry.clientboundPlay().register(ConfigSyncPayload.ID, ConfigSyncPayload.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(OpenFromScreenPayload.ID, OpenFromScreenPayload.CODEC);
 
 		// Config menu: "/dd" sends values, Done sends changes back
@@ -207,10 +206,7 @@ public class Deeperdark implements ModInitializer {
 
 		// Sync config toggles to each client when they join
 		net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-			net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.send(
-					handler.player, new VoidFogSyncPacket(DeeperDarkConfig.get().voidFogEnabled));
-			net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.send(
-					handler.player, new AllIngredientsConsumableSyncPacket(DeeperDarkConfig.get().allIngredientsConsumable));
+			ConfigSync.send(handler.player);
 			if (DeeperDarkConfig.get().unlockAllRecipes) {
 				handler.player.awardRecipes(server.getRecipeManager().getRecipes());
 			}
@@ -371,6 +367,7 @@ public class Deeperdark implements ModInitializer {
 	 *                   rather than exiting to the game.
 	 */
 	public static void openContainerFromInventory(ServerPlayer player, int slot, boolean fromScreen) {
+		if (!DeeperDarkConfig.get().openContainerItems) return;
 		if (slot < 0 || slot >= player.getInventory().getContainerSize()) return;
 		ItemStack stack = player.getInventory().getItem(slot);
 		if (stack.isEmpty()) return;
@@ -439,6 +436,7 @@ public class Deeperdark implements ModInitializer {
 	 * automatically reopens the parent.
 	 */
 	public static void openContainerFromCurrentMenu(ServerPlayer player, int menuSlotIndex) {
+		if (!DeeperDarkConfig.get().openContainerItems) return;
 		net.minecraft.world.inventory.AbstractContainerMenu currentMenu = player.containerMenu;
 		if (menuSlotIndex < 0 || menuSlotIndex >= currentMenu.slots.size()) return;
 
@@ -552,6 +550,7 @@ public class Deeperdark implements ModInitializer {
 	 *  matching stack, extracts as many items as will fit, and adds them to the inventory.
 	 *  Returns true if anything was extracted. */
 	public static boolean searchAndExtractForPickBlock(Inventory inventory, ItemStack target) {
+		if (!DeeperDarkConfig.get().pickBlockFromContainers) return false;
 		int bestContainerSlot = -1;
 		int bestBundleSlot = -1;
 		int bestCount = Integer.MAX_VALUE;

@@ -1,5 +1,6 @@
 package net.noahsarch.deeperdark.mixin;
 
+import net.noahsarch.deeperdark.DeeperDarkConfig;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -73,7 +74,7 @@ public abstract class ContainerScreenOpenMixin<T extends AbstractContainerMenu> 
 
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
     private void deeperdark$openContainerOnKey(KeyEvent event, CallbackInfoReturnable<Boolean> cir) {
-        if (!ContainerItemKeyHandler.KEY.matches(event)) return;
+        if (!ContainerItemKeyHandler.KEY.matches(event) || !DeeperDarkConfig.get().openContainerItems) return;
         if (this.hoveredSlot == null) return;
 
         ItemStack stack = this.hoveredSlot.getItem();

@@ -1,5 +1,6 @@
 package net.noahsarch.deeperdark.mixin;
 
+import net.noahsarch.deeperdark.DeeperDarkConfig;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -29,6 +30,7 @@ public class BeaconBlockEntityMixin {
         Operation<AABB> original,
         @Local(argsOnly = true) Level level
     ) {
+        if (!DeeperDarkConfig.get().beaconFullHeight) return original.call(inflated, dx, dy, dz);
         double worldMinY = level.getMinY();
         double worldMaxY = level.getMinY() + level.getHeight();
         return new AABB(inflated.minX, worldMinY, inflated.minZ,

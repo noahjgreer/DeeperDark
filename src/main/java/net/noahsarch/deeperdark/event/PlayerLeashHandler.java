@@ -1,5 +1,6 @@
 package net.noahsarch.deeperdark.event;
 
+import net.noahsarch.deeperdark.DeeperDarkConfig;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -58,7 +59,7 @@ public class PlayerLeashHandler {
             }
 
             // Leash: requires a lead in hand and a different target.
-            if (!player.getItemInHand(hand).is(Items.LEAD)) return InteractionResult.PASS;
+            if (!DeeperDarkConfig.get().playerLeashing || !player.getItemInHand(hand).is(Items.LEAD)) return InteractionResult.PASS;
             if (target.getUUID().equals(player.getUUID())) return InteractionResult.PASS;
             if (level.isClientSide()) return InteractionResult.SUCCESS;
 

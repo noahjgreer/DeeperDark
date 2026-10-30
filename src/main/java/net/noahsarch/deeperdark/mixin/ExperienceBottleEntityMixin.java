@@ -1,5 +1,6 @@
 package net.noahsarch.deeperdark.mixin;
 
+import net.noahsarch.deeperdark.DeeperDarkConfig;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrownExperienceBottle;
@@ -23,9 +24,9 @@ public abstract class ExperienceBottleEntityMixin extends ThrowableItemProjectil
 
     @Inject(method = "onHit", at = @At("HEAD"), cancellable = true)
     private void onHit(HitResult hitResult, CallbackInfo ci) {
-        super.onHit(hitResult);
         Level world = ((EntityAccessor)(Object)this).deeperdark$getWorld();
-        if (!world.isClientSide()) {
+        if (!world.isClientSide() && DeeperDarkConfig.get().fixedXpBottleReward) {
+            super.onHit(hitResult);
             // Play splash effect (2002 is Potion Splash)
             // Color for water is 3694022
             world.levelEvent(2002, this.blockPosition(), 3694022);

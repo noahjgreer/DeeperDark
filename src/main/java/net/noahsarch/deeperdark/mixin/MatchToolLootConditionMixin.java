@@ -1,5 +1,6 @@
 package net.noahsarch.deeperdark.mixin;
 
+import net.noahsarch.deeperdark.DeeperDarkConfig;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -30,7 +31,7 @@ public abstract class MatchToolLootConditionMixin {
     private void deeperdark$implicitSilkTouch(LootContext lootContext, CallbackInfoReturnable<Boolean> cir) {
         ItemStack stack = (ItemStack) lootContext.getOptionalParameter(LootContextParams.TOOL);
 
-        if (stack != null && deeperdark$isGoldenTool(stack)) {
+        if (stack != null && DeeperDarkConfig.get().goldenToolsSilkTouch && deeperdark$isGoldenTool(stack)) {
              ItemStack modifiedStack = stack.copy();
 
              ItemEnchantments enchantments = modifiedStack.getOrDefault(DataComponents.ENCHANTMENTS, ItemEnchantments.EMPTY);

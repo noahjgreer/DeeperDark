@@ -272,6 +272,44 @@ public class DeeperDarkConfig {
         // When true, every loaded recipe (all mods and vanilla) is unlocked for players on join.
         public boolean unlockAllRecipes = true;
 
+        // Feature toggles (each true = the DeeperDark behaviour, false = vanilla)
+        public boolean smallNetherPortals = true;
+        public boolean netherRoofElytraBurn = true;
+        public boolean explosionsDropAllBlocks = true;
+        public boolean squidMilking = true;
+        public boolean villagerEmeraldTempt = true;
+        public boolean villagerLeashing = true;
+        public boolean explosiveZombieVillagerCure = true;
+        public boolean boneOnHead = true;
+        public boolean fishOnHead = true;
+        public boolean anyItemOnHead = true;
+        public boolean playerLeashing = true;
+        public boolean playerRiding = true;
+        public boolean armorStandArms = true;
+        public boolean armorStandOffhand = true;
+        public boolean openContainerItems = true;
+        public boolean pickBlockFromContainers = true;
+        public boolean fixedXpBottleReward = true;
+        public boolean splashWaterExtinguishes = true;
+        public boolean goldenToolsSilkTouch = true;
+        public boolean unbreakingV = true;
+        public boolean fortuneXpBonus = true;
+        public boolean shearsEnchantable = true;
+        public boolean unlimitedLoomPatterns = true;
+        public boolean fireCoarseDirt = true;
+        public boolean netherIceEvaporates = true;
+        public boolean featherFallingProtectsFarmland = true;
+        public boolean beaconFullHeight = true;
+        public boolean craftingSound = true;
+        public boolean organNoteBlock = true;
+        public boolean giantOakTrees = true;
+        public boolean compactTreeGrowth = true;
+        public boolean podzolSpreading = true;
+        public boolean ladderTweaks = true;
+        public boolean anyBootsOnPowderSnow = true;
+        public boolean depthStriderInLava = true;
+        public boolean boatStepUp = true;
+
         // Creature configuration
         public net.noahsarch.deeperdark.creature.CreatureConfig creature = new net.noahsarch.deeperdark.creature.CreatureConfig();
 
@@ -435,6 +473,9 @@ public class DeeperDarkConfig {
                     #   This is an operator-only setting (/dd config all_ingredients_consumable) synced to all clients.
                     #
                     # unlockAllRecipes: if true, every recipe from every mod and vanilla is unlocked in the recipe book on join (default: true)
+                    #
+                    # Feature toggles (smallNetherPortals ... boatStepUp): each switches one DeeperDark tweak on (true, default)
+                    #   or back to vanilla (false). See /dd config list, or the /dd menu tooltips, for what each one does.
                     #
                     # Creepiness Configuration (old Minecraft scares, each heard by one player only; see /dd creepiness):
                     # creepiness.enabled: if true, each player gets one haunt every minDelayTicks-maxDelayTicks (default: 6000-18000)

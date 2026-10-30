@@ -1,5 +1,6 @@
 package net.noahsarch.deeperdark.event;
 
+import net.noahsarch.deeperdark.DeeperDarkConfig;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -14,6 +15,7 @@ import net.minecraft.world.phys.HitResult;
 public class FishHeadEvents {
     public static void register() {
         UseItemCallback.EVENT.register((player, world, hand) -> {
+            if (!DeeperDarkConfig.get().fishOnHead) return InteractionResult.PASS;
             ItemStack stack = player.getItemInHand(hand);
             if (!world.isClientSide() && (stack.getItem() == Items.COD || stack.getItem() == Items.SALMON || stack.getItem() == Items.TROPICAL_FISH && !(player.isShiftKeyDown()))) {
                 // Raycast to see if looking at a cat/ocelot

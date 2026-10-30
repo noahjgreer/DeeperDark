@@ -1,5 +1,6 @@
 package net.noahsarch.deeperdark.mixin;
 
+import net.noahsarch.deeperdark.DeeperDarkConfig;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.FarmlandBlock;
 import net.minecraft.core.component.DataComponents;
@@ -23,7 +24,7 @@ public class FarmlandBlockMixin {
 
     @Inject(method = "fallOn", at = @At("HEAD"), cancellable = true)
     private void deeperdark$preventTrampleWithFeatherFalling(Level world, BlockState state, BlockPos pos, Entity entity, double fallDistance, CallbackInfo ci) {
-        if (entity instanceof Player player) {
+        if (entity instanceof Player player && DeeperDarkConfig.get().featherFallingProtectsFarmland) {
             ItemStack boots = player.getItemBySlot(EquipmentSlot.FEET);
 
             if (!boots.isEmpty()) {

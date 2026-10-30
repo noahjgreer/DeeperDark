@@ -1,5 +1,6 @@
 package net.noahsarch.deeperdark.mixin;
 
+import net.noahsarch.deeperdark.DeeperDarkConfig;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
@@ -18,14 +19,14 @@ public class EnchantmentMixin {
 
     @Inject(method = "getMaxLevel", at = @At("HEAD"), cancellable = true)
     private void deeperdark$modifyMaxLevel(CallbackInfoReturnable<Integer> cir) {
-        if (deeperdark$isUnbreakingEnchantment()) {
+        if (deeperdark$appliesUnbreakingV()) {
             cir.setReturnValue(5);
         }
     }
 
     @Inject(method = "getMinCost", at = @At("HEAD"), cancellable = true)
     private void deeperdark$modifyMinCost(int level, CallbackInfoReturnable<Integer> cir) {
-        if (deeperdark$isUnbreakingEnchantment()) {
+        if (deeperdark$appliesUnbreakingV()) {
             // Keep vanilla feel while making level 5 realistically rollable.
             cir.setReturnValue(5 + (level - 1) * 7);
         }
@@ -33,7 +34,7 @@ public class EnchantmentMixin {
 
     @Inject(method = "getMaxCost", at = @At("HEAD"), cancellable = true)
     private void deeperdark$modifyMaxCost(int level, CallbackInfoReturnable<Integer> cir) {
-        if (deeperdark$isUnbreakingEnchantment()) {
+        if (deeperdark$appliesUnbreakingV()) {
             cir.setReturnValue(5 + (level - 1) * 7 + 45);
         }
     }
@@ -43,8 +44,7 @@ public class EnchantmentMixin {
      */
     @Inject(method = "modifyBlockExperience", at = @At("TAIL"))
     private void deeperdark$multiplyBlockExperience(ServerLevel world, int level, ItemStack stack, MutableFloat blockExperience, CallbackInfo ci) {
-        // Check if this enchantment is Fortune
-        if (deeperdark$isFortuneEnchantment()) {
+        if (deeperdark$appliesFortuneXpBonus()) {
             // Multiply XP by (1 + level), so Fortune I = 2x, Fortune II = 3x, Fortune III = 4x
             float currentXp = blockExperience.floatValue();
             if (currentXp > 0) {
@@ -58,8 +58,7 @@ public class EnchantmentMixin {
      */
     @Inject(method = "modifyMobExperience", at = @At("TAIL"))
     private void deeperdark$multiplyMobExperience(ServerLevel world, int level, ItemStack stack, Entity user, MutableFloat mobExperience, CallbackInfo ci) {
-        // Check if this enchantment is Fortune
-        if (deeperdark$isFortuneEnchantment()) {
+        if (deeperdark$appliesFortuneXpBonus()) {
             // Multiply XP by (1 + level), so Fortune I = 2x, Fortune II = 3x, Fortune III = 4x
             float currentXp = mobExperience.floatValue();
             if (currentXp > 0) {
@@ -68,18 +67,16 @@ public class EnchantmentMixin {
         }
     }
 
-    /**
-     * Helper method to check if an enchantment is Fortune
-     * We check the translation key which contains "enchantment.minecraft.fortune"
-     */
+    /** True for Fortune while fortune_xp_bonus is on; matched by translation key. */
     @Unique
-    private boolean deeperdark$isFortuneEnchantment() {
-        return deeperdark$hasDescriptionKey("enchantment.minecraft.fortune");
+    private boolean deeperdark$appliesFortuneXpBonus() {
+        return DeeperDarkConfig.get().fortuneXpBonus && deeperdark$hasDescriptionKey("enchantment.minecraft.fortune");
     }
 
+    /** True for Unbreaking while unbreaking_v is on. */
     @Unique
-    private boolean deeperdark$isUnbreakingEnchantment() {
-        return deeperdark$hasDescriptionKey("enchantment.minecraft.unbreaking");
+    private boolean deeperdark$appliesUnbreakingV() {
+        return DeeperDarkConfig.get().unbreakingV && deeperdark$hasDescriptionKey("enchantment.minecraft.unbreaking");
     }
 
     @Unique
