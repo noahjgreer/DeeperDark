@@ -31,7 +31,8 @@ public class LadderBlockMixin {
     }
 
     /**
-     * Collects all same-facing ladders vertically connected to pos (up and down), capped at 256.
+     * Collects all same-facing ladders vertically connected to pos (up and down). Uncapped so a
+     * ladder lowered from a ledge stays anchored at any depth; world height bounds it.
      */
     @Unique
     private static List<BlockPos> deeperdark$collectChain(LevelReader level, BlockPos start, Direction facing) {
@@ -39,13 +40,13 @@ public class LadderBlockMixin {
         chain.add(start);
 
         BlockPos cur = start.above();
-        while (chain.size() < 256 && deeperdark$isSameFacingLadder(level.getBlockState(cur), facing)) {
+        while (deeperdark$isSameFacingLadder(level.getBlockState(cur), facing)) {
             chain.add(cur);
             cur = cur.above();
         }
 
         cur = start.below();
-        while (chain.size() < 256 && deeperdark$isSameFacingLadder(level.getBlockState(cur), facing)) {
+        while (deeperdark$isSameFacingLadder(level.getBlockState(cur), facing)) {
             chain.add(cur);
             cur = cur.below();
         }

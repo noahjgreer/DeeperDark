@@ -416,7 +416,7 @@
   "deeperdark.config.option.podzol_spreading": "Podzol spreading",
   "deeperdark.config.option.podzol_spreading.desc": "Podzol slowly spreads to nearby dirt and dies when covered.",
   "deeperdark.config.option.ladder_tweaks": "Ladder tweaks",
-  "deeperdark.config.option.ladder_tweaks.desc": "Ladders can be placed on top of or under other ladders and hang from them, and can be climbed from the back.",
+  "deeperdark.config.option.ladder_tweaks.desc": "Ladders can be placed on top of or under other ladders and hang from them, and can be climbed from the back. Using a ladder on the front of a ladder, or on its top while standing there, extends the ladder downward.",
   "deeperdark.config.option.any_boots_on_powder_snow": "Any boots on powder snow",
   "deeperdark.config.option.any_boots_on_powder_snow.desc": "Any boots let you walk on powder snow, at reduced speed unless they are leather.",
   "deeperdark.config.option.depth_strider_in_lava": "Depth Strider in lava",

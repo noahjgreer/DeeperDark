@@ -27,6 +27,7 @@
     "IceBlockMixin",
     "IronBarsBlockMixin",
     "LadderBlockMixin",
+    "BlockItemLadderMixin",
     "ItemEntityMixin",
     "DamageSourceQuicksandMixin",
     "LivingEntityMixin",
