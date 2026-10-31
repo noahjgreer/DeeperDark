@@ -570,5 +570,7 @@
   "deeperdark.config.option.creepiness.follower": "Follower",
   "deeperdark.config.option.creepiness.follower.desc": "The player's own footsteps replay a few blocks behind them.",
   "deeperdark.config.option.creepiness.ghost_blocks": "Ghost blocks",
-  "deeperdark.config.option.creepiness.ghost_blocks.desc": "A block the player recently mined reappears for a few seconds, on their screen only."
+  "deeperdark.config.option.creepiness.ghost_blocks.desc": "A block the player recently mined reappears for a few seconds, on their screen only.",
+  "painting.deeperdark.cozy.author": "FinniTheFox",
+  "painting.deeperdark.cozy.title": "Cozy"
 }

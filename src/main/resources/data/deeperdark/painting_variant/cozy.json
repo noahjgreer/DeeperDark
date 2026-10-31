@@ -1,0 +1,13 @@
+{
+  "asset_id": "deeperdark:cozy",
+  "author": {
+    "color": "gray",
+    "translate": "painting.deeperdark.cozy.author"
+  },
+  "height": 3,
+  "title": {
+    "color": "yellow",
+    "translate": "painting.deeperdark.cozy.title"
+  },
+  "width": 4
+}
