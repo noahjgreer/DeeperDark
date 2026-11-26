@@ -241,8 +241,7 @@ public class CrateBlockEntity extends BlockEntity implements MenuProvider {
     }
 
     private void playSound(SoundEvent sound) {
-        level.playSound(null, worldPosition, sound, SoundSource.BLOCKS, 0.5F,
-            level.getRandom().nextFloat() * 0.1F + 0.9F);
+        level.playSound(null, worldPosition, sound, SoundSource.BLOCKS, 0.5F, CrateBlock.PITCH);
     }
 
     @Override

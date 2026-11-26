@@ -18,6 +18,7 @@ bows would each take a vault entry. Crafted from 4 iron ingots, 4 planks and an 
   but not in vaults, boxes or other crates, and hold only tier 0–1 items. They can't go in bundles
   either, since a crate of bundles holding crates would nest without limit.
 - **Breaking** keeps the contents on the item (`copy_components` loot), like vaults.
+- **Sounds** are the barrel's (open/close, and its wood block sounds) at pitch 0.5 (`CrateBlock.PITCH`).
 
 ## Auto-merge
 
