@@ -33,11 +33,13 @@ import net.noahsarch.deeperdark.inventory.ContainerItemUtil;
 import net.noahsarch.deeperdark.inventory.ItemBackedContainer;
 import net.noahsarch.deeperdark.inventory.ItemBackedVaultEntity;
 import net.noahsarch.deeperdark.inventory.OpenMarkedContainer;
+import net.noahsarch.deeperdark.menu.CrateMenu;
 import net.noahsarch.deeperdark.menu.VaultMenu;
 import net.noahsarch.deeperdark.sound.ModSounds;
 import net.noahsarch.deeperdark.duck.CraftingPanelHolder;
 import net.noahsarch.deeperdark.config.ConfigMenu;
 import net.noahsarch.deeperdark.config.ConfigSync;
+import net.noahsarch.deeperdark.payload.CrateSearchPayload;
 import net.noahsarch.deeperdark.payload.ConfigSyncPayload;
 import net.noahsarch.deeperdark.payload.ConfigChangesPayload;
 import net.noahsarch.deeperdark.payload.ConfigMenuPayload;
@@ -143,6 +145,13 @@ public class Deeperdark implements ModInitializer {
 		ServerPlayNetworking.registerGlobalReceiver(OpenContainerItemPayload.ID, (payload, context) ->
 			context.server().execute(() -> openContainerFromInventory(context.player(), payload.slot(), true))
 		);
+
+		PayloadTypeRegistry.serverboundPlay().register(CrateSearchPayload.ID, CrateSearchPayload.CODEC);
+		ServerPlayNetworking.registerGlobalReceiver(CrateSearchPayload.ID, (payload, context) -> context.server().execute(() -> {
+			if (context.player().containerMenu instanceof CrateMenu menu && menu.containerId == payload.containerId()) {
+				menu.setSearch(payload.query(), payload.generation());
+			}
+		}));
 
 		// Container-within-container: client â†’ server
 		PayloadTypeRegistry.serverboundPlay().register(OpenNestedContainerPayload.ID, OpenNestedContainerPayload.CODEC);

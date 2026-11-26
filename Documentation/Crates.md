@@ -61,6 +61,20 @@ handles every click on those slots itself (the client doesn't predict them):
 - Hotbar swap, drag, throw and double-click collect are ignored on crate slots, because vanilla's
   versions write through the slot and would dupe or delete.
 
+**Search.** The box in the title row sends each edit to the server (`CrateSearchPayload`),
+because the server decides what the slots show. The menu then pages through only the matching
+entries, still in crate order. Every word typed must appear in the item's name, its item id or an
+enchantment's name or id (ids without the `minecraft:` namespace). A level word (`v`, `5`) instead
+needs an enchantment of that level matching the word before it, so `sharpness i` doesn't match
+Sharpness V, or that exact word in the name (`strength ii` for potions). Names resolve in the
+server's language, which in singleplayer is the player's own; on a dedicated server non-English
+players should search by id (`sharpness`, `bow`).
+
+Each search carries a generation number that the menu echoes back in a DataSlot. Until the echo
+matches, the screen ignores clicks on crate slots: they still show the old results, while the
+server already maps those positions to the new ones. Clicks also rebuild the matches before
+acting, so a hopper's changes since the last sync can't point a click past the end of the list.
+
 `CrateScreen` draws counts of 1000 and up as `1k`/`1M` and shows the exact count in the tooltip.
 Its texture `textures/gui/container/crate.png` is vanilla's `generic_54` widened by 19px, with
 the creative tab's scrollbar track.

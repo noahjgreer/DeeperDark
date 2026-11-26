@@ -2,10 +2,13 @@ package net.noahsarch.deeperdark.client.screen;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
@@ -13,11 +16,13 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.noahsarch.deeperdark.Deeperdark;
 import net.noahsarch.deeperdark.menu.CrateMenu;
+import net.noahsarch.deeperdark.payload.CrateSearchPayload;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,17 +40,61 @@ public class CrateScreen extends AbstractContainerScreen<CrateMenu> {
     private static final int SCROLL_X = 175, SCROLL_Y = 18, SCROLL_HEIGHT = 108, SCROLLER_WIDTH = 12, SCROLLER_HEIGHT = 15;
     private static final int TOGGLE_X = 174, TOGGLE_Y = 139, TOGGLE_SIZE = 16;
     private static final int TOOLTIP_WIDTH = 170;
+    private static final int LABEL_COLOR = 0xFF404040;
+    private static final int SEARCH_X = 82, SEARCH_Y = 4, SEARCH_WIDTH = 106, SEARCH_HEIGHT = 12;
 
     private int row;
     private boolean scrolling;
+    private EditBox search;
+    // Counts searches sent; DataSlots carry 15 bits, so it wraps there.
+    private int searchGeneration;
 
     public CrateScreen(CrateMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title, 195, 222);
         this.inventoryLabelY = imageHeight - 94;
     }
 
+    @Override
+    protected void init() {
+        super.init();
+        // init runs again on resize; keep what was typed.
+        String query = search == null ? "" : search.getValue();
+        Component label = Component.translatable("container.deeperdark.crate.search");
+        search = new EditBox(font, leftPos + SEARCH_X, topPos + SEARCH_Y, SEARCH_WIDTH, SEARCH_HEIGHT, label);
+        search.setMaxLength(CrateSearchPayload.MAX_LENGTH);
+        search.setHint(label);
+        search.setValue(query);
+        search.setResponder(text -> {
+            row = 0; // the server resets its row on a new search too
+            searchGeneration = (searchGeneration + 1) & 0x7FFF;
+            ClientPlayNetworking.send(new CrateSearchPayload(menu.containerId, text, searchGeneration));
+        });
+        addRenderableWidget(search);
+    }
+
+    @Override
+    public boolean keyPressed(KeyEvent event) {
+        // While typing, keys like E and the hotbar numbers go to the box, not the screen.
+        if (!event.isEscape() && (search.keyPressed(event) || search.canConsumeInput())) return true;
+        return super.keyPressed(event);
+    }
+
+    /** Until the server's results for the latest search arrive, the slots show stale entries. */
+    @Override
+    protected void slotClicked(Slot slot, int slotId, int button, ContainerInput input) {
+        if (slot != null && slot.index < CrateMenu.VISIBLE_SLOTS && menu.getSearchGeneration() != searchGeneration) return;
+        super.slotClicked(slot, slotId, button, input);
+    }
+
+    @Override
+    protected void extractLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+        String title = font.plainSubstrByWidth(this.title.getString(), SEARCH_X - titleLabelX - 2);
+        graphics.text(font, title, titleLabelX, titleLabelY, LABEL_COLOR, false);
+        graphics.text(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, LABEL_COLOR, false);
+    }
+
     private int maxRow() {
-        return CrateMenu.maxScrollRow(menu.getEntryCount());
+        return CrateMenu.maxScrollRow(menu.getMatchCount());
     }
 
     private void scrollTo(int newRow) {
@@ -126,6 +175,8 @@ public class CrateScreen extends AbstractContainerScreen<CrateMenu> {
 
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        // Vanilla never drops focus on a click elsewhere, which would leave E and hotbar keys typing.
+        if (!search.isMouseOver(event.x(), event.y())) setFocused(null);
         if (event.button() == 0 && isHovering(SCROLL_X, SCROLL_Y, SCROLLER_WIDTH, SCROLL_HEIGHT, event.x(), event.y())) {
             scrolling = true;
             dragScroller(event.y());

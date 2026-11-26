@@ -36,6 +36,7 @@
   "block.deeperdark.crate": "Crate",
   "container.deeperdark.crate": "Crate",
   "container.deeperdark.crate.stored": "Stored: %s",
+  "container.deeperdark.crate.search": "Search",
   "container.deeperdark.crate.auto_merge.on": "Auto-merge: On",
   "container.deeperdark.crate.auto_merge.off": "Auto-merge: Off",
   "container.deeperdark.crate.auto_merge.desc": "Damaged items with no enchantments or other changes combine as they go in, like repairing them in a crafting grid.",
