@@ -29,6 +29,7 @@ import net.minecraft.resources.Identifier;
 import net.noahsarch.deeperdark.client.renderer.CreatureEntityRenderer;
 import net.noahsarch.deeperdark.client.renderer.PrimedDynamiteRenderer;
 import net.noahsarch.deeperdark.client.renderer.SaddlePlayerLayer;
+import net.noahsarch.deeperdark.client.renderer.CrateBlockEntityRenderer;
 import net.noahsarch.deeperdark.client.renderer.VaultBlockEntityRenderer;
 import net.noahsarch.deeperdark.client.renderer.VaultItemSpecialRenderer;
 import net.minecraft.client.Minecraft;
@@ -80,6 +81,7 @@ public class DeeperDarkClient implements ClientModInitializer {
         MenuScreens.register(ModMenus.CRATE, CrateScreen::new);
 
         BlockEntityRenderers.register(ModBlockEntities.VAULT, VaultBlockEntityRenderer::new);
+        BlockEntityRenderers.register(ModBlockEntities.CRATE, CrateBlockEntityRenderer::new);
         SpecialModelRenderers.ID_MAPPER.put(
             Identifier.fromNamespaceAndPath(Deeperdark.MOD_ID, "vault"),
             VaultItemSpecialRenderer.Unbaked.MAP_CODEC

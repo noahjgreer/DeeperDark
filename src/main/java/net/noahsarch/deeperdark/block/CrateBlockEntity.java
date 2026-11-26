@@ -1,6 +1,12 @@
 package net.noahsarch.deeperdark.block;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponents;
@@ -15,6 +21,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
@@ -48,12 +55,20 @@ public class CrateBlockEntity extends BlockEntity implements MenuProvider {
     final CrateStorage storage = new CrateStorage(this);
     private boolean autoMerge;
     private int openCount;
+    // The best entry, as last sent to clients for the labels on the block's faces.
+    private ItemStack shown = ItemStack.EMPTY;
 
     public CrateBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CRATE, pos, state);
     }
 
     public int getEntryCount() { return entries.size(); }
+
+    public ItemStack getShown() { return shown; }
+
+    private ItemStack best() {
+        return entries.isEmpty() ? ItemStack.EMPTY : entries.getFirst().representative;
+    }
 
     public boolean isAutoMerge() { return autoMerge; }
 
@@ -202,6 +217,29 @@ public class CrateBlockEntity extends BlockEntity implements MenuProvider {
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
         setContents(input.read("contents", CrateContents.CODEC).orElse(CrateContents.EMPTY));
+        // Only the client's update tag carries it; a save from disk recomputes it.
+        shown = input.read("shown", ItemStack.OPTIONAL_CODEC).orElseGet(() -> best().copy());
+    }
+
+    @Override
+    public void setChanged() {
+        super.setChanged();
+        if (level == null || level.isClientSide() || ItemStack.matches(best(), shown)) return;
+        shown = best().copy();
+        level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+    }
+
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    // Just the label, never the contents. Written even when empty so an emptied crate clears its label.
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        CompoundTag tag = new CompoundTag();
+        tag.store("shown", ItemStack.OPTIONAL_CODEC, registries.createSerializationContext(NbtOps.INSTANCE), shown);
+        return tag;
     }
 
     @Override

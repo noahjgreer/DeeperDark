@@ -65,9 +65,17 @@ handles every click on those slots itself (the client doesn't predict them):
 Its texture `textures/gui/container/crate.png` is vanilla's `generic_54` widened by 19px, with
 the creative tab's scrollbar track.
 
+## Labels
+
+Every face not against a solid block shows a blank map (vanilla's `map_background.png`, as drawn
+for a held map) with the crate's best entry on it, in the item-frame (`FIXED`) pose
+(`CrateBlockEntityRenderer`). The crate is opaque, so each label takes its light from the block in
+front of it. Clients never get the contents: `getUpdateTag` carries only that one item (`shown`),
+and `setChanged` sends an update only when the best entry changes. The tag is written even for an
+empty crate, so emptying a crate clears its labels.
+
 ## Known limits
 
 - The crate can't yet be opened or filled as an item (vault-style right-click in air, open key,
   cursor insert).
-- The locked item isn't shown on the block yet.
 - The creative-mode break drops nothing, like vaults.
