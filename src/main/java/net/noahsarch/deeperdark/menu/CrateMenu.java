@@ -61,7 +61,8 @@ public class CrateMenu extends AbstractContainerMenu {
                 });
             }
         }
-        addStandardInventorySlots(inventory, 8, 18 + VISIBLE_ROWS * 18 + 13);
+        // One lower than ChestMenu: crate.png doesn't shift its inventory half up a pixel as ContainerScreen does.
+        addStandardInventorySlots(inventory, 8, 18 + VISIBLE_ROWS * 18 + 14);
         addDataSlot(matchCount);
         addDataSlot(autoMerge);
         addDataSlot(searchGeneration);

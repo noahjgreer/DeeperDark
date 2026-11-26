@@ -43,7 +43,7 @@ import java.util.List;
 public class CrateBlockEntity extends BlockEntity implements MenuProvider {
 
     // Distinct variants each carry their own NBT, so this bounds the chunk and the crate item.
-    public static final int MAX_ENTRIES = 128;
+    public static final int MAX_ENTRIES = 256;
 
     // Best first: more enchantment levels, then more durability left.
     private static final Comparator<ItemStack> ORDER = Comparator

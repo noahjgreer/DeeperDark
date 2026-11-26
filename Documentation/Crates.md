@@ -9,7 +9,7 @@ bows would each take a vault entry. Crafted from 4 iron ingots, 4 planks and an 
 - **Lock.** The first item in claims the crate for that exact item (`stack.is(item)`). Any variant
   of it goes in. An emptied crate accepts anything again.
 - **Entries.** Identical variants share one entry with a count (`VaultBlockEntity.VaultEntry`,
-  reused). The crate holds at most `MAX_ENTRIES` (128) distinct entries. Every distinct variant
+  reused). The crate holds at most `MAX_ENTRIES` (256) distinct entries. Every distinct variant
   carries its own NBT, so the cap bounds both the chunk data and the crate item.
 - **Order.** Entries are kept sorted best first: more enchantment levels (stored ones for books),
   then more durability left. Ties keep insertion order. The menu shows this order. Hoppers take

@@ -5,7 +5,7 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.input.KeyEvent;
@@ -34,11 +34,9 @@ public class CrateScreen extends AbstractContainerScreen<CrateMenu> {
         Deeperdark.MOD_ID, "textures/gui/container/crate.png");
     private static final Identifier SCROLLER = Identifier.withDefaultNamespace("container/creative_inventory/scroller");
     private static final Identifier SCROLLER_DISABLED = Identifier.withDefaultNamespace("container/creative_inventory/scroller_disabled");
-    private static final Identifier BUTTON = Identifier.withDefaultNamespace("widget/button");
-    private static final Identifier BUTTON_HIGHLIGHTED = Identifier.withDefaultNamespace("widget/button_highlighted");
 
     private static final int SCROLL_X = 175, SCROLL_Y = 18, SCROLL_HEIGHT = 108, SCROLLER_WIDTH = 12, SCROLLER_HEIGHT = 15;
-    private static final int TOGGLE_X = 174, TOGGLE_Y = 139, TOGGLE_SIZE = 16;
+    private static final int TOGGLE_X = 174, TOGGLE_Y = 140, TOGGLE_SIZE = 16;
     private static final int TOOLTIP_WIDTH = 170;
     private static final int LABEL_COLOR = 0xFF404040;
     private static final int SEARCH_X = 82, SEARCH_Y = 4, SEARCH_WIDTH = 106, SEARCH_HEIGHT = 12;
@@ -46,6 +44,7 @@ public class CrateScreen extends AbstractContainerScreen<CrateMenu> {
     private int row;
     private boolean scrolling;
     private EditBox search;
+    private Button autoMergeButton;
     // Counts searches sent; DataSlots carry 15 bits, so it wraps there.
     private int searchGeneration;
 
@@ -70,6 +69,13 @@ public class CrateScreen extends AbstractContainerScreen<CrateMenu> {
             ClientPlayNetworking.send(new CrateSearchPayload(menu.containerId, text, searchGeneration));
         });
         addRenderableWidget(search);
+        // Empty message: the button is too small for text, so it shows an icon and narrates the name.
+        autoMergeButton = addRenderableWidget(Button.builder(Component.empty(),
+                button -> minecraft.gameMode.handleInventoryButtonClick(menu.containerId, CrateMenu.TOGGLE_AUTO_MERGE_BUTTON))
+            .bounds(leftPos + TOGGLE_X, topPos + TOGGLE_Y, TOGGLE_SIZE, TOGGLE_SIZE)
+            .createNarration(defaultNarration -> Component.translatable(menu.isAutoMerge()
+                ? "container.deeperdark.crate.auto_merge.on" : "container.deeperdark.crate.auto_merge.off"))
+            .build());
     }
 
     @Override
@@ -115,10 +121,13 @@ public class CrateScreen extends AbstractContainerScreen<CrateMenu> {
         int scrollerY = max == 0 ? 0 : (SCROLL_HEIGHT - SCROLLER_HEIGHT) * row / max;
         graphics.blitSprite(RenderPipelines.GUI_TEXTURED, max == 0 ? SCROLLER_DISABLED : SCROLLER,
             leftPos + SCROLL_X, topPos + SCROLL_Y + scrollerY, SCROLLER_WIDTH, SCROLLER_HEIGHT);
+    }
 
-        boolean hovered = isHovering(TOGGLE_X, TOGGLE_Y, TOGGLE_SIZE, TOGGLE_SIZE, mouseX, mouseY);
-        int x = leftPos + TOGGLE_X, y = topPos + TOGGLE_Y;
-        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, hovered ? BUTTON_HIGHLIGHTED : BUTTON, x, y, TOGGLE_SIZE, TOGGLE_SIZE);
+    @Override
+    public void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+        super.extractContents(graphics, mouseX, mouseY, delta);
+        // After super, which draws the widgets, so the icon sits on the button.
+        int x = autoMergeButton.getX(), y = autoMergeButton.getY();
         var pose = graphics.pose();
         pose.pushMatrix();
         pose.translate(x + 2, y + 2);
@@ -126,12 +135,7 @@ public class CrateScreen extends AbstractContainerScreen<CrateMenu> {
         graphics.item(new ItemStack(Items.GRINDSTONE), 0, 0);
         pose.popMatrix();
         if (!menu.isAutoMerge()) graphics.fill(x + 1, y + 1, x + TOGGLE_SIZE - 1, y + TOGGLE_SIZE - 1, 0xA0303030);
-    }
-
-    @Override
-    public void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
-        super.extractContents(graphics, mouseX, mouseY, delta);
-        if (isHovering(TOGGLE_X, TOGGLE_Y, TOGGLE_SIZE, TOGGLE_SIZE, mouseX, mouseY)) {
+        if (autoMergeButton.isHovered()) {
             List<FormattedCharSequence> lines = new ArrayList<>();
             lines.add(Component.translatable(menu.isAutoMerge()
                 ? "container.deeperdark.crate.auto_merge.on" : "container.deeperdark.crate.auto_merge.off").getVisualOrderText());
@@ -180,11 +184,6 @@ public class CrateScreen extends AbstractContainerScreen<CrateMenu> {
         if (event.button() == 0 && isHovering(SCROLL_X, SCROLL_Y, SCROLLER_WIDTH, SCROLL_HEIGHT, event.x(), event.y())) {
             scrolling = true;
             dragScroller(event.y());
-            return true;
-        }
-        if (event.button() == 0 && isHovering(TOGGLE_X, TOGGLE_Y, TOGGLE_SIZE, TOGGLE_SIZE, event.x(), event.y())) {
-            AbstractWidget.playButtonClickSound(minecraft.getSoundManager());
-            minecraft.gameMode.handleInventoryButtonClick(menu.containerId, CrateMenu.TOGGLE_AUTO_MERGE_BUTTON);
             return true;
         }
         return super.mouseClicked(event, doubleClick);
