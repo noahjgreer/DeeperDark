@@ -54,10 +54,10 @@ public final class ContainerItemUtil {
     public static final int VAULT_TIER = 2;
     public static final int SHULKER_TIER = 3;
 
-    /** A stack's tier as content: shulker 3, vault 2, box 1, anything else 0. */
+    /** A stack's tier as content: shulker 3, vault or crate 2, box 1, anything else 0. */
     public static int tier(ItemStack stack) {
         if (stack.is(ItemTags.SHULKER_BOXES)) return SHULKER_TIER;
-        if (isVaultItem(stack)) return VAULT_TIER;
+        if (isVaultItem(stack) || stack.is(ModBlocks.CRATE.asItem())) return VAULT_TIER;
         return getContainerSize(stack) >= 0 ? BOX_TIER : 0;
     }
 

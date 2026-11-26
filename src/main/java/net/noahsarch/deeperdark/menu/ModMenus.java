@@ -51,6 +51,8 @@ public class ModMenus {
         ModMenus::createLargeVaultMenu
     );
 
+    public static final MenuType<CrateMenu> CRATE = register("crate", CrateMenu::new);
+
     private static CollarBenchMenu createCollarBenchMenu(int containerId, Inventory inventory) {
         return new CollarBenchMenu(COLLAR_BENCH, containerId, inventory, new SimpleContainer(2));
     }

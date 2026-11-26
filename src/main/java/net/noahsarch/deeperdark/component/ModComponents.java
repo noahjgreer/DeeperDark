@@ -5,6 +5,7 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.noahsarch.deeperdark.Deeperdark;
+import net.noahsarch.deeperdark.block.CrateContents;
 import net.noahsarch.deeperdark.block.VaultBlockEntity;
 
 import java.util.List;
@@ -28,6 +29,15 @@ public class ModComponents {
         DataComponentType.<List<VaultBlockEntity.VaultEntry>>builder()
             .persistent(VaultBlockEntity.ENTRY_CODEC.listOf())
             .networkSynchronized(VaultBlockEntity.ENTRIES_STREAM_CODEC)
+            .build()
+    );
+
+    public static final DataComponentType<CrateContents> CRATE_CONTENTS = Registry.register(
+        BuiltInRegistries.DATA_COMPONENT_TYPE,
+        Identifier.fromNamespaceAndPath(Deeperdark.MOD_ID, "crate_contents"),
+        DataComponentType.<CrateContents>builder()
+            .persistent(CrateContents.CODEC)
+            .networkSynchronized(CrateContents.STREAM_CODEC)
             .build()
     );
 

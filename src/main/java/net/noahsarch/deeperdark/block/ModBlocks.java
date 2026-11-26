@@ -28,6 +28,8 @@ import net.minecraft.world.level.block.WallBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
+import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 import net.noahsarch.deeperdark.Deeperdark;
 import net.noahsarch.deeperdark.sound.ModSoundType;
@@ -56,6 +58,15 @@ public class ModBlocks {
                         .component(DataComponents.TOOLTIP_DISPLAY,
                                 TooltipDisplay.DEFAULT.withHidden(DataComponents.CONTAINER, true)));
         Registry.register(BuiltInRegistries.ITEM, itemKey, vaultItem);
+        return Registry.register(BuiltInRegistries.BLOCK, blockKey, block);
+    }
+
+    private static Block registerCrateBlock(String name, BlockBehaviour.Properties settings) {
+        ResourceKey<Block> blockKey = keyOfBlock(name);
+        Block block = new CrateBlock(settings.setId(blockKey));
+        ResourceKey<Item> itemKey = keyOfItem(name);
+        Registry.register(BuiltInRegistries.ITEM, itemKey,
+                new CrateItem(block, new Item.Properties().setId(itemKey).useBlockDescriptionPrefix().stacksTo(1)));
         return Registry.register(BuiltInRegistries.BLOCK, blockKey, block);
     }
 
@@ -181,6 +192,7 @@ public class ModBlocks {
             content.accept(SMALL_ITEM_VAULT);
             content.accept(MEDIUM_ITEM_VAULT);
             content.accept(LARGE_ITEM_VAULT);
+            content.accept(CRATE);
         });
 
         Block[] copperRails = {
@@ -385,6 +397,16 @@ public class ModBlocks {
                     .sound(VaultBlock.VAULT_SOUND_TYPE)
                     .lightLevel(state -> 15)
                     .noOcclusion());
+
+    // Barrel's properties.
+    public static final Block CRATE = registerCrateBlock(
+            "crate",
+            BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.WOOD)
+                    .instrument(NoteBlockInstrument.BASS)
+                    .strength(2.5F)
+                    .sound(SoundType.WOOD)
+                    .ignitedByLava());
 
     public static final Block COLLAR_BENCH = register(
             "collarbench",

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "P": "#minecraft:planks",
+    "F": "minecraft:item_frame"
+  },
+  "pattern": [
+    "IPI",
+    "PFP",
+    "IPI"
+  ],
+  "result": {
+    "id": "deeperdark:crate",
+    "count": 1
+  }
+}

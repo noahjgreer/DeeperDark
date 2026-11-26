@@ -35,6 +35,7 @@ import net.minecraft.client.Minecraft;
 import net.noahsarch.deeperdark.client.screen.BoxScreen;
 import net.noahsarch.deeperdark.client.screen.ConfigScreen;
 import net.noahsarch.deeperdark.payload.ConfigMenuPayload;
+import net.noahsarch.deeperdark.client.screen.CrateScreen;
 import net.noahsarch.deeperdark.client.screen.VaultScreen;
 import net.noahsarch.deeperdark.entity.ModEntities;
 import net.noahsarch.deeperdark.client.ContainerItemKeyHandler;
@@ -76,6 +77,7 @@ public class DeeperDarkClient implements ClientModInitializer {
         MenuScreens.register(ModMenus.SMALL_VAULT, VaultScreen::new);
         MenuScreens.register(ModMenus.MEDIUM_VAULT, VaultScreen::new);
         MenuScreens.register(ModMenus.LARGE_VAULT, VaultScreen::new);
+        MenuScreens.register(ModMenus.CRATE, CrateScreen::new);
 
         BlockEntityRenderers.register(ModBlockEntities.VAULT, VaultBlockEntityRenderer::new);
         SpecialModelRenderers.ID_MAPPER.put(

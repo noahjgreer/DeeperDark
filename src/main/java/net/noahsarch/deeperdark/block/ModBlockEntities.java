@@ -1,6 +1,7 @@
 package net.noahsarch.deeperdark.block;
 
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
@@ -39,7 +40,14 @@ public class ModBlockEntities {
         ).build()
     );
 
+    public static final BlockEntityType<CrateBlockEntity> CRATE = Registry.register(
+        BuiltInRegistries.BLOCK_ENTITY_TYPE,
+        Identifier.fromNamespaceAndPath(Deeperdark.MOD_ID, "crate"),
+        FabricBlockEntityTypeBuilder.create(CrateBlockEntity::new, ModBlocks.CRATE).build()
+    );
+
     public static void initialize() {
         Deeperdark.LOGGER.info("Registering ModBlockEntities for deeperdark");
+        ItemStorage.SIDED.registerForBlockEntity((crate, direction) -> crate.storage, CRATE);
     }
 }

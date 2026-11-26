@@ -37,11 +37,12 @@ each tick from the inventory of any player who has no menu open.
 One rule, `ContainerItemUtil.canStore(tier, stack)`, whether the container is placed or opened
 as an item, for menu slots, right-click inserts and hoppers into boxes and vaults (vanilla's
 hopper check for placed shulker boxes already refuses exactly shulker boxes). Containers are tiered
-shulker box 3 > vault 2 > box 1 > anything else 0, and a container only holds lower tiers:
+shulker box 3 > vault or crate 2 > box 1 > anything else 0, and a container only holds lower tiers
+(crates, `Documentation/Crates.md`, can't be opened as items yet):
 
 - Shulker box: anything except shulker boxes.
-- Vault: no vaults or shulker boxes.
-- Box: no boxes, vaults or shulker boxes.
+- Vault and crate: no vaults, crates or shulker boxes.
+- Box: no boxes, vaults, crates or shulker boxes.
 - Ender chest: anything not open (an ender chest item carries no contents itself).
 
 The strict ordering keeps nesting finite; a box↔vault or box↔bundle loop could grow NBT without
