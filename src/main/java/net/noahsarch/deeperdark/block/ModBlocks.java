@@ -405,7 +405,7 @@ public class ModBlocks {
                     .mapColor(MapColor.WOOD)
                     .instrument(NoteBlockInstrument.BASS)
                     .strength(2.5F)
-                    .sound(CrateBlock.SOUND_TYPE)
+                    .sound(SoundType.WOOD)
                     .ignitedByLava());
 
     public static final Block COLLAR_BENCH = register(

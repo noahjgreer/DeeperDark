@@ -10,6 +10,7 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
@@ -20,7 +21,6 @@ import net.noahsarch.deeperdark.menu.CrateMenu;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Environment(EnvType.CLIENT)
 public class CrateScreen extends AbstractContainerScreen<CrateMenu> {
@@ -34,6 +34,7 @@ public class CrateScreen extends AbstractContainerScreen<CrateMenu> {
 
     private static final int SCROLL_X = 175, SCROLL_Y = 18, SCROLL_HEIGHT = 108, SCROLLER_WIDTH = 12, SCROLLER_HEIGHT = 15;
     private static final int TOGGLE_X = 174, TOGGLE_Y = 139, TOGGLE_SIZE = 16;
+    private static final int TOOLTIP_WIDTH = 170;
 
     private int row;
     private boolean scrolling;
@@ -82,11 +83,12 @@ public class CrateScreen extends AbstractContainerScreen<CrateMenu> {
     public void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
         super.extractContents(graphics, mouseX, mouseY, delta);
         if (isHovering(TOGGLE_X, TOGGLE_Y, TOGGLE_SIZE, TOGGLE_SIZE, mouseX, mouseY)) {
-            List<Component> lines = List.of(
-                Component.translatable(menu.isAutoMerge()
-                    ? "container.deeperdark.crate.auto_merge.on" : "container.deeperdark.crate.auto_merge.off"),
-                Component.translatable("container.deeperdark.crate.auto_merge.desc").withStyle(ChatFormatting.GRAY));
-            graphics.setTooltipForNextFrame(font, lines, Optional.empty(), mouseX, mouseY);
+            List<FormattedCharSequence> lines = new ArrayList<>();
+            lines.add(Component.translatable(menu.isAutoMerge()
+                ? "container.deeperdark.crate.auto_merge.on" : "container.deeperdark.crate.auto_merge.off").getVisualOrderText());
+            lines.addAll(font.split(Component.translatable("container.deeperdark.crate.auto_merge.desc")
+                .withStyle(ChatFormatting.GRAY), TOOLTIP_WIDTH));
+            graphics.setTooltipForNextFrame(lines, mouseX, mouseY);
         }
     }
 
